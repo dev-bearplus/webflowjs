@@ -427,6 +427,8 @@ const mainScript = () => {
         }
         setup() {
             if(viewport.w > 991) {
+                this.initContentPopup();
+                activeItem(['.home-senses-menu-item'], 0);
                 let listBg = $(".home-senses-bg-item");
                 let listItemMenu = ['.home-senses-menu-item'];
                 let triggered = new Array(listBg.length).fill(false);
@@ -521,7 +523,7 @@ const mainScript = () => {
                         let indexActive = $('.home-senses-menu-item.active').index();
                         activeItem(['.home-popup-item'], indexActive);
                         $('.global-popup-wrap').addClass('has-popup');
-                        // header.hideMenu();
+                        lenis.stop();
                         cursor.reset();
                     }
                 })
@@ -558,6 +560,45 @@ const mainScript = () => {
                     }
                 }
             })
+            $('.home-popup-item-left-inner').on('click', '.home-popup-item-left-content', function(e) {
+                e.preventDefault();
+                $('.home-popup-item-left-content').removeClass('active');
+                $(this).addClass('active');
+                let dataHeader = $(this).attr('data-title');
+                var scrollTop =  $('.home-popup-item').scrollTop() + $(`.service-hero-popup-content-txt h6[data-title="${dataHeader}"]`).offset().top  - parseFloat($('.service-hero-popup-menu-inner').css('top'));
+                console.log(scrollTop )
+                $('.home-popup-item.active').animate({
+                    scrollTop: scrollTop
+                }, 2000);
+            })
+        }
+        initContentPopup() {
+            let iframeSpotifySrc ='https://open.spotify.com/embed/playlist/1bhxiHUsBUQPTaYOyt8gUi?utm_source=generator&theme=0'
+            let titleLeft = $('.home-popup-item-left-content').eq(0).clone();
+            $('.home-popup-item-left-content').remove();
+            $('.home-popup-item').each((idx, item) => {
+                $(item).find('.home-popup-item-content h6').each((i, el) => {
+                    $(el).attr('data-title', `toch-${i}`);
+                    let titleLeftClone = titleLeft.clone();
+                    if(i == 0) {
+                        titleLeftClone.addClass('active');
+                    }
+                    titleLeftClone.find('.home-popup-item-left-title').text($(el).text());
+                    titleLeftClone.attr('data-title', `toch-${i}`);
+                    $(item).find('.home-popup-item-left-inner').append(titleLeftClone);
+                })
+                $(item).find('a').each((i, el) => {
+                    let href = $(el).attr('href');
+                    if(href.includes('spotify-embed')) {
+                        $(el).closest('p').addClass('spotify-embed-wrap');
+                        $(el)
+                        console.log($(el).closest('p'));
+                        $(el).replaceWith(`<iframe src="${iframeSpotifySrc}" width="100%" height="400px" frameborder="0" clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`);
+                        
+                    }
+                })
+            })
+
         }
     }
     let homeSenses = new HomeSenses(".home-senses-wrap");
@@ -1265,7 +1306,6 @@ const mainScript = () => {
             })
         }
         ItemContentActiveCheck(el) {
-            console.log('khanh')
             for (let i = 0; i < $(el).length; i++) {
                 let top = $(el).eq(i).get(0).getBoundingClientRect().top;
                 console.log(top)
@@ -2096,44 +2136,66 @@ const mainScript = () => {
             this.tl.play();
         }
         interact() {
-            viewport.w> 991 && $(".header-menu-title-wrap").on("click", (e) =>  {
-                e.preventDefault();
-                if($('.header-menu-inner').hasClass('active')){
-                    $('.header').removeClass('on-white');
-                    $('.header-menu-inner').removeClass('active');
-                    gsap.to('.header-menu-title.close .word', {duration: .8, y: "-100%", stagger: 0.015, ease: "power2.out"});
-                    gsap.to('.header-menu-title.open .word', {duration: .8, y: "0%", stagger: 0.015, ease: "power2.out"});
-                }
-                else {
-                    $('.header-menu-inner').addClass('active');
-                    $('.header').addClass('on-white')
-                    gsap.to('.header-menu-title.close .word', {duration: .8, y: "0%", stagger: 0.015, ease: "power2.out"});
-                    gsap.to('.header-menu-title.open .word', {duration: .8, y: "100%", stagger: 0.015, ease: "power2.out"});
-                }
-            });
-            viewport.w < 991 && $(".header-menu-title-wrap").on("click", (e) => {
-                console.log('click');   
-                e.preventDefault();
-                if($('.header-menu-inner').hasClass('active')){
-                    
-                    $('.header-menu-inner').removeClass('active');
-                    gsap.to('.header-menu-title.close .word', {duration: .8, y: "100%", stagger: 0.015, ease: "power2.out"});
-                    gsap.to('.header-menu-title.open .word', {duration: .8, y: "0%", stagger: 0.015, ease: "power2.out"});
-                    this.deactiveMenuTablet();
-                }
-                else {
-                    $('.header-menu-inner').addClass('active');
-                    $('.header-menu-inner').addClass('active');
-                    gsap.to('.header-menu-title.close .word', {duration: .8, y: "0%", stagger: 0.015, ease: "power2.out"});
-                    gsap.to('.header-menu-title.open .word', {duration: .8, y: "-100%", stagger: 0.015, ease: "power2.out"});
-                    this.activeMenuTablet();
-                }
-            })
+            if (viewport.w > 991) {
+                const $menuWrap = $(".header-menu-title-wrap");
+                const $menuInner = $(".header-menu-inner");
+                const $header = $(".header");
+            
+                const openMenu = () => {
+                    $header.addClass("on-show-menu on-white");
+                    $menuInner.addClass("active");
+                    gsap.to(".header-menu-title.close .word", { duration: 0.8, y: "0%", stagger: 0.015, ease: "power2.out" });
+                    gsap.to(".header-menu-title.open .word", { duration: 0.8, y: "100%", stagger: 0.015, ease: "power2.out" });
+                };
+            
+                const closeMenu = () => {
+                    $header.removeClass("on-show-menu");
+                    header.toggleWhiteMode();
+                    $menuInner.removeClass("active");
+                    gsap.to(".header-menu-title.close .word", { duration: 0.8, y: "-100%", stagger: 0.015, ease: "power2.out" });
+                    gsap.to(".header-menu-title.open .word", { duration: 0.8, y: "0%", stagger: 0.015, ease: "power2.out" });
+                };
+            
+                $menuWrap.on("click", function (e) {
+                    e.preventDefault();
+                    $menuInner.hasClass("active") ? closeMenu() : openMenu();
+                });
+            
+                // Gán một lần duy nhất
+                $(document).on("click", function (e) {
+                    if (
+                        !$menuInner.is(e.target) && $menuInner.has(e.target).length === 0 &&
+                        !$menuWrap.is(e.target) && $menuWrap.has(e.target).length === 0 &&
+                        $menuInner.hasClass("active")
+                    ) {
+                        closeMenu();
+                    }
+                });
+            }
+            else {
+                $(".header-menu-title-wrap").on("click", (e) => {
+                    console.log('click');   
+                    e.preventDefault();
+                    if($('.header-menu-inner').hasClass('active')){
+                        
+                        $('.header-menu-inner').removeClass('active');
+                        gsap.to('.header-menu-title.close .word', {duration: .8, y: "100%", stagger: 0.015, ease: "power2.out"});
+                        gsap.to('.header-menu-title.open .word', {duration: .8, y: "0%", stagger: 0.015, ease: "power2.out"});
+                        this.deactiveMenuTablet();
+                    }
+                    else {
+                        $('.header-menu-inner').addClass('active');
+                        $('.header-menu-inner').addClass('active');
+                        gsap.to('.header-menu-title.close .word', {duration: .8, y: "0%", stagger: 0.015, ease: "power2.out"});
+                        gsap.to('.header-menu-title.open .word', {duration: .8, y: "-100%", stagger: 0.015, ease: "power2.out"});
+                        this.activeMenuTablet();
+                    }
+                })
+            }
             $('.header-lang-title-wrap').on('click', (e) => {
                 e.preventDefault();
                 $('.header-lang').toggleClass('active');
                 this.toggleLang();
-                
             })
         }
         toggleLang(){
@@ -2162,7 +2224,7 @@ const mainScript = () => {
             gsap.fromTo('.header-menu-list',{scale: 1}, {duration: 1, scale: .8, ease: "circ.inOut"});
             // gsap.fromTo('.header-menu-bot',{scale: 1}, {duration: .8, scale: .8, ease: "circ.inOut"});
             gsap.fromTo('.header-menu-inner',{clipPath: 'polygon(0% 0%, 100% 0, 100% 100%, 0% 100%)'}, {duration: 1, clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)', ease: "circ.inOut", onComplete: () => {
-                $('.header').removeClass('on-mode');
+            $('.header').removeClass('on-mode');
             }, onUpdate: function() {
                 if(this.progress() > .7){
                     header.toggleWhiteMode();
@@ -2181,25 +2243,28 @@ const mainScript = () => {
             let elArr = Array.from($('[data-section="white"]'));
             if (elArr.some(function (el) { return isInHeaderCheck(el) })) {
                 $('.header').addClass('on-white');
-            } else {
+            } 
+            else if( !$('.header').hasClass('on-show-menu')) {
                 $('.header').removeClass('on-white');
             }
         }
-        toggleOnHide = () => {
-            let elArr = Array.from($('.footer-wrap'));
-            if (elArr.some(function (el) { return isInHeaderCheckNoHeight(el) })) {
-                $('.header').addClass('on-hide');
-            } else {
-                $('.header').removeClass('on-hide');
-            }
-            function isInHeaderCheckNoHeight(el) {
-                const rect = $(el).get(0).getBoundingClientRect();
-                const headerRect = $('.header').get(0).getBoundingClientRect();
-                return (
-                    rect.bottom >= 0 &&
-                    rect.top - headerRect.height  <= 0
-                );
-            }
+        toggleOnHide = (inst) => {
+            const scrollTop = document.documentElement.scrollTop || window.scrollY;
+            const $header = $('.header');
+            const isScrollHeader = scrollTop > $('.header').height() * (viewport.w > 767 ? 4 : 1.5) && !$header.hasClass('on-show-menu');
+            let debounceTimer;
+            debounceTimer && clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                if (isScrollHeader) {
+                    if (inst.direction >= 1) {
+                        $header.addClass('on-hide');
+                    } else {
+                        $header.removeClass('on-hide');
+                    }
+                } else {
+                    $header.removeClass('on-hide');
+                }
+            }, 100);
         }
     }
     const header = new Header('.header'); 
@@ -2297,11 +2362,10 @@ const mainScript = () => {
 
         header.toggleOnScroll(lenis);
         header.toggleWhiteMode();
-        let isScrolling = $('.main').attr('data-header')== 'no-hide'? false : true;
         lenis.on("scroll", function (inst) {
-            isScrolling && header.toggleOnScroll(inst);
             header.toggleWhiteMode();
-            header.toggleOnHide();
+            header.toggleOnScroll(lenis);
+            header.toggleOnHide(inst);
         });
     };
     /** (💡)  - START PAGE */
