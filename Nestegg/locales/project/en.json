@@ -1,0 +1,24 @@
+{
+    "btn_viewCase": "View full case",
+    "relatedCase": "Related case",
+    "codesphere": {
+        "heading": "Streamlining Deployment for Efficiency",
+        "sub": "We focus on optimizing the user experience of IDE, from Git to deployment processes as well as its marketplace. Through extensive research, iterative prototyping, and user testing, we refined the software interface to simplify deployment procedures significantly, ultimately enhancing their productivity and reducing time-to-market.",
+        "desc": "We conducted in-depth user research, engaging with CTOs, Tech leads, senior developers, project managers, and stakeholders to understand their pain points and requirements thoroughly. \nIn the UX phase, our focus was on intuitive workflows and seamless interactions, ensuring that users could quickly configure deployment settings, manage integrations from the marketplace, and easily access to uptime monitoring.\nIn the UI phase, we crafted a cohesive design system, incorporating intuitively visual cues and affordances to guide users through the software. We made complex deployment configurations straightforward and accessible."
+    },
+    "gentlenero": {
+        "heading": "Timeless Elegance: Bespoke Tailoring Chronicles",
+        "sub": "Through a harmonious blend of classic aesthetics and modern usability, we crafted a user interface that reflected the sophistication and timeless charm of bespoke suits. Our design choices aimed at not only representing the brand's heritage but also creating an immersive online environment where visitors could appreciate the tradition and quality synonymous with bespoke tailoring.",
+        "desc": "We embarked on a creative journey to capture the essence of a long-standing tradition in bespoke suit tailoring in Germany. Our approach was rooted in preserving the legacy while infusing a sense of contemporary elegance into the online experience.\nThrough extensive research and empathetic understanding of the tailor's craft, we curated a visual narrative that celebrated the artistry and heritage of bespoke tailoring. We meticulously designed the website's layout, ensuring seamless navigation and intuitive user interactions.\nThrough a harmonious blend of classic aesthetics and modern usability, we crafted a user interface that reflected the sophistication and timeless charm of bespoke suits. Our design choices aimed at not only representing the brand's heritage but also creating an immersive online environment where visitors could appreciate the tradition and quality synonymous with bespoke tailoring."
+    },
+    "metaspets": {
+        "heading": "Play-to-earn: a NFT strategic game",
+        "sub": "We conceptualized and designed a user interface that seamlessly integrated real-time gameplay with the unique features of non-fungible tokens. We crafted immersive visual story that attracted players to eagerly register for beta release. Our goal was to deliver not just a game but an unique digital universe experience where strategy, technology, and creativity converged to redefine the gaming landscape.",
+        "desc": "Our design approach focused on marrying the intricate world of real-time strategy gaming with the innovative realm of blockchain technology and NFTs. Through extensive research and collaboration with developers, we conceptualized and designed a user interface that seamlessly integrated real-time gameplay with the unique features of non-fungible tokens.\nWe crafted immersive visual story that attracted players to eagerly register for beta release. Our goal was to deliver not just a game but an unique digital universe experience where strategy, technology, and creativity converged to redefine the gaming landscape."
+    },
+    "cargokite": {
+        "heading": "Revolutionizing ocean transport & logistic",
+        "sub": "CargoKite is a maritime hard tech firm. The company specializes in offering small autonomous micro ships powered by wind energy to work in commercial freight shipping.",
+        "desc": "CargoKite is a maritime hard tech company based in Munich, Germany. The company was founded in 2022 with the mission of sustainable and at the same time economically viable commercial shipping. \nNestegg was assigned the task of re-envisioning the website. Our focus is to craft an interactive platform that seamlessly delivers information, showcasing CargoKite's futuristic vision and cutting-edge technology in an intuitive and engaging manner."
+    }
+}

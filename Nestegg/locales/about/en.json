@@ -1,0 +1,37 @@
+{
+    "meta": {
+        "title": "About us"
+    },
+    "hero": {
+        "heading_letter_1": "A",
+        "heading_letter_2": "b",
+        "heading_letter_3": "o",
+        "heading_letter_4": "u",
+        "heading_letter_5": "t",
+        "sub": "Little by little, the bird makes its nest."
+    },
+    "intro": {
+        "sub_1": "As the proverb goes, Nestegg dedicates our time to carefully craft even the tiniest details, resulting in a substantial word-of-mouth effect that brings satisfaction to your users.",
+        "sub_2": "Established in 2022 in Germany, our dynamic team comprises seasoned designers and developers proficient in a wide range of disciplines, including UX/UI, branding, motion design, 3D modeling, and website development."
+    },
+    "process": {
+        "big_title": "Our process",
+        "sub": "Our approach is all about efficiency. We navigate and conquer organizational challenges, ultimately paving the way for the products of the future.",
+        "step_1": {
+            "title": "Research",
+            "desc": "Our primary goal is to get a clear picture of user preferences, pain points, and expectations, which will guide our design decisions. We'll conduct user interviews, surveys, and competitive analysis to gather valuable insights."
+        },
+        "step_2": {
+            "title": "Design",
+            "desc": "We'll create user personas, define user journeys & information architecture, and craft wireframes and prototypes. This step allows us to explore various design concepts and ensure that the user interface aligns with your brand while prioritizing usability and accessibility."
+        },
+        "step_3": {
+            "title": "Build",
+            "desc": "Once the design is finalized, we move on to the build phase. Here, we transform the approved prototypes into a functional product. Our development team will work closely with the design team to ensure that the user experience remains consistent and that the final product meets technical requirements. Regular testing and quality assurance are crucial during this stage."
+        },
+        "step_4": {
+            "title": "Optimize",
+            "desc": "After the product is launched, our work isn't finished. The optimization phase involves continuous monitoring and feedback analysis. We'll collect user data, conduct usability testing, and gather user feedback to identify areas for enhancement. This iterative process ensures that your product remains user-centered and evolves to meet changing user needs and market trends."
+        }
+    }
+}

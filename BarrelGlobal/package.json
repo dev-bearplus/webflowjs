@@ -1,0 +1,19 @@
+{
+	"name": "BarrelGlobal",
+	"type": "module",
+	"source": "src/barrel.js",
+	"exports": {
+		"require": "./dist/barrel.js",
+		"default": "./dist/barrel.modern.mjs"
+	},
+	"main": "dist/barrel.js",
+	"module": "./dist/barrel.module.js",
+	"unpkg": "./dist/barrel.umd.js",
+	"scripts": {
+		"build": "microbundle",
+		"dev": "microbundle watch"
+	},
+	"devDependencies": {
+		"microbundle": "^0.15.1"
+	}
+}

@@ -1,0 +1,27 @@
+{
+    "meta": {
+        "title": "Kontaktieren Sie uns"
+    },
+    "hero": {
+        "sub": "Hast du ein Projekt im Kopf?\nLass uns das Ei gemeinsam ausbrüten!",
+        "heading_letter_1": "K",
+        "heading_letter_2": "o",
+        "heading_letter_3": "n",
+        "heading_letter_4": "t",
+        "heading_letter_5": "a",
+        "heading_letter_6": "k",
+        "heading_letter_7": "t"
+    },
+    "form": {
+        "title": "Woran möchten Sie arbeiten?",
+        "name_field": "Ihr vollständiger name",
+        "email_field": "Ihre email",
+        "services_field": "Dienstleistungen auswählen",
+        "budget_field": "Budget auswählen",
+        "message_field": "Erzählen sie uns von ihrem projekt",
+        "submit_btn": "Ihre Nachricht absenden",
+        "submit_wait": "Bitte warten sie...",
+        "success_msg": "Vielen Dank! Ihre Einsendung wurde empfangen!",
+        "error_msg": "Hoppla! Beim Absenden des Formulars ist etwas schiefgegangen."
+    }
+}

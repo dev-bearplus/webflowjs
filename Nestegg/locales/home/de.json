@@ -1,0 +1,30 @@
+{
+    "meta": {
+        "title": "Nestegg",
+        "description": "Preisgekrönte Digitalagentur, spezialisiert auf Design und Entwicklung."
+    },
+    "hero": {
+        "sub": "Wir liefern maßgeschneiderte Design- und Entwicklungslösungen, um Startups schnell zu skalieren"
+    },
+    "intro": {
+        "title": "Wir helfen Ihnen dabei, die Eier auszubrüten",
+        "sub": "Nestegg konzentriert sich darauf, überzeugende digitale Erlebnisse zu schaffen, die nicht nur hohe Konversionen fördern, sondern auch tiefgehendes Engagement fördern. Wir sind bestrebt, Ihr Unternehmen auf dem Weg zu außergewöhnlichem Erfolg zu unterstützen.",
+        "service": "Unsere Dienstleistungen",
+        "contact": "So erreichen Sie uns"
+    },
+    "case": {
+        "big_title": "Aktuelle Fallstudien",
+        "title": "Unsere arbeiten",
+        "sub": "Wir übersetzen Forschung in Lösungen, gestalten durchdachte und vereinheitlichte Marken, Apps, Websites, Schnittstellen und Systeme.",
+        "list" : {
+            "common": {
+                "link": "Kompletten Herbst ansehen"
+            }
+        }
+    },
+    "services": {
+        "big_title": "Unsere dienstleistungen",
+        "sub": "Jeden Tag ermöglichen wir Millionen von Menschen weltweit, mühelos mit den von uns erstellten Produkten zu interagieren, um sicherzustellen, dass sie intuitiv, zuverlässig und visuell beeindruckend sind.",
+        "read_more": "Mehr lesen"
+    }
+}

@@ -1,0 +1,897 @@
+<link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@3.5.4/dist/locomotive-scroll.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/@barba/core"></script>
+<script src="https://unpkg.com/swiper@7/swiper-bundle.min.js"></script>
+
+<script>
+  const isEmail = (value) =>
+    /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(value);
+  gsap.registerPlugin(ScrollTrigger);
+  //init scollmain
+  let scrollmain = new LocomotiveScroll({
+    el: document.querySelector(".scrollmain"),
+    smooth: false,
+    getDirection: true,
+  });
+
+  //Assign var
+  let scrolled = false;
+  let scrolledInner = false;
+  let curSc = 0,
+    lastSc = 0;
+  let direction;
+  let header = $(".header");
+
+  $(window).on("refresh", () => {
+    scrolled = false;
+    scrolledInner = false;
+    curSc = 0;
+    lastSc = 0;
+  });
+
+  //on scroll
+  scrollmain.on("scroll", (inst) => {
+    if ($(".homepage").length != 1) {
+      if (inst.scroll.y > header.outerHeight()) {
+        $(".nav-trigger").addClass("show");
+        $(".header-links").removeClass("show");
+      } else {
+        $(".nav-trigger").removeClass("show");
+        $(".header-links").addClass("show");
+      }
+    }
+  });
+
+  const transitionLeavePage = (data) => {
+    const currentContainer = data.current.container;
+    console.log("leavingTransition");
+    const tl = gsap.timeline();
+    tl.set(".page-trans-wrap", { autoAlpha: 1 })
+      .set(".page-trans-mask", { autoAlpha: 0, y: -200 }, 0)
+      .to(currentContainer, { y: -200, duration: 0.8 }, 0)
+      .fromTo(
+        ".page-trans-wrap",
+        { yPercent: 100, duration: 0.6, delay: 0.2 },
+        { yPercent: 0 },
+        0
+      )
+      .fromTo(
+        ".page-trans-mask",
+        { autoAlpha: 0, y: -200, duration: 0.6, delay: 0.2 },
+        { autoAlpha: 1, y: 0 },
+        0
+      );
+    return tl;
+  };
+
+  const transitionEnterPage = (data) => {
+    const nextContainer = data.next.container;
+    console.log("enteringTransition");
+    const tl = gsap.timeline();
+    tl.to(".page-trans-wrap", { yPercent: -100, duration: 0.6 }, 0)
+      .fromTo(
+        ".page-trans-mask",
+        { autoAlpha: 1, y: 0, duration: 0.6, delay: 0.2 },
+        { autoAlpha: 0, y: 200 },
+        0
+      )
+      .from(nextContainer, { y: 200, delay: -0.2 }, 0)
+      .set(".page-trans-wrap", { autoAlpha: 0, yPercent: 100 })
+      .set(".page-trans-mask", { autoAlpha: 0, y: -200 });
+    return tl;
+  };
+
+  // barba
+  barba.hooks.before(() => { });
+  barba.hooks.after(() => {
+    detectLinks();
+  });
+
+  barba.init({
+    sync: true,
+    timeout: 5000,
+    transitions: [
+      {
+        once(data) {
+          detectLinks();
+          setTimeout((e) => {
+            scrollmain.scrollTo(0, 0);
+          }, 500);
+        },
+        async afterLeave(data) {
+          //when leave
+          const done = this.async();
+          const tlafter = transitionLeavePage(data);
+          $(".nav-trigger").removeClass("active");
+          $(".nav-main").removeClass("active");
+          tlafter.then(() => done());
+        },
+        async enter(data) {
+          //when enter
+          transitionEnterPage(data);
+          scrollmain.scrollTo(0, 0);
+          setTimeout(() => {
+            $(".header-links").addClass("show");
+          }, 1000);
+        },
+      },
+    ],
+    views: [
+      {
+        namespace: "home",
+        beforeEnter() {
+          scrolled = false;
+          console.log("beforeEnter");
+          $(".body").css("overflow", "hidden");
+          homeScript();
+        },
+        beforeLeave() {
+          scrolled = false;
+          scrolledInner = false;
+          curSc = 0;
+          lastSc = 0;
+          console.log("afterLeave");
+          $('.nav-ic-trigger').css('backgroundColor', 'white');
+        },
+      },
+      {
+        namespace: "service",
+        beforeEnter() {
+          console.log("beforeEnter");
+          $(".body").css("overflow", "auto");
+          $(".body").css("overflow-x", "hidden");
+          serviceScript();
+        },
+        afterEnter() {
+          console.log("afterEnter");
+        },
+      },
+      {
+        namespace: "review",
+        beforeEnter() {
+          $(".body").css("overflow", "auto");
+          $(".body").css("overflow-x", "hidden");
+        },
+        afterEnter() { },
+      },
+      {
+        namespace: "blog",
+        beforeEnter() {
+          $(".body").css("overflow", "auto");
+          $(".body").css("overflow-x", "hidden");
+          blogScript();
+        },
+        afterEnter() { },
+      },
+      {
+        namespace: "blogdetail",
+        beforeEnter() {
+          $(".body").css("overflow", "auto");
+          $(".body").css("overflow-x", "hidden");
+        },
+        afterEnter() { },
+      },
+      {
+        namespace: "portfolio",
+        beforeEnter() {
+          $(".body").css("overflow", "auto");
+          $(".body").css("overflow-x", "hidden");
+          portfolioScript();
+        },
+        afterEnter() { },
+      },
+      {
+        namespace: "project",
+        beforeEnter() {
+          $(".body").css("overflow", "auto");
+          $(".body").css("overflow-x", "hidden");
+          projectScript();
+        },
+        afterEnter() { },
+      },
+      {
+        namespace: "about",
+        beforeEnter() {
+          $(".body").css("overflow", "auto");
+          $(".body").css("overflow-x", "hidden");
+          aboutScript();
+        },
+        afterEnter() { },
+      },
+      {
+        namespace: "contact",
+        beforeEnter() {
+          $(".body").css("overflow", "auto");
+          $(".body").css("overflow-x", "hidden");
+          contactScript();
+        },
+        afterEnter() { },
+      },
+    ],
+  });
+  // Detect Page and Link
+  function clearActive() {
+    $(".header-link").removeClass("active");
+    $(".nav-link").removeClass("active");
+    $(".ft-link").removeClass("active");
+  }
+  function detectLinks() {
+    clearActive();
+    if ($(".homepage").length) {
+      $('[data-link="home"]').addClass("active");
+    } else if ($(".servicepage").length) {
+      $('[data-link="service"]').addClass("active");
+    } else if ($(".reviewpage").length) {
+      $('[data-link="review"]').addClass("active");
+    } else if ($(".blogpage").length || $(".blogdetailpage").length) {
+      $('[data-link="blog"]').addClass("active");
+    } else if ($(".aboutpage").length) {
+      $('[data-link="about"]').addClass("active");
+    } else if ($(".portfoliopage").length || $(".projectpage").length) {
+      $('[data-link="portfolio"]').addClass("active");
+    } else if ($(".contactpage").length) {
+      $('[data-link="contact"]').addClass("active");
+    }
+  }
+
+  function initMagicMouse() {
+    const cursor = $(".cursor-wrap");
+    document.addEventListener("mousemove", (e) => {
+      cursor.css({
+        top: `${e.pageY}px`,
+        left: `${e.pageX}px`,
+      });
+    });
+  }
+  initMagicMouse();
+
+  function navHandle() {
+    let navLinks = $('.nav-link');
+    let navFooters = $('.nav-footer-link');
+    $(".nav-ic-trigger").on("click", (e) => {
+      e.preventDefault();
+      if ($(e.target).closest('.nav-trigger').hasClass('active')) {
+        $(".nav-trigger").removeClass("active");
+        $(".nav-main").removeClass("active");
+        gsap.to('.nav-circle', { scale: .9, clearProps: true });
+        scrolled = false;
+      } else {
+        gsap.set(navLinks, { x: 40, autoAlpha: 0 });
+        gsap.set('.nav-footer .line', { scaleX: 0 });
+        gsap.set(navFooters, { x: 40, autoAlpha: 0 });
+        gsap.set('.nav-footer-content .text-16', { x: 40, autoAlpha: 0 });
+        $(".nav-trigger").addClass("active");
+        gsap.to(navLinks, { x: 0, autoAlpha: 1, stagger: 0.06, clearProps: true });
+        gsap.to(navFooters, { x: 0, autoAlpha: 1, stagger: 0.06, clearProps: true });
+        gsap.to('.nav-footer-content .text-16', { x: 0, autoAlpha: 1, clearProps: true });
+        gsap.to(".nav-footer .line", { scaleX: 1, clearProps: true });
+        gsap.fromTo('.nav-circle', { scale: .9 }, { scale: 1, clearProps: true });
+        $(".nav-main").addClass("active");
+        scrolled = true;
+      }
+
+    });
+  }
+  navHandle();
+
+  function layout() {
+    $(".nav").css("z-index", "98");
+    $(".page-trans-wrap").css("z-index", "999");
+  }
+  layout();
+
+  // Homepage script
+
+  function homeScript() {
+    if ($(".homepage").length) {
+      const circlePos = [
+        "circle-s1",
+        "circle-s2",
+        "circle-s3",
+        "circle-s4",
+        "circle-s5",
+      ];
+      const processBars = ["0%", "20%", "40%", "60%", "80%"];
+
+      //Layout service sections
+      const colW = ($(".container").width() - 472) / 12;
+      const serviceW =
+        "calc(-" + $(".container").css("margin-left") + " + -60px)";
+      const circleL = "calc(" + colW * 5 + "px + 160px)";
+      $(".schome-ser-bg").css("margin-left", serviceW);
+
+      function homeSet() {
+        $(".schome").css({
+          "pointer-events": "none",
+        });
+        $(".c-scrollbar").css("opacity", "0");
+
+        // Service loop marquee
+        gsap.set('.schome-work-loop', { x: `-${$('.home-work-loop-item').outerWidth()}` });
+        gsap.set(".home-work-loop-item", {
+          x: (i) => i * ($('.home-work-loop-item').outerWidth()),
+        });
+        gsap.to(".home-work-loop-item", {
+          duration: 20,
+          ease: "none",
+          x: `+=${$('.home-work-loop-item').outerWidth()}`,
+          repeat: -1
+        });
+
+        //Testimonial content max-height
+        let heightArray = [];
+        for (let i = 0; i < $(".schome-testi-content .swiper-slide").length; i++) {
+          let itemHeight = $(".schome-testi-content .swiper-slide").eq(i).height();
+          console.log($(".schome-testi-content .swiper-slide").eq(i).height());
+          heightArray.push(itemHeight);
+        };
+        let maxHeight = Math.max.apply(Math, heightArray);
+        $(".schome-testi-content").css('max-height', maxHeight);
+
+        $(".cursor-container").css("z-index", "1000");
+        const swiper = new Swiper(".schome-pj-slide-contain", {
+          direction: "vertical",
+          spaceBetween: 60,
+          slidesPerView: 1,
+          mousewheel: true,
+          loop: true,
+          loopAdditionalSlides: 1,
+          speed: 1000,
+          on: {
+            slideNextTransitionStart() {
+              gsap.to("#icEyeLine", {
+                rotation: 90,
+                duration: 1,
+                ease: "power1.out",
+                clearProps: "all",
+              });
+            },
+            slidePrevTransitionStart() {
+              gsap.to("#icEyeLine", {
+                rotation: -90,
+                duration: 1,
+                ease: "power1.out",
+                clearProps: "all",
+              });
+            },
+          },
+        });
+        const swiperTestiName = new Swiper(".schome-testi-name", {
+          direction: "vertical",
+          spaceBetween: 0,
+          slidesPerView: 1,
+          mousewheel: true,
+        });
+        const swiperTestiContent = new Swiper(".schome-testi-content", {
+          direction: "vertical",
+          spaceBetween: 0,
+          slidesPerView: 1,
+          effect: "fade",
+          fadeEffect: {
+            crossFade: true,
+          },
+        });
+        const swiperTestiAvatar = new Swiper(".schome-testi-avatar", {
+          direction: "vertical",
+          spaceBetween: 0,
+          slidesPerView: 1,
+          effect: "fade",
+          fadeEffect: {
+            crossFade: true,
+          },
+        });
+        swiperTestiName.controller.control = [
+          swiperTestiContent,
+          swiperTestiAvatar,
+        ];
+        $(".ser-hover-content").removeClass("active");
+      }
+      homeSet();
+
+      function handleDirection() {
+        window.addEventListener("wheel", function (event) {
+          if ($(".homepage").length) {
+            if (Math.sign(event.deltaY) === 1) {
+              direction = "down";
+            } else if (Math.sign(event.deltaY) === -1) {
+              direction = "up";
+            }
+          }
+        });
+      }
+      handleDirection();
+
+      function homeScroll() {
+        window.addEventListener("wheel", function (event) {
+          if ($(".homepage").length) {
+            if (scrolled) return;
+            if (Math.sign(event.deltaY) === 1) {
+              if (curSc < 4) {
+                lastSc = curSc;
+                curSc++;
+                handleScChange();
+                $(".schome").eq(lastSc).removeClass("active");
+                $(".schome").eq(curSc).addClass("active");
+                console.log(curSc);
+                gsap.to(".schome-container", {
+                  y: `-${curSc * 1}00vh`,
+                  duration: 1.6,
+                  ease: "power2.inOut",
+                });
+                console.log(lastSc);
+                hanldeCircle();
+                handleProcessBar();
+                scrolled = true;
+                if ($(".schome-pj-content").is(":hover")) {
+                  return;
+                } else {
+                  setTimeout(() => {
+                    scrolled = false;
+                  }, 1600);
+                }
+              }
+            } else if (Math.sign(event.deltaY) === -1) {
+              if (curSc > 0) {
+                lastSc = curSc;
+                curSc--;
+                handleScChange();
+                $(".schome").eq(lastSc).removeClass("active");
+                $(".schome").eq(curSc).addClass("active");
+                console.log(curSc);
+                gsap.to(".schome-container", {
+                  y: `-${curSc * 1}00vh`,
+                  duration: 1.6,
+                  ease: "power2.inOut",
+                });
+                console.log(lastSc);
+                hanldeCircle();
+                handleProcessBar();
+                scrolled = true;
+                if ($(".schome-pj-content").is(":hover")) {
+                  return;
+                } else {
+                  setTimeout(() => {
+                    scrolled = false;
+                  }, 1600);
+                }
+              }
+            }
+          }
+        });
+        const handleScChange = () => {
+          //header changes
+          if (curSc >= 1) {
+            $(".nav-trigger").addClass("show");
+            $(".header-links").removeClass("show");
+          } else {
+            $(".nav-trigger").removeClass("show");
+            $(".header-links").addClass("show");
+          }
+
+          if (curSc == 3) {
+            $('.home-circle').css('left', `${$('.schome-pj-content').outerWidth() + $('.schome-pj-content').offset().left}px`);
+          } else {
+            if (document.querySelector('.home-circle').style.removeProperty) {
+              document.querySelector('.home-circle').style.removeProperty('left');
+            } else {
+              document.querySelector('.home-circle').style.removeProperty('left');
+            }
+          }
+
+          //each section changes
+          if (curSc == 3) {
+            $(".schome-pj-content").on("mouseover mousemove", (e) => {
+              scrolled = true;
+              $(".cursor-wrap").addClass("active");
+            });
+            $(".schome-pj-content").on("mouseleave", (e) => {
+              scrolled = false;
+              $(".cursor-wrap").removeClass("active");
+            });
+          } else if (curSc == 4) {
+            $(".schome-testi-name").on("mouseover mousemove", (e) => {
+              scrolled = true;
+            });
+            $(".schome-testi-name").on("mouseleave", (e) => {
+              scrolled = false;
+            });
+          } else if (curSc == 2) {
+            $(".schome-ser-web.web").on("mouseenter", (e) => {
+              $('[data-ser="web"]').addClass("active");
+              if ($('[data-ser="web"]').hasClass("active")) {
+                $('[data-ser="web"]').addClass("active");
+              }
+              $(".schome-service-title").removeClass("active");
+              $(".img-home-ser.mid").removeClass("active");
+            });
+            $(".schome-ser-web.web").on("mouseleave", (e) => {
+              $('[data-ser="web"]').removeClass("active");
+              $(".schome-service-title").addClass("active");
+              $(".img-home-ser.mid").addClass("active");
+            });
+            $(".schome-ser-web.brand").on("mouseenter", (e) => {
+              $('[data-ser="brand"]').addClass("active");
+              $(".schome-service-title").removeClass("active");
+              $(".img-home-ser.mid").removeClass("active");
+            });
+            $(".schome-ser-web.brand").on("mouseleave", (e) => {
+              $('[data-ser="brand"]').removeClass("active");
+              $(".schome-service-title").addClass("active");
+              $(".img-home-ser.mid").addClass("active");
+            });
+          }
+
+          if (curSc == 3) {
+            $(".nav-ic-trigger").css("backgroundColor", "#EBEDEA");
+            $(".schome-bg-wrap").addClass("bg-home-s4");
+            $(".home-circle.circle-s4").css("left", circleL);
+            $(".schome-pj-bg").addClass("active");
+          } else {
+            $(".nav-ic-trigger").css("backgroundColor", "#ffffff");
+            $(".schome-bg-wrap").removeClass("bg-home-s4");
+            $(".schome-pj-bg").removeClass("active");
+          }
+
+          if (curSc != 2) {
+            $('[data-ser="web"]').removeClass("active");
+            $('[data-ser="brand"]').removeClass("active");
+            $(".schome-service-title").addClass("active");
+            $(".img-home-ser.mid").addClass("active");
+          }
+        };
+
+        const hanldeCircle = () => {
+          const curPos = circlePos[curSc];
+          const lastPos = circlePos[lastSc];
+          $(".home-circle").removeClass(lastPos);
+          $(".home-circle").addClass(curPos);
+        };
+        const handleProcessBar = () => {
+          const percent = processBars[curSc];
+          $(".processbar-cur").css("top", percent);
+        };
+      }
+      homeScroll();
+    }
+  }
+
+  function serviceScript() {
+    if ($(".servicepage").length) {
+      let tabArray = [1, 2, 3, 4, 5, 6];
+      let currentTab = 1;
+      function serviceSet() {
+        $(".ser-how-step-item").css({
+          "grid-column": "1/2",
+          "grid-row": "1/2",
+          "pointer-events": "none",
+          opacity: "0",
+        });
+        $(".ser-how-step-item .ser-how-content-wrap").css("opacity", 0);
+        $(".ser-how-tab-item").eq(0).addClass("active");
+        $(".ser-how-step-item").eq(0).addClass("active");
+
+        for (let i = 0; i < tabArray.length; i++) {
+          $(".ser-how-tab-item").eq(i).attr("data-tab", tabArray[i]);
+          $(".ser-how-step-item").eq(i).attr("data-tab", tabArray[i]);
+        }
+      }
+      serviceSet();
+
+      function serviceEvent() {
+        const activeItem = (target) => {
+          currentTab = target;
+          const tabActiveArr = Array.from({ length: target }, (_, i) => i + 1);
+          $(".ser-how-tab-item").removeClass("active");
+          $(".ser-how-step-item").removeClass("active");
+          const activeStepIndex = tabActiveArr[tabActiveArr.length - 1];
+          $(`.ser-how-step-item[data-tab=${activeStepIndex}]`).addClass("active");
+          tabActiveArr.forEach((value) => {
+            $(`.ser-how-tab-item[data-tab=${value}]`).addClass("active");
+          });
+          $(".ser-how-line-progress").width(
+            `${(tabActiveArr.length / tabArray.length) * 100}%`
+          );
+        };
+        const activeControlBtn = () => {
+          currentTab === 1
+            ? $(".control-item-prev").addClass("disable")
+            : $(".control-item-prev").removeClass("disable");
+          currentTab === 6
+            ? $(".control-item-next").addClass("disable")
+            : $(".control-item-next").removeClass("disable");
+        };
+        $(".ser-how-tab").on("click", (e) => {
+          e.preventDefault();
+          let target = $(e.target).parent().attr("data-tab");
+          activeItem(target);
+        });
+        $(".control-item-prev").on("click", (e) => {
+          e.preventDefault();
+          currentTab--;
+          activeControlBtn();
+          activeItem(currentTab);
+        });
+        $(".control-item-next").on("click", (e) => {
+          e.preventDefault();
+          currentTab++;
+          activeControlBtn();
+          activeItem(currentTab);
+        });
+      }
+      serviceEvent();
+    }
+  }
+
+  function blogScript() {
+    if ($(".blogpage").length) {
+      function blogSet() {
+        $(".blog-item").removeClass("hidden-load");
+        $(".blog-item").removeClass("hidden-filter");
+        for (let i = $(".blog-item:not(.hidden-filter)").length; i >= 2; i -= 1) {
+          $(".blog-item").eq(i).addClass("hidden-load");
+        }
+        if ($(".blog-item:not(.hidden-filter)").length > 2) {
+          $(".link-load").removeClass("hidden");
+        } else {
+          $(".link-load").addClass("hidden");
+        }
+      }
+      blogSet();
+
+      function blogEvent() {
+        $(".link-load").on("click", (e) => {
+          for (let i = 0; i < 2; i++) {
+            $(".blog-item.hidden-load").eq(i).removeClass("hidden-load");
+          }
+          if ($(".blog-item.hidden-load").length < 1) {
+            $(e.target).addClass("hidden");
+          }
+        });
+        $(".filter-blog").on("click", (e) => {
+          $(".filter-blog").removeClass("active");
+          $(e.target).addClass("active");
+          if ($(e.target).data("filter") == "*") {
+            console.log("all");
+            $(".blog-main-title").text("Our blog");
+            $(".blog-item").removeClass("hidden-filter");
+          } else {
+            $(".blog-main-title").text($(e.target).data("filter"));
+            $(".blog-item").addClass("hidden-filter");
+            $(`.info-cate:contains("${$(e.target).data("filter")}")`)
+              .closest(".blog-item")
+              .removeClass("hidden-filter");
+          }
+          blogSet();
+        });
+      }
+      blogEvent();
+    }
+  }
+  function portfolioScript() {
+    if ($(".portfoliopage").length) {
+      function portfolioSet() {
+        $(".filter-counter").eq(0).text($(".port-item").length);
+        $(".filter-counter")
+          .eq(1)
+          .text(
+            $(`.port-cate-text:contains("Branding")`).closest(".port-item").length
+          );
+        $(".filter-counter")
+          .eq(2)
+          .text(
+            $(`.port-cate-text:contains("UX/UI Design")`).closest(".port-item")
+              .length
+          );
+      }
+      portfolioSet();
+
+      function portfolioEvent() {
+        $(".filter-port").on("click", (e) => {
+          $(".port-filter-counter").removeClass("active");
+          $(e.target).closest(".port-filter-counter").addClass("active");
+          if ($(e.target).data("filter") == "*") {
+            console.log("all");
+            $(".port-main-title").text("Portfolio");
+            $(".port-item").removeClass("hidden-filter");
+          } else {
+            $(".port-main-title").text($(e.target).data("filter"));
+            $(".port-item").addClass("hidden-filter");
+            $(`.port-cate-text:contains("${$(e.target).data("filter")}")`)
+              .closest(".port-item")
+              .removeClass("hidden-filter");
+          }
+        });
+      }
+      portfolioEvent();
+    }
+  }
+  function projectScript() {
+    if ($(".projectpage").length) {
+      function projectSet() {
+        $(".proj-sol-img-item:first-child").css("grid-column", "1/3");
+        $(".proj-more-img-item:first-child").css("grid-column", "1/3");
+        $(".proj-more-img-item:last-child").css("grid-column", "1/3");
+      }
+      projectSet();
+    }
+  }
+  function aboutScript() {
+    if ($(".aboutpage").length) {
+    }
+  }
+  function contactScript() {
+    if ($(".contactpage").length) {
+      const showError = (name, message) => {
+        const selectorForm = `[data-form-group=${name}]`;
+        $(`${selectorForm} .text-error`).text(message);
+        $(`${selectorForm} .text-error`).addClass("show");
+        $(`${selectorForm} .contact-input`).addClass("has-error");
+      };
+      const hideError = (name) => {
+        const selectorForm = `[data-form-group=${name}]`;
+        $(`${selectorForm} .text-error`).text("");
+        $(`${selectorForm} .text-error`).removeClass("show");
+        $(`${selectorForm} .contact-input`).removeClass("has-error");
+      };
+      function contactSet() {
+        $(".contact-main").css({
+          opacity: "0",
+          "grid-column": "1/2",
+          "grid-row": "1/2",
+          "pointer-events": "none",
+        });
+        $(".contact-main").eq(0).addClass("active");
+        $(".main-form").addClass("hide");
+        $("#Service").val($(".contact-1-item").eq(0).text());
+        $("#Goal").val($(".contact-2-item").eq(0).text());
+        $(".sccontact-success").css({
+          position: "absolute",
+          top: 0,
+          "z-index": 1,
+          "pointer-events": "none",
+          opacity: 0,
+        });
+      }
+      contactSet();
+      function contactEvent() {
+        $(".contact-1-item").on("click", (e) => {
+          $(".contact-1-item").removeClass("active");
+          $(e.target).addClass("active");
+          let value = $(e.target).text();
+          $("#Service").val(value);
+          console.log(value);
+        });
+        $(".contact-2-item").on("click", (e) => {
+          $(".contact-2-item").removeClass("active");
+          $(e.target).addClass("active");
+          let value = $(e.target).text();
+          $("#Goal").val(value);
+          console.log(value);
+        });
+        $("#PhSite").on("keyup", (e) => {
+          let value = $(e.target).val();
+          $("#Site").val(value);
+          console.log(value);
+        });
+        $("#PhName").on("keyup", (e) => {
+          let value = $(e.target).val();
+          $("#Name").val(value);
+          console.log(value);
+        });
+        $("#PhEmail").on("keyup", (e) => {
+          let value = $(e.target).val();
+          $("#Email").val(value);
+          console.log(value);
+        });
+        $("#PhPhone").on("keyup", (e) => {
+          let value = $(e.target).val();
+          $("#Phone").val(value);
+          console.log(value);
+        });
+        $("#PhMessage").on("keyup", (e) => {
+          let value = $(e.target).val();
+          $("#Message").val(value);
+          console.log(value);
+        });
+
+        let curCont = 0;
+        let lastCont;
+
+        $(".contact-act-next-wrap").on("click", (e) => {
+          e.preventDefault();
+          curCont = curCont + 1;
+          $(".contact-act-back").removeClass("hide");
+          $(".contact-main").removeClass("active");
+          $(".contact-process").removeClass("active");
+          $(".contact-main").eq(curCont).addClass("active");
+          for (let i = 0; i < curCont + 1; i++) {
+            $(".contact-process").eq(i).addClass("active");
+          }
+          if (curCont == 3) {
+            $(".contact-act-next-wrap").addClass("hide");
+            $(".main-form").removeClass("hide");
+          }
+        });
+        $(".contact-act-back").on("click", (e) => {
+          e.preventDefault();
+          hideError("Email");
+          curCont = curCont - 1;
+          if (curCont == 0) {
+            $(e.target).addClass("hide");
+          }
+          $(".contact-main").removeClass("active");
+          $(".contact-process").removeClass("active");
+          $(".contact-main").eq(curCont).addClass("active");
+          for (let i = 0; i < curCont + 1; i++) {
+            $(".contact-process").eq(i).addClass("active");
+          }
+          if (curCont < 3) {
+            $(".contact-act-next-wrap").removeClass("hide");
+            $(".main-form").addClass("hide");
+          }
+        });
+        $("#email-form").submit((e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target); // get the form data
+          const parsedFormData = {};
+          [...formData.entries()].forEach((dataObject) => {
+            parsedFormData[dataObject[0]] = dataObject[1];
+          });
+          const validateForm = () => {
+            let successValidate = true;
+            if (!isEmail(parsedFormData["Email"])) {
+              showError("Email", "Invalid email");
+              successValidate = false;
+            } else {
+              hideError("Email");
+              successValidate = true;
+            }
+            return successValidate;
+          };
+          const successValidate = validateForm();
+          if (successValidate) {
+            const serializeData = (data) => { };
+            const data = {
+              name: "Email Form",
+              source: window.location.href,
+              test: false,
+              "fields[Name]": parsedFormData["Name"],
+              "fields[Email]": parsedFormData["Email"],
+              "fields[Phone]": parsedFormData["Phone"],
+              "fields[Service]": parsedFormData["Service"],
+              "fields[Goal]": parsedFormData["Goal"],
+              "fields[Site]": parsedFormData["Site"],
+              dolphin: false,
+            };
+            const final_data = new URLSearchParams(data).toString();
+            $.ajax({
+              url: "https://webflow.com/api/v1/form/618e3f423d49661f9b1eded5",
+              method: "POST",
+              data: final_data,
+              headers: {
+                accept: "application/json, text/javascript, */*; q=0.01",
+              },
+              success: function (response) {
+                // Do what u want after success
+                $(".sccontact-hero").addClass("hidden");
+                $(".sccontact-success").addClass("show");
+              },
+              error: function () {
+                alert("Opps. Something went wrongs");
+                // console.log("error");
+              },
+            });
+          } else {
+            return false;
+          }
+        });
+      }
+      contactEvent();
+    }
+  }
+</script>

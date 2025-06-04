@@ -1,0 +1,37 @@
+{
+    "meta": {
+        "title": "Über uns"
+    },
+    "hero": {
+        "heading_letter_1": "Ü",
+        "heading_letter_2": "b",
+        "heading_letter_3": "e",
+        "heading_letter_4": "r",
+        "heading_letter_5": "",
+        "sub": "Stück für Stück baut der Vogel sein Nest."
+    },
+    "intro": {
+        "sub_1": "Wie das Sprichwort sagt, widmet sich Nestegg unserer Zeit, um selbst die kleinsten Details sorgfältig auszuarbeiten, was zu einer erheblichen Mundpropaganda führt und Zufriedenheit bei Ihren Nutzern bringt.",
+        "sub_2": "Gegründet im Jahr 2022 in Deutschland, besteht unser dynamisches Team aus erfahrenen Designern und Entwicklern, die in einer Vielzahl von Disziplinen versiert sind, darunter UX/UI, Branding, Motion Design, 3D-Modellierung und Webentwicklung."
+    },
+    "process": {
+        "big_title": "Unser Prozess",
+        "sub": "Unser Ansatz dreht sich alles um Effizienz. Wir bewältigen organisatorische Herausforderungen und ebneten letztendlich den Weg für die Produkte der Zukunft.",
+        "step_1": {
+            "title": "Forschung",
+            "desc": "Unser Hauptziel ist es, ein klares Bild von den Vorlieben, Schwierigkeiten und Erwartungen der Benutzer zu bekommen, die unsere Designentscheidungen leiten werden. Wir werden Benutzerinterviews, Umfragen und Wettbewerbsanalysen durchführen, um wertvolle Erkenntnisse zu sammeln."
+        },
+        "step_2": {
+            "title": "Design",
+            "desc": "We zullen gebruikerspersona's creëren, gebruikersreizen en informatiearchitectuur definiëren, en draadmodellen en prototypes maken. Deze stap stelt ons in staat om verschillende ontwerpprojecten te verkennen en ervoor te zorgen dat de gebruikersinterface in lijn is met uw merk, waarbij gebruiksgemak en toegankelijkheid voorop staan."
+        },
+        "step_3": {
+            "title": "Bauen",
+            "desc": "Sobald das Design abgeschlossen ist, gehen wir zur Bauphase über. Hier verwandeln wir die genehmigten Prototypen in ein funktionierendes Produkt. Unser Entwicklungsteam arbeitet eng mit dem Designteam zusammen, um sicherzustellen, dass die Benutzererfahrung konsistent bleibt und das endgültige Produkt die technischen Anforderungen erfüllt. Regelmäßige Tests und Qualitätskontrollen sind in dieser Phase entscheidend."
+        },
+        "step_4": {
+            "title": "Optimieren",
+            "desc": "Nachdem das Produkt gestartet wurde, ist unsere Arbeit noch nicht abgeschlossen. Die Optimierungsphase umfasst kontinuierliches Monitoring und die Analyse von Rückmeldungen. Wir sammeln Benutzerdaten, führen Usability-Tests durch und sammeln Benutzerfeedback, um Bereiche für Verbesserungen zu identifizieren. Dieser iterative Prozess stellt sicher, dass Ihr Produkt benutzerzentriert bleibt und sich weiterentwickelt, um sich den sich ändernden Benutzeranforderungen und Markttrends anzupassen."
+        }
+    }
+}

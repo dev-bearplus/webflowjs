@@ -1,0 +1,27 @@
+{
+    "meta": {
+        "title": "Contact us"
+    },
+    "hero": {
+        "sub": "Have a project in mind?\nLet’s hatch the egg together!",
+        "heading_letter_1": "C",
+        "heading_letter_2": "o",
+        "heading_letter_3": "n",
+        "heading_letter_4": "t",
+        "heading_letter_5": "a",
+        "heading_letter_6": "c",
+        "heading_letter_7": "t"
+    },
+    "form": {
+        "title": "What are you looking to work on?",
+        "name_field": "Your full name",
+        "email_field": "Your email",
+        "services_field": "Select services",
+        "budget_field": "Select budget",
+        "message_field": "Tell us about your project",
+        "submit_btn": "Submit your message",
+        "submit_wait": "Please wait...",
+        "success_msg": "Thank you! Your submission has been received!",
+        "error_msg": "Oops! Something went wrong while submitting the form."
+    }
+}

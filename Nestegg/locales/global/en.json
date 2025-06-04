@@ -1,0 +1,63 @@
+{
+    "link_home": "Home",
+    "link_about": "About",
+    "link_contact": "Contact",
+    "link_work": "Work",
+    "header": {
+        "hire_us": "Hire us"
+    },
+    "scope": {
+        "title": "Scope of work",
+        "branding-design": "Branding design",
+        "graphic-design": "Graphic design",
+        "art-direction": "Art direction",
+        "customer-interview": "Customer interview",
+        "user-interview": "User interview",
+        "user-personas-journey": "User personas & journey",
+        "wireframing": "Wireframing",
+        "design-system": "Design system",
+        "ux-ui-design": "UX/UI design",
+        "figma-prototype": "Figma prototype",
+        "website-development": "Website development",
+        "usability-testing": "Usability testing",
+        "a-b-testing": "A/B testing",
+        "market-research": "Market research",
+        "product-design": "Product design",
+        "packaging-design": "Packaging design",
+        "website-design": "Website design"
+    },
+    "service": {
+        "ux-ui-design": {
+            "title": "UI/UX Design",
+            "desc": "Unleash limitless design possibilities through our services tailored for websites, SaaS platforms, and mobile apps."
+        },
+        "branding-graphic-design": {
+            "title": "Branding & Graphic Design",
+            "desc": "With strategy and visionary design, we bring your ideas to life, forging a unique brand identity that connects with your target audience and establishes a strong market presence."
+        },
+        "website-development": {
+            "title": "Website Development",
+            "desc": "We provide flexible package solutions designed to assist rapidly growing startups in aligning their website with the demands of their expanding workforce and customer base, ensuring seamless scalability."
+        },
+        "graphic-design": {
+            "title": "Graphic Design"
+        },
+        "website-design-development": {
+            "title": "Website Design & Development"
+        },
+        "design-system": {
+            "title": "Design System"
+        },
+        "art-direction": {
+            "title": "Art Direction"
+        },
+        "website-design": {
+            "title": "Website Design"
+        }
+    },
+    "footer": {
+        "title": "Contact us",
+        "sub": "We're here to help.\nSend us an email.",
+        "copyright": "©Copyright 2023"
+    }
+}

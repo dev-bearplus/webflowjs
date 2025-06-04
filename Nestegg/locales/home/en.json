@@ -1,0 +1,30 @@
+{
+    "meta": {
+        "title": "Nestegg",
+        "description": "Award-winning digital agency specializing in design and development."
+    },
+    "hero": {
+        "sub": "We deliver bespoke design and development solutions for startups to scale fast"
+    },
+    "intro": {
+        "title": "We help you hatch the eggs",
+        "sub": "Nestegg focuses on creating compelling digital experiences that drive high conversions and foster profound engagement. We are dedicated to supporting your business as it embarks on the path to extraordinary success.",
+        "service": "See our services",
+        "contact": "See how you get in touch with us"
+    },
+    "case": {
+        "big_title": "Recent case studies",
+        "title": "Our works",
+        "sub": "We translate research into solutions, crafting thoughtful and unified brands, apps, websites, interfaces, and systems.",
+        "list" : {
+            "common": {
+                "link": "View full case"
+            }
+        }
+    },
+    "services": {
+        "big_title": "Our services",
+        "sub": "Every day, we empower millions of people worldwide to effortlessly engage with the products we create, ensuring they are intuitive, reliable, and visually stunning.",
+        "read_more": "Read more"
+    }
+}

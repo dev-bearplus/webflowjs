@@ -1,0 +1,63 @@
+{
+    "link_home": "Startseite",
+    "link_about": "Über",
+    "link_contact": "Kontakt",
+    "link_work": "Arbeit",
+    "header": {
+        "hire_us": "Engagieren Sie uns"
+    },
+    "scope": {
+        "title": "Umfang der Arbeit",
+        "branding-design": "Gestaltung der Marke",
+        "graphic-design": "Grafische gestaltung",
+        "art-direction": "Künstlerische leitung",
+        "customer-interview": "Kunden interview",
+        "user-interview": "Benutzer interview",
+        "user-personas-journey": " Benutzer-personas & reise",
+        "wireframing": "Wireframing",
+        "design-system": "System entwerfen",
+        "ux-ui-design": "UX/UI design",
+        "figma-prototype": "Figma prototype",
+        "website-development": "Website entwicklung",
+        "usability-testing": "Prüfung der Benutzerfreundlichkeit",
+        "a-b-testing": "A/B-tests",
+        "market-research": "Marktonderzoek",
+        "product-design": "Productontwerp",
+        "packaging-design": "Ontwerp van verpakking",
+        "website-design": "Website Ontwerp"
+    },
+    "service": {
+        "ux-ui-design": {
+            "title": "UI/UX Design",
+            "desc": "Entfesseln Sie grenzenlose Gestaltungsmöglichkeiten durch unsere maßgeschneiderten Dienstleistungen für Websites, SaaS-Plattformen und mobile Apps."
+        },
+        "branding-graphic-design": {
+            "title": "Markenbildung & Grafikdesign",
+            "desc": "Mit Strategie und visionärem Design setzen wir Ihre Ideen um, schaffen eine einzigartige Markenidentität, die sich mit Ihrer Zielgruppe verbindet, und etablieren eine starke Präsenz am Markt."
+        },
+        "website-development": {
+            "title": "Website Entwicklung",
+            "desc": "Wir bieten flexible Paketlösungen an, die darauf abzielen, schnell wachsenden Start-ups bei der Anpassung ihrer Website an die Anforderungen ihres expandierenden Teams und Kundenstamms zu unterstützen, um eine nahtlose Skalierbarkeit sicherzustellen."
+        },
+        "graphic-design": {
+            "title": "Grafikdesign"
+        },
+        "website-design-development": {
+            "title": "Website Ontwerp & Entwicklung"
+        },
+        "design-system": {
+            "title": "Design System"
+        },
+        "art-direction": {
+            "title": "Kunstrichtung"
+        },
+        "website-design": {
+            "title": "Website Ontwerp"
+        }
+    },
+    "footer": {
+        "title": "Kontaktieren Sie uns",
+        "sub": "Wir sind hier, um zu helfen.\nSenden Sie uns eine E-Mail.",
+        "copyright": "©Urheberrecht 2023"
+    }
+}
