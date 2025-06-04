@@ -314,6 +314,21 @@ const mainScript = () => {
         observeParents: true,
         centerSlide: true,
       })
+
+      $(window).on('scroll', function () {
+        if ($(window).scrollTop() > $(".header").height()) {
+          $('.about-list-scroll-top').addClass('active');
+        } else {
+          $('.about-list-scroll-top').removeClass('active');
+        }
+        $('.about-list-scroll-top').on('click', function () {
+          lenis.scrollTo(0, {
+            duration: 1,
+            lock: true
+
+          })
+        })
+      });
     }
     $('.about-list-post-pagi-item')?.each((idx, item) => {
       $(item).on('click', function () {
