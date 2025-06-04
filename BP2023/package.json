@@ -1,0 +1,22 @@
+{
+	"name": "BP2023",
+	"version": "1.0.0",
+	"type": "module",
+	"source": "src/index.js",
+	"exports": {
+		"require": "./dist/bp.js",
+		"default": "./dist/bp.modern.mjs"
+	},
+	"main": "./dist/bp.js",
+	"module": "./dist/bp.mjs",
+	"scripts": {
+		"build": "microbundle -o dist/bp.js --no-pkg-main -f es --compress --no-sourcemap --external none",
+		"dev": "microbundle -w -o dist/bp.js --no-pkg-main -f es --compress --no-sourcemap --external none"
+	},
+	"devDependencies": {
+		"microbundle": "^0.15.1"
+	},
+	"dependencies": {
+		"yarn": "^1.22.21"
+	}
+}

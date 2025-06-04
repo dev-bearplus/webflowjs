@@ -1,0 +1,317 @@
+{
+    "type": "AirportsCollection",
+    "airports": [
+        {
+            "text": "JFK",
+            "size": 1.0,
+            "country": "United States",
+            "city": "New York",
+            "lat": "40.6413",
+            "lng": "-73.7781"
+        },
+        {
+            "text": "LAX",
+            "size": 1.0,
+            "country": "United States",
+            "city": "Los Angeles",
+            "lat": "33.9416",
+            "lng": "-118.4085"
+        },
+        {
+            "text": "YYZ",
+            "size": 1.0,
+            "country": "Canada",
+            "city": "Toronto",
+            "lat": "43.6777",
+            "lng": "-79.6248"
+        },
+        {
+            "text": "MEX",
+            "size": 1.0,
+            "country": "Mexico",
+            "city": "Mexico City",
+            "lat": "19.4361",
+            "lng": "-99.0719"
+        },
+        {
+            "text": "GRU",
+            "size": 1.0,
+            "country": "Brazil",
+            "city": "Sao Paulo",
+            "lat": "-23.4356",
+            "lng": "-46.4731"
+        },
+        {
+            "text": "EZE",
+            "size": 1.0,
+            "country": "Argentina",
+            "city": "Buenos Aires",
+            "lat": "-34.8222",
+            "lng": "-58.5358"
+        },
+        {
+            "text": "BOG",
+            "size": 1.0,
+            "country": "Colombia",
+            "city": "Bogota",
+            "lat": "4.7016",
+            "lng": "-74.1469"
+        },
+        {
+            "text": "SCL",
+            "size": 1.0,
+            "country": "Chile",
+            "city": "Santiago",
+            "lat": "-33.393",
+            "lng": "-70.7858"
+        },
+        {
+            "text": "LHR",
+            "size": 1.0,
+            "country": "United Kingdom",
+            "city": "London",
+            "lat": "51.4700",
+            "lng": "-0.4543"
+        },
+        {
+            "text": "FRA",
+            "size": 1.0,
+            "country": "Germany",
+            "city": "Frankfurt",
+            "lat": "50.033333",
+            "lng": "8.570556"
+        },
+        {
+            "text": "MAD",
+            "size": 1.0,
+            "country": "Spain",
+            "city": "Madrid",
+            "lat": "40.4719",
+            "lng": "-3.5626"
+        },
+        {
+            "text": "CPT",
+            "size": 1.0,
+            "country": "South Africa",
+            "city": "Cape Town",
+            "lat": "-33.9648",
+            "lng": "18.6017"
+        },
+        {
+            "text": "NBO",
+            "size": 1.0,
+            "country": "Kenya",
+            "city": "Nairobi",
+            "lat": "-1.3192",
+            "lng": "36.9279"
+        },
+        {
+            "text": "CAI",
+            "size": 1.0,
+            "country": "Egypt",
+            "city": "Cairo",
+            "lat": "30.1219",
+            "lng": "31.4054"
+        },
+        {
+            "text": "NRT",
+            "size": 1.0,
+            "country": "Japan",
+            "city": "Tokyo",
+            "lat": "35.7719",
+            "lng": "140.3928"
+        },
+        {
+            "text": "HKG",
+            "size": 1.0,
+            "country": "Hong Kong",
+            "city": "Hong Kong",
+            "lat": "22.3080",
+            "lng": "113.9185"
+        },
+        {
+            "text": "BKK",
+            "size": 1.0,
+            "country": "Thailand",
+            "city": "Bangkok",
+            "lat": "13.6890",
+            "lng": "100.7501"
+        },
+        {
+            "text": "SIN",
+            "size": 1.0,
+            "country": "Singapore",
+            "city": "Singapore",
+            "lat": "1.3644",
+            "lng": "103.9915"
+        },
+        {
+            "text": "SYD",
+            "size": 1.0,
+            "country": "Australia",
+            "city": "Sydney",
+            "lat": "-33.9399",
+            "lng": "151.1753"
+        },
+        {
+            "text": "AKL",
+            "size": 1.0,
+            "country": "New Zealand",
+            "city": "Auckland",
+            "lat": "-37.0082",
+            "lng": "174.7850"
+        },
+        {
+            "text": "IST",
+            "size": 1.0,
+            "country": "Turkey",
+            "city": "Istanbul",
+            "lat": "40.9769",
+            "lng": "28.8146"
+        },
+        {
+            "text": "RUH",
+            "size": 1.0,
+            "country": "Saudi Arabia",
+            "city": "Riyadh",
+            "lat": "24.9576",
+            "lng": "46.6988"
+        },
+        {
+            "text": "TLV",
+            "size": 1.0,
+            "country": "Israel",
+            "city": "Tel Aviv",
+            "lat": "32.0114",
+            "lng": "34.8866"
+        },
+        {
+            "text": "DOH",
+            "size": 1.0,
+            "country": "Qatar",
+            "city": "Doha",
+            "lat": "25.2736",
+            "lng": "51.6080"
+        },
+        {
+            "text": "BRU",
+            "size": 1.0,
+            "country": "Belgium",
+            "city": "Brussels",
+            "lat": "50.9010",
+            "lng": "4.4856"
+        },
+        {
+            "text": "SOF",
+            "size": 1.0,
+            "country": "Bulgaria",
+            "city": "Sofia",
+            "lat": "42.6954",
+            "lng": "23.4063"
+        },
+        {
+            "text": "CPH",
+            "size": 1.0,
+            "country": "Denmark",
+            "city": "Copenhagen",
+            "lat": "55.6180",
+            "lng": "12.6561"
+        },
+        {
+            "text": "HEL",
+            "size": 1.0,
+            "country": "Finland",
+            "city": "Helsinki",
+            "lat": "60.3172",
+            "lng": "24.9633"
+        },
+        {
+            "text": "CDG",
+            "size": 1.0,
+            "country": "France",
+            "city": "Paris",
+            "lat": "49.0097",
+            "lng": "2.5479"
+        },
+        {
+            "text": "BUD",
+            "size": 1.0,
+            "country": "Hungary",
+            "city": "Budapest",
+            "lat": "47.4369",
+            "lng": "19.2557"
+        },
+        {
+            "text": "DUB",
+            "size": 1.0,
+            "country": "Ireland",
+            "city": "Dublin",
+            "lat": "53.4213",
+            "lng": "-6.2701"
+        },
+        {
+            "text": "FCO",
+            "size": 1.0,
+            "country": "Italy",
+            "city": "Rome",
+            "lat": "41.8003",
+            "lng": "12.2389"
+        },
+        {
+            "text": "LUX",
+            "size": 1.0,
+            "country": "Luxembourg",
+            "city": "Luxembourg",
+            "lat": "49.6266",
+            "lng": "6.2115"
+        },
+        {
+            "text": "AMS",
+            "size": 1.0,
+            "country": "Netherlands",
+            "city": "Amsterdam",
+            "lat": "52.3105",
+            "lng": "4.7683"
+        },
+        {
+            "text": "WAW",
+            "size": 1.0,
+            "country": "Poland",
+            "city": "Warsaw",
+            "lat": "52.1651",
+            "lng": "20.9670"
+        },
+        {
+            "text": "LIS",
+            "size": 1.0,
+            "country": "Portugal",
+            "city": "Lisbon",
+            "lat": "38.7742",
+            "lng": "-9.1342"
+        },
+        {
+            "text": "OTP",
+            "size": 1.0,
+            "country": "Romania",
+            "city": "Bucharest",
+            "lat": "44.5735",
+            "lng": "26.1021"
+        },
+        {
+            "text": "BRN",
+            "size": 1.0,
+            "country": "Switzerland",
+            "city": "Bern",
+            "lat": "46.9132",
+            "lng": "7.5045"
+        },
+        {
+            "text": "STO",
+            "size": 1.0,
+            "country": "Sweden",
+            "city": "Stockholm",
+            "lat": "59.6519",
+            "lng": "17.9186"
+        }
+    ]
+}
