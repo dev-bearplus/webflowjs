@@ -560,6 +560,9 @@ const mainScript = () => {
                     }
                 }
             })
+            $('.home-popup-item').on('scroll', ()=> {
+                this.ItemContentActiveCheck('.home-popup-item.active .home-popup-item-content h6');
+            })
             $('.home-popup-item.active  .home-popup-item-left-inner').on('click', '.home-popup-item-left-content', function(e) {
                 e.preventDefault();
                 console.log('click');
@@ -572,6 +575,15 @@ const mainScript = () => {
                     scrollTop: scrollTop
                 }, 2000);
             })
+        }
+        ItemContentActiveCheck(el) {
+            for (let i = 0; i < $(el).length; i++) {
+                let top = $(el).eq(i).get(0).getBoundingClientRect().top;
+                if (top > 0 && top + $(el).eq(i).height() < viewport.h/4*3 ) {
+                    $('.home-popup-item.active .home-popup-item-left-content').removeClass('active');
+                    $('.home-popup-item.active .home-popup-item-left-content').eq(i).addClass('active');
+                }
+                }
         }
         initContentPopup() {
             let iframeSpotifySrc ='https://open.spotify.com/embed/playlist/1bhxiHUsBUQPTaYOyt8gUi?utm_source=generator&theme=0'
@@ -587,16 +599,6 @@ const mainScript = () => {
                     titleLeftClone.find('.home-popup-item-left-title').text($(el).text());
                     titleLeftClone.attr('data-title', `toch-${i}`);
                     $(item).find('.home-popup-item-left-inner').append(titleLeftClone);
-                })
-                $(item).find('a').each((i, el) => {
-                    let href = $(el).attr('href');
-                    if(href.includes('spotify-embed')) {
-                        $(el).closest('p').addClass('spotify-embed-wrap');
-                        $(el)
-                        console.log($(el).closest('p'));
-                        $(el).replaceWith(`<iframe src="${iframeSpotifySrc}" width="100%" height="400px" frameborder="0" clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`);
-                        
-                    }
                 })
             })
 
@@ -1299,11 +1301,11 @@ const mainScript = () => {
                 $('.service-hero-popup-menu-item').removeClass('active');
                 $(this).addClass('active');
                 let dataHeader = $(this).attr('data-title');
-                var scrollTop =  $('.service-hero-popup-inner').scrollTop() + $(`.service-hero-popup-content-txt h6[data-title="${dataHeader}"]`).offset().top  - parseFloat($('.service-hero-popup-menu-inner').css('top'));
+                var scrollTop =  $('.service-hero-popup-inner').scrollTop() - $('.service-hero-popup-inner').offset().top + $(`.service-hero-popup-content-txt h6[data-title="${dataHeader}"]`).offset().top  - parseFloat($('.service-hero-popup-menu-inner').css('top'));
                 console.log(scrollTop )
                 $('.service-hero-popup-inner.active').animate({
                     scrollTop: scrollTop
-                }, 2000);
+                }, 1000);
             })
         }
         ItemContentActiveCheck(el) {
@@ -2006,7 +2008,6 @@ const mainScript = () => {
                 }
             }) 
             $('.work-popup-item').on('scroll', ()=> {
-                console.log('scroll')
                 this.ItemContentActiveCheck('.work-popup-item.active .work-popup-item-content h5');
             })
             $('.work-popup-item-left-content').on('click', '.work-popup-item-left-title', function(e) {
@@ -2014,9 +2015,10 @@ const mainScript = () => {
                 $('.work-popup-item-left-title').removeClass('active');
                 $(this).addClass('active');
                 let dataHeader = $(this).attr('data-title');
+                var scrollTop =  $('.work-popup-inner').scrollTop() - $('.work-popup-inner').offset().top + $(`.work-popup-item-left-content .work-popup-item-left-title[data-title="${dataHeader}"]`).offset().top   - parseFloat($('.work-popup-item-left-content').css('top'));
                 $('.work-popup-item.active').animate({
-                    scrollTop: $(`.work-popup-item-left-content .work-popup-item-left-title[data-title="${dataHeader}"]`).offset().top 
-                }, 2000);
+                    scrollTop: scrollTop
+                }, 1000);
             })
             function resetScrollPopup() {
                 setTimeout(() => {
@@ -2048,7 +2050,6 @@ const mainScript = () => {
             for (let i = 0; i < $(el).length; i++) {
                 let top = $(el).eq(i).get(0).getBoundingClientRect().top;
                 if (top > 0 && top + $(el).eq(i).height() < viewport.h/4*3 ) {
-                    console.log(i)
                     $('.work-popup-item.active .work-popup-item-left-content .work-popup-item-left-title').removeClass('active');
                     $('.work-popup-item.active .work-popup-item-left-content .work-popup-item-left-title').eq(i).addClass('active');
                 }
@@ -2151,7 +2152,7 @@ const mainScript = () => {
             
                 const closeMenu = () => {
                     $header.removeClass("on-show-menu");
-                    header.toggleWhiteMode();
+                    header.toggleColorMode('white');
                     $menuInner.removeClass("active");
                     gsap.to(".header-menu-title.close .word", { duration: 0.8, y: "-100%", stagger: 0.015, ease: "power2.out" });
                     gsap.to(".header-menu-title.open .word", { duration: 0.8, y: "0%", stagger: 0.015, ease: "power2.out" });
@@ -2228,7 +2229,7 @@ const mainScript = () => {
             $('.header').removeClass('on-mode');
             }, onUpdate: function() {
                 if(this.progress() > .7){
-                    header.toggleWhiteMode();
+                    header.toggleColorMode('white');
                 }
             }});
         }
@@ -2240,13 +2241,13 @@ const mainScript = () => {
                 $(".header").removeClass("on-scroll");
             }
         }
-        toggleWhiteMode = () => {
-            let elArr = Array.from($('[data-section="white"]'));
+        toggleColorMode = (color) => {
+            let elArr = Array.from($(`[data-section="${color}"]`));
             if (elArr.some(function (el) { return isInHeaderCheck(el) })) {
-                $('.header').addClass('on-white');
+                $('.header').addClass(`on-${color}`);
             } 
             else if( !$('.header').hasClass('on-show-menu')) {
-                $('.header').removeClass('on-white');
+                $('.header').removeClass(`on-${color}`);
             }
         }
         toggleOnHide = (inst) => {
@@ -2362,9 +2363,10 @@ const mainScript = () => {
         }
 
         header.toggleOnScroll(lenis);
-        header.toggleWhiteMode();
+        header.toggleColorMode('white');
         lenis.on("scroll", function (inst) {
-            header.toggleWhiteMode();
+            header.toggleColorMode('white');
+            header.toggleColorMode('blue');
             header.toggleOnScroll(lenis);
             header.toggleOnHide(inst);
         });
