@@ -1,0 +1,707 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{
+    "@type": "Question",
+    "name": "What is Chocolate Finance?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Chocolate Finance is a new place for your spare cash. Enjoy 4.5% p.a. return on your first S$20k and a target 3.5% p.a. on any amount thereafter. No lock-ins, no hoops to jump through.
+What's more, we take no fees and make no money until we deliver the target return."
+    }
+  },{
+    "@type": "Question",
+    "name": "How does Chocolate Finance generate these great returns?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Banks generate returns by investing your deposits mainly in mortgages and credit to get returns. Chocolate instead invests your money into a portfolio of fixed-income funds designed to optimise risk-adjusted returns based on duration, spread, and currency. This allows the portfolio to target a return of 4.5% p.a. for the first S$20k, and 3.5% p.a. thereafter. 
+See your returns daily in the app. What's more, if the portfolio doesn't make the target 4.5% p.a. for your first S$20k, we will top up the difference to ensure you enjoy the target return during the Qualifying Period. We take no fee and make no money until we deliver the target return. Does it get any better than that?"
+    }
+  },{
+    "@type": "Question",
+    "name": "What is the Chocolate Top-Up Programme and its Qualifying Period?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "We think the Chocolate Top-Up program is pretty awesome. It's been put in place so you can enjoy the target 4.5% p.a. on your first S$20k. This means if the portfolio underperforms, we will top up the difference so you enjoy the target return during the Qualifying Period. 
+The Qualifying Period is from now until 31 December 2023, or until the assets under management for the Chocolate Managed Account reach S$500 million – whichever occurs earlier. 
+Chocolate reserves the right to amend the Qualifying Period at any time, and without notice. Read the details for the liquidity and top-up terms and conditions."
+    }
+  },{
+    "@type": "Question",
+    "name": "Is Chocolate Finance a bank?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Chocolate Finance is not a bank. It is a managed account operated by Havenport Investments Pte. Ltd. Havenport is a Holder of a Capital Markets Services Licence and an Exempt Financial Adviser, regulated by the Monetary Authority of Singapore with a license number of (CMS100173)."
+    }
+  },{
+    "@type": "Question",
+    "name": "Is Chocolate Finance a cryptocurrency savings account?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Nope, no, absolutely not. No crypto anywhere! We neither accept or invest in cryptocurrencies."
+    }
+  },{
+    "@type": "Question",
+    "name": "As there are no fees, how does Chocolate finance make money?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Chocolate invests your savings in a portfolio of fixed-income funds. We only make money once you’ve made money. So naturally, it’s our number one priority to make the returns we’ve targeted for you. We make our money when the funds overperform."
+    }
+  },{
+    "@type": "Question",
+    "name": "Does Chocolate Finance have an app?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes! In fact, we that's all we have - the future is digital! Available for free download from the App Store or Google Play store. Sign up in minutes with your mobile number!"
+    }
+  },{
+    "@type": "Question",
+    "name": "Is Chocolate Finance a good way to make money?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "We certainly think so! Enjoy 4.5% p.a. return on your first S$20k and a target 3.5% p.a. on any amount thereafter
+
+See your returns daily in the app. Chocolate takes no fee and makes no money until we deliver the target return. What's more, if we don't make the target 4.5% p.a. for your first S$20k, we will top up the difference to make sure you enjoy the target return. Does it get any better than that? Learn more about the top-up in the [Terms and Conditions]."
+    }
+  },{
+    "@type": "Question",
+    "name": "How is Chocolate Finance different from others in the market?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "To get higher returns, many other products need you to lock in your money for long periods, or jump through several hoops to get a good rate - we don’t. 
+
+Say goodbye to unreasonable restrictions, lock-ins, confusing tiered interest rates, or complex criteria  - hello exciting returns and happy money.   
+
+What's more, if we don't make the target 4.5% p.a. for your first S$20k, we will top up the difference so you can enjoy the target return. Does it get any better than that? Read about the top-up in the [Terms and Conditions]."
+    }
+  },{
+    "@type": "Question",
+    "name": "What happens if Chocolate Finance gets acquired, goes public or closes?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Nothing happens to your money! It's safe. We understand that the security of your funds is of utmost importance. To ensure that your money is safeguarded, we have taken measures to keep it entirely separate from our own finances. Whether your funds are in the form of cash or securities, we use the services of custodian banks to hold and manage them.
+
+When your assets are held in custodian banks, they are always placed in a segregated account that is distinct from Chocolate's operations and assets. This ensures that you have complete access and ownership of your assets, regardless of any circumstances that may affect Chocolate."
+    }
+  },{
+    "@type": "Question",
+    "name": "Are you covered by the SDIC Singapore Deposit Insurance Corporation, for up to S$75,000?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "As an asset management company, we are not a member of the Singapore Deposit Insurance Corporation. Unlike commercial banks, your funds with Chocolate Finance are separately held with the fund managers' custodian. This means that if anything goes wrong with Chocolate, your money is still safe.
+
+That said, we understand how important the security of your money is. That's why, if we don't make the target 4.5% p.a. for your first S$20k, we will top up the difference to make sure you enjoy the target return."
+    }
+  },{
+    "@type": "Question",
+    "name": "Is Chocolate Finance legitimate and regulated by the MAS?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes, Chocolate Finance is absolutely legitimate!  
+Chocolate Finance is a managed account service operated by Havenport Investments Pte Ltd, a Holder of a Capital Markets Services Licence regulated to perform fund management activities, dealing in capital markets products, and providing custodial services. Havenport Investments Pte Ltd is also an Exempt Financial Adviser regulated to perform financial advisory services in Singapore. Chocolate Finance is a brand licenced for use by Havenport from Chocolate Pte Ltd.
+
+Rest assured, Havenport Investments Pte Ltd is regulated by the Monetary Authority of Singapore (license number CMS100173)
+
+Chocolate Pte. Ltd is a registered Singapore private company and a member of both the Singapore Fund Administrators Association and Singapore Fintech Association."
+    }
+  },{
+    "@type": "Question",
+    "name": "Which bank does Chocolate Finance use to collect account holders money?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Chocolate Finance uses DBS for the collection of the account holder's money. 
+
+Need help adding money to your Chocolate account? See \"How do I add money to my Chocolate Finance Account?\""
+    }
+  },{
+    "@type": "Question",
+    "name": "Who owns Chocolate Pte Ltd?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Chocolate Pte. Ltd. was founded by Walter de Oude, who previously founded Singapore Life (Singlife). 
+
+Chocolate has significant reputable investors including Peak XV Partners (previously Sequoia), Prosus, DST, Credit Saison, GFC, and Dara Holdings."
+    }
+  },{
+    "@type": "Question",
+    "name": "How do I open a Chocolate Finance account?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You can open a Chocolate Finance account in minutes.
+Step 1: Download the Chocolate Finance app from the App store or Google Play. 
+Step 2: Sign up and verify your identity using Singpass or manual verification.
+Step 3: Add money into your account using a bank FAST transfer or Paynow QR.
+Step 4: See your returns daily in the app."
+    }
+  },{
+    "@type": "Question",
+    "name": "Can you cancel your Chocolate Finance account at any time?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Absolutely, although we would be incredibly sad to see you go. There are no lock-ins, minimums, maximums, or penalties. You can withdraw your money, close or delete your account yourself from within the app whenever you like."
+    }
+  },{
+    "@type": "Question",
+    "name": "How do I contact Chocolate Finance Customer Services?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "There are a number of ways to contact our awesome customer service team. The fastest way is using WhatsApp from within your Chocolate Finance app. Just tap on the pink WhatsApp icon in the top right corner of your homepage and we'll get chatting! 
+
+Alternatively you can call us on +65 94797979 or email us at support@chocolatefinance.com
+
+Our customer services will be available from 9am - 6pm Monday-Friday."
+    }
+  },{
+    "@type": "Question",
+    "name": "How long does it take to complete sign up for a Chocolate Finance account?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Sign up is quick and easy and should take no more than a few minutes from downloading the app. See also \"How do I open a Chocolate Finance account?\""
+    }
+  },{
+    "@type": "Question",
+    "name": "What is the minimum age to open a Chocolate Finance Account?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You must be 18 years old or above to open a Chocolate Finance account."
+    }
+  },{
+    "@type": "Question",
+    "name": "Can I have multiple or joint Chocolate Finance accounts?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Chocolate Finance is limited to one, single account per person. But why not refer partners and family using our refer a friend program, then they can access the target 4.5% p.a. returns on their S$20k and collectively your money is happier!"
+    }
+  },{
+    "@type": "Question",
+    "name": "What supporting documents are required to open my Chocolate Finance Account?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "To sign up for a Chocolate Finance account you will be required to verify your ID and address. As a resident of Singapore, the easiest way to do this is using Singpass, MyInfo (in which case, it's a click of a button).
+ 
+Alternatively, you can verify your identity manually by taking a photo of your ID, taking a gorgeous selfie, and uploading proof of address. Easy peasy!
+
+Please note, if additional verification is required, we may get in touch with you and request for additional documents."
+    }
+  },{
+    "@type": "Question",
+    "name": "Do I need a bank account for Chocolate Finance?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "In order to add money into your Chocolate account you will need a bank account in your name.
+
+If we receive money from a bank account that is different from your Chocolate Finance account name, we may be required to return the funds or request further information on the source of funds."
+    }
+  },{
+    "@type": "Question",
+    "name": "How much does it cost to open a Chocolate Finance account?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Best things in life are free! It's completely free to open a Chocolate Finance account."
+    }
+  },{
+    "@type": "Question",
+    "name": "Can non-Singapore residents use Chocolate Finance?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Absolutely! Chocolate Finance is open to almost anyone, almost anywhere in the world.
+
+We currently can't accept US Citizens (i) , but watch this space. 
+
+(i) will open the following: 
+We currently can't accept:
+a) U.S. Citizen or U.S. Permanent Resident (green card) status; or
+b)U.S. residency and/or mailing address; or
+c) U.S. Taxpayer Identification Number (TIN)."
+    }
+  },{
+    "@type": "Question",
+    "name": "Can a corporate open a Chocolate Finance Account?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No, Chocolate Finance is for personal sign up only. We hope to be able to onboard corporate applications in the future."
+    }
+  },{
+    "@type": "Question",
+    "name": "How are notifications sent? Do I have the option to change?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "We will send SMS and push notifications for communication regarding transactions and confirmation of your actions on your account. This may include notifications about your top-ups, spending, withdrawals, or transfers. 
+
+We will also email you a monthly statement at the end of every month for your records. You can choose to print your statement yourself if you like, however, we would encourage you not to waste paper. #savetheplanet. 
+
+You can amend your notification preferences anytime in your app under the 'My Account' page, in the 'App Settings' section."
+    }
+  },{
+    "@type": "Question",
+    "name": "What happens if I change my mobile number?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No problem at all! You can edit your phone number in the app anytime. Go to the 'My Account' page, tap on your name, then on the \"My details\" page, tap on the phone number, and simply update it with your new number. An OTP will be sent via SMS to your new phone number for verification. You will be logged out of the app and asked to re-login with your new mobile and OTP."
+    }
+  },{
+    "@type": "Question",
+    "name": "How do I change the email address linked to my Chocolate Finance Account?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You can easily edit your email address in the app. Go to the 'My Account' page, tap on your name, then on the \"My details\" page, tap on the current email address and update it with your new email address. A unique link will be sent to your new email address for verification."
+    }
+  },{
+    "@type": "Question",
+    "name": "How often are the target returns credited to my Chocolate Finance account and available for me to withdraw?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Unlike traditional finance options, with Chocolate Finance, you can see your returns daily in the app. Withdraw anytime you like!"
+    }
+  },{
+    "@type": "Question",
+    "name": "How do I check how much money my Chocolate Finance account has made?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Finding your balance and returns is incredibly easy! Simply open your Chocolate Finance app and your balance and monthly returns are on the home page.  If you want to see further details on the returns, you can:
+
+1. Tap on the returns banner from the homepage to see a breakdown of your returns. This will show you how much you are earning on your first S$20k and amounts above that within the current month. You can also see your lifetime returns with Chocolate here. 
+
+2. If you want to see further detail on what your money is invested in, you can go to your account page and tap on 'live statement'. 
+3. You may also see your monthly statements on your account page. We will notify you when your monthly statement is ready at the end of every month."
+    }
+  },{
+    "@type": "Question",
+    "name": "What interest rate is Chocolate Finance offering?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Enjoy 4.5% p.a. return on your first S$20k and a target 3.5% p.a. on any amount thereafter. No lock-ins, no hoops to jump through. 
+
+See your returns daily in the app. Chocolate takes no fee and makes no money until we deliver the target return. What's more, if we don't make the target 4.5% p.a. for your first S$20k, we will top up the difference to make sure you enjoy the target return. Does it get any better than that?"
+    }
+  },{
+    "@type": "Question",
+    "name": "Does Chocolate Finance offer a fixed deposit rate? Is there a lock-in period?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Chocolate Finance is not a fixed deposit account. There are no minimum or maximum requirements for a Chocolate Finance account.  Your money is never locked in, withdraw anytime. No penalties.
+
+Enjoy 4.5% p.a. return on your first S$20k and a target 3.5% p.a. on any amount thereafter without any lock ins!"
+    }
+  },{
+    "@type": "Question",
+    "name": "How fast does my deposit start earning returns?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Super duper fast! See your returns daily in the app."
+    }
+  },{
+    "@type": "Question",
+    "name": "Is the money in Chocolate Finance Account safe from capital losses, Can I lose my principal sum?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "There are no guarantees in life. Our portfolio is structured to deliver 4.5% p.a. return on your first S$20k and a target 3.5% p.a. on any amount thereafter. However, If we don't make the target 4.5% p.a. for your first S$20k, we will top up the difference to make sure you enjoy the target return. Does it get any better than that? 
+
+For amounts above S$20k, we target 3.5% p.a. Your return is a money-weighted rate of return. We advise that 3.5% p.a. is not guaranteed and there is a potential for capital losses.
+
+Past performance is not necessarily an indication of future performance."
+    }
+  },{
+    "@type": "Question",
+    "name": "Do Chocolate finance offer guaranteed returns? Can the target return ever change?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "There are no guarantees in life. Chocolate Finance invests in a portfolio of short-term fixed-income funds to deliver your returns. These are still subject to market volatility.  However, if we don't make the target 4.5% p.a. for your first S$20k, we will top up the difference to make sure you enjoy the target return. Does it get any better than that? 
+
+In the event that we decide to change the target returns, we will communicate this change to you via email, SMS, or notification. You can withdraw your money at any time if you are not happy with the change."
+    }
+  },{
+    "@type": "Question",
+    "name": "What happens to accumulated returns if I close my account?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "If you ever decide to close your account (we would be incredibly sad to see you go), you can withdraw all your money, including the accumulated returns you have earned right up until the day you close. No penalties."
+    }
+  },{
+    "@type": "Question",
+    "name": "How do I add money to my Chocolate Finance Account?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "From the homepage of your Chocolate Finance app, tap on 'Add Money' and follow the instructions on the page to transfer money into your Chocolate account from your bank or you can use Paynow QR for ease. 
+
+For faster future top-ups, you can link your bank account to Chocolate."
+    }
+  },{
+    "@type": "Question",
+    "name": "How much money can I have in my Chocolate Finance account? Is there a minimum deposit?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "There are no minimum or maximum requirements for the Chocolate Finance account. You can add as much or as little as you like! (obviously, the more the better 👍).
+
+However, it's worth noting that the returns you earn on amounts less than $83 is below 1 cent, so perhaps add more than that to start seeing your returns daily!"
+    }
+  },{
+    "@type": "Question",
+    "name": "How long does it take for Chocolate Finance to receive funds?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Singapore FAST and Paynow transfers are usually instant. If it isn't instant, perhaps give technology a few minutes to work magic!
+
+International transfers could take 1-2 days to reflect in your account from when the funds are sent. This depends on the bank you send money from."
+    }
+  },{
+    "@type": "Question",
+    "name": "What is the funds accounting currency?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Your Chocolate account only supports SGD for now, but USD and more currencies are coming soon!"
+    }
+  },{
+    "@type": "Question",
+    "name": "Can you link a credit card to Chocolate Finance?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Not at the moment, sorry! Currently, you can only add money to your Chocolate Finance account via FAST bank transfer or PayNow."
+    }
+  },{
+    "@type": "Question",
+    "name": "Can I use CPF or SRS to transfer money into my Chocolate Finance Account?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No, Chocolate Finance is not currently part of the supplementary retirement scheme or the CPF investment Scheme in Singapore."
+    }
+  },{
+    "@type": "Question",
+    "name": "Can I receive my salary into my Chocolate Finance account?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "We are required to verify that the account you are sending money into Chocolate from belongs to you. If the originating account does not belong to you, as may be the case for salaries, we would not be allowed to accept this money. 
+That said, why not set up an auto top-up to add money into your Chocolate account every month! In fact, we would love this 😘."
+    }
+  },{
+    "@type": "Question",
+    "name": "How do I withdraw money from Chocolate Finance?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You can withdraw from your Chocolate Finance account using a FAST bank transfer. 
+
+Step 1: Tap on the \"withdraw\" button on the Chocolate Finance app home page.
+Step 2: Add a bank account to withdraw the money to. Make sure the account details are correct and the bank you are withdrawing money to belongs to you.
+Step 3: Enter the amount you would like to withdraw and swipe to confirm the withdrawal!
+
+There are no minimum or maximum limits on withdrawal."
+    }
+  },{
+    "@type": "Question",
+    "name": "Do I have instant access to my cash?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Absolutely, it's your money. Do whatever you like with it. 
+
+• Withdraw your money via FAST bank transfer. 
+• Send your money to Chocolate customer via ChocPay.
+• Spend in style with your Chocolate VISA Card."
+    }
+  },{
+    "@type": "Question",
+    "name": "How long does it take to withdraw money from Chocolate Finance? Can I withdraw all my money from Chocolate Finance?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes, you can withdraw all your money. Most withdrawals are instant (speed is our middle name 😎):
+
+• For withdrawals up to S$20k (or multiple withdrawals adding up to S$20k within any 1 given day) – You will receive your money instantly!  
+• For withdrawals over S$20k (or multiple withdrawals adding up to more than S$20k within any 1 given day) – You will receive your money in the next 1-5 business days."
+    }
+  },{
+    "@type": "Question",
+    "name": "Does Chocolate Finance charge to withdraw?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "There are no charges or penalties to withdraw your money 😊. Take money out anytime, no restrictions. No charges."
+    }
+  },{
+    "@type": "Question",
+    "name": "Is there a monthly charge for Chocolate Finance?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "There are no monthly charges or subscriptions for using Chocolate Finance."
+    }
+  },{
+    "@type": "Question",
+    "name": "What fees do Chocolate charge?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "We only make money after you make money. So naturally, it’s our number one priority to make the returns we’ve targeted for you. No fees are charged until you achieve the returns we target. 
+
+Only once the target return has been achieved and the fund outperforms the target, we will take a fee of between 0-2%, depending on how much the portfolio outperforms (we've got to make our money somewhere 🤑). We will never take any money from your 4.5% p.a. returns on your first S$20k or amounts thereafter for performance below 3.5% p.a. 
+
+If you'd like to dive into the detail 🤓, read away here."
+    }
+  },{
+    "@type": "Question",
+    "name": "What happens if Chocolate Finance outperforms the target return?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Only once the target return has been achieved and the fund outperforms the target, we will take a fee of between 0-2%, depending on how much the portfolio outperforms (we've got to make our money somewhere 🤑). We will never take any money from your 4.5% p.a. returns on your first S$20k or amounts thereafter for performance below 3.5% p.a. 
+
+If the funds return is in excess of 2% p.a. above the target return, then ka-ching! These returns are yours, you're welcome. 
+
+If you'd like to dive into the detail 🤓, read away here."
+    }
+  },{
+    "@type": "Question",
+    "name": "How does the Chocolate Finance referral program work?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Chocolate is currently only inviting people from the waitlist to use the product. But we know sharing is caring 🤗! So in addition to exclusive early access and great returns, get rewarded for referring friends to Chocolate.
+
+Invite up to 4 of your special friends or family (anyone, anywhere in the world) to Chocolate and unlock S$5 for every friend who successfully signs up and adds money to their account (up to S$20). Once you are a part of the Chocolate community, get involved with our bug buster competition for a chance to win more rewards and help us to make the app better by sharing your honest feedback."
+    }
+  },{
+    "@type": "Question",
+    "name": "How to refer a friend?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "It's simple! 
+1. Go to 'refer a friend' from the homepage. 
+2. Give Chocolate access to your contacts for ease or manually enter their number into the search bar.
+3. Select up to 4 friends from your contact list (choose wisely, you can only invite 4)
+4. Once you tap on the “send invite” button, an SMS with a unique link will be generated for you to send.
+5. Your friends can tap on the link to download the app. They can then sign up for an account using the mobile number you sent the SMS to.  
+
+Once your friend has signed up and added money into their account for their Chocolate account we will credit S$5 to your Chocolate balance!"
+    }
+  },{
+    "@type": "Question",
+    "name": "When will I receive my referral reward?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The S$5 reward will only be credited to your Chocolate Finance balance once the friend you invited has successfully signed up and added money to their Chocolate account."
+    }
+  },{
+    "@type": "Question",
+    "name": "What is the Chocolate Finance waitlist?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Signing up to Chocolate Finance is currently by invite only 🤫. The waitlist is for people who are keen to be the first to know when Chocolate Finance is available for customers. They will have exclusive early access to the world of Chocolate.
+
+
+Add your name and details to the waitlist and If you're eligible to sign up, we'll let you know when we're ready for you. Alternatively, if you have a friend who has already been invited, you can ask them to refer you 🙌 !"
+    }
+  },{
+    "@type": "Question",
+    "name": "How long will it take to get an invite?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "We have a big list to go through (and it's growing rapidly 😊). We are working hard to get through it fast. Join the waitlist and keep an eye on your email. We will let you know when we can welcome you onboard.
+
+Another way to get early access is to ask a friend who's already been invited to refer you."
+    }
+  },{
+    "@type": "Question",
+    "name": "How to add yourself to the waitlist",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Go to the www.chocolatefinance.com website and click on the \"join the waitlist' button. Answer the questions and voila - you are on the waitlist!"
+    }
+  },{
+    "@type": "Question",
+    "name": "Can I do anything to improve my chances of being invited?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "You can always try 😉  - follow us on social media, like our posts, shower us with compliments and who knows!"
+    }
+  },{
+    "@type": "Question",
+    "name": "Is Chocolate Finance a Money Market Fund?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Chocolate Finance is not a money market fund. It is a managed account operated by Havenport Investments Pte. Ltd. Havenport is licensed as an asset management company by the Monetary Authority of Singapore (CMS100173). The managed account, however, does invest in short-duration fixed-income funds and money market funds."
+    }
+  },{
+    "@type": "Question",
+    "name": "Do I have to declare my chocolate account with the taxman?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "As a financial institution, we do not provide tax advice. It is important to consult with a tax professional who is familiar with the tax laws in your country or region to ensure that you are complying with the requirements of your country."
+    }
+  },{
+    "@type": "Question",
+    "name": "Where is the company based out of?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "We are registered Singapore private company, with head offices in Singapore. We are a proudly Singaporean brand."
+    }
+  },{
+    "@type": "Question",
+    "name": "Can you sustain in the long run?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Our current target of 4.5% p.a returns on amounts up to S$20k is appropriate given where rates are at the moment. But just like banks if market rates fall, our target return will adjust accordingly.
+  
+Chocolate is well supported by investors and partners like Sequoia, Prosus, the founder of Singlife and others. We expect to grow and sustain our business for the long run."
+    }
+  },{
+    "@type": "Question",
+    "name": "Are the funds invested globally and am I exposed to FX risks?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The underlying funds of the Chocolate Managed Account are invested globally to maximise returns.  Any investments in global currencies are hedged back to SGD to protect against FX risk.  
+
+Please review the underlying fund's prospectus and its product highlight sheets to understand the fund's investment objectives, strategies, and risks. This can be found in the app under the 'my account\"\" page, 'documents' section."
+    }
+  },{
+    "@type": "Question",
+    "name": "How do I report an alleged fraud attempt or scam?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "As part of our commitment to protecting our customers and preventing fraud, we monitor all transactions on our system and conduct periodic reviews to identify any unusual or suspicious activity. To report any scam or fraud cases please do email our customer service team at support@chocolatefinance.com. Thank you!"
+    }
+  },{
+    "@type": "Question",
+    "name": "How do I report an email, social media handle, website or app impersonating Chocolate Finance?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Whilst imitation is the sincerest form of flattery 😊 we take things like this seriously. Please help us to control impersonations by reporting this to our team at support@chocolatefinance.com immediately. We thank you in advance."
+    }
+  },{
+    "@type": "Question",
+    "name": "How do I report phishing emails or messages, claiming to be Chocolate finance, requesting for my login credentials and personal information?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "We take the security of your personal information very seriously and we will never ask for your login credentials. Please report any potential phishing attempts immediately to our customer service team at support@chocolatefinance.com. We thank you in advance."
+    }
+  },{
+    "@type": "Question",
+    "name": "What should I do if I lose my phone? Can Chocolate block my account?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Losing your phone can be a real pain! Call or Whatsapp us on +65 94797979 or email us at support@chocolatefinance.com and we will temporarily freeze your account. Don't worry your Chocolate account will be in safe hands until you're ready to use it again."
+    }
+  },{
+    "@type": "Question",
+    "name": "Can I transfer funds from a bank account that is not mine?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Chocolate can only accept money sent from a bank account that belongs to you. Therefore, if you have sent money from a bank account with a different name, we will have to reject the transaction and return the money."
+    }
+  },{
+    "@type": "Question",
+    "name": "Why was my funds transfer rejected by the other bank?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "As much as we would love to help, you will have to ask your other bank this question."
+    }
+  },{
+    "@type": "Question",
+    "name": "I have deposited $50 - why can I not see my returns?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "It's worth noting that the returns you earn on balances less than $83 is below 1 cent (S$0.01), so perhaps add more than that to start seeing your daily returns!"
+    }
+  },{
+    "@type": "Question",
+    "name": "What are the underlying fund fees?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The funds are chosen to maximise returns net of any underlying third-party fees. Please refer to the fund documents in the Chocolate App for detailed information on the underlying funds. This can be found on the 'My Account' page under the 'Documents' section.
+
+Don't worry, your target return is NET of any underlying fund expenses. This means you will still get the full target 4.5% p.a. on your first S$20k and a target 3.5% on any amount above that."
+    }
+  },{
+    "@type": "Question",
+    "name": "What are the underlying funds?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The Chocolate managed account is a new portfolio of fixed-income securities comprising of a collection of funds. The portfolio is currently made up of: 
+– Dimensional STIG SGD
+– United SGD Fund 
+– Fullerton SGD Cash Fund 
+
+These may change at the sole discretion of the portfolio manager. In your Chocolate app you will be able to see the information on each fund and the percentage of money allocated to them."
+    }
+  },{
+    "@type": "Question",
+    "name": "What is the past/historic performance of the portfolio?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Past performance of each individual underlying fund can be found here. Please note past performance is not necessarily indicative of the relevant fund's future results."
+    }
+  },{
+    "@type": "Question",
+    "name": "Why is the return on my balance above $20k lower than 3.5%.",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Our target return rate is 3.5% p.a., but the actual return may fluctuate due to market volatility. This means that the return on your balance above S$20k may fall below 3.5% from time to time.  
+
+Remember that Chocolate only makes money if you make money, so we are very incentivised to achieve 3.5% target.
+
+Your return is a money-weighted rate of return. We advise that 3.5% p.a. is not guaranteed and there is a potential, although small, for capital losses.
+
+Past performance is not necessarily an indication of future performance."
+    }
+  },{
+    "@type": "Question",
+    "name": "What is the Chocolate Bug Buster Competition?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "\"Help us make the world of Chocolate better for everyone. However small or big – tell us what you think, and stand a chance to win up to $100! 
+
+From now until the XXXXXX, share feedback, suggestions, or report a bug and the top 3 bug busters will get rewarded – 1st place: $100, 2nd place: $50, 3rd place: $25. Rewards will be credited to your Chocolate account. Happy hunting! 
+
+Simply shake your phone, take a screenshot or tap on the ‘Log an issue now’ button and follow the instructions on the pop-up!\""
+    }
+  },{
+    "@type": "Question",
+    "name": "Can I transfer money from my Chocolate Finance account to a friend?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "If your friend is also a Chocolate user you can transfer money from your Chocolate account to theirs using ChocPay. This is an instant transfer and there are no charges for this (share transfer, how cool is that!). They will see returns on that money in the app from the very next day!
+
+If your friend isn't a Chocolate user, why not invite them to become a Chocolate user - Check out our referral program."
+    }
+  },{
+    "@type": "Question",
+    "name": "Is the Chocolate Finance debit card free?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes! Every Chocolate Finance account will have one free Visa debit card available digitally in the app (completely free of charge). You can activate this in your app with a tap of a button! If you would also like a physical card, you can request this in the app (also completely free of charge). There are no annual fees linked to your Chocolate Card."
+    }
+  },{
+    "@type": "Question",
+    "name": "Can I pay bills with my Chocolate Finance card?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Sure! You can use your Chocolate Finance card for payment wherever Visa is accepted (which is almost everywhere). The annual spending cap is S$30k. Keep in mind the more you spend the lower your returns, so remember to top up your account again when you're done with your spending spree!"
+    }
+  },{
+    "@type": "Question",
+    "name": "Can I add my Chocolate card to my Apple Pay and Google Pay e-wallets?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes, you can add your Chocolate card to Google Pay e-wallet to make payments. Apple pay coming soon."
+    }
+  },{
+    "@type": "Question",
+    "name": "I have lost my card, how do I replace it?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No problem at all! You can order a new card from your Chocolate Finance app. Simply go to [enter process after they have been designed ] - this will incur a [$15] replacement fee."
+    }
+  },{
+    "@type": "Question",
+    "name": "I did not make a card transaction thats showing in my app, what should I do?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Sorry to hear that. There are a number of ways to report this. The fastest way is using WhatsApp from within your Chocolate Finance app. Just tap on the pink WhatsApp icon in the top right corner of your homepage and we'll get chatting! Alternatively, you can call us at +65 94797979 or email us at support@chocolatefinance.com
+
+As a precautionary measure, we can also freeze your card temporarily to prevent any further unauthorised transactions. 
+
+Our customer services will be available from 9am - 6pm Monday-Friday."
+    }
+  },{
+    "@type": "Question",
+    "name": "Can I earn more than 3.5% p.a. on amounts above S$20k?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Yes, it's possible! This will happen if the underlying portfolio outperforms its target return by more than 2% p.a. over a full year period. This would be pretty rare as the portfolio is designed to have very low volatility so we can focus on meeting the target. As you know, we only take a fee (max 2%) once the portfolio has delivered the target (We need to make money somewhere 🤑)... But if the portfolio return is in excess of 2% p.a. above the target return, then ka-ching! these excess returns are yours. You're welcome!
+
+If you'd like to dive into the detail 🤓, read away here."
+    }
+  }]
+}
