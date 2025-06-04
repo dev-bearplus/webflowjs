@@ -1,0 +1,31 @@
+.header.style2 .header__navbar .navbar__link .nav-bar-link-txt,
+.header.style2 .header__cta .btn.btn--xs .btn__text {
+    color: #fff;
+}
+.header.style2 .header__cta .btn.btn--xs:hover .btn__text {
+    color: #008feb;
+}
+.header.style2 .header__cta .btn.btn--fill {
+    background-color: #fff;
+}
+.header.style2 .header__cta .btn.btn--fill:hover {
+    background-color: #E5F4FD;
+}
+.header.style2 .header__cta .btn.btn--fill .btn__text {
+    color: #136BA6;
+}
+.header.style2 .header__cta .btn.btn--fill:hover .btn__text {
+    color: #102D47;
+}
+.header.style2 .header-logo-blue {
+    opacity: 0;
+}
+.header.style2 .header-logo-white {
+    opacity: 1;
+}
+.header.style2 .nav-toggle-line {
+    background-color: #fff;
+}
+.text-base.header__dropdown-link.w--current {
+    background-color: #e5f4fd;
+}
