@@ -562,10 +562,11 @@ const mainScript = () => {
             })
             $('.home-popup-item-left-inner').on('click', '.home-popup-item-left-content', function(e) {
                 e.preventDefault();
+                console.log('click');
                 $('.home-popup-item-left-content').removeClass('active');
                 $(this).addClass('active');
                 let dataHeader = $(this).attr('data-title');
-                var scrollTop =  $('.home-popup-item').scrollTop() + $(`.service-hero-popup-content-txt h6[data-title="${dataHeader}"]`).offset().top  - parseFloat($('.service-hero-popup-menu-inner').css('top'));
+                var scrollTop =  $('.home-popup-item.active').scrollTop() + $(`.home-popup-item-content h6[data-title="${dataHeader}"]`).offset().top  - parseFloat($('.home-popup-item-left-inner').css('top'));
                 console.log(scrollTop )
                 $('.home-popup-item.active').animate({
                     scrollTop: scrollTop
