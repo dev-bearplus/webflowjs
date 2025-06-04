@@ -2903,6 +2903,15 @@ const mainScript = () => {
     SCRIPT.blogAuthScript = () => {
     }
     SCRIPT.articleScript = () => {
+        function updateMobileTable() {
+            if ($(window).width() < 767) {
+                $('.w-embed:has(.embed-tab)').css({
+                    'padding-inline': '2rem',
+                    'margin-inline':'-2rem',
+                    'overflow':'scroll'
+                })   
+            }
+        }
         function socialShare() {
             let currentUrl = window.location.href;
             let allLink = $('[blog-share]');
@@ -2955,6 +2964,7 @@ const mainScript = () => {
         function currentUpdate() {
             console.log('update')
             socialShare();
+            updateMobileTable();
             if (isStagging) {
                 updateTabTable();
             }
