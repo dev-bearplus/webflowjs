@@ -616,7 +616,7 @@ const mainScript = () => {
             let tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.home-featured',
-                    start: "top top+=75%",
+                    start: "top top+=65%",
                 },
             })
             $('.home-featured-right-item').each((idx, el) => {
@@ -636,7 +636,7 @@ const mainScript = () => {
                     gsap.set(desc.words, {yPercent: 100});
                     if(idx === 0) {
                         tl
-                        .to(title.words, {yPercent: 0, duration: .6, stagger: 0.025, ease: "power1.out"})
+                        .to(title.words, {yPercent: 0, duration: .4, stagger: 0.015, ease: "power1.out"})
                     }
     
                     $(el).find('.home-featured-time-item').each((i, item) => {
@@ -647,14 +647,14 @@ const mainScript = () => {
                         gsap.set(itemTitle.words, {yPercent: 100});
                         if(idx === 0) {
                             tl
-                            .to(itemLabel.words, {yPercent: 0, duration: .4, stagger: 0.01, ease: "power1.out"}, `<=${i*0.1}`)
-                            .to(itemTitle.words, {yPercent: 0, duration: .4, stagger: 0.01, ease: "power1.out"}, '<=.2')
+                            .to(itemLabel.words, {yPercent: 0, duration: .3, stagger: 0.01, ease: "power1.out"}, `<=0`)
+                            .to(itemTitle.words, {yPercent: 0, duration: .3, stagger: 0.01, ease: "power1.out"}, '<=0')
                         }
                     })
                     if(idx === 0) {
                         tl
-                        .to(sub.words, {yPercent: 0, duration: .4, stagger: 0.01, ease: "power1.out"}, `<=.2`)
-                        .to(desc.words, {yPercent: 0, duration: .4, stagger: 0.01, ease: "power1.out"}, '<=.2')
+                        .to(sub.words, {yPercent: 0, duration: .3, stagger: 0.01, ease: "power1.out"}, `<=0`)
+                        .to(desc.words, {yPercent: 0, duration: .3, stagger: 0.01, ease: "power1.out"}, '<=0')
                     }
                 })
                 let itemLeft = $(".home-featured-left");
@@ -1702,6 +1702,10 @@ const mainScript = () => {
             this.interact();
         }
         setup() {
+            $('.event-calendar-item').each((i, el) => {
+                this.calendar($(el));
+            })
+            this.filterByTab();
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
                 let index = $(this).closest('.event-hero-card-item').index();
@@ -1758,20 +1762,201 @@ const mainScript = () => {
             
         }
         activeTab(tagName) {
+            this.filterReset();
             $('.event-hero-card-item').fadeOut(400);
+            $('.event-hero-card-item').removeClass('active');
             $('.event-hero-card-item').each((i, el) => {
                 if($(el).attr('data-tag') == tagName) {
                     $(el).fadeIn(400);
+                    $(el).addClass('active');
                 }
             })
         }
         initActiveTab(tagName) {
             $('.event-hero-card-item').hide();
+            $('.event-hero-card-item').removeClass('active');
             $('.event-hero-card-item').each((i, el) => {
                 if($(el).attr('data-tag') == tagName) {
                     $(el).show();
+                    $(el).addClass('active');
                 }
             })
+        }
+        calendar($container) {
+            let dataCalendar = $container.attr('date-calendar');
+            
+            const $dateHeader = $container.find(".calendar-header-date span");
+            const $days = $container.find(".event-calendar-item-date");
+            let date = new Date();
+            if (dataCalendar === 'next-month') {
+                date.setMonth(date.getMonth() + 1);
+            }
+            const year = date.getFullYear();
+            console.log(year)
+            const month = date.getMonth();
+            const monthNames = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+              ];
+              $container.find(".event-calendar-item-head-month").text(monthNames[month]);
+              $container.find(".event-calendar-item-head-year").text(year);
+            $days.html("");
+            const displayCalendar = () => {
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const firstDayIndex = firstDay.getDay();
+                const numberOfDays = lastDay.getDate();
+        
+                const formattedDate = new Date(year, month).toLocaleString("en-US", {
+                    month: "long",
+                    year: "numeric"
+                });
+                $dateHeader.html(formattedDate);
+                for (let x = 1; x <= firstDayIndex; x++) {
+                    const $div = $('<div class=" txt txt-16 txt-label event-calendar-item-date-txt no-value"></div>');
+                    $days.append($div);
+                }
+                for (let i = 1; i <= numberOfDays; i++) {
+                    const today = new Date();
+                    const currentDate = new Date(year, month, i);
+                    const $div = $('<div class="txt txt-16 txt-label event-calendar-item-date-txt"></div>');
+                    $div.attr("data-date", formatDate(currentDate));
+                    let arrDateFilter=[];
+                    $div.append(i);
+                    if (currentDate < today) {
+                        $div.addClass("disable");
+                    }
+                    $days.append($div);
+                    $div.on("click",  () =>  {
+                        if ($div.hasClass("disable")) return;
+                        $('.event-calendar-item-date-txt').removeClass("active");
+                        $div.addClass("active");
+                        arrDateFilter.push(formatDate(currentDate));
+                        $('.event-hero-date-filter-item').removeClass('active');
+                        this.filterEvents(arrDateFilter);
+                    });
+        
+                    if (
+                        currentDate.getFullYear() === today.getFullYear() &&
+                        currentDate.getMonth() === today.getMonth() &&
+                        currentDate.getDate() === today.getDate()
+                    ) {
+                        $div.addClass("current-date").removeClass("disable");
+                    }
+                }
+            };
+        
+            displayCalendar();
+            function formatDate(date) {
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // tháng bắt đầu từ 0
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+        }
+        filterEvents(filterDates) {
+            $('.event-hero-card-item.active').each((i, el) => {
+                const dateFilterRaw = $(el).attr('data-date-filter'); // "22/06/2025, 25/06/2025"
+                const dateFilterList = dateFilterRaw
+                    ? dateFilterRaw.split(',').map(d => d.trim())
+                    : [];
+                const isMatch = filterDates.some(d => dateFilterList.includes(d));
+                if (isMatch) {
+                    $(el).fadeIn().addClass('show');
+                } else {
+                    $(el).fadeOut().removeClass('show');
+                }
+            });
+        }
+        filterByTab() {
+            $('.event-hero-date-filter-item').on('click',  (e) => {
+                $('.event-hero-date-filter-item').removeClass('active');
+                $(e.currentTarget).addClass('active');
+                const range = $(e.currentTarget).data('filter-fast');
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = today.getMonth();
+                //convert month to character english short
+
+
+                const day = today.getDate();
+            
+                // Xóa tất cả highlight trước
+                $('.event-calendar-item-date-txt').removeClass('active');
+            
+                $('.event-calendar-item-date-txt').each( (i, el) => {
+                    const itemDateStr = $(el).attr('data-date');
+                    const parts = itemDateStr.split('/');
+                    const itemDate = new Date(+parts[2], parts[1] - 1, +parts[0]);
+            
+                    if (range === 'today') {
+                        if (
+                            itemDate.getFullYear() === year &&
+                            itemDate.getMonth() === month &&
+                            itemDate.getDate() === day
+                        ) {
+                            $(el).addClass('active');
+                            this.filterEvents(getDateRangeArray(today, today));
+                        }
+                    }
+            
+                    if (range === 'this-week') {
+                        activateThisWeekAcrossCalendars();
+                    }
+            
+                    if (range === 'month') {
+                        const endOfMonth = new Date(year, month + 1, 0);
+                        if (itemDate.getFullYear() === year &&
+                            itemDate.getMonth() === month &&
+                            itemDate.getDate() === day || itemDate >= today && itemDate <= endOfMonth) {
+                            $(el).addClass('active');
+                        }
+                        this.filterEvents(getDateRangeArray(today, endOfMonth));
+                    }
+                });
+            });
+            const activateThisWeekAcrossCalendars = () =>{
+                const today = new Date();
+                const startOfWeek = new Date(today);
+                const endOfWeek = new Date(today);
+                const day = today.getDay();
+                const diffToMonday = day === 0 ? -6 : 1 - day;
+                startOfWeek.setDate(today.getDate() + diffToMonday);
+                endOfWeek.setDate(startOfWeek.getDate() + 6);
+                this.filterEvents(getDateRangeArray(startOfWeek, endOfWeek));
+                $('.event-calendar-item-date-txt').each(function (e) {
+                    const $item = $(this);
+                    const dateStr = $item.attr('data-date'); 
+                    if (!dateStr) return;
+            
+                    const [d, m, y] = dateStr.split('/').map(Number);
+                    const itemDate = new Date(y, m - 1, d);
+            
+                    if (itemDate >= startOfWeek && itemDate <= endOfWeek) {
+                        $item.addClass('active');
+                    } else {
+                        $item.removeClass('active');
+                    }
+                });
+            }
+            function getDateRangeArray(start, end) {
+                let result = [];
+                let current = new Date(start);
+            
+                while (current <= end) {
+                    const day = String(current.getDate()).padStart(2, '0');
+                    const month = String(current.getMonth() + 1).padStart(2, '0');
+                    const year = current.getFullYear();
+                    result.push(`${day}/${month}/${year}`);
+                    current.setDate(current.getDate() + 1);
+                }
+            
+                return result;
+            }
+        }
+        filterReset() {
+            $('.event-hero-date-filter-item').removeClass('active');
+            $('.event-calendar-item-date-txt').removeClass('active');
         }
     }
     let eventHero = new EventHero();
