@@ -738,39 +738,39 @@ const mainScript = () => {
         activeContent(index){
             if(lenis.direction == 1) {
                 if(index!=0) {
-                    gsap.to($('.home-featured-left-inner').eq(index-1).find('.home-featured-title .word'),{yPercent: -100, stagger: .02, duration: .6, ease: "power1.out"} )
+                    gsap.to($('.home-featured-left-inner').eq(index-1).find('.home-featured-title .word'),{yPercent: -100, stagger: .01, duration: .4, ease: "power1.out"} )
                     $('.home-featured-left-inner').eq(index-1).find('.home-featured-time-item').each((i, item) => {
-                        gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: -100, stagger:.02, duration:.4, ease: "power1.out"})
-                        gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: -100, stagger:.02, duration:.4, ease: "power1.out"})
+                        gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: -100, stagger:.01, duration:.4, ease: "power1.out"})
+                        gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: -100, stagger:.01, duration:.4, ease: "power1.out"})
                     })
-                    gsap.to($('.home-featured-left-inner').eq(index-1).find('.home-featured-info-label .word'),{yPercent: -100, stagger: .01, duration: .4, ease: "power1.out"})
-                    gsap.to($('.home-featured-left-inner').eq(index-1).find('.home-featured-info-body .word'),{yPercent: -100, stagger: .01, duration: .4, ease: "power1.out"})
+                    gsap.to($('.home-featured-left-inner').eq(index-1).find('.home-featured-info-label .word'),{yPercent: -100, stagger: .01, duration: .3, ease: "power1.out"})
+                    gsap.to($('.home-featured-left-inner').eq(index-1).find('.home-featured-info-body .word'),{yPercent: -100, stagger: .01, duration: .3, ease: "power1.out"})
 
-                    gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-title .word'),{yPercent: 0, stagger: .02, duration: .6, delay: '.15', ease: "power1.out"})
+                    gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-title .word'),{yPercent: 0, stagger: .01, duration: .4, delay: '.1', ease: "power1.out"})
                     $('.home-featured-left-inner').eq(index).find('.home-featured-time-item').each((i, item) => {
-                        gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: 0, stagger:.02, duration:.4, delay: '.1', ease: "power1.out"})
-                        gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: 0, stagger:.02, duration:.4, delay: '.1', ease: "power1.out"})
+                        gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: 0, stagger:.01, duration:.4, delay: '.1', ease: "power1.out"})
+                        gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: 0, stagger:.01, duration:.4, delay: '.1', ease: "power1.out"})
                     })
-                    gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-label .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .4, ease: "power1.out"})
-                    gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-body .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .4, ease: "power1.out"})
+                    gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-label .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .3, ease: "power1.out"})
+                    gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-body .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .3, ease: "power1.out"})
                 } 
             }
             else {
-                gsap.to($('.home-featured-left-inner').eq(index+1).find('.home-featured-title .word'),{yPercent: 100, stagger: .02, duration: .6, ease: "power1.out"} )
+                gsap.to($('.home-featured-left-inner').eq(index+1).find('.home-featured-title .word'),{yPercent: 100, stagger: .01, duration: .4, ease: "power1.out"} )
                 $('.home-featured-left-inner').eq(index+1).find('.home-featured-time-item').each((i, item) => {
-                    gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: 100, stagger:.02, duration:.4, ease: "power1.out"})
-                    gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: 100, stagger:.02, duration:.4, ease: "power1.out"})
+                    gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: 100, stagger:.01, duration:.3, ease: "power1.out"})
+                    gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: 100, stagger:.01, duration:.3, ease: "power1.out"})
                 })
                 gsap.to($('.home-featured-left-inner').eq(index+1).find('.home-featured-info-label .word'),{yPercent: 100, stagger: .01, duration: .4, ease: "power1.out"})
                 gsap.to($('.home-featured-left-inner').eq(index+1).find('.home-featured-info-body .word'),{yPercent: 100, stagger: .01, duration: .4, ease: "power1.out"})
 
-                gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-title .word'),{yPercent: 0, stagger: .02, duration: .6, delay: '.15', ease: "power1.out"})
+                gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-title .word'),{yPercent: 0, stagger: .01, duration: .4, delay: '.1', ease: "power1.out"})
                 $('.home-featured-left-inner').eq(index).find('.home-featured-time-item').each((i, item) => {
-                    gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: 0, stagger:.02, duration:.4, delay: '.1', ease: "power1.out"})
-                    gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: 0, stagger:.02, duration:.4, delay: '.1', ease: "power1.out"})
+                    gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: 0, stagger:.01, duration:.3, delay: '.1', ease: "power1.out"})
+                    gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: 0, stagger:.01, duration:.3, delay: '.1', ease: "power1.out"})
                 })
-                gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-label .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .4, ease: "power1.out"})
-                gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-body .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .4, ease: "power1.out"})
+                gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-label .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .3, ease: "power1.out"})
+                gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-body .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .3, ease: "power1.out"})
             }
         }
     }
