@@ -93,6 +93,39 @@ const script = () => {
     SCRIPT.storyScript = () => {
         console.log("story");
     }
+    SCRIPT.portalScript = () => {
+        console.log("portal");
+        function handleTOC() {
+            let headings = $('.portal-main-content-richtext h1');
+            let tocWrap = $('.portal-main-toc-body');
+
+            if (headings.length <= 1) {
+                tocWrap.parent().remove();
+            }
+
+            let cloneTOC = $('.portal-main-toc-item').eq(0).clone();
+            tocWrap.html('');
+            headings.each((idx, heading) => {
+                $(heading).attr('id', `toc-${idx}`);
+                let clone = cloneTOC.clone();
+                clone.find('.portal-main-toc-item-txt').attr('href', `#${$(heading).attr('id')}`).text($(heading).text());
+                idx === 0 && clone.addClass('active');
+                tocWrap.append(clone);
+            })
+
+            $(window).on('scroll', function (e) {
+                const scrollTop = document.documentElement.scrollTop || window.scrollY
+                headings.each((idx, heading) => {
+                    if (scrollTop > $(heading).offset().top - 200) {
+                        $(`.portal-main-toc-item-txt[href="#${$(heading).attr('id')}"]`).parent().addClass('active');;
+                        $(`.portal-main-toc-item-txt[href="#${$(heading).attr('id')}"]`).parent().siblings().removeClass('active');
+                    }
+                })
+            })
+        }
+
+        $(window).width() > 767 && handleTOC();
+    }
 
     scrollTop();
     marquee($('.last-cta-strip-marquee-list'));
