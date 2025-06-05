@@ -560,6 +560,9 @@ const mainScript = () => {
                     }
                 }
             })
+            $('.home-popup-item').on('scroll', ()=> {
+                this.ItemContentActiveCheck('.home-popup-item.active .home-popup-item-content h6');
+            })
             $('.home-popup-item.active  .home-popup-item-left-inner').on('click', '.home-popup-item-left-content', function(e) {
                 e.preventDefault();
                 console.log('click');
@@ -572,6 +575,15 @@ const mainScript = () => {
                     scrollTop: scrollTop
                 }, 2000);
             })
+        }
+        ItemContentActiveCheck(el) {
+            for (let i = 0; i < $(el).length; i++) {
+                let top = $(el).eq(i).get(0).getBoundingClientRect().top;
+                if (top > 0 && top + $(el).eq(i).height() < viewport.h/4*3 ) {
+                    $('.home-popup-item.active .home-popup-item-left-content').removeClass('active');
+                    $('.home-popup-item.active .home-popup-item-left-content').eq(i).addClass('active');
+                }
+                }
         }
         initContentPopup() {
             let iframeSpotifySrc ='https://open.spotify.com/embed/playlist/1bhxiHUsBUQPTaYOyt8gUi?utm_source=generator&theme=0'
@@ -587,16 +599,6 @@ const mainScript = () => {
                     titleLeftClone.find('.home-popup-item-left-title').text($(el).text());
                     titleLeftClone.attr('data-title', `toch-${i}`);
                     $(item).find('.home-popup-item-left-inner').append(titleLeftClone);
-                })
-                $(item).find('a').each((i, el) => {
-                    let href = $(el).attr('href');
-                    if(href.includes('spotify-embed')) {
-                        $(el).closest('p').addClass('spotify-embed-wrap');
-                        $(el)
-                        console.log($(el).closest('p'));
-                        $(el).replaceWith(`<iframe src="${iframeSpotifySrc}" width="100%" height="400px" frameborder="0" clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`);
-                        
-                    }
                 })
             })
 
@@ -614,7 +616,7 @@ const mainScript = () => {
             let tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.home-featured',
-                    start: "top top+=75%",
+                    start: "top top+=65%",
                 },
             })
             $('.home-featured-right-item').each((idx, el) => {
@@ -634,7 +636,7 @@ const mainScript = () => {
                     gsap.set(desc.words, {yPercent: 100});
                     if(idx === 0) {
                         tl
-                        .to(title.words, {yPercent: 0, duration: .6, stagger: 0.025, ease: "power1.out"})
+                        .to(title.words, {yPercent: 0, duration: .4, stagger: 0.015, ease: "power1.out"})
                     }
     
                     $(el).find('.home-featured-time-item').each((i, item) => {
@@ -645,14 +647,14 @@ const mainScript = () => {
                         gsap.set(itemTitle.words, {yPercent: 100});
                         if(idx === 0) {
                             tl
-                            .to(itemLabel.words, {yPercent: 0, duration: .4, stagger: 0.01, ease: "power1.out"}, `<=${i*0.1}`)
-                            .to(itemTitle.words, {yPercent: 0, duration: .4, stagger: 0.01, ease: "power1.out"}, '<=.2')
+                            .to(itemLabel.words, {yPercent: 0, duration: .3, stagger: 0.01, ease: "power1.out"}, `<=0`)
+                            .to(itemTitle.words, {yPercent: 0, duration: .3, stagger: 0.01, ease: "power1.out"}, '<=0')
                         }
                     })
                     if(idx === 0) {
                         tl
-                        .to(sub.words, {yPercent: 0, duration: .4, stagger: 0.01, ease: "power1.out"}, `<=.2`)
-                        .to(desc.words, {yPercent: 0, duration: .4, stagger: 0.01, ease: "power1.out"}, '<=.2')
+                        .to(sub.words, {yPercent: 0, duration: .3, stagger: 0.01, ease: "power1.out"}, `<=0`)
+                        .to(desc.words, {yPercent: 0, duration: .3, stagger: 0.01, ease: "power1.out"}, '<=0')
                     }
                 })
                 let itemLeft = $(".home-featured-left");
@@ -736,39 +738,39 @@ const mainScript = () => {
         activeContent(index){
             if(lenis.direction == 1) {
                 if(index!=0) {
-                    gsap.to($('.home-featured-left-inner').eq(index-1).find('.home-featured-title .word'),{yPercent: -100, stagger: .02, duration: .6, ease: "power1.out"} )
+                    gsap.to($('.home-featured-left-inner').eq(index-1).find('.home-featured-title .word'),{yPercent: -100, stagger: .01, duration: .4, ease: "power1.out"} )
                     $('.home-featured-left-inner').eq(index-1).find('.home-featured-time-item').each((i, item) => {
-                        gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: -100, stagger:.02, duration:.4, ease: "power1.out"})
-                        gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: -100, stagger:.02, duration:.4, ease: "power1.out"})
+                        gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: -100, stagger:.01, duration:.4, ease: "power1.out"})
+                        gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: -100, stagger:.01, duration:.4, ease: "power1.out"})
                     })
-                    gsap.to($('.home-featured-left-inner').eq(index-1).find('.home-featured-info-label .word'),{yPercent: -100, stagger: .01, duration: .4, ease: "power1.out"})
-                    gsap.to($('.home-featured-left-inner').eq(index-1).find('.home-featured-info-body .word'),{yPercent: -100, stagger: .01, duration: .4, ease: "power1.out"})
+                    gsap.to($('.home-featured-left-inner').eq(index-1).find('.home-featured-info-label .word'),{yPercent: -100, stagger: .01, duration: .3, ease: "power1.out"})
+                    gsap.to($('.home-featured-left-inner').eq(index-1).find('.home-featured-info-body .word'),{yPercent: -100, stagger: .01, duration: .3, ease: "power1.out"})
 
-                    gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-title .word'),{yPercent: 0, stagger: .02, duration: .6, delay: '.15', ease: "power1.out"})
+                    gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-title .word'),{yPercent: 0, stagger: .01, duration: .4, delay: '.1', ease: "power1.out"})
                     $('.home-featured-left-inner').eq(index).find('.home-featured-time-item').each((i, item) => {
-                        gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: 0, stagger:.02, duration:.4, delay: '.1', ease: "power1.out"})
-                        gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: 0, stagger:.02, duration:.4, delay: '.1', ease: "power1.out"})
+                        gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: 0, stagger:.01, duration:.4, delay: '.1', ease: "power1.out"})
+                        gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: 0, stagger:.01, duration:.4, delay: '.1', ease: "power1.out"})
                     })
-                    gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-label .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .4, ease: "power1.out"})
-                    gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-body .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .4, ease: "power1.out"})
+                    gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-label .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .3, ease: "power1.out"})
+                    gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-body .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .3, ease: "power1.out"})
                 } 
             }
             else {
-                gsap.to($('.home-featured-left-inner').eq(index+1).find('.home-featured-title .word'),{yPercent: 100, stagger: .02, duration: .6, ease: "power1.out"} )
+                gsap.to($('.home-featured-left-inner').eq(index+1).find('.home-featured-title .word'),{yPercent: 100, stagger: .01, duration: .4, ease: "power1.out"} )
                 $('.home-featured-left-inner').eq(index+1).find('.home-featured-time-item').each((i, item) => {
-                    gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: 100, stagger:.02, duration:.4, ease: "power1.out"})
-                    gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: 100, stagger:.02, duration:.4, ease: "power1.out"})
+                    gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: 100, stagger:.01, duration:.3, ease: "power1.out"})
+                    gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: 100, stagger:.01, duration:.3, ease: "power1.out"})
                 })
                 gsap.to($('.home-featured-left-inner').eq(index+1).find('.home-featured-info-label .word'),{yPercent: 100, stagger: .01, duration: .4, ease: "power1.out"})
                 gsap.to($('.home-featured-left-inner').eq(index+1).find('.home-featured-info-body .word'),{yPercent: 100, stagger: .01, duration: .4, ease: "power1.out"})
 
-                gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-title .word'),{yPercent: 0, stagger: .02, duration: .6, delay: '.15', ease: "power1.out"})
+                gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-title .word'),{yPercent: 0, stagger: .01, duration: .4, delay: '.1', ease: "power1.out"})
                 $('.home-featured-left-inner').eq(index).find('.home-featured-time-item').each((i, item) => {
-                    gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: 0, stagger:.02, duration:.4, delay: '.1', ease: "power1.out"})
-                    gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: 0, stagger:.02, duration:.4, delay: '.1', ease: "power1.out"})
+                    gsap.to($(item).find('.home-featured-time-item-label .word'),{yPercent: 0, stagger:.01, duration:.3, delay: '.1', ease: "power1.out"})
+                    gsap.to($(item).find('.home-featured-time-item-title .word'),{yPercent: 0, stagger:.01, duration:.3, delay: '.1', ease: "power1.out"})
                 })
-                gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-label .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .4, ease: "power1.out"})
-                gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-body .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .4, ease: "power1.out"})
+                gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-label .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .3, ease: "power1.out"})
+                gsap.to($('.home-featured-left-inner').eq(index).find('.home-featured-info-body .word'),{yPercent: 0, stagger: .01, delay: '.1', duration: .3, ease: "power1.out"})
             }
         }
     }
@@ -1299,11 +1301,11 @@ const mainScript = () => {
                 $('.service-hero-popup-menu-item').removeClass('active');
                 $(this).addClass('active');
                 let dataHeader = $(this).attr('data-title');
-                var scrollTop =  $('.service-hero-popup-inner').scrollTop() + $(`.service-hero-popup-content-txt h6[data-title="${dataHeader}"]`).offset().top  - parseFloat($('.service-hero-popup-menu-inner').css('top'));
+                var scrollTop =  $('.service-hero-popup-inner').scrollTop() - $('.service-hero-popup-inner').offset().top + $(`.service-hero-popup-content-txt h6[data-title="${dataHeader}"]`).offset().top  - parseFloat($('.service-hero-popup-menu-inner').css('top'));
                 console.log(scrollTop )
                 $('.service-hero-popup-inner.active').animate({
                     scrollTop: scrollTop
-                }, 2000);
+                }, 1000);
             })
         }
         ItemContentActiveCheck(el) {
@@ -1700,6 +1702,10 @@ const mainScript = () => {
             this.interact();
         }
         setup() {
+            $('.event-calendar-item').each((i, el) => {
+                this.calendar($(el));
+            })
+            this.filterByTab();
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
                 let index = $(this).closest('.event-hero-card-item').index();
@@ -1756,20 +1762,201 @@ const mainScript = () => {
             
         }
         activeTab(tagName) {
+            this.filterReset();
             $('.event-hero-card-item').fadeOut(400);
+            $('.event-hero-card-item').removeClass('active');
             $('.event-hero-card-item').each((i, el) => {
                 if($(el).attr('data-tag') == tagName) {
                     $(el).fadeIn(400);
+                    $(el).addClass('active');
                 }
             })
         }
         initActiveTab(tagName) {
             $('.event-hero-card-item').hide();
+            $('.event-hero-card-item').removeClass('active');
             $('.event-hero-card-item').each((i, el) => {
                 if($(el).attr('data-tag') == tagName) {
                     $(el).show();
+                    $(el).addClass('active');
                 }
             })
+        }
+        calendar($container) {
+            let dataCalendar = $container.attr('date-calendar');
+            
+            const $dateHeader = $container.find(".calendar-header-date span");
+            const $days = $container.find(".event-calendar-item-date");
+            let date = new Date();
+            if (dataCalendar === 'next-month') {
+                date.setMonth(date.getMonth() + 1);
+            }
+            const year = date.getFullYear();
+            console.log(year)
+            const month = date.getMonth();
+            const monthNames = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+              ];
+              $container.find(".event-calendar-item-head-month").text(monthNames[month]);
+              $container.find(".event-calendar-item-head-year").text(year);
+            $days.html("");
+            const displayCalendar = () => {
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const firstDayIndex = firstDay.getDay();
+                const numberOfDays = lastDay.getDate();
+        
+                const formattedDate = new Date(year, month).toLocaleString("en-US", {
+                    month: "long",
+                    year: "numeric"
+                });
+                $dateHeader.html(formattedDate);
+                for (let x = 1; x <= firstDayIndex; x++) {
+                    const $div = $('<div class=" txt txt-16 txt-label event-calendar-item-date-txt no-value"></div>');
+                    $days.append($div);
+                }
+                for (let i = 1; i <= numberOfDays; i++) {
+                    const today = new Date();
+                    const currentDate = new Date(year, month, i);
+                    const $div = $('<div class="txt txt-16 txt-label event-calendar-item-date-txt"></div>');
+                    $div.attr("data-date", formatDate(currentDate));
+                    let arrDateFilter=[];
+                    $div.append(i);
+                    if (currentDate < today) {
+                        $div.addClass("disable");
+                    }
+                    $days.append($div);
+                    $div.on("click",  () =>  {
+                        if ($div.hasClass("disable")) return;
+                        $('.event-calendar-item-date-txt').removeClass("active");
+                        $div.addClass("active");
+                        arrDateFilter.push(formatDate(currentDate));
+                        $('.event-hero-date-filter-item').removeClass('active');
+                        this.filterEvents(arrDateFilter);
+                    });
+        
+                    if (
+                        currentDate.getFullYear() === today.getFullYear() &&
+                        currentDate.getMonth() === today.getMonth() &&
+                        currentDate.getDate() === today.getDate()
+                    ) {
+                        $div.addClass("current-date").removeClass("disable");
+                    }
+                }
+            };
+        
+            displayCalendar();
+            function formatDate(date) {
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // tháng bắt đầu từ 0
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+        }
+        filterEvents(filterDates) {
+            $('.event-hero-card-item.active').each((i, el) => {
+                const dateFilterRaw = $(el).attr('data-date-filter'); // "22/06/2025, 25/06/2025"
+                const dateFilterList = dateFilterRaw
+                    ? dateFilterRaw.split(',').map(d => d.trim())
+                    : [];
+                const isMatch = filterDates.some(d => dateFilterList.includes(d));
+                if (isMatch) {
+                    $(el).fadeIn().addClass('show');
+                } else {
+                    $(el).fadeOut().removeClass('show');
+                }
+            });
+        }
+        filterByTab() {
+            $('.event-hero-date-filter-item').on('click',  (e) => {
+                $('.event-hero-date-filter-item').removeClass('active');
+                $(e.currentTarget).addClass('active');
+                const range = $(e.currentTarget).data('filter-fast');
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = today.getMonth();
+                //convert month to character english short
+
+
+                const day = today.getDate();
+            
+                // Xóa tất cả highlight trước
+                $('.event-calendar-item-date-txt').removeClass('active');
+            
+                $('.event-calendar-item-date-txt').each( (i, el) => {
+                    const itemDateStr = $(el).attr('data-date');
+                    const parts = itemDateStr.split('/');
+                    const itemDate = new Date(+parts[2], parts[1] - 1, +parts[0]);
+            
+                    if (range === 'today') {
+                        if (
+                            itemDate.getFullYear() === year &&
+                            itemDate.getMonth() === month &&
+                            itemDate.getDate() === day
+                        ) {
+                            $(el).addClass('active');
+                            this.filterEvents(getDateRangeArray(today, today));
+                        }
+                    }
+            
+                    if (range === 'this-week') {
+                        activateThisWeekAcrossCalendars();
+                    }
+            
+                    if (range === 'month') {
+                        const endOfMonth = new Date(year, month + 1, 0);
+                        if (itemDate.getFullYear() === year &&
+                            itemDate.getMonth() === month &&
+                            itemDate.getDate() === day || itemDate >= today && itemDate <= endOfMonth) {
+                            $(el).addClass('active');
+                        }
+                        this.filterEvents(getDateRangeArray(today, endOfMonth));
+                    }
+                });
+            });
+            const activateThisWeekAcrossCalendars = () =>{
+                const today = new Date();
+                const startOfWeek = new Date(today);
+                const endOfWeek = new Date(today);
+                const day = today.getDay();
+                const diffToMonday = day === 0 ? -6 : 1 - day;
+                startOfWeek.setDate(today.getDate() + diffToMonday);
+                endOfWeek.setDate(startOfWeek.getDate() + 6);
+                this.filterEvents(getDateRangeArray(startOfWeek, endOfWeek));
+                $('.event-calendar-item-date-txt').each(function (e) {
+                    const $item = $(this);
+                    const dateStr = $item.attr('data-date'); 
+                    if (!dateStr) return;
+            
+                    const [d, m, y] = dateStr.split('/').map(Number);
+                    const itemDate = new Date(y, m - 1, d);
+            
+                    if (itemDate >= startOfWeek && itemDate <= endOfWeek) {
+                        $item.addClass('active');
+                    } else {
+                        $item.removeClass('active');
+                    }
+                });
+            }
+            function getDateRangeArray(start, end) {
+                let result = [];
+                let current = new Date(start);
+            
+                while (current <= end) {
+                    const day = String(current.getDate()).padStart(2, '0');
+                    const month = String(current.getMonth() + 1).padStart(2, '0');
+                    const year = current.getFullYear();
+                    result.push(`${day}/${month}/${year}`);
+                    current.setDate(current.getDate() + 1);
+                }
+            
+                return result;
+            }
+        }
+        filterReset() {
+            $('.event-hero-date-filter-item').removeClass('active');
+            $('.event-calendar-item-date-txt').removeClass('active');
         }
     }
     let eventHero = new EventHero();
@@ -2006,7 +2193,6 @@ const mainScript = () => {
                 }
             }) 
             $('.work-popup-item').on('scroll', ()=> {
-                console.log('scroll')
                 this.ItemContentActiveCheck('.work-popup-item.active .work-popup-item-content h5');
             })
             $('.work-popup-item-left-content').on('click', '.work-popup-item-left-title', function(e) {
@@ -2014,9 +2200,10 @@ const mainScript = () => {
                 $('.work-popup-item-left-title').removeClass('active');
                 $(this).addClass('active');
                 let dataHeader = $(this).attr('data-title');
+                var scrollTop =  $('.work-popup-inner').scrollTop() - $('.work-popup-inner').offset().top + $(`.work-popup-item-left-content .work-popup-item-left-title[data-title="${dataHeader}"]`).offset().top   - parseFloat($('.work-popup-item-left-content').css('top'));
                 $('.work-popup-item.active').animate({
-                    scrollTop: $(`.work-popup-item-left-content .work-popup-item-left-title[data-title="${dataHeader}"]`).offset().top 
-                }, 2000);
+                    scrollTop: scrollTop
+                }, 1000);
             })
             function resetScrollPopup() {
                 setTimeout(() => {
@@ -2048,7 +2235,6 @@ const mainScript = () => {
             for (let i = 0; i < $(el).length; i++) {
                 let top = $(el).eq(i).get(0).getBoundingClientRect().top;
                 if (top > 0 && top + $(el).eq(i).height() < viewport.h/4*3 ) {
-                    console.log(i)
                     $('.work-popup-item.active .work-popup-item-left-content .work-popup-item-left-title').removeClass('active');
                     $('.work-popup-item.active .work-popup-item-left-content .work-popup-item-left-title').eq(i).addClass('active');
                 }
@@ -2151,7 +2337,7 @@ const mainScript = () => {
             
                 const closeMenu = () => {
                     $header.removeClass("on-show-menu");
-                    header.toggleWhiteMode();
+                    header.toggleColorMode('white');
                     $menuInner.removeClass("active");
                     gsap.to(".header-menu-title.close .word", { duration: 0.8, y: "-100%", stagger: 0.015, ease: "power2.out" });
                     gsap.to(".header-menu-title.open .word", { duration: 0.8, y: "0%", stagger: 0.015, ease: "power2.out" });
@@ -2228,7 +2414,7 @@ const mainScript = () => {
             $('.header').removeClass('on-mode');
             }, onUpdate: function() {
                 if(this.progress() > .7){
-                    header.toggleWhiteMode();
+                    header.toggleColorMode('white');
                 }
             }});
         }
@@ -2240,13 +2426,13 @@ const mainScript = () => {
                 $(".header").removeClass("on-scroll");
             }
         }
-        toggleWhiteMode = () => {
-            let elArr = Array.from($('[data-section="white"]'));
+        toggleColorMode = (color) => {
+            let elArr = Array.from($(`[data-section="${color}"]`));
             if (elArr.some(function (el) { return isInHeaderCheck(el) })) {
-                $('.header').addClass('on-white');
+                $('.header').addClass(`on-${color}`);
             } 
             else if( !$('.header').hasClass('on-show-menu')) {
-                $('.header').removeClass('on-white');
+                $('.header').removeClass(`on-${color}`);
             }
         }
         toggleOnHide = (inst) => {
@@ -2362,9 +2548,10 @@ const mainScript = () => {
         }
 
         header.toggleOnScroll(lenis);
-        header.toggleWhiteMode();
+        header.toggleColorMode('white');
         lenis.on("scroll", function (inst) {
-            header.toggleWhiteMode();
+            header.toggleColorMode('white');
+            header.toggleColorMode('blue');
             header.toggleOnScroll(lenis);
             header.toggleOnHide(inst);
         });
