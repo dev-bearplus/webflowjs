@@ -331,15 +331,11 @@ const mainScript = () => {
       });
     }
     $('.about-list-post-pagi-item')?.each((idx, item) => {
-      $(item).on('click', function () {
+      $(item).on('click', function (e) {
         if (!$(this).hasClass("w--current")) {
-          // setTimeout(() => {
-          //   window.scrollTo({
-          //     top: 0,
-          //     behavior: 'instant',
-          //     left: 0
-          //   })
-          // }, 50)
+          lenis.scrollTo(0, {
+            duration: 1.2
+          })
         }
       })
     })
