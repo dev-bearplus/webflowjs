@@ -64,10 +64,20 @@ const script = () => {
                 }
             }, 100);
         },
+        toggleNav: () => {
+            $('.header').toggleClass('on-active-nav');
+        }
     }
+
+    $('.header-ham').on('click', function () {
+        HEADER.toggleNav();
+    })
 
     HEADER.toggleOnScroll(window.pageYOffset);
     $(window).on("scroll", function () {
+        if ($('.header').hasClass('on-active-nav')) {
+            HEADER.toggleNav();
+        }
 		HEADER.toggleOnScroll();
 		HEADER.toggleHide();
 	});
