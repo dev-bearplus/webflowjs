@@ -334,20 +334,32 @@ const mainScript = () => {
       $('.about-list-post-pagi-item')?.each((idx, item) => {
         $(item).on('click', function () {
           if (!$(item).hasClass("w--current")) {
-            lenis.scrollTo(0, {
-              duration: 0.8,
-              lock: true,
-              force: true,
-              delay: 0.1,
-              onComplete: () => {
-                console.log('complete')
-              }
-            })
+            handleScrollTop();
           }
         })
       })
+      $('.about-list-post-pagi-next').on('click', function () {
+        if (!$(this).hasClass("is-list-pagination-disabled")) {
+          handleScrollTop();
+        }
+      })
+      $('.about-list-post-pagi-prev').on('click', function () {
+        if (!$(this).hasClass("is-list-pagination-disabled")) {
+          handleScrollTop();
+        }
+      })
     }
-
+    const handleScrollTop = () => {
+      lenis.scrollTo(0, {
+        duration: 0.8,
+        lock: true,
+        force: true,
+        delay: 0.1,
+        onComplete: () => {
+          console.log('complete')
+        }
+      })
+    }
     // Initial binding
     handlePaginationClick();
 
