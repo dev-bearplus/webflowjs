@@ -332,7 +332,7 @@ const mainScript = () => {
     }
     $('.about-list-post-pagi-item')?.each((idx, item) => {
       $(item).on('click', function () {
-
+        console.log('click___')
         if (!$(item).hasClass("w--current")) {
           lenis.scrollTo(0, {
             duration: 0.8,
