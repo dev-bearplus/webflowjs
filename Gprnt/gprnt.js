@@ -338,7 +338,6 @@ const mainScript = () => {
             duration: 0.8,
             lock: true,
             force: true,
-            immediate: true,
             delay: 0.1,
             onComplete: () => {
               console.log('complete')
