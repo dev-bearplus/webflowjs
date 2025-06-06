@@ -330,22 +330,36 @@ const mainScript = () => {
         })
       });
     }
-    $('.about-list-post-pagi-item')?.each((idx, item) => {
-      $(item).on('click', function () {
-        console.log('click___')
-        if (!$(item).hasClass("w--current")) {
-          lenis.scrollTo(0, {
-            duration: 0.8,
-            lock: true,
-            force: true,
-            delay: 0.1,
-            onComplete: () => {
-              console.log('complete')
-            }
-          })
-        }
+    const handlePaginationClick = () => {
+      $('.about-list-post-pagi-item')?.each((idx, item) => {
+        $(item).on('click', function () {
+          if (!$(item).hasClass("w--current")) {
+            lenis.scrollTo(0, {
+              duration: 0.8,
+              lock: true,
+              force: true,
+              delay: 0.1,
+              onComplete: () => {
+                console.log('complete')
+              }
+            })
+          }
+        })
       })
-    })
+    }
+
+    // Initial binding
+    handlePaginationClick();
+
+    // Watch for DOM changes
+    const observer = new MutationObserver(() => {
+      handlePaginationClick();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
     // set link pdf newroom 
     if ($('.about-news-list-item').length > 0) {
       $('.about-news-list-item').each((_idx, item) => {
