@@ -183,7 +183,7 @@ const script = () => {
     }
 
     scrollTop();
-    $('.loader').animate({ opacity: 0 }, 1000, () => $('.loader').remove());
+    $('.loader').animate({ opacity: 0 }, 5000, () => $('.loader').remove());
     marquee($('.last-cta-strip-marquee-list'));
     const pageName = $('main.main').attr('data-namespace');
     if (pageName) {
