@@ -28,13 +28,24 @@ const mainScript = () => {
     const lerp = (a, b, t = 0.08) => {
         return a + (b - a) * t;
     };
-    function refreshTrigger() { 
-        gsap.globalTimeline.getChildren().forEach((el) => {
-            if (el.scrollTrigger && el.scrollTrigger.progress === 0) {
-                el?.scrollTrigger?.refresh();
+    function setupIframe() {
+        let iframes = $("iframe");
+        iframes.each(function (idx, item) {
+            const src = $(item).attr('data-src');
+        
+            // Kiểm tra xem src có chứa "youtube"
+            if (src && src.includes('youtube')) {
+                $(item).closest('.w-iframe').addClass('iframe-youtube');
             }
-        });
+        
+            // Gán src mới từ data-src nếu có
+            const dataSrc = $(item).attr("data-src");
+            if (dataSrc) {
+                $(item).attr("src", dataSrc);
+            }
+        });        
     }
+    
     function isInHeaderCheck(el) {
         const rect = $(el).get(0).getBoundingClientRect();
         const headerRect = $('.header').get(0).getBoundingClientRect();
@@ -413,6 +424,18 @@ const mainScript = () => {
         super.setTrigger(this.setup.bind(this));
         }
         setup() {
+            const $container = $('.home-explore-img-inner');
+            const $items = $container.find('.home-explore-img');
+            const totalItemsNeeded = 28;
+        
+            if ($items.length > 0) {
+                let index = 0;
+                while ($container.find('.home-explore-img').length < totalItemsNeeded) {
+                    const $clone = $items.eq(index).clone();
+                    $container.append($clone);
+                    index = (index + 1) % $items.length; // Lặp lại từ đầu nếu hết danh sách
+                }
+            }
            viewport.w > 991 && new ImageTrail('.home-explore');
         }
     }
@@ -2387,13 +2410,16 @@ const mainScript = () => {
                     scrollTop: scrollTop
                 }, 800);
             })
+            lenis.on('scroll', () => {
+                this.ItemContentActiveCheck('.policy-hero-content h6');
+            })
         }
         ItemContentActiveCheck(el) {
             for (let i = 0; i < $(el).length; i++) {
                 let top = $(el).eq(i).get(0).getBoundingClientRect().top;
                 if (top > 0 && top + $(el).eq(i).height() < viewport.h/4*3 ) {
-                    $('.home-popup-item.active .home-popup-item-left-content').removeClass('active');
-                    $('.home-popup-item.active .home-popup-item-left-content').eq(i).addClass('active');
+                    $('.policy-hero-menu-item').removeClass('active');
+                    $('.policy-hero-menu-item').eq(i).addClass('active');
                 }
                 }
         }
@@ -2700,15 +2726,20 @@ const mainScript = () => {
         if (pageName) {
         SCRIPT[`${pageName}Script`]();
         }
-
         header.toggleOnScroll(lenis);
         header.toggleColorMode('white');
+        let isScrolling = false;
         lenis.on("scroll", function (inst) {
+            if (!isScrolling) {
+                setupIframe();
+                isScrolling = true;
+            }
             header.toggleColorMode('white');
             header.toggleColorMode('blue');
             header.toggleOnScroll(lenis);
             header.toggleOnHide(inst);
         });
+       
     };
     /** (💡)  - START PAGE */
     if (window.scrollY > 0) {
