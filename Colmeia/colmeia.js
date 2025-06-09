@@ -739,9 +739,9 @@ const mainScript = () => {
         });
     }
     const initAllPopup = () => {
-        initPopup('schedule', {
-            onOpen: () => initMeetingsEmbedCode()
-        });
+        // initPopup('schedule', {
+        //     onOpen: () => initMeetingsEmbedCode()
+        // });
         initPopup('contact', {
             onOpen: () => {
                 $(`[data-popup-contact='wrap'] .iti__country-list`).each(function () {
@@ -2379,6 +2379,10 @@ const mainScript = () => {
                             $('.ar-content-share-popup').removeClass('active');
                         }, 2000);
                     }
+
+                    if (viewport.w > 991) {
+                        $('.ar-content-cta').css('top', ($(window).height() - $('.ar-content-cta').height()) / 2)
+                    }
                 }
                 scContent();
 
@@ -2468,6 +2472,12 @@ const mainScript = () => {
                     }
                 }
                 scContent();
+            }
+        },
+        schedule: {
+            namespace: 'schedule',
+            afterEnter() {
+                initMeetingsEmbedCode();
             }
         }
     }
