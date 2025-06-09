@@ -330,15 +330,48 @@ const mainScript = () => {
         })
       });
     }
-    $('.about-list-post-pagi-item')?.each((idx, item) => {
-      $(item).on('click', function (e) {
-        if (!$(this).hasClass("w--current")) {
-          lenis.scrollTo(0, {
-            duration: 1.2
-          })
+    const handlePaginationClick = () => {
+      $('.about-list-post-pagi-item')?.each((idx, item) => {
+        $(item).on('click', function () {
+          if (!$(item).hasClass("w--current")) {
+            handleScrollTop();
+          }
+        })
+      })
+      $('.about-list-post-pagi-next').on('click', function () {
+        if (!$(this).hasClass("is-list-pagination-disabled")) {
+          handleScrollTop();
         }
       })
-    })
+      $('.about-list-post-pagi-prev').on('click', function () {
+        if (!$(this).hasClass("is-list-pagination-disabled")) {
+          handleScrollTop();
+        }
+      })
+    }
+    const handleScrollTop = () => {
+      lenis.scrollTo(0, {
+        duration: 0.8,
+        lock: true,
+        force: true,
+        delay: 0.1,
+        onComplete: () => {
+          console.log('complete')
+        }
+      })
+    }
+    // Initial binding
+    handlePaginationClick();
+
+    // Watch for DOM changes
+    const observer = new MutationObserver(() => {
+      handlePaginationClick();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
     // set link pdf newroom 
     if ($('.about-news-list-item').length > 0) {
       $('.about-news-list-item').each((_idx, item) => {
