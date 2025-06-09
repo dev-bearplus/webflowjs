@@ -436,6 +436,19 @@ const mainScript = () => {
                     index = (index + 1) % $items.length; // Lặp lại từ đầu nếu hết danh sách
                 }
             }
+            let tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: this.triggerEl,
+                    start: "top top+=55%",
+                    once: true,
+                },
+            });
+            new MasterTimeline({
+                timeline: tl,
+                tweenArr: [
+                    new FadeSplitText({ el: $('.home-explore-title').get(0), onMask: true })
+                ]
+            })
            viewport.w > 991 && new ImageTrail('.home-explore');
         }
     }
@@ -449,6 +462,19 @@ const mainScript = () => {
             this.interact();
         }
         setup() {
+            let tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: this.triggerEl,
+                    start: "top top+=45%",
+                    once: true,
+                },
+            })
+            new MasterTimeline({
+                timeline: tl,
+                tweenArr: [
+                    ...Array.from($('.home-senses-menu-item-txt')).flatMap((el, idx) => new FadeSplitText({ el: el, onMask: true, delay: idx == 0? '<=0' : '<=.1' })),
+                ]
+            })
             if(viewport.w > 991) {
                 this.initContentPopup();
                 activeItem(['.home-senses-menu-item'], 0);
@@ -638,7 +664,7 @@ const mainScript = () => {
             let tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.home-featured',
-                    start: "top top+=65%",
+                    start: "top top+=55%",
                 },
             })
             $('.home-featured-right-item').each((idx, el) => {
@@ -647,6 +673,18 @@ const mainScript = () => {
                 let dataLinkType = linkInner.attr('data-link-type');
                 let linkCurrent = linkInner.attr('href');
                 linkInner.attr('href', `${linkCurrent}?detail=${dataLinkDetail}&type=${dataLinkType}`);
+            })
+            let tlLabel = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.home-featured',
+                    start: "top top+=65%",
+                },
+            })
+            new MasterTimeline({
+                timeline: tlLabel,
+                tweenArr: [
+                   ...Array.from($('.home-featured-label')).flatMap((el, idx) => new FadeSplitText({ el: el, onMask: true})),
+                ]
             })
             if(viewport.w > 768 ) {
                 $('.home-featured-left-inner').each((idx, el) => {
@@ -669,8 +707,8 @@ const mainScript = () => {
                         gsap.set(itemTitle.words, {yPercent: 100});
                         if(idx === 0) {
                             tl
-                            .to(itemLabel.words, {yPercent: 0, duration: .3, stagger: 0.01, ease: "power1.out"}, `<=0`)
-                            .to(itemTitle.words, {yPercent: 0, duration: .3, stagger: 0.01, ease: "power1.out"}, '<=0')
+                            .to(itemLabel.words, {yPercent: 0, duration: .4, stagger: 0.015, ease: "power1.out"}, `<=0`)
+                            .to(itemTitle.words, {yPercent: 0, duration: .4, stagger: 0.015, ease: "power1.out"}, '<=0')
                         }
                     })
                     if(idx === 0) {
@@ -861,6 +899,21 @@ const mainScript = () => {
             super.setTrigger(this.setup.bind(this));
         }
         setup() {
+            let tlLabel = new gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.home-service',
+                    start: "top top+=55%",
+                },
+            })
+            let tl = gsap.timeline({
+                
+            })
+            new MasterTimeline({
+                timeline: tlLabel,
+                tweenArr: [
+                   ...Array.from($('.home-service-label')).flatMap((el, idx) => new FadeSplitText({ el: el, onMask: true})),
+                ]
+            })
             $('.home-service-item').each((idx, el) => {
                 let linkItem = $(el).find('.home-service-item-link');
                 let linkItemHref = linkItem.attr('href');
@@ -1034,6 +1087,14 @@ const mainScript = () => {
             super.init(this.play.bind(this));
         }
         setup() {
+            new MasterTimeline({
+                timeline: this.tl,
+                tweenArr: [
+                  new FadeSplitText({ el: $('.mb-hero-title').get(0), onMask: true }),
+                  ...Array.from($('.mb-hero-control-item')).flatMap((el, idx) => new FadeSplitText({ el: el, onMask: true, delay: idx ==0 ? 0 : 0.2 })),
+                  ...Array.from($('.mb-hero-card-item-inner')).flatMap((el, idx) => new ScaleInset({ el: $(el).get(0), delay: idx ==0? 0 : 0.2 })),
+                ]
+            })
             if(viewport.w > 991) {
                 let lengthSlide = $(".mb-hero-card-item").length;
                 let stickyBot =  viewport.h - $('.mb-hero-card-main').height();
