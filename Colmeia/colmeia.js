@@ -2300,6 +2300,7 @@ const mainScript = () => {
 
                     gsap.set('.ar-content-thumb', { clipPath: 'inset(20%)' });
                     gsap.set('.ar-content-thumb img', { scale: 1.4, autoAlpha: 0 });
+                    gsap.set('.ar-content-cta', { autoAlpha: 0, y: 50 });
 
                     let tl = gsap.timeline({
                         delay: GLOBAL_DELAY,
@@ -2315,6 +2316,7 @@ const mainScript = () => {
                         .to(heroTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 })
                         .to('.ar-content-thumb', { clipPath: 'inset(0%)', duration: 1.5, ease: 'expo.out' }, "<=.1")
                         .to('.ar-content-thumb img', { scale: 1, autoAlpha: 1, duration: 1.5, ease: 'expo.out', clearProps: 'all' }, "<=0")
+                        .to('.ar-content-cta', { autoAlpha: 1, y: 0, duration: 1, ease: 'expo.out', clearProps: 'all' }, "<=0")
                     heroSub.length !== 0 && tl.to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, "<=.1")
 
                 }
