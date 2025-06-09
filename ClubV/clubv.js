@@ -1087,12 +1087,20 @@ const mainScript = () => {
             super.init(this.play.bind(this));
         }
         setup() {
+            this.tl = new gsap.timeline(
+                {
+                    onStart: () => {
+                        $('[data-init-df]').removeAttr('data-init-df');
+                    },
+                }
+            );
             new MasterTimeline({
                 timeline: this.tl,
                 tweenArr: [
                   new FadeSplitText({ el: $('.mb-hero-title').get(0), onMask: true }),
                   ...Array.from($('.mb-hero-control-item')).flatMap((el, idx) => new FadeSplitText({ el: el, onMask: true, delay: idx ==0 ? 0 : 0.2 })),
                   ...Array.from($('.mb-hero-card-item-inner')).flatMap((el, idx) => new ScaleInset({ el: $(el).get(0), delay: idx ==0? 0 : 0.2 })),
+                  ...Array.from($('.mb-hero-content-item-txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx ==0? 0 : 0.1 })),
                 ]
             })
             if(viewport.w > 991) {
@@ -1192,6 +1200,23 @@ const mainScript = () => {
         setup() {
             let txtMap = new SplitType('.contact-hero-right-item-link .contact-hero-right-item-link-txt', {types: 'lines, words', lineClass: 'bp-line'});
             multiLineText('.contact-hero-right-item-link');
+            new MasterTimeline({
+                timeline: this.tl,
+                tweenArr: [
+                    new FadeSplitText({ el: $('.contact-hero-title').get(0), onMask: true }),
+                    // new ScaleInset({ el: $('.contact-hero-right-img').get(0) }),
+                    new FadeSplitText({ el: $('.contact-hero-label').get(0), onMask: true }),
+                    new FadeSplitText({ el: $('.contact-hero-required').get(0), onMask: true }),
+                    ...Array.from($('.contact-hero-form-label')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx == 0 ? 0 : 0.2 })),
+                    ...Array.from($('.contact-hero-form-input-group')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0),  delay: idx == 0 ? 0 : 0.2 })),
+                    ...Array.from($('.contact-hero-form-textarea-group')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0),  delay: idx == 0 ? 0 : 0.2 })),
+                    new FadeIn({ el: $('.contact-hero-form-submit-wrap'), delay: .2 }),
+                    ...Array.from($('.contact-hero-info-social .txt')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0),  delay: idx == 0 ? 0 : 0.2 })),
+                    ...Array.from($('.contact-hero-info-social .contact-hero-social-item-link')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0),  delay: idx == 0 ? 0 : 0.2 })),
+                    ...Array.from($('.contact-hero-content-bot .txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true,  delay: idx == 0 ? 0 : 0.2 })),
+                    ...Array.from($('.contact-hero-right-content .txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true,  delay: idx == 0? 0 : 0.2 })),
+                ]
+            })
             this.autosize();
             this.validation();
         }
@@ -1355,6 +1380,34 @@ const mainScript = () => {
             this.interact();
         }
         setup() {
+            new MasterTimeline({
+                timeline: this.tl,
+                tweenArr: [
+                  new FadeSplitText({ el: $('.service-hero-title').get(0), onMask: true })
+                ]
+            })
+            this.tl = gsap.timeline ({
+                onStart: () => {
+                    $('[data-init-df]').removeAttr('data-init-df');
+                }
+            })
+            $('.service-hero-content-item').each((idx, el) => {
+                let tlItem = new gsap.timeline({
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top top+=65%"
+                    },
+                })
+                new MasterTimeline({
+                    timeline: tlItem,
+                    tweenArr: [
+                      new ScaleInset({ el: $(el).find('.service-hero-content-item-img').get(0), onMask: true }),
+                      new FadeSplitText({ el: $(el).find('.service-hero-content-item-title .txt').get(0), onMask: true, delay: 0.2 }),
+                      new FadeSplitText({ el: $(el).find('.service-hero-content-item-sub').get(0), onMask: true, delay: 0.2 }),
+                      new FadeSplitText({ el: $(el).find('.service-hero-content-item-link-txt').get(0), onMask: true })
+                    ]
+                })
+            })
             this.initContentPopup();
             let currentUrl = window.location.href;
             let url = new URL(currentUrl);
@@ -2700,8 +2753,104 @@ const mainScript = () => {
             let txtMap = new SplitType('.footer-info-link-map .footer-info-link-txt', {types: 'lines, words', lineClass: 'bp-line'});
             multiLineText('.footer-info-link-map');
             viewport.w < 768 && $('.footer-info-link-map .bp-line').css('margin-inline', 'auto')
-            
-            
+            let tlImg = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.footer-left-img',
+                    start: 'top top+=55%',
+                }
+            })
+            new MasterTimeline({
+                timeline: tlImg,
+                tweenArr: [
+                    new ScaleInset({el: $('.footer-left-img-inner.active').get(0), onMask: true})
+                ]
+            })
+            let tlMenu = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.footer-menu',
+                    start: 'top top+=65%',
+                }
+            })
+            new MasterTimeline({
+                timeline: tlMenu,
+                tweenArr: [
+                    ...Array.from($('.footer-left-social-item-txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx == 0 ? 0 : .1})),
+                    ...Array.from($('.footer-menu-space')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx == 0 ? 0 : .1}))
+                ]
+            })
+            let tlPolicy = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.footer-policy-wrap',
+                    start: 'top top+=65%',
+                }
+            })
+            new MasterTimeline({
+                timeline: tlPolicy,
+                tweenArr: [
+                    ...Array.from($('.footer-policy-item-txt')).flatMap((el, i) => {
+                    return [
+                        new FadeSplitText({ el: $(el).get(0), onMask: true, delay: i == 0 ? 0 : .1}),
+                    ]
+                    })
+                ]
+            })
+            let tlApp = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.footer-policy-wrap',
+                    start: 'top top+=65%',
+                }
+            })
+            new MasterTimeline({
+                timeline: tlApp,
+                tweenArr: [
+                    ...Array.from($('.footer-app .txt')).flatMap((el, i) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: i == 0 ? 0 : .2}),),
+                    new FadeIn({el: $('.footer-touch-ic').get(0), onMask: true}),
+                    new FadeSplitText({ el: $('.footer-touch-txt').get(0), onMask: true})
+                ]
+            })
+            let tlSocial = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.footer-info',
+                    start: 'top top+=75%',
+                }
+            })
+            new MasterTimeline({
+                timeline: tlSocial,
+                tweenArr: [
+                    ...Array.from($('.footer-info .txt')).flatMap((el, i) => {
+                        return [
+                            new FadeSplitText({ el: $(el).get(0), onMask: true, delay: i == 0? 0 :.1}),
+                        ]
+                    })  ,
+                    ...Array.from($('.footer-info .footer-info-item-social-ic')).flatMap((el, i) => {
+                        return [
+                            new FadeIn({ el: $(el).get(0), onMask: true, delay: i == 0? 0 :.05}),
+                        ]
+                    })     
+                ]
+            })
+            let tlBot = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.footer-copyright-wrap',
+                    start: 'top bottom  ',
+                }
+            })
+            new MasterTimeline({
+                timeline: tlBot,
+                tweenArr: [
+                    ...Array.from($('.footer-left-social-list .txt')).flatMap((el, i) => {
+                        return [
+                            new FadeIn({ el: $(el).get(0), onMask: true, delay: i == 0? 0 :.05}),
+                        ]
+                    }),
+                    ...Array.from($('.footer-copyright-wrap .txt')).flatMap((el, i) => {
+                        return [
+                            new FadeSplitText({ el: $(el).get(0), onMask: true, delay: i == 0? 0 :.1}),
+                        ]
+                    })  ,
+                       
+                ]
+            })
         }
         interact() {
             let zIndexVal = 1;
@@ -2789,6 +2938,7 @@ const mainScript = () => {
         }
         header.toggleOnScroll(lenis);
         header.toggleColorMode('white');
+        header.toggleColorMode('blue');
         let isScrolling = false;
         lenis.on("scroll", function (inst) {
             if (!isScrolling) {
