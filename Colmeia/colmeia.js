@@ -1315,8 +1315,8 @@ const mainScript = () => {
                             .to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '>-.5')
                             .from('.home-hero-btn', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' }, '>-.6')
                             .to(companyTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, '>-.8')
-                            .from('.home-hero-company .line', { scaleX: 0, transformOrigin: 'left', duration: 1, clearProps: 'all' }, '>-.8')
-                            .from('.home-hero-company-item', { autoAlpha: 0, yPercent: 40, xPercent: -30, rotate: 2, duration: 1.2, stagger: .05 }, '>-.85')
+                            .from($('.home-hero-company .line:visible'), { scaleX: 0, transformOrigin: 'left', duration: 1, clearProps: 'all' }, '>-.8')
+                            .from($('.home-hero-company-item:visible'), { autoAlpha: 0, yPercent: 40, xPercent: -30, rotate: 2, duration: 1.2, stagger: .05 }, '>-.85')
                         }
                         else {
                             tl
@@ -1325,10 +1325,10 @@ const mainScript = () => {
                             .to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '>-.5')
                             .from('.home-hero-btn', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' }, '>-.6')
                             .to(companyTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, '>-.8')
-                            .from('.home-hero-company .line', { scaleX: 0, transformOrigin: 'left', duration: 1, clearProps: 'all' }, '>-.8')
-                            .from('.home-hero-company-item', { autoAlpha: 0, yPercent: 40, xPercent: -30, rotate: 2, duration: 1.2, stagger: .05 }, '>-.85')
                             .from('.home-hero-thumb-inner', { autoAlpha: 0, y: 50, filter: 'blur(5px)', duration: 1.5, ease: 'expo.out', clearProps: 'all' }, "<=0")
                             .from('.home-hero-thumb-decor', { autoAlpha: 0, scale: .8, duration: 1.5, ease: 'back.out(1.3)', clearProps: 'all' }, "<=.4")
+                            .from($('.home-hero-company .line:visible'), { scaleX: 0, transformOrigin: 'left', duration: 1, clearProps: 'all' }, '>-.8')
+                            .from($('.home-hero-company-item:visible'), { autoAlpha: 0, yPercent: 40, xPercent: -30, rotate: 2, duration: 1.2, stagger: .05 }, '>-.85')
                         }
                     }
 
