@@ -1333,6 +1333,16 @@ const mainScript = () => {
                     }
 
                     animShowEl();
+
+                    $('.home-hero-thumb-btn a').on('click', function (e) {
+                        e.preventDefault();
+                        $('.home-hero-thumb-vid iframe')[0].src += "&autoplay=1";
+                        gsap.to('.home-hero-thumb-overlay, .home-hero-thumb-btn', {
+                            autoAlpha: 0, onComplete: () => {
+                            $('.home-hero-thumb-overlay').remove();
+                            $('.home-hero-thumb-btn').remove();
+                        } });
+                    })
                 }
                 scHero();
 
@@ -2075,13 +2085,23 @@ const mainScript = () => {
                             }
                         })
                         tl
-                            .from('.prod-hero-thumb-item', { autoAlpha: 0, scale: 1.2, duration: 1.5, stagger: 0.03, ease: 'circ.out', clearProps: 'all' })
+                            .from('.prod-hero-thumb-inner', { autoAlpha: 0, y: 50, filter: 'blur(5px)', duration: 1.5, ease: 'expo.out', clearProps: 'all' })
+                            .to(heroDesc.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
                             .to(heroTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, "<=.1")
                             .to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
-                            .to(heroDesc.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
-                            .from('.prod-hero .btn', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' }, '<=.2')
+                            .from('.prod-hero-btn .btn', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' },  '>-.6')
                     }
                     animShowEl();
+
+                    $('.prod-hero-thumb-btn a').on('click', function (e) {
+                        e.preventDefault();
+                        $('.prod-hero-thumb-vid iframe')[0].src += "&autoplay=1";
+                        gsap.to('.prod-hero-thumb-overlay, .prod-hero-thumb-btn', {
+                            autoAlpha: 0, onComplete: () => {
+                            $('.prod-hero-thumb-overlay').remove();
+                            $('.prod-hero-thumb-btn').remove();
+                        } });
+                    })
                 }
                 scHero();
 
