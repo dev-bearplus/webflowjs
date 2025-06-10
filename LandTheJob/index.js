@@ -185,7 +185,7 @@ const script = () => {
     scrollTop();
     setTimeout(() => {
         $('.loader').animate({ opacity: 0 }, 1000, () => $('.loader').remove());
-    }, 1000);
+    }, 4000);
     marquee($('.last-cta-strip-marquee-list'));
     const pageName = $('main.main').attr('data-namespace');
     if (pageName) {
