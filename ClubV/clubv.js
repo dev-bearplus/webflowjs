@@ -1302,7 +1302,7 @@ const mainScript = () => {
                         ScrollTrigger.refresh();
                     },
                     onLeave: () => {
-                        $(".mb-hero-card-wrap").removeClass('on-sticky');
+                        // $(".mb-hero-card-wrap").removeClass('on-sticky');
                         ScrollTrigger.refresh();
                     }
                 },
@@ -1432,6 +1432,13 @@ const mainScript = () => {
             super.init(this.play.bind(this));
         }
         setup() {
+            new MasterTimeline({
+                timeline: this.tl,
+                tweenArr: [
+                    ...Array.from($('.fb-hero-title-wrap .heading')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx == 0? 0 : 0.2 })),
+                    ...Array.from($('.fb-hero-item')).flatMap((el, idx) => new ScaleInset({ el: $(el).get(0), delay: idx == 0? 0 : 0.2 })),
+                ]
+            })
             if(viewport.w > 991 || viewport.w < 768) {
                 let paddingLeftContainer = parseFloat($('.fb-hero .container').css('padding-left'));
                 const initThumb = () => {
@@ -1639,7 +1646,7 @@ const mainScript = () => {
                 let currentIndex = -1;
                 activeItem(['.game-hero-machine-title'], 0);
                 gsap.set(machineTitle.words, {yPercent: 100, opacity: 0});
-                gsap.set('.game-hero-title-ic img', {yPercent: 100, opacity: 0});
+                viewport.w> 991 && gsap.set('.game-hero-title-ic img', {yPercent: 100, opacity: 0});
                 this.tl = gsap.timeline({
                     onStart: () => {
                         $('[data-init-df]').removeAttr('data-init-df');
@@ -1654,7 +1661,7 @@ const mainScript = () => {
                     tweenArr: [
                         new FadeSplitText({ el: $('.game-hero-sub').get(0), onMask: true }),
                         new FadeSplitText({ el: $('.game-hero-machine').eq(0).find('.game-hero-machine-label').get(0), onMask: true }),
-                        new ScaleInset({ el: $('.game-hero-img-item').get(0), duration: .1}),
+                        new ScaleInset({ el: $('.game-hero-img-item').get(0), duration: .6}),
                         new FadeIn({ el: $('.game-hero-right-link'), onStart: () => {
                             gsap.to($('.game-hero-machine-title').eq(0).find('.word'), {yPercent: 0, opacity: 1, duration: .35, stagger: .015, ease: 'power1.out'})
                             gsap.to($('.game-hero-machine-title').eq(0).find('.game-hero-title-ic img'), {yPercent: 0, opacity: 1, duration: .4, ease: 'power1.out'},'<=.1')
@@ -1756,15 +1763,15 @@ const mainScript = () => {
         activeTitle(index, direction) {
             activeItem(['.game-hero-machine-title'], index);
             if(direction == 1) {
-                gsap.to($('.game-hero-machine-title').eq(index - 1).find('.word'), {yPercent: -100, opacity: 0, duration:.4, stagger:.015, ease: 'power1.out'})
+                gsap.to($('.game-hero-machine-title').eq(index - 1).find('.word'), {yPercent: -100, opacity: 0, duration:.4, stagger:.01, ease: 'power1.out'})
                 gsap.to($('.game-hero-machine-title').eq(index -1).find('.game-hero-title-ic').find('img'), {yPercent: -100, opacity: 0, duration:.4, stagger:.015, ease: 'power1.out'})
-                gsap.to($('.game-hero-machine-title').eq(index).find('.word'), {yPercent: 0, opacity: 1, duration:.4, stagger:.015, delay: '.1', ease: 'power1.out'})
+                gsap.to($('.game-hero-machine-title').eq(index).find('.word'), {yPercent: 0, opacity: 1, duration:.4, stagger:.01, delay: '.1', ease: 'power1.out'})
                 gsap.to($('.game-hero-machine-title').eq(index ).find('.game-hero-title-ic').find('img'), {yPercent: 0, opacity: 1, duration:.4, delay: '.1', ease: 'power1.out'})
             }
             else if( direction == -1) {
-                gsap.to($('.game-hero-machine-title').eq(index + 1).find('.word'), {yPercent: 100, opacity: 0, duration:.4, stagger:.015, ease: 'power1.out'})
+                gsap.to($('.game-hero-machine-title').eq(index + 1).find('.word'), {yPercent: 100, opacity: 0, duration:.4, stagger:.01, ease: 'power1.out'})
                 gsap.to($('.game-hero-machine-title').eq(index + 1).find('.game-hero-title-ic').find('img'), {yPercent: 100, opacity: 0, duration:.4, ease: 'power1.out'})
-                gsap.to($('.game-hero-machine-title').eq(index).find('.word'), {yPercent: 0, opacity: 1, delay: '.1', duration:.4, stagger:.015, ease: 'power1.out'})
+                gsap.to($('.game-hero-machine-title').eq(index).find('.word'), {yPercent: 0, opacity: 1, delay: '.1', duration:.4, stagger:.01, ease: 'power1.out'})
                 gsap.to($('.game-hero-machine-title').eq(index).find('.game-hero-title-ic').find('img'), {yPercent: 0, opacity: 1, delay: '.1', duration:.4, ease: 'power1.out'})
             }
         }
@@ -2037,6 +2044,20 @@ const mainScript = () => {
             this.interact();
         }
         setup() {
+            new MasterTimeline({
+                timeline: this.tl,
+                tweenArr : [
+                    new FadeSplitText({el: $('.event-hero-title').get(0), onMask: true}),
+                    new FadeSplitText({el: $('.event-hero-tag-title').get(0), onMask: true}),
+                    ...Array.from($('.event-hero-card-item')).flatMap((el, index) => new FadeIn({el: $(el), delay:.2})),
+                    ...Array.from($('.event-hero-tag-item')).flatMap((el, index) => new FadeIn({el: $(el), delay: .2})),
+                    new FadeSplitText({el: $('.event-hero-date-title').get(0), onMask: true}),
+                    new FadeIn({el: $('.event-hero-date-reset').get(0), delay: .2}),
+                    ...Array.from($('.event-hero-date-filter-item')).flatMap((el, index) => new FadeIn({el: $(el), delay: .2})),
+                    ...Array.from($('.event-calendar-item')).flatMap((el, index) => new FadeIn({el: $(el), delay: .2})),
+                ]
+            })
+
             $('.event-calendar-item').each((i, el) => {
                 this.calendar($(el));
             })
@@ -2094,7 +2115,10 @@ const mainScript = () => {
                 let tagName  = $(e.target).closest('.event-hero-tag-item').attr('data-tag');
                 this.activeTab(tagName);
             })
-            
+            $('.event-hero-date-reset').on('click', (e) => {
+                e.preventDefault();
+                this.filterReset();
+            })
         }
         activeTab(tagName) {
             this.filterReset();
@@ -2310,6 +2334,8 @@ const mainScript = () => {
         filterReset() {
             $('.event-hero-date-filter-item').removeClass('active');
             $('.event-calendar-item-date-txt').removeClass('active');
+            let tagActive = $('.event-hero-tag-item.active').attr('data-tag');
+            this.initActiveTab(tagActive);
         }
     }
     let eventHero = new EventHero();
@@ -2323,6 +2349,31 @@ const mainScript = () => {
             super.init(this.play.bind(this));
         }
         setup() {
+            new MasterTimeline({
+                timeline: this.tl,
+                tweenArr : [
+                    new FadeSplitText({el: $('.work-hero-title').get(0), onMask: true}),
+                    new FadeSplitText({el: $('.work-hero-label').get(0), onMask: true}),
+                    new ScaleInset({el: $('.work-hero-sub-img-inner').get(0), delay: .2}),
+                ]
+            })
+
+            $('.work-hero-sub-item').each((i, el) => {
+                let tlItem = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top top+=75%",
+                    },
+                })
+                new MasterTimeline({
+                    timeline: tlItem,
+                    tweenArr : [
+                        new  FadeSplitText({el: $(el).find('.work-hero-sub-item-num').get(0), onMask: true}),
+                        new  FadeSplitText({el: $(el).find('.work-hero-sub-item-title').get(0), onMask: true}),
+                        new  FadeSplitText({el: $(el).find('.work-hero-sub-item-sub').get(0), onMask: true}),
+                    ]
+                })
+            })
             if(viewport.w < 768) {
                 $('.work-hero-sub-wrap').addClass('swiper')
                 $('.work-hero-sub-inner').addClass('swiper-wrapper')
@@ -2353,7 +2404,23 @@ const mainScript = () => {
             super.setTrigger(this.setup.bind(this));
         }
         setup() {
-           
+            let tlInit = new gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.work-thumb',
+                    start: 'bottom-=5% bottom',
+                    once: true,
+                }
+            })
+            new MasterTimeline({
+                timeline: tlInit,
+                tweenArr : [
+                    ...Array.from($('.work-thumb-content-txt')).flatMap((el,i) => new FadeSplitText({el: $(el).get(0), onMask: true})),
+                    ...Array.from($('.work-thumb-people')).flatMap((el,i) => new ScaleInset({el: $(el).get(0)})),
+                ]
+            })
+            tlInit
+                .fromTo('.work-thumb-people',{scale: 1.2, opacity: 0},{scale: 1, opacity: 1, duration: 1, ease: 'power1.out'}, '<=0')
+                .fromTo('.work-enviroment-people.item1',{scale: 1.2, opacity: 0},{scale: 1, opacity: 1, duration: 1, ease: 'power1.out'}, '<=0')
             const $section = $('.work-thumb');
             const $peoples = $section.find('.work-thumb-people');
             $peoples.each((idx, el) => {
@@ -2415,7 +2482,19 @@ const mainScript = () => {
             super.setTrigger(this.setup.bind(this));
         }
         setup() {
-          
+            let tlInit = new gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.work-enviroment',
+                    start: 'top top+=60%',
+                    once: true,
+                }
+            })
+            tlInit
+               .fromTo('.work-enviroment-people:not(.item1)',{scale: 1.2, opacity: 0},{scale: 1, opacity: 1, duration: 1,stagger: {
+                amount: 2,
+                from: "random"
+              }, ease: 'power1.out'},)
+              .fromTo('.work-enviroment-deco',{scale: 1.2, opacity: 0}, {scale: 1, opacity: 1, duration: 1, ease: 'power1.out'}, '<=0')
             const $section = $('.work-enviroment');
             const $peoples = $section.find('.work-enviroment-people');
             let yBlock = viewport.w > 991 ? 50 : 30;
@@ -2456,6 +2535,36 @@ const mainScript = () => {
             super.setTrigger(this.setup.bind(this));
         }
         setup() {
+            let tlRight = new gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.work-workspace-right',
+                    start: 'top top+=65%',
+                    once: true,
+                }
+            })
+            new MasterTimeline({
+                timeline: tlRight,
+                tweenArr: [
+                    new FadeSplitText({ el: $('.work-workspace-right-label').get(0), onMask: true }),
+                    new FadeIn({el: '.work-workspace-right-inner'})
+                ]
+            });
+            $('.work-workspace-left-item').each((i, el) => {
+                let tlItem = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top top+=75%",
+                    },
+                })
+                new MasterTimeline({
+                    timeline: tlItem,
+                    tweenArr : [
+                        new  FadeSplitText({el: $(el).find('.work-workspace-left-item-num').get(0), onMask: true}),
+                        new  FadeSplitText({el: $(el).find('.work-workspace-left-item-title').get(0), onMask: true}),
+                        new  FadeSplitText({el: $(el).find('.work-workspace-left-item-sub').get(0), onMask: true}),
+                    ]
+                })
+            })
             if(viewport.w < 768) {
                 $('.work-workspace-left').addClass('swiper')
                 $('.work-workspace-left-inner').addClass('swiper-wrapper')
@@ -2521,6 +2630,30 @@ const mainScript = () => {
         this.interact();
         }
         setup() {
+            let tlInit = new gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.work-job',
+                    start: 'top top+=55%',
+                    once: true,
+                }
+            })
+            new MasterTimeline({
+                timeline: tlInit,
+                tweenArr: [
+                    new FadeSplitText({ el: $('.work-job-label').get(0), onMask: true }),
+                    new FadeSplitText({ el: $('.work-job-title').get(0), onMask: true }),
+                ]
+            })
+            $('.work-job-item').each((i, el) => {
+                new MasterTimeline({
+                    timeline: tlInit,
+                    tweenArr : [
+                        new  ScaleLine({el: $(el).find('.work-job-item-line').get(0), delay: i==0 ? 0: i*.1}),
+                        new FadeSplitText({el: $(el).find('.work-job-item-label').get(0), onMask: true, delay: i==0 ? 0: i*.2}),
+                        ...Array.from($(el).find('.work-job-item-title')).flatMap((el,i) => new FadeSplitText({el: $(el).get(0), onMask: true, delay: .2})),
+                    ]
+                })
+            })
             this.initContentPopup();
         }
         interact() {
@@ -2627,6 +2760,42 @@ const mainScript = () => {
         }
     }
     let workOffice = new WorkOffice(".work-office-wrap");
+    class WorkInfo extends TriggerSetup {
+        constructor(triggerEl) {
+        super(triggerEl);
+        }
+        trigger() {
+            super.setTrigger(this.setup.bind(this));
+        }
+        setup() {
+            let tlInit = new gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.work-info',
+                    start: 'top top+=65%',
+                    once: true,
+                }
+            })
+            new MasterTimeline(
+            {
+                timeline: tlInit,
+                tweenArr: [
+                    new FadeSplitText({ el: $('.work-info-label').get(0), onMask: true }),
+                ]
+            })
+            $('.work-info-content-item').each((i, el) => {
+                new MasterTimeline({
+                    timeline: tlInit,
+                    tweenArr : [
+                        new FadeSplitText({el: $(el).find('.work-info-content-item-label').get(0), onMask: true, delay: i==0? 0: i*.1}),
+                        ...Array.from($(el).find('.work-info-content-item-name')).flatMap((el,i) => new FadeSplitText({el: $(el).get(0), onMask: true, delay:.2})),
+                        ...Array.from($(el).find('.work-info-content-item-link')).flatMap((el,i) => new FadeIn({el: $(el).get(0)})),
+                        new FadeSplitText({el: $(el).find('.work-info-content-item-title').get(0), onMask: true, delay:.2})
+                    ]
+                })
+            })
+        }
+    }
+    let workInfo = new WorkInfo(".work-info-wrap");
     class FaqsHero extends TriggerSetupHero {
         constructor() {
             super();
@@ -2637,6 +2806,13 @@ const mainScript = () => {
             super.init(this.play.bind(this));
         }
         setup() {
+            new MasterTimeline({
+                timeline: this.tl,
+                tweenArr: [
+                    new FadeSplitText({ el: $('.faq-hero-title').get(0), onMask: true }),
+                    ...Array.from($('.faq-hero-item')).flatMap((el,i) => new FadeIn({el: $(el).get(0)})),
+                ]
+            })
             $('.faq-hero-item').each((idx, el) => {
                 let number = idx <=9? `0${idx+1}` : idx+1;
                 $(el).find('.faq-hero-item-number').text(`(${number})`);
@@ -2920,7 +3096,8 @@ const mainScript = () => {
             let tlImg = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.footer-left-img',
-                    start: 'top top+=55%',
+                    start: 'top top+=60%',
+                    once: true,
                 }
             })
             new MasterTimeline({
@@ -2932,7 +3109,8 @@ const mainScript = () => {
             let tlMenu = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.footer-menu',
-                    start: 'top top+=65%',
+                    start: 'top top+=75%',
+                    once: true,
                 }
             })
             new MasterTimeline({
@@ -2945,7 +3123,7 @@ const mainScript = () => {
             let tlPolicy = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.footer-policy-wrap',
-                    start: 'top top+=65%',
+                    start: 'top top+=75%',
                 }
             })
             new MasterTimeline({
@@ -2961,7 +3139,8 @@ const mainScript = () => {
             let tlApp = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.footer-touch-wrap',
-                    start: 'top top+=65%',
+                    start: 'top top+=80%',
+                    once: true,
                 }
             })
             new MasterTimeline({
@@ -2976,6 +3155,7 @@ const mainScript = () => {
                 scrollTrigger: {
                     trigger: '.footer-info',
                     start: 'top top+=80%',
+                    once: true,
                 }
             })
             new MasterTimeline({
@@ -2997,6 +3177,7 @@ const mainScript = () => {
                 scrollTrigger: {
                     trigger: '.footer-copyright-wrap',
                     start: 'top bottom  ',
+                    once: true,
                 }
             })
             new MasterTimeline({
@@ -3078,6 +3259,7 @@ const mainScript = () => {
             workEnviroment.trigger();
             workJob.trigger();
             workOffice.trigger();
+            workInfo.trigger();
             footer.trigger();
         },
         policyScript: () => { 
