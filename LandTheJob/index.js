@@ -183,17 +183,17 @@ const script = () => {
     }
 
     scrollTop();
-    // $('.senja-embed').each((idx, el) => {
-    //     let id = $(el).attr('data-id');
-    //     setTimeout(() => {
-    //         $('<script/>', {
-    //             src: `https://widget.senja.io/widget/${id}/platform.js`,
-    //             type: 'text/javascript',
-    //             async: true
-    //         }).appendTo('body');
-    //         $(el).css('display', 'block');
-    //     }, $(window).width() < 767 ? 1000 : 300);
-    // })
+    $('.senja-embed').each((idx, el) => {
+        let id = $(el).attr('data-id');
+        setTimeout(() => {
+            $('<script/>', {
+                src: `https://widget.senja.io/widget/${id}/platform.js`,
+                type: 'text/javascript',
+                async: true
+            }).appendTo('body');
+            $(el).css('display', 'block');
+        }, $(window).width() < 767 ? 1000 : 300);
+    })
     // let isLoaded = sessionStorage.getItem('isLoaded') === 'true' ? true : false;
     // if (!isLoaded) {
     //     if ($(window).width() < 767) {
