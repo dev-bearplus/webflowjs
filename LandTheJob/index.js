@@ -103,23 +103,23 @@ const script = () => {
             $('.home-search-answer-stick').css('top', ($(window).height() - $('.home-search-answer-stick').height()) / 2);
         }
         else {
-            // requestAnimationFrame(() => {
-            //     $('.home-search-answer-list-wrap').css('display', 'block');
-            //     requestAnimationFrame(() => {
-            //         $('.home-search-answer-list-wrap').css({
-            //             '--grid-row-height': `${$('.home-search-answer-list-inner').height()}px`,
-            //             'display': 'grid'
-            //         });
-            //         requestAnimationFrame(() => {
-            //             $('.home-search-answer-list-wrap').css({
-            //                 'grid-template-rows': `${$('.home-search-answer-list').height()}px`,
-            //             });
-            //         })
-            //     })
-            // })
-            // $('.home-search-answer-more-btn').on('click', function (e) {
-            //     $('.home-search-answer-list-wrap').addClass('active');
-            // })
+            requestAnimationFrame(() => {
+                $('.home-search-answer-list-wrap').css('display', 'block');
+                requestAnimationFrame(() => {
+                    $('.home-search-answer-list-wrap').css({
+                        '--grid-row-height': `${$('.home-search-answer-list-inner').height()}px`,
+                        'display': 'grid'
+                    });
+                    requestAnimationFrame(() => {
+                        $('.home-search-answer-list-wrap').css({
+                            'grid-template-rows': `${$('.home-search-answer-list').height()}px`,
+                        });
+                    })
+                })
+            })
+            $('.home-search-answer-more-btn').on('click', function (e) {
+                $('.home-search-answer-list-wrap').addClass('active');
+            })
         }
     }
     SCRIPT.storyScript = () => {
