@@ -1333,18 +1333,22 @@ const mainScript = () => {
                     }
 
                     animShowEl();
-                    let iframeSrc = new URL($('.home-hero-thumb-vid-inner').attr('data-iframe-src'));
 
+                    let iframeSrc = new URL($('.home-hero-thumb-vid-inner').attr('data-iframe-src'));
                     $('.home-hero-thumb-btn a').on('click', function (e) {
                         e.preventDefault();
                         iframeSrc += "?autoplay=1";
                         let iframe = $('<iframe></iframe>');
-                        iframe.attr('src', iframeSrc);
-                        iframe.attr('allow', 'autoplay');
-                        iframe.attr('allowfullscreen', '');
-                        iframe.attr('width', '100%');
-                        iframe.attr('height', '100%');
-                        iframe.attr('frameborder', 0);
+                        iframe.attr({
+                            'src': iframeSrc,
+                            'allow': 'autoplay',
+                            'allowfullscreen': '',
+                            'width': '100%',
+                            'height': '100%',
+                            'frameborder': 0,
+                            'allow': 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+                            'referrerpolicy': 'strict-origin-when-cross-origin'
+                        });
                         iframe.appendTo('.home-hero-thumb-vid-inner');
                         gsap.to('.home-hero-thumb-overlay, .home-hero-thumb-btn', {
                             autoAlpha: 0, onComplete: () => {
@@ -2108,13 +2112,17 @@ const mainScript = () => {
                         e.preventDefault();
                         iframeSrc += "?autoplay=1";
                         let iframe = $('<iframe></iframe>');
-                        iframe.attr('src', iframeSrc);
-                        iframe.attr('title', iframeTitle);
-                        iframe.attr('allow', 'autoplay');
-                        iframe.attr('allowfullscreen', '');
-                        iframe.attr('width', '100%');
-                        iframe.attr('height', '100%');
-                        iframe.attr('frameborder', 0);
+                        iframe.attr({
+                            'src': iframeSrc,
+                            'title': iframeTitle,
+                            'allow': 'autoplay',
+                            'allowfullscreen': '',
+                            'width': '100%',
+                            'height': '100%',
+                            'frameborder': 0,
+                            'allow': 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+                            'referrerpolicy': 'strict-origin-when-cross-origin'
+                        });
                         iframe.appendTo('.prod-hero-thumb-vid-inner');
                         gsap.to('.prod-hero-thumb-overlay, .prod-hero-thumb-btn', {
                             autoAlpha: 0, onComplete: () => {
