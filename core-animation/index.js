@@ -371,7 +371,7 @@ class ScaleLine {
 }
 
 class ScaleInset {
-    constructor({el, elInner, type, options, delay }) {
+    constructor({el, elInner, type, options, delay, duration= 1.5 }) {
         this.DOM = { el: el, elInner: elInner || el?.querySelector('img') };
         this.type = type;
         this.delay = delay;
@@ -391,7 +391,7 @@ class ScaleInset {
         this.animation = gsap.fromTo(this.DOM.elInner,
             { ...this.options[this.type]?.set || this.options.default.set },
             {
-                ...this.options[this.type]?.to || this.options.default.to, duration: 1.5, ease: 'circ.out',
+                ...this.options[this.type]?.to || this.options.default.to, duration: duration, ease: 'circ.out',
                 ...options,
                 onComplete: () => {
                     gsap.set([this.DOM.el, this.DOM.elInner], { clearProps: 'all' });
