@@ -915,7 +915,7 @@ const mainScript = () => {
         swapMode: () => {
             $('.header').removeClass('on-light on-dark on-mix');
             $('.header').addClass(`on-${$('[data-header]').attr('data-header') || 'light'}`);
-            // $('.header').hasAttr('data-current-mode') && $('.header').removeAttr('data-current-mode');
+            $('.header').hasAttr('data-current-mode') && $('.header').removeAttr('data-current-mode');
         }
     }
 
@@ -1333,10 +1333,19 @@ const mainScript = () => {
                     }
 
                     animShowEl();
+                    let iframeSrc = new URL($('.home-hero-thumb-vid-inner').attr('data-iframe-src'));
 
                     $('.home-hero-thumb-btn a').on('click', function (e) {
                         e.preventDefault();
-                        $('.home-hero-thumb-vid iframe')[0].src += "&autoplay=1";
+                        iframeSrc += "?autoplay=1";
+                        let iframe = $('<iframe></iframe>');
+                        iframe.attr('src', iframeSrc);
+                        iframe.attr('allow', 'autoplay');
+                        iframe.attr('allowfullscreen', '');
+                        iframe.attr('width', '100%');
+                        iframe.attr('height', '100%');
+                        iframe.attr('frameborder', 0);
+                        iframe.appendTo('.home-hero-thumb-vid-inner');
                         gsap.to('.home-hero-thumb-overlay, .home-hero-thumb-btn', {
                             autoAlpha: 0, onComplete: () => {
                             $('.home-hero-thumb-overlay').remove();
@@ -2303,7 +2312,7 @@ const mainScript = () => {
                     gsap.set('.ar-content-cta', { autoAlpha: 0, y: 50 });
 
                     let tl = gsap.timeline({
-                        delay: GLOBAL_DELAY,
+                        delay: .5,
                         defaults: { ease: 'power2.out' },
                         once: true,
                         onComplete: () => {
@@ -2380,10 +2389,6 @@ const mainScript = () => {
                         setTimeout(() => {
                             $('.ar-content-share-popup').removeClass('active');
                         }, 2000);
-                    }
-
-                    if (viewport.w > 991) {
-                        $('.ar-content-cta').css('top', ($(window).height() - $('.ar-content-cta').height()) / 2)
                     }
                 }
                 scContent();
