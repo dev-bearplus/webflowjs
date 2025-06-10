@@ -373,22 +373,22 @@ const mainScript = () => {
       subtree: true
     });
     // set link pdf newroom 
-    if ($('.about-news-list-item').length > 0) {
-      $('.about-news-list-item').each((_idx, item) => {
+    if ($('.about-list-post-item').length > 0) {
+      $('.about-list-post-item').each((_idx, item) => {
         const pdfLink = $(item).find('.about-news-list-clone-link').attr('href');
         function isValidLink(link) {
           const urlPattern = /https?:\/\/[^\s]+/;
           return urlPattern.test(link);
         };
         if (isValidLink(pdfLink)) {
-          $(item).find('.about-news-list-item-inner').attr('href', pdfLink);
-          $(item).find('.about-news-list-item-inner').attr('target', '_blank');
+          $(item).find('.about-list-post-item-inner').attr('href', pdfLink);
+          $(item).find('.about-list-post-item-inner').attr('target', '_blank');
         } else {
-          const hrefInner = $(item).find('.about-news-list-item-inner').attr('href');
+          const hrefInner = $(item).find('.about-list-post-item-inner').attr('href');
           if (!hrefInner || hrefInner === '#') {
             const title = $(item).find('.heading.txt-20').text().split(',')[0].trim();
             const slug = generateSlug(title);
-            $(item).find('.about-news-list-item-inner').attr('href', `${document.location.href}/${slug}`);
+            $(item).find('.about-list-post-item-inner').attr('href', `${document.location.href}/${slug}`);
           }
         }
       })
