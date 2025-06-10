@@ -192,7 +192,7 @@ const script = () => {
                 async: true
             }).appendTo('body');
             $(el).css('display', 'block');
-        }, 1000);
+        }, $(window).width() < 767 ? 1000 : 300);
     })
     // let isLoaded = sessionStorage.getItem('isLoaded') === 'true' ? true : false;
     // if (!isLoaded) {
