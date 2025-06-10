@@ -183,15 +183,22 @@ const script = () => {
     }
 
     scrollTop();
-    setTimeout(() => {
-        $('.loader').animate({ opacity: 0 }, 1000, () => $('.loader').remove());
-    }, 4000);
+    if ($(window).width() < 767) {
+        $({foo:0}).animate({foo:100}, {
+            step: function(val) {
+                $('.loader-logo-front').css('clip-path', `polygon(0 0, ${val}% 0, ${val}% 100%, 0% 100%)`)
+            },
+            duration: 1500,
+            complete: function() {
+                $('.loader').animate({ opacity: 0 }, 1000, () => $('.loader').remove())
+            }
+        });
+    }
     marquee($('.last-cta-strip-marquee-list'));
     const pageName = $('main.main').attr('data-namespace');
     if (pageName) {
         SCRIPT[`${pageName}Script`]();
     }
 }
-
 
 window.onload = script;
