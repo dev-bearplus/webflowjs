@@ -45,6 +45,14 @@ const mainScript = () => {
             }
         });        
     }
+    function setupImg() {
+        $('.w-richtext-figure-type-image').each((idx, item) => {
+            let link = $(item).find('a').attr('href');
+            if(link && link.includes('img-logo')){
+                $(item).addClass('img-logo-richtext');
+            }
+        })
+    }
     
     function isInHeaderCheck(el) {
         const rect = $(el).get(0).getBoundingClientRect();
@@ -1660,6 +1668,7 @@ const mainScript = () => {
                     allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $('.game-hero-sub').get(0), onMask: true }),
+                        new FadeIn({ el: $('.game-hero-title').get(0), onMask: true }),
                         new FadeSplitText({ el: $('.game-hero-machine').eq(0).find('.game-hero-machine-label').get(0), onMask: true }),
                         new ScaleInset({ el: $('.game-hero-img-item').get(0), duration: .6}),
                         new FadeIn({ el: $('.game-hero-right-link'), onStart: () => {
@@ -3289,6 +3298,7 @@ const mainScript = () => {
         lenis.on("scroll", function (inst) {
             if (!isScrolling) {
                 setupIframe();
+                setupImg();
                 isScrolling = true;
             }
             header.toggleColorMode('white');
