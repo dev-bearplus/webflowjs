@@ -2312,7 +2312,7 @@ const mainScript = () => {
                     gsap.set('.ar-content-cta', { autoAlpha: 0, y: 50 });
 
                     let tl = gsap.timeline({
-                        delay: .5,
+                        delay: GLOBAL_DELAY,
                         defaults: { ease: 'power2.out' },
                         once: true,
                         onComplete: () => {
