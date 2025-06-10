@@ -103,23 +103,23 @@ const script = () => {
             $('.home-search-answer-stick').css('top', ($(window).height() - $('.home-search-answer-stick').height()) / 2);
         }
         else {
-            requestAnimationFrame(() => {
-                $('.home-search-answer-list-wrap').css('display', 'block');
-                requestAnimationFrame(() => {
-                    $('.home-search-answer-list-wrap').css({
-                        '--grid-row-height': `${$('.home-search-answer-list-inner').height()}px`,
-                        'display': 'grid'
-                    });
-                    requestAnimationFrame(() => {
-                        $('.home-search-answer-list-wrap').css({
-                            'grid-template-rows': `${$('.home-search-answer-list').height()}px`,
-                        });
-                    })
-                })
-            })
-            $('.home-search-answer-more-btn').on('click', function (e) {
-                $('.home-search-answer-list-wrap').addClass('active');
-            })
+            // requestAnimationFrame(() => {
+            //     $('.home-search-answer-list-wrap').css('display', 'block');
+            //     requestAnimationFrame(() => {
+            //         $('.home-search-answer-list-wrap').css({
+            //             '--grid-row-height': `${$('.home-search-answer-list-inner').height()}px`,
+            //             'display': 'grid'
+            //         });
+            //         requestAnimationFrame(() => {
+            //             $('.home-search-answer-list-wrap').css({
+            //                 'grid-template-rows': `${$('.home-search-answer-list').height()}px`,
+            //             });
+            //         })
+            //     })
+            // })
+            // $('.home-search-answer-more-btn').on('click', function (e) {
+            //     $('.home-search-answer-list-wrap').addClass('active');
+            // })
         }
     }
     SCRIPT.storyScript = () => {
@@ -183,17 +183,25 @@ const script = () => {
     }
 
     scrollTop();
-    if ($(window).width() < 767) {
-        $({foo:0}).animate({foo:100}, {
-            step: function(val) {
-                $('.loader-logo-front').css('clip-path', `polygon(0 0, ${val}% 0, ${val}% 100%, 0% 100%)`)
-            },
-            duration: 1500,
-            complete: function() {
-                $('.loader').animate({ opacity: 0 }, 1000, () => $('.loader').remove())
-            }
-        });
-    }
+    // let isLoaded = sessionStorage.getItem('isLoaded') === 'true' ? true : false;
+    // if (!isLoaded) {
+    //     if ($(window).width() < 767) {
+    //         $({foo:0}).animate({foo:100}, {
+    //             step: function(val) {
+    //                 $('.loader-logo-front').css('clip-path', `polygon(0 0, ${val}% 0, ${val}% 100%, 0% 100%)`)
+    //             },
+    //             duration: 1500,
+    //             complete: function() {
+    //                 $('.loader').animate({ opacity: 0 }, 1000, () => $('.loader').remove())
+    //                 sessionStorage.setItem('isLoaded', true);
+    //             }
+    //         });
+    //     }
+    //     else {
+    //         console.log(isLoaded)
+    //         $('.loader').animate({ opacity: 0 }, 1000, () => $('.loader').remove())
+    //     }
+    // }
     marquee($('.last-cta-strip-marquee-list'));
     const pageName = $('main.main').attr('data-namespace');
     if (pageName) {
