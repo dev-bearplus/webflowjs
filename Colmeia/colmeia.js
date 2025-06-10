@@ -1337,7 +1337,7 @@ const mainScript = () => {
                     let iframeSrc = new URL($('.home-hero-thumb-vid-inner').attr('data-iframe-src'));
                     $('.home-hero-thumb-btn a').on('click', function (e) {
                         e.preventDefault();
-                        iframeSrc += "?autoplay=1";
+                        iframeSrc += `?origin=${window.location.origin}&autoplay=1`;
                         let iframe = $('<iframe></iframe>');
                         iframe.attr({
                             'src': iframeSrc,
@@ -2110,7 +2110,7 @@ const mainScript = () => {
                     let iframeTitle = $('.prod-hero-thumb-vid-inner').attr('data-iframe-title');
                     $('.prod-hero-thumb-btn a').on('click', function (e) {
                         e.preventDefault();
-                        iframeSrc += "?autoplay=1";
+                        iframeSrc += `?origin=${window.location.origin}&autoplay=1`;
                         let iframe = $('<iframe></iframe>');
                         iframe.attr({
                             'src': iframeSrc,
