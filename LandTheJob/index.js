@@ -190,6 +190,10 @@ const script = () => {
             type: 'text/javascript',
             async: true
         }).appendTo('body');
+
+        setTimeout(() => {
+            $(el).css('display', 'block');
+        }, 500);
     })
     // let isLoaded = sessionStorage.getItem('isLoaded') === 'true' ? true : false;
     // if (!isLoaded) {
