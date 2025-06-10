@@ -1654,7 +1654,7 @@ const mainScript = () => {
                     tweenArr: [
                         new FadeSplitText({ el: $('.game-hero-sub').get(0), onMask: true }),
                         new FadeSplitText({ el: $('.game-hero-machine').eq(0).find('.game-hero-machine-label').get(0), onMask: true }),
-                        new ScaleInset({ el: $('.game-hero-img-item').get(0)}),
+                        new ScaleInset({ el: $('.game-hero-img-item').get(0), duration: .1}),
                         new FadeIn({ el: $('.game-hero-right-link'), onStart: () => {
                             gsap.to($('.game-hero-machine-title').eq(0).find('.word'), {yPercent: 0, opacity: 1, duration: .35, stagger: .015, ease: 'power1.out'})
                             gsap.to($('.game-hero-machine-title').eq(0).find('.game-hero-title-ic img'), {yPercent: 0, opacity: 1, duration: .4, ease: 'power1.out'},'<=.1')
@@ -1896,7 +1896,7 @@ const mainScript = () => {
                       });
                     }
               
-                  }, i * 150);
+                  }, i * 100);
                 }
               
               }, 400); 
@@ -2938,8 +2938,8 @@ const mainScript = () => {
             new MasterTimeline({
                 timeline: tlMenu,
                 tweenArr: [
-                    ...Array.from($('.footer-left-social-item-txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx == 0 ? 0 : .2})),
-                    ...Array.from($('.footer-menu-space')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx == 0 ? 0 : .2}))
+                    ...Array.from($('.footer-left-social-item-txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx == 0 ? 0 : .1})),
+                    ...Array.from($('.footer-menu-space')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx == 0 ? 0 : .1}))
                 ]
             })
             let tlPolicy = gsap.timeline({
@@ -2960,7 +2960,7 @@ const mainScript = () => {
             })
             let tlApp = gsap.timeline({
                 scrollTrigger: {
-                    trigger: '.footer-policy-wrap',
+                    trigger: '.footer-touch-wrap',
                     start: 'top top+=65%',
                 }
             })
@@ -2975,7 +2975,7 @@ const mainScript = () => {
             let tlSocial = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.footer-info',
-                    start: 'top top+=75%',
+                    start: 'top top+=80%',
                 }
             })
             new MasterTimeline({
