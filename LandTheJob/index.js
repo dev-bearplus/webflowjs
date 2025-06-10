@@ -185,15 +185,14 @@ const script = () => {
     scrollTop();
     $('.senja-embed').each((idx, el) => {
         let id = $(el).attr('data-id');
-        $('<script/>', {
-            src: `https://widget.senja.io/widget/${id}/platform.js`,
-            type: 'text/javascript',
-            async: true
-        }).appendTo('body');
-
         setTimeout(() => {
+            $('<script/>', {
+                src: `https://widget.senja.io/widget/${id}/platform.js`,
+                type: 'text/javascript',
+                async: true
+            }).appendTo('body');
             $(el).css('display', 'block');
-        }, 500);
+        }, 1000);
     })
     // let isLoaded = sessionStorage.getItem('isLoaded') === 'true' ? true : false;
     // if (!isLoaded) {
