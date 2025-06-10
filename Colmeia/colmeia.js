@@ -2102,9 +2102,20 @@ const mainScript = () => {
                     }
                     animShowEl();
 
+                    let iframeSrc = new URL($('.prod-hero-thumb-vid-inner').attr('data-iframe-src'));
+                    let iframeTitle = $('.prod-hero-thumb-vid-inner').attr('data-iframe-title');
                     $('.prod-hero-thumb-btn a').on('click', function (e) {
                         e.preventDefault();
-                        $('.prod-hero-thumb-vid iframe')[0].src += "&autoplay=1";
+                        iframeSrc += "?autoplay=1";
+                        let iframe = $('<iframe></iframe>');
+                        iframe.attr('src', iframeSrc);
+                        iframe.attr('title', iframeTitle);
+                        iframe.attr('allow', 'autoplay');
+                        iframe.attr('allowfullscreen', '');
+                        iframe.attr('width', '100%');
+                        iframe.attr('height', '100%');
+                        iframe.attr('frameborder', 0);
+                        iframe.appendTo('.prod-hero-thumb-vid-inner');
                         gsap.to('.prod-hero-thumb-overlay, .prod-hero-thumb-btn', {
                             autoAlpha: 0, onComplete: () => {
                             $('.prod-hero-thumb-overlay').remove();
