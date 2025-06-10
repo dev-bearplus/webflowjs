@@ -28,13 +28,24 @@ const mainScript = () => {
     const lerp = (a, b, t = 0.08) => {
         return a + (b - a) * t;
     };
-    function refreshTrigger() { 
-        gsap.globalTimeline.getChildren().forEach((el) => {
-            if (el.scrollTrigger && el.scrollTrigger.progress === 0) {
-                el?.scrollTrigger?.refresh();
+    function setupIframe() {
+        let iframes = $("iframe");
+        iframes.each(function (idx, item) {
+            const src = $(item).attr('data-src');
+        
+            // Kiểm tra xem src có chứa "youtube"
+            if (src && src.includes('youtube')) {
+                $(item).closest('.w-iframe').addClass('iframe-youtube');
             }
-        });
+        
+            // Gán src mới từ data-src nếu có
+            const dataSrc = $(item).attr("data-src");
+            if (dataSrc) {
+                $(item).attr("src", dataSrc);
+            }
+        });        
     }
+    
     function isInHeaderCheck(el) {
         const rect = $(el).get(0).getBoundingClientRect();
         const headerRect = $('.header').get(0).getBoundingClientRect();
@@ -413,6 +424,31 @@ const mainScript = () => {
         super.setTrigger(this.setup.bind(this));
         }
         setup() {
+            const $container = $('.home-explore-img-inner');
+            const $items = $container.find('.home-explore-img');
+            const totalItemsNeeded = 28;
+        
+            if ($items.length > 0) {
+                let index = 0;
+                while ($container.find('.home-explore-img').length < totalItemsNeeded) {
+                    const $clone = $items.eq(index).clone();
+                    $container.append($clone);
+                    index = (index + 1) % $items.length; // Lặp lại từ đầu nếu hết danh sách
+                }
+            }
+            let tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: this.triggerEl,
+                    start: "top top+=55%",
+                    once: true,
+                },
+            });
+            new MasterTimeline({
+                timeline: tl,
+                tweenArr: [
+                    new FadeSplitText({ el: $('.home-explore-title').get(0), onMask: true })
+                ]
+            })
            viewport.w > 991 && new ImageTrail('.home-explore');
         }
     }
@@ -426,6 +462,19 @@ const mainScript = () => {
             this.interact();
         }
         setup() {
+            let tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: this.triggerEl,
+                    start: "top top+=45%",
+                    once: true,
+                },
+            })
+            new MasterTimeline({
+                timeline: tl,
+                tweenArr: [
+                    ...Array.from($('.home-senses-menu-item-txt')).flatMap((el, idx) => new FadeSplitText({ el: el, onMask: true, delay: idx == 0? '<=0' : '<=.1' })),
+                ]
+            })
             if(viewport.w > 991) {
                 this.initContentPopup();
                 activeItem(['.home-senses-menu-item'], 0);
@@ -586,7 +635,6 @@ const mainScript = () => {
                 }
         }
         initContentPopup() {
-            let iframeSpotifySrc ='https://open.spotify.com/embed/playlist/1bhxiHUsBUQPTaYOyt8gUi?utm_source=generator&theme=0'
             let titleLeft = $('.home-popup-item-left-content').eq(0).clone();
             $('.home-popup-item-left-content').remove();
             $('.home-popup-item').each((idx, item) => {
@@ -616,7 +664,7 @@ const mainScript = () => {
             let tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.home-featured',
-                    start: "top top+=75%",
+                    start: "top top+=55%",
                 },
             })
             $('.home-featured-right-item').each((idx, el) => {
@@ -625,6 +673,18 @@ const mainScript = () => {
                 let dataLinkType = linkInner.attr('data-link-type');
                 let linkCurrent = linkInner.attr('href');
                 linkInner.attr('href', `${linkCurrent}?detail=${dataLinkDetail}&type=${dataLinkType}`);
+            })
+            let tlLabel = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.home-featured',
+                    start: "top top+=65%",
+                },
+            })
+            new MasterTimeline({
+                timeline: tlLabel,
+                tweenArr: [
+                   ...Array.from($('.home-featured-label')).flatMap((el, idx) => new FadeSplitText({ el: el, onMask: true})),
+                ]
             })
             if(viewport.w > 768 ) {
                 $('.home-featured-left-inner').each((idx, el) => {
@@ -636,7 +696,7 @@ const mainScript = () => {
                     gsap.set(desc.words, {yPercent: 100});
                     if(idx === 0) {
                         tl
-                        .to(title.words, {yPercent: 0, duration: .6, stagger: 0.025, ease: "power1.out"})
+                        .to(title.words, {yPercent: 0, duration: .4, stagger: 0.015, ease: "power1.out"})
                     }
     
                     $(el).find('.home-featured-time-item').each((i, item) => {
@@ -647,14 +707,14 @@ const mainScript = () => {
                         gsap.set(itemTitle.words, {yPercent: 100});
                         if(idx === 0) {
                             tl
-                            .to(itemLabel.words, {yPercent: 0, duration: .4, stagger: 0.01, ease: "power1.out"}, `<=${i*0.1}`)
-                            .to(itemTitle.words, {yPercent: 0, duration: .4, stagger: 0.01, ease: "power1.out"}, '<=.2')
+                            .to(itemLabel.words, {yPercent: 0, duration: .4, stagger: 0.015, ease: "power1.out"}, `<=0`)
+                            .to(itemTitle.words, {yPercent: 0, duration: .4, stagger: 0.015, ease: "power1.out"}, '<=0')
                         }
                     })
                     if(idx === 0) {
                         tl
-                        .to(sub.words, {yPercent: 0, duration: .4, stagger: 0.01, ease: "power1.out"}, `<=.2`)
-                        .to(desc.words, {yPercent: 0, duration: .4, stagger: 0.01, ease: "power1.out"}, '<=.2')
+                        .to(sub.words, {yPercent: 0, duration: .3, stagger: 0.01, ease: "power1.out"}, `<=0`)
+                        .to(desc.words, {yPercent: 0, duration: .3, stagger: 0.01, ease: "power1.out"}, '<=0')
                     }
                 })
                 let itemLeft = $(".home-featured-left");
@@ -839,10 +899,34 @@ const mainScript = () => {
             super.setTrigger(this.setup.bind(this));
         }
         setup() {
+            let tlLabel = new gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.home-service',
+                    start: "top top+=55%",
+                },
+            })
+            let tl = gsap.timeline({
+                
+            })
+            new MasterTimeline({
+                timeline: tlLabel,
+                tweenArr: [
+                   ...Array.from($('.home-service-label')).flatMap((el, idx) => new FadeSplitText({ el: el, onMask: true})),
+                ]
+            })
+            $('.home-service-item').each((idx, el) => {
+                let linkItem = $(el).find('.home-service-item-link');
+                let linkItemHref = linkItem.attr('href');
+                let dataLinkItem = linkItem.attr('data-link-item');
+                linkItem.attr('href', `${linkItemHref}?detail=${dataLinkItem}`);
+                let number = idx <=9 ? `0${idx+1}` : idx+1;
+                $(el).find('.home-service-item-number').text(`(${number})`);
+
+            })
             if(viewport.w > 991) {
                 let zIndexVal = 1;
                 let urlImgItemFirtst = $('.home-service-img img').eq(0).attr('src');
-                console.log(urlImgItemFirtst);
+                activeItem(['.home-service-img'], 0)
                 $('.home-service-img-inner').css('background-image', `url(${urlImgItemFirtst})`);
                 $('.home-service-item').hover(
                     function(){
@@ -855,10 +939,10 @@ const mainScript = () => {
                 )
             }
             else {
-                $('.home-service-right-wrap').addClass('swiper')
-                $('.home-service-right').addClass('swiper-wrapper')
+                $('.home-service-cms').addClass('swiper')
+                $('.home-service-list').addClass('swiper-wrapper')
                 $('.home-service-item').addClass('swiper-slide')
-                let swiper = new Swiper(".home-service-right-wrap", {
+                let swiper = new Swiper(".home-service-cms", {
                     slidesPerView: 'auto',
                     spaceBetween: parseRem(20),
                     pagination: {
@@ -886,6 +970,10 @@ const mainScript = () => {
         super.setTrigger(this.setup.bind(this));
         }
         setup() {
+            $('.home-faq-item').each((idx, el) => {
+                let number = idx <=9? `0${idx+1}` : idx+1;
+                $(el).find('.home-faq-item-number').text(`(${number})`);
+            })
             $('.home-faq-item').on('click', function(){
                 if($(this).hasClass('active')){
                     $(this).removeClass('active')
@@ -999,6 +1087,22 @@ const mainScript = () => {
             super.init(this.play.bind(this));
         }
         setup() {
+            this.tl = new gsap.timeline(
+                {
+                    onStart: () => {
+                        $('[data-init-df]').removeAttr('data-init-df');
+                    },
+                }
+            );
+            new MasterTimeline({
+                timeline: this.tl,
+                tweenArr: [
+                  new FadeSplitText({ el: $('.mb-hero-title').get(0), onMask: true }),
+                  ...Array.from($('.mb-hero-control-item')).flatMap((el, idx) => new FadeSplitText({ el: el, onMask: true, delay: idx ==0 ? 0 : 0.2 })),
+                  ...Array.from($('.mb-hero-card-item-inner')).flatMap((el, idx) => new ScaleInset({ el: $(el).get(0), delay: idx ==0? 0 : 0.2 })),
+                  ...Array.from($('.mb-hero-content-item-txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx ==0? 0 : 0.1 })),
+                ]
+            })
             if(viewport.w > 991) {
                 let lengthSlide = $(".mb-hero-card-item").length;
                 let stickyBot =  viewport.h - $('.mb-hero-card-main').height();
@@ -1096,6 +1200,23 @@ const mainScript = () => {
         setup() {
             let txtMap = new SplitType('.contact-hero-right-item-link .contact-hero-right-item-link-txt', {types: 'lines, words', lineClass: 'bp-line'});
             multiLineText('.contact-hero-right-item-link');
+            new MasterTimeline({
+                timeline: this.tl,
+                tweenArr: [
+                    new FadeSplitText({ el: $('.contact-hero-title').get(0), onMask: true }),
+                    // new ScaleInset({ el: $('.contact-hero-right-img').get(0) }),
+                    new FadeSplitText({ el: $('.contact-hero-label').get(0), onMask: true }),
+                    new FadeSplitText({ el: $('.contact-hero-required').get(0), onMask: true }),
+                    ...Array.from($('.contact-hero-form-label')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx == 0 ? 0 : 0.2 })),
+                    ...Array.from($('.contact-hero-form-input-group')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0),  delay: idx == 0 ? 0 : 0.2 })),
+                    ...Array.from($('.contact-hero-form-textarea-group')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0),  delay: idx == 0 ? 0 : 0.2 })),
+                    new FadeIn({ el: $('.contact-hero-form-submit-wrap'), delay: .2 }),
+                    ...Array.from($('.contact-hero-info-social .txt')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0),  delay: idx == 0 ? 0 : 0.2 })),
+                    ...Array.from($('.contact-hero-info-social .contact-hero-social-item-link')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0),  delay: idx == 0 ? 0 : 0.2 })),
+                    ...Array.from($('.contact-hero-content-bot .txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true,  delay: idx == 0 ? 0 : 0.2 })),
+                    ...Array.from($('.contact-hero-right-content .txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true,  delay: idx == 0? 0 : 0.2 })),
+                ]
+            })
             this.autosize();
             this.validation();
         }
@@ -1259,7 +1380,44 @@ const mainScript = () => {
             this.interact();
         }
         setup() {
+            new MasterTimeline({
+                timeline: this.tl,
+                tweenArr: [
+                  new FadeSplitText({ el: $('.service-hero-title').get(0), onMask: true })
+                ]
+            })
+            this.tl = gsap.timeline ({
+                onStart: () => {
+                    $('[data-init-df]').removeAttr('data-init-df');
+                }
+            })
+            $('.service-hero-content-item').each((idx, el) => {
+                let tlItem = new gsap.timeline({
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top top+=65%"
+                    },
+                })
+                new MasterTimeline({
+                    timeline: tlItem,
+                    tweenArr: [
+                      new ScaleInset({ el: $(el).find('.service-hero-content-item-img').get(0), onMask: true }),
+                      new FadeSplitText({ el: $(el).find('.service-hero-content-item-title .txt').get(0), onMask: true, delay: 0.2 }),
+                      new FadeSplitText({ el: $(el).find('.service-hero-content-item-sub').get(0), onMask: true, delay: 0.2 }),
+                      new FadeSplitText({ el: $(el).find('.service-hero-content-item-link-txt').get(0), onMask: true })
+                    ]
+                })
+            })
             this.initContentPopup();
+            let currentUrl = window.location.href;
+            let url = new URL(currentUrl);
+            let itemDetail = url.searchParams.get("detail");
+            if(itemDetail) {
+                $('.service-hero-popup-inner').removeClass('active');
+                $(`.service-hero-popup-inner[data-link-item="${itemDetail}"]`).addClass('active');
+                $('.service-hero-popup').addClass('active');
+                lenis.stop();
+            }
         }
         play() {
             this.tl.play();
@@ -1500,7 +1658,7 @@ const mainScript = () => {
           this.center = 0;
           this.radius = 0;
           this.balls = [];
-          this.limitBall = viewport.w > 767 ? 35 : 29;
+          this.limitBall = viewport.w > 767 ? 40 : 29;
         }
       
         init() {
@@ -1530,7 +1688,7 @@ const mainScript = () => {
             Matter.Render.run(this.render);
             Matter.Runner.run(this.engine);
             requestAnimationFrame(() => {
-                this._dropInitialBalls(this.limitBall - 5);
+                this._dropInitialBalls(this.limitBall - 20);
             })
         }
         _createWorld() {
@@ -1561,48 +1719,62 @@ const mainScript = () => {
             const { Bodies, World, Composite } = Matter;
             const d = viewport.w > 767 ? parseRem(80) : parseRem(40);
             setInterval(() => {
-                const r = d/2;
-                const x = this.center ;
-                const y = d/2;
-                const ball = Bodies.circle(x, y, r, {
-                    frictionAir: 0.0000001,
-                    restitution: 0.8,
-                    friction: viewport.w > 767? 0.04 : 0.08,
-                    render: {
-                        fillStyle: "#002b8d"
-                    }
-              });
-              World.add(this.world, ball);
-              ball._scale = 1;
-              this.balls.push(ball);
-              gsap.to({ scale: 0 }, {
-                scale: 1,
-                duration: viewport.w > 767? 2 : 1,
-                ease: "power1.out",
-                onUpdate() {
-                  const s = this.targets()[0].scale;
-                  Matter.Body.scale(ball, s / ball._scale || s, s / ball._scale || s);
-                  ball._scale = s;
-                }
-              });
-              if (this.balls.length > this.limitBall) {
-                const oldBall = this.balls.shift();
-                gsap.to({ scale: 1 }, {
-                  scale: 0,
-                  duration: .5,
-                  ease: "power1.in",
-                  onUpdate: function () {
-                    const s = this.targets()[0].scale;
-                    Matter.Body.scale(oldBall, s / (oldBall._scale || 1), s / (oldBall._scale || 1));
-                    oldBall._scale = s;
-                  },
-                  onComplete: function () {
-                    Composite.remove(this.world, oldBall);
-                  }.bind(this)
-                });
-              }
+                const r = d / 2;
+                const y = d / 2;
               
-            }, 400);
+                const numberOfBalls = Math.floor(Math.random() * 2) + 2; // 2 hoặc 3 bóng
+              
+                for (let i = 0; i < numberOfBalls; i++) {
+                  setTimeout(() => {
+                    const offset = (Math.random() - .5) * d;
+                    const x = this.center + offset;
+              
+                    const ball = Matter.Bodies.circle(x, y, r, {
+                      frictionAir: 0.0000001,
+                      restitution: 0.8,
+                      friction: viewport.w > 767 ? 0.04 : 0.08,
+                      render: {
+                        fillStyle: "#002b8d"
+                      }
+                    });
+              
+                    Matter.World.add(this.world, ball);
+                    ball._scale = 1;
+                    this.balls.push(ball);
+              
+                    // Animate scale with GSAP
+                    gsap.to({ scale: 0 }, {
+                      scale: 1,
+                      duration: viewport.w > 767 ? 2 : 1,
+                      ease: "power1.out",
+                      onUpdate() {
+                        const s = this.targets()[0].scale;
+                        Matter.Body.scale(ball, s / ball._scale || s, s / ball._scale || s);
+                        ball._scale = s;
+                      }
+                    });
+                    if (this.balls.length > this.limitBall) {
+                      const oldBall = this.balls.shift();
+                      gsap.to({ scale: 1 }, {
+                        scale: 0,
+                        duration: 0.5,
+                        ease: "power1.in",
+                        onUpdate: function () {
+                          const s = this.targets()[0].scale;
+                          Matter.Body.scale(oldBall, s / (oldBall._scale || 1), s / (oldBall._scale || 1));
+                          oldBall._scale = s;
+                        },
+                        onComplete: function () {
+                          Matter.Composite.remove(this.world, oldBall);
+                        }.bind(this)
+                      });
+                    }
+              
+                  }, i * 150);
+                }
+              
+              }, 400); 
+              
           }
         _dropInitialBalls(count) {
             const { Bodies, World, Composite } = Matter;
@@ -1686,7 +1858,6 @@ const mainScript = () => {
                     animingFlag = false;
                 }})
                 gsap.to($(`.game-jackpot-main-ball-txt[data-type="${dataType}"] .word`), {yPercent: 0, duration:.6, ease: 'power1.out'})
-                
             })
         }
     }
@@ -1702,6 +1873,10 @@ const mainScript = () => {
             this.interact();
         }
         setup() {
+            $('.event-calendar-item').each((i, el) => {
+                this.calendar($(el));
+            })
+            this.filterByTab();
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
                 let index = $(this).closest('.event-hero-card-item').index();
@@ -1758,20 +1933,219 @@ const mainScript = () => {
             
         }
         activeTab(tagName) {
+            this.filterReset();
             $('.event-hero-card-item').fadeOut(400);
+            $('.event-hero-card-item').removeClass('active');
             $('.event-hero-card-item').each((i, el) => {
                 if($(el).attr('data-tag') == tagName) {
                     $(el).fadeIn(400);
+                    $(el).addClass('active');
                 }
             })
         }
         initActiveTab(tagName) {
             $('.event-hero-card-item').hide();
+            $('.event-hero-card-item').removeClass('active');
             $('.event-hero-card-item').each((i, el) => {
                 if($(el).attr('data-tag') == tagName) {
                     $(el).show();
+                    $(el).addClass('active');
                 }
             })
+        }
+        calendar($container) {
+            let dataCalendar = $container.attr('date-calendar');
+            
+            const $dateHeader = $container.find(".calendar-header-date span");
+            const $days = $container.find(".event-calendar-item-date");
+            let date = new Date();
+            if (dataCalendar === 'next-month') {
+                date.setMonth(date.getMonth() + 1);
+            }
+            const year = date.getFullYear();
+            console.log(year)
+            const month = date.getMonth();
+            const monthNames = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+              ];
+              $container.find(".event-calendar-item-head-month").text(monthNames[month]);
+              $container.find(".event-calendar-item-head-year").text(year);
+            $days.html("");
+            const displayCalendar = () => {
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const firstDayIndex = firstDay.getDay();
+                const numberOfDays = lastDay.getDate();
+        
+                const formattedDate = new Date(year, month).toLocaleString("en-US", {
+                    month: "long",
+                    year: "numeric"
+                });
+                $dateHeader.html(formattedDate);
+                for (let x = 1; x <= firstDayIndex; x++) {
+                    const $div = $('<div class=" txt txt-16 txt-label event-calendar-item-date-txt no-value"></div>');
+                    $days.append($div);
+                }
+                for (let i = 1; i <= numberOfDays; i++) {
+                    const today = new Date();
+                    const currentDate = new Date(year, month, i);
+                    const $div = $('<div class="txt txt-16 txt-label event-calendar-item-date-txt"></div>');
+                    $div.attr("data-date", formatDate(currentDate));
+                    let arrDateFilter=[];
+                    $div.append(i);
+                    if (currentDate < today) {
+                        $div.addClass("disable");
+                    }
+                    $days.append($div);
+                    $div.on("click",  () =>  {
+                        if ($div.hasClass("disable")) return;
+                        $('.event-calendar-item-date-txt').removeClass("active");
+                        $div.addClass("active");
+                        arrDateFilter.push(formatDate(currentDate));
+                        $('.event-hero-date-filter-item').removeClass('active');
+                        this.filterEvents(arrDateFilter);
+                    });
+        
+                    if (
+                        currentDate.getFullYear() === today.getFullYear() &&
+                        currentDate.getMonth() === today.getMonth() &&
+                        currentDate.getDate() === today.getDate()
+                    ) {
+                        $div.addClass("current-date").removeClass("disable");
+                    }
+                }
+            };
+        
+            displayCalendar();
+            function formatDate(date) {
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // tháng bắt đầu từ 0
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+        }
+        filterEvents(filterDates) {
+            $('.event-hero-card-item.active').each((i, el) => {
+                const dateFilterRaw = $(el).attr('data-date-filter'); // "22/06/2025, 25/06/2025"
+                const dateFilterList = dateFilterRaw
+                    ? dateFilterRaw.split(',').map(d => d.trim())
+                    : [];
+                const isMatch = filterDates.some(d => dateFilterList.includes(d));
+                if (isMatch) {
+                    $(el).fadeIn().addClass('show');
+                } else {
+                    $(el).fadeOut().removeClass('show');
+                }
+            });
+        }
+        filterByTab() {
+            $('.event-hero-date-filter-item').on('click',  (e) => {
+                $('.event-hero-date-filter-item').removeClass('active');
+                $(e.currentTarget).addClass('active');
+                const range = $(e.currentTarget).data('filter-fast');
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = today.getMonth();
+                //convert month to character english short
+
+
+                const day = today.getDate();
+            
+                // Xóa tất cả highlight trước
+                $('.event-calendar-item-date-txt').removeClass('active');
+            
+                $('.event-calendar-item-date-txt').each( (i, el) => {
+                    const itemDateStr = $(el).attr('data-date');
+                    const parts = itemDateStr.split('/');
+                    const itemDate = new Date(+parts[2], parts[1] - 1, +parts[0]);
+            
+                    if (range === 'today') {
+                        if (
+                            itemDate.getFullYear() === year &&
+                            itemDate.getMonth() === month &&
+                            itemDate.getDate() === day
+                        ) {
+                            $(el).addClass('active');
+                            this.filterEvents(getDateRangeArray(today, today));
+                        }
+                    }
+            
+                    if (range === 'this-week') {
+                        activateThisWeekAcrossCalendars();
+                    }
+                    if (range === 'month') {
+                        const endOfMonth = new Date(year, month + 1, 0);
+                        if (itemDate.getFullYear() === year &&
+                            itemDate.getMonth() === month &&
+                            itemDate.getDate() === day || itemDate >= today && itemDate <= endOfMonth) {
+                            $(el).addClass('active');
+                        }
+                        this.filterEvents(getDateRangeArray(today, endOfMonth));
+                    }
+                    if (range === 'optional') {
+                        $('.header').addClass('on-hide')
+                        $('.event-calendar-list').addClass('active');
+                    }
+                });
+            });
+            $('.event-calendar-close').on('click',  (e) => {
+                hideAllCalendars();
+            })
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('.event-calendar-item-date-txt').length 
+                && !$(e.target).closest('.event-calendar-close').length && !$(e.target).closest('.event-calendar-inner').length 
+                && !$(e.target).closest('.event-hero-date-filter-item.only-tablet').length) {
+                    hideAllCalendars();
+                }
+            })
+            function hideAllCalendars() {
+                $('.header').removeClass('on-hide')
+                $('.event-calendar-list').removeClass('active');
+                $('.event-calendar-item-date-txt').removeClass('active');
+            }
+            const activateThisWeekAcrossCalendars = () =>{
+                const today = new Date();
+                const startOfWeek = new Date(today);
+                const endOfWeek = new Date(today);
+                const day = today.getDay();
+                const diffToMonday = day === 0 ? -6 : 1 - day;
+                startOfWeek.setDate(today.getDate() + diffToMonday);
+                endOfWeek.setDate(startOfWeek.getDate() + 6);
+                this.filterEvents(getDateRangeArray(startOfWeek, endOfWeek));
+                $('.event-calendar-item-date-txt').each(function (e) {
+                    const $item = $(this);
+                    const dateStr = $item.attr('data-date'); 
+                    if (!dateStr) return;
+            
+                    const [d, m, y] = dateStr.split('/').map(Number);
+                    const itemDate = new Date(y, m - 1, d);
+            
+                    if (itemDate >= startOfWeek && itemDate <= endOfWeek) {
+                        $item.addClass('active');
+                    } else {
+                        $item.removeClass('active');
+                    }
+                });
+            }
+            function getDateRangeArray(start, end) {
+                let result = [];
+                let current = new Date(start);
+            
+                while (current <= end) {
+                    const day = String(current.getDate()).padStart(2, '0');
+                    const month = String(current.getMonth() + 1).padStart(2, '0');
+                    const year = current.getFullYear();
+                    result.push(`${day}/${month}/${year}`);
+                    current.setDate(current.getDate() + 1);
+                }
+            
+                return result;
+            }
+        }
+        filterReset() {
+            $('.event-hero-date-filter-item').removeClass('active');
+            $('.event-calendar-item-date-txt').removeClass('active');
         }
     }
     let eventHero = new EventHero();
@@ -2089,6 +2463,103 @@ const mainScript = () => {
         }
     }
     let workOffice = new WorkOffice(".work-office-wrap");
+    class FaqsHero extends TriggerSetupHero {
+        constructor() {
+            super();
+            this.tl = null;
+        }
+        trigger() {
+            this.setup();
+            super.init(this.play.bind(this));
+        }
+        setup() {
+            $('.faq-hero-item').each((idx, el) => {
+                let number = idx <=9? `0${idx+1}` : idx+1;
+                $(el).find('.faq-hero-item-number').text(`(${number})`);
+            })
+            $('.faq-hero-item').on('click', function(){
+                if($(this).hasClass('active')){
+                    $(this).removeClass('active')
+                    $(this).find('.faq-hero-item-sub-wrap').slideUp();
+                }
+                else {
+                    $('.faq-hero-item').removeClass('active')
+                    $(this).addClass('active')
+                    $('.faq-hero-item-sub-wrap').slideUp();
+                    $(this).find('.faq-hero-item-sub-wrap').slideDown();
+                }
+            })
+        }
+        play() {
+            this.tl.play();
+        }
+        
+    }
+    let faqsHero = new FaqsHero();
+    class PolicyHero extends TriggerSetupHero {
+        constructor() {
+            super();
+            this.tl = null;
+        }
+        trigger() {
+            this.setup();
+            super.init(this.play.bind(this));
+        }
+        setup() {
+            this.interact();
+            this.initContentPopup();
+        }
+        interact() {
+            lenis.on('scroll', ()=> {
+                this.ItemContentActiveCheck('.policy-hero-content h6');
+            })
+            $('.policy-hero-left-inner').on('click', '.policy-hero-menu-item', function(e) {
+                e.preventDefault();
+                $('.policy-hero-menu-item').removeClass('active');
+                $(this).addClass('active');
+                let dataHeader = $(this).attr('data-title');
+                var scrollTop =  $(`.policy-hero-content h6[data-title="${dataHeader}"]`).offset().top + $('.policy-hero').scrollTop() - $('.policy-hero-content').offset().top + parseFloat($('.policy-hero-left-inner').css('top'));
+                console.log(scrollTop)
+                $('html').animate({
+                    scrollTop: scrollTop
+                }, 800);
+            })
+            lenis.on('scroll', () => {
+                this.ItemContentActiveCheck('.policy-hero-content h6');
+            })
+        }
+        ItemContentActiveCheck(el) {
+            for (let i = 0; i < $(el).length; i++) {
+                let top = $(el).eq(i).get(0).getBoundingClientRect().top;
+                if (top > 0 && top + $(el).eq(i).height() < viewport.h/4*3 ) {
+                    $('.policy-hero-menu-item').removeClass('active');
+                    $('.policy-hero-menu-item').eq(i).addClass('active');
+                }
+                }
+        }
+        initContentPopup() {
+            console.log('init policy')
+            let titleLeft = $('.policy-hero-menu-item').eq(0).clone();
+            $('.policy-hero-menu-item').remove();
+            $('.policy-hero-content h6').each((i, el) => {
+                $(el).attr('data-title', `toch-${i}`);
+                let titleLeftClone = titleLeft.clone();
+                if(i == 0) {
+                    titleLeftClone.addClass('active');
+                }
+                titleLeftClone.find('.policy-hero-menu-item-number').text(i>9? `(${i+1})` : `(0${i+1})`);
+                titleLeftClone.find('.policy-hero-menu-item-title').text($(el).text());
+                titleLeftClone.attr('data-title', `toch-${i}`);
+                $('.policy-hero-menu').append(titleLeftClone);
+            })
+
+        }
+        play() {
+            this.tl.play();
+        }
+        
+    }
+    let policyHero = new PolicyHero();
     class Header extends TriggerSetupHero {
         constructor() {
             super();
@@ -2216,7 +2687,7 @@ const mainScript = () => {
             // gsap.fromTo('.header-menu-bot',{scale: 1.2}, {duration: .8, scale: 1, ease: "circ.inOut"});
             gsap.fromTo('.header-menu-inner',{clipPath: 'polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)'}, {duration: 1, clipPath: 'polygon(0% 0%, 100% 0, 100% 100%, 0% 100%)', ease: "circ.inOut", onUpdate: function(){
                 console.log(this.progress());
-                if(this.progress() > .7) {
+                if(this.progress() > .4) {
                     $('.header').removeClass('on-white');
                 }
             }});
@@ -2228,7 +2699,7 @@ const mainScript = () => {
             gsap.fromTo('.header-menu-inner',{clipPath: 'polygon(0% 0%, 100% 0, 100% 100%, 0% 100%)'}, {duration: 1, clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)', ease: "circ.inOut", onComplete: () => {
             $('.header').removeClass('on-mode');
             }, onUpdate: function() {
-                if(this.progress() > .7){
+                if(this.progress() > .4){
                     header.toggleColorMode('white');
                 }
             }});
@@ -2282,8 +2753,104 @@ const mainScript = () => {
             let txtMap = new SplitType('.footer-info-link-map .footer-info-link-txt', {types: 'lines, words', lineClass: 'bp-line'});
             multiLineText('.footer-info-link-map');
             viewport.w < 768 && $('.footer-info-link-map .bp-line').css('margin-inline', 'auto')
-            
-            
+            let tlImg = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.footer-left-img',
+                    start: 'top top+=55%',
+                }
+            })
+            new MasterTimeline({
+                timeline: tlImg,
+                tweenArr: [
+                    new ScaleInset({el: $('.footer-left-img-inner.active').get(0), onMask: true})
+                ]
+            })
+            let tlMenu = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.footer-menu',
+                    start: 'top top+=65%',
+                }
+            })
+            new MasterTimeline({
+                timeline: tlMenu,
+                tweenArr: [
+                    ...Array.from($('.footer-left-social-item-txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx == 0 ? 0 : .1})),
+                    ...Array.from($('.footer-menu-space')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx == 0 ? 0 : .1}))
+                ]
+            })
+            let tlPolicy = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.footer-policy-wrap',
+                    start: 'top top+=65%',
+                }
+            })
+            new MasterTimeline({
+                timeline: tlPolicy,
+                tweenArr: [
+                    ...Array.from($('.footer-policy-item-txt')).flatMap((el, i) => {
+                    return [
+                        new FadeSplitText({ el: $(el).get(0), onMask: true, delay: i == 0 ? 0 : .1}),
+                    ]
+                    })
+                ]
+            })
+            let tlApp = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.footer-policy-wrap',
+                    start: 'top top+=65%',
+                }
+            })
+            new MasterTimeline({
+                timeline: tlApp,
+                tweenArr: [
+                    ...Array.from($('.footer-app .txt')).flatMap((el, i) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: i == 0 ? 0 : .2}),),
+                    new FadeIn({el: $('.footer-touch-ic').get(0), onMask: true}),
+                    new FadeSplitText({ el: $('.footer-touch-txt').get(0), onMask: true})
+                ]
+            })
+            let tlSocial = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.footer-info',
+                    start: 'top top+=75%',
+                }
+            })
+            new MasterTimeline({
+                timeline: tlSocial,
+                tweenArr: [
+                    ...Array.from($('.footer-info .txt')).flatMap((el, i) => {
+                        return [
+                            new FadeSplitText({ el: $(el).get(0), onMask: true, delay: i == 0? 0 :.1}),
+                        ]
+                    })  ,
+                    ...Array.from($('.footer-info .footer-info-item-social-ic')).flatMap((el, i) => {
+                        return [
+                            new FadeIn({ el: $(el).get(0), onMask: true, delay: i == 0? 0 :.05}),
+                        ]
+                    })     
+                ]
+            })
+            let tlBot = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.footer-copyright-wrap',
+                    start: 'top bottom  ',
+                }
+            })
+            new MasterTimeline({
+                timeline: tlBot,
+                tweenArr: [
+                    ...Array.from($('.footer-left-social-list .txt')).flatMap((el, i) => {
+                        return [
+                            new FadeIn({ el: $(el).get(0), onMask: true, delay: i == 0? 0 :.05}),
+                        ]
+                    }),
+                    ...Array.from($('.footer-copyright-wrap .txt')).flatMap((el, i) => {
+                        return [
+                            new FadeSplitText({ el: $(el).get(0), onMask: true, delay: i == 0? 0 :.1}),
+                        ]
+                    })  ,
+                       
+                ]
+            })
         }
         interact() {
             let zIndexVal = 1;
@@ -2348,7 +2915,15 @@ const mainScript = () => {
             workJob.trigger();
             workOffice.trigger();
             footer.trigger();
-        }
+        },
+        policyScript: () => { 
+            policyHero.trigger();          
+            footer.trigger();
+        },
+        faqsScript: () => { 
+            faqsHero.trigger();          
+            footer.trigger();
+        },
     };
     const initGlobal = () => {
         cursor.init();
@@ -2361,15 +2936,21 @@ const mainScript = () => {
         if (pageName) {
         SCRIPT[`${pageName}Script`]();
         }
-
         header.toggleOnScroll(lenis);
         header.toggleColorMode('white');
+        header.toggleColorMode('blue');
+        let isScrolling = false;
         lenis.on("scroll", function (inst) {
+            if (!isScrolling) {
+                setupIframe();
+                isScrolling = true;
+            }
             header.toggleColorMode('white');
             header.toggleColorMode('blue');
             header.toggleOnScroll(lenis);
             header.toggleOnHide(inst);
         });
+       
     };
     /** (💡)  - START PAGE */
     if (window.scrollY > 0) {

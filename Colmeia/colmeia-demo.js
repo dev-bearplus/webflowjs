@@ -739,9 +739,9 @@ const mainScript = () => {
         });
     }
     const initAllPopup = () => {
-        // initPopup('schedule', {
-        //     onOpen: () => initMeetingsEmbedCode()
-        // });
+        initPopup('schedule', {
+            onOpen: () => initMeetingsEmbedCode()
+        });
         initPopup('contact', {
             onOpen: () => {
                 $(`[data-popup-contact='wrap'] .iti__country-list`).each(function () {
@@ -915,10 +915,196 @@ const mainScript = () => {
         swapMode: () => {
             $('.header').removeClass('on-light on-dark on-mix');
             $('.header').addClass(`on-${$('[data-header]').attr('data-header') || 'light'}`);
-            // $('.header').hasAttr('data-current-mode') && $('.header').removeAttr('data-current-mode');
+            $('.header').hasAttr('data-current-mode') && $('.header').removeAttr('data-current-mode');
         }
     }
 
+    let renderer, camera, scene;
+    let Globe;
+    let requestGlobeID;
+
+    function initThree() {
+        // Initialize renderer
+        let wrapper = document.querySelector('.home-hero-thumb-globe-inner');
+        let clock = new THREE.Clock();
+
+        renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            alpha: true,
+            canvas: document.getElementById('globe')
+        });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
+
+        // Initialize scene, light
+        scene = new THREE.Scene();
+        scene.add(new THREE.AmbientLight(0xbbbbbb, 0.3));
+        // scene.background = new Color(0x040d21);
+
+        // Initialize camera, light
+        camera = new THREE.PerspectiveCamera();
+        camera.aspect = wrapper.clientWidth / wrapper.clientHeight;
+        camera.updateProjectionMatrix();
+
+        var dLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dLight.position.set(-800, 2000, 400);
+        camera.add(dLight);
+
+        var dLight1 = new THREE.DirectionalLight(0x7982f6, 1);
+        dLight1.position.set(-200, 500, 200);
+        camera.add(dLight1);
+
+        var dLight2 = new THREE.PointLight(0x8566cc, 0.5);
+        dLight2.position.set(-200, 500, 200);
+        camera.add(dLight2);
+
+        camera.position.z = 300;
+        camera.position.x = 0;
+        camera.position.y = 0;
+
+        scene.add(camera);
+
+        // Additional effects
+        scene.fog = new THREE.Fog(0x535ef3, 400, 2000);
+
+        function onWindowResize() {
+            camera.aspect = wrapper.clientWidth / wrapper.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
+        }
+
+        window.addEventListener("resize", onWindowResize, false);
+        function animate() {
+            if (Globe) {
+                // Globe.rotation.x -= (Math.PI / 2880) * Math.sin(time * 0.001) * dir;
+                Globe.rotation.y += .2 * clock.getDelta();
+            }
+            if (isInViewport('.home-hero')) {
+                camera.lookAt(scene.position);
+                renderer.render(scene, camera);
+            }
+            requestGlobeID = requestAnimationFrame(animate);
+        }
+        animate();
+    }
+
+    async function initGlobe() {
+        try {
+            // Fetch data từ GitHub API
+            const data = await Promise.all([
+                fetch("https://cdnwf.bear.plus/Colmeia/files/globe-data-min.json").then(value => value.json()),
+                fetch("https://cdnwf.bear.plus/Colmeia/files/my-flights.json").then(value => value.json()),
+                fetch("https://cdnwf.bear.plus/Colmeia/files/my-airports.json").then(value => value.json())
+            ])
+
+            const countries = data[0].features;
+            const travelHistory = data[1].flights;
+            const airportHistory = data[2].airports;
+
+            Globe = new ThreeGlobe({
+                waitForGlobeReady: true,
+                animateIn: false,
+            })
+                .hexPolygonsData(countries)
+                .hexPolygonResolution(3)
+                .hexPolygonMargin(0.7)
+                .showAtmosphere(false)
+                .atmosphereColor("#000")
+                .atmosphereAltitude(0.25)
+                .hexPolygonColor((e) => {
+                    if (
+                        ["KGZ", "KOR", "THA", "RUS", "UZB", "IDN", "KAZ", "MYS"].includes(
+                            e.properties.ISO_A3
+                        )
+                    ) {
+                        return "rgba(255,255,255, 1)";
+                    } else return "rgba(255,255,255, 0.7)";
+                });
+
+
+            // Thiết lập thêm các hiệu ứng cho Globe sau khi Globe đã vào scene
+            setTimeout(() => {
+                Globe.arcsData(travelHistory)
+                    .arcColor((e) => {
+                        return e.status ? "#e85945" : "#ecda85";
+                    })
+                    .arcAltitude((e) => {
+                        return e.arcAlt;
+                    })
+                    .arcStroke((e) => {
+                        return e.status ? 0.5 : 0.3;
+                    })
+                    .arcDashLength(0.9)
+                    .arcDashGap(4)
+                    .arcDashAnimateTime(1000)
+                    .arcsTransitionDuration(1000)
+                    .arcDashInitialGap((e) => e.order * 1)
+                    // .labelsData(airportHistory)
+                    // .labelColor(() => "#ffcb21")
+                    .labelDotOrientation((e) => {
+                        return e.text === "ALA" ? "top" : "right";
+                    })
+                    .labelDotRadius(0.3)
+                    .labelSize((e) => e.size)
+                    .labelText("city")
+                    .labelResolution(6)
+                    .labelAltitude(0.01)
+                    .pointsData(airportHistory)
+                    .pointColor(() => "#ffffff")
+                    .pointsMerge(true)
+                    .pointAltitude(0.07)
+                    .pointRadius(0.05);
+            }, 1000);
+
+            // Đặt các thuộc tính cho globe material
+            Globe.rotateY(-Math.PI * .5);
+            Globe.rotateZ(-Math.PI / 10);
+            gsap.set('.home-hero-thumb-globe-canvas', { autoAlpha: 0, duration: 0 })
+            const globeMaterial = Globe.globeMaterial();
+            globeMaterial.color = new THREE.Color(0x0D3451);
+            globeMaterial.emissive = new THREE.Color(0x0D3451);
+            globeMaterial.opacity = 0;
+            globeMaterial.emissiveIntensity = 0.1;
+            globeMaterial.shininess = 0.7;
+
+            // Thêm Globe vào scene
+            scene.add(Globe);
+            gsap.to('.home-hero-thumb-globe-placeholder', { autoAlpha: 0, duration: .5, ease: 'linear' });
+            gsap.set('.home-hero-thumb-globe-canvas', { autoAlpha: 1, duration: 0 })
+
+        } catch (error) {
+            console.error('Error loading JSON:', error);
+        }
+    }
+    let isInitThreeGlobeScript = false;
+    function initThreeGlobe() {
+        if (isInitThreeGlobeScript) {
+            initThree();
+            initGlobe();
+        } else {
+            isInitThreeGlobeScript = true;
+            const scripts = [
+                "https://cdn.jsdelivr.net/npm/three@0.125.0/build/three.min.js",
+                "https://cdn.jsdelivr.net/npm/three-globe@2.34.2/dist/three-globe.min.js"
+            ];
+
+            const loadScript = (src) => new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.defer = true;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+
+            scripts.reduce((p, src) => p.then(() => loadScript(src)), Promise.resolve())
+                .then(() => {
+                    initThree();
+                    initGlobe();
+                })
+                .catch(console.error);
+        }
+    }
     let isAnimFooter = false;
     function animFooter() {
         if (isAnimFooter) return;
@@ -1280,13 +1466,63 @@ const mainScript = () => {
             namespace: 'home',
             afterEnter() {
                 function scHero() {
+                    // setTimeout(() => {
+                    //     // gsap.set('.home-about', { autoAlpha: 1, duration: 0 });
+                    // }, 200);
+                    if (window.requestIdleCallback) {
+                        requestIdleCallback(() => {
+                            initThreeGlobe();
+                        });
+                    } else {
+                        setTimeout(() => {
+                            initThreeGlobe();
+                        }, 2000);
+                    }
+
+                    function animRing() {
+                        let cloneRing = $('.home-hero-thumb-ring').clone();
+                        $('.home-hero-thumb-rings').html('');
+                        const countRing = 4;
+
+                        for (let i = 0; i < countRing; i++) {
+                            let html = cloneRing.clone();
+                            html.css("animation-delay", `${(-15 / countRing) * i}s`);
+                            html.addClass('anim-wave');
+                            $('.home-hero-thumb-rings').append(html);
+                        }
+                    }
+                    animRing();
+
+                    function animShape() {
+                        const itemPosition = [
+                            "0",
+                            "calc(100% / 3)",
+                            "calc(100% / 3 * 2.3)",
+                            "calc(100% / 3 * 1.5)",
+                            "calc(100% / 3 * 3)",
+                            "calc(100% / 3 * .5)",
+                            "calc(100% / 3 * 2)",
+                            "calc(100% / 3 * 1.2)",
+                            "calc(100% / 3 * 2.7)",
+                            "calc(100% / 3 * 1.7)",
+                        ]
+                        $('.home-hero-thumb-fading-item').each((idx, item) => {
+                            $(item).css({
+                                "animation-delay": `${(-30 / $('.home-hero-thumb-fading-item').length) * idx}s`,
+                                "left": itemPosition[idx],
+                            });
+                            $(item).addClass("anim-fadeBubble");
+                        });
+                    }
+                    animShape();
+
                     function marqueeLogo() {
                         const cloneAmount = 2;
                         new Array(cloneAmount).fill().forEach((_, index) => {
                             let itemClone = $('.home-hero-company-list').clone();
                             $('.home-hero-company-cms').append(itemClone);
                         })
-                        $('.home-hero-company-list').addClass('anim-marquee-right')
+                        $('.home-hero-company-list').addClass('animMarquee')
                     }
                     marqueeLogo();
 
@@ -1306,43 +1542,22 @@ const mainScript = () => {
                                 companyTitle.revert();
                             }
                         });
-                        if (viewport.w > 991) {
-                            tl
-                            .from('.home-hero-thumb-inner', { autoAlpha: 0, y: 50, filter: 'blur(5px)', duration: 1.5, ease: 'expo.out', clearProps: 'all' })
-                            .from('.home-hero-thumb-decor', { autoAlpha: 0, scale: .8, duration: 1.5, ease: 'back.out(1.3)', clearProps: 'all' }, "<=.4")
+
+                        tl
+                            .from('.home-hero-thumb-inner', { autoAlpha: 0, x: -50, filter: 'blur(5px)', duration: 1.2, ease: 'expo.out', clearProps: 'all' })
+                            .from('.home-hero-thumb-fading', { autoAlpha: 0, filter: 'blur(5px)', scale: .8, duration: 1.2, ease: 'power2.inOut', onComplete: () => $('.home-hero-thumb-fading-item').eq(0).addClass('anim-fadeBubble'), clearProps: 'all' }, "<=0.2")
+                            .from('.home-hero-thumb-globe-inner', { autoAlpha: 0, scale: .8, duration: 1.2, ease: 'back.out(1.3)', clearProps: 'all' }, "<=.1")
+                            .from('.home-hero-thumb-rings', { scale: .8, autoAlpha: 0, duration: 1, clearProps: 'all' }, '<=.35')
                             .to(heroLabel.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, 0)
                             .to(heroTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, '>-.4')
                             .to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '>-.5')
                             .from('.home-hero-btn', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' }, '>-.6')
                             .to(companyTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, '>-.8')
-                            .from($('.home-hero-company .line:visible'), { scaleX: 0, transformOrigin: 'left', duration: 1, clearProps: 'all' }, '>-.8')
-                            .from($('.home-hero-company-item:visible'), { autoAlpha: 0, yPercent: 40, xPercent: -30, rotate: 2, duration: 1.2, stagger: .05 }, '>-.85')
-                        }
-                        else {
-                            tl
-                            .to(heroLabel.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, 0)
-                            .to(heroTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, '>-.4')
-                            .to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '>-.5')
-                            .from('.home-hero-btn', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' }, '>-.6')
-                            .to(companyTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, '>-.8')
-                            .from('.home-hero-thumb-inner', { autoAlpha: 0, y: 50, filter: 'blur(5px)', duration: 1.5, ease: 'expo.out', clearProps: 'all' }, "<=0")
-                            .from('.home-hero-thumb-decor', { autoAlpha: 0, scale: .8, duration: 1.5, ease: 'back.out(1.3)', clearProps: 'all' }, "<=.4")
-                            .from($('.home-hero-company .line:visible'), { scaleX: 0, transformOrigin: 'left', duration: 1, clearProps: 'all' }, '>-.8')
-                            .from($('.home-hero-company-item:visible'), { autoAlpha: 0, yPercent: 40, xPercent: -30, rotate: 2, duration: 1.2, stagger: .05 }, '>-.85')
-                        }
+                            .from('.home-hero-company .line', { scaleX: 0, transformOrigin: 'left', duration: 1, clearProps: 'all' }, '>-.8')
+                            .from('.home-hero-company-item', { autoAlpha: 0, yPercent: 40, xPercent: 30, rotate: -2, duration: 1.2, stagger: .05 }, '>-.85')
                     }
 
                     animShowEl();
-
-                    $('.home-hero-thumb-btn a').on('click', function (e) {
-                        e.preventDefault();
-                        $('.home-hero-thumb-vid iframe')[0].src += "&autoplay=1";
-                        gsap.to('.home-hero-thumb-overlay, .home-hero-thumb-btn', {
-                            autoAlpha: 0, onComplete: () => {
-                            $('.home-hero-thumb-overlay').remove();
-                            $('.home-hero-thumb-btn').remove();
-                        } });
-                    })
                 }
                 scHero();
 
@@ -1549,6 +1764,7 @@ const mainScript = () => {
             },
             beforeLeave() {
                 requestID && cancelAnimationFrame(requestID);
+                requestGlobeID && cancelAnimationFrame(requestGlobeID);
             }
         },
         about: {
@@ -2085,23 +2301,13 @@ const mainScript = () => {
                             }
                         })
                         tl
-                            .from('.prod-hero-thumb-inner', { autoAlpha: 0, y: 50, filter: 'blur(5px)', duration: 1.5, ease: 'expo.out', clearProps: 'all' })
-                            .to(heroDesc.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
+                            .from('.prod-hero-thumb-item', { autoAlpha: 0, scale: 1.2, duration: 1.5, stagger: 0.03, ease: 'circ.out', clearProps: 'all' })
                             .to(heroTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, "<=.1")
                             .to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
-                            .from('.prod-hero-btn .btn', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' },  '>-.6')
+                            .to(heroDesc.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
+                            .from('.prod-hero .btn', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' }, '<=.2')
                     }
                     animShowEl();
-
-                    $('.prod-hero-thumb-btn a').on('click', function (e) {
-                        e.preventDefault();
-                        $('.prod-hero-thumb-vid iframe')[0].src += "&autoplay=1";
-                        gsap.to('.prod-hero-thumb-overlay, .prod-hero-thumb-btn', {
-                            autoAlpha: 0, onComplete: () => {
-                            $('.prod-hero-thumb-overlay').remove();
-                            $('.prod-hero-thumb-btn').remove();
-                        } });
-                    })
                 }
                 scHero();
 
@@ -2300,7 +2506,6 @@ const mainScript = () => {
 
                     gsap.set('.ar-content-thumb', { clipPath: 'inset(20%)' });
                     gsap.set('.ar-content-thumb img', { scale: 1.4, autoAlpha: 0 });
-                    gsap.set('.ar-content-cta', { autoAlpha: 0, y: 50 });
 
                     let tl = gsap.timeline({
                         delay: GLOBAL_DELAY,
@@ -2316,7 +2521,6 @@ const mainScript = () => {
                         .to(heroTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 })
                         .to('.ar-content-thumb', { clipPath: 'inset(0%)', duration: 1.5, ease: 'expo.out' }, "<=.1")
                         .to('.ar-content-thumb img', { scale: 1, autoAlpha: 1, duration: 1.5, ease: 'expo.out', clearProps: 'all' }, "<=0")
-                        .to('.ar-content-cta', { autoAlpha: 1, y: 0, duration: 1, ease: 'expo.out' }, "<=0")
                     heroSub.length !== 0 && tl.to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, "<=.1")
 
                 }
@@ -2380,10 +2584,6 @@ const mainScript = () => {
                         setTimeout(() => {
                             $('.ar-content-share-popup').removeClass('active');
                         }, 2000);
-                    }
-
-                    if (viewport.w > 991) {
-                        $('.ar-content-cta').css('top', ($(window).height() - $('.ar-content-cta').height()) / 2)
                     }
                 }
                 scContent();
@@ -2474,12 +2674,6 @@ const mainScript = () => {
                     }
                 }
                 scContent();
-            }
-        },
-        schedule: {
-            namespace: 'schedule',
-            afterEnter() {
-                initMeetingsEmbedCode();
             }
         }
     }
