@@ -739,9 +739,32 @@ const mainScript = () => {
         });
     }
     const initAllPopup = () => {
-        // initPopup('schedule', {
-        //     onOpen: () => initMeetingsEmbedCode()
-        // });
+        initPopup('demo', {
+            onOpen: () => {
+                let iframe = $('.demo-vid-inner iframe').length > 0 ? $('.demo-vid-inner iframe'): $('<iframe></iframe>');
+                let iframeSrc = new URL($('.demo-vid-inner').attr('data-iframe-src'));
+                iframeSrc += `?origin=${window.location.origin}&autoplay=1`;
+                iframe.attr({
+                    'src': iframeSrc,
+                    'allow': 'autoplay',
+                    'title': 'COLMEIA - Job Architecture Made Easy!',
+                    'allowfullscreen': '',
+                    'width': '100%',
+                    'height': '100%',
+                    'frameborder': 0,
+                    'allow': 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+                    'referrerpolicy': 'strict-origin-when-cross-origin'
+                });
+                iframe.appendTo('.demo-vid-inner');
+            },
+            onClose: () => {
+                let iframe = $('.demo-vid-inner iframe');
+                if (iframe) {
+                    let iframeSrc = iframe.attr('src');
+                    iframe.attr('src', '');
+                }
+            }
+        });
         initPopup('contact', {
             onOpen: () => {
                 $(`[data-popup-contact='wrap'] .iti__country-list`).each(function () {
