@@ -1229,20 +1229,18 @@ const mainScript = () => {
                     },
                 }
             );
-            new MasterTimeline({
-                timeline: this.tl,
-                tweenArr: [
-                  new FadeSplitText({ el: $('.mb-hero-title').get(0), onMask: true }),
-                  ...Array.from($('.mb-hero-control-item')).flatMap((el, idx) => new FadeSplitText({ el: el, onMask: true, delay: idx ==0 ? .3 : 0.2 })),
-                  ...Array.from($('.mb-hero-card-item-inner')).flatMap((el, idx) => new ScaleInset({ el: $(el).get(0), delay: idx ==0? 0 : 0.2 })),
-                  ...Array.from($('.mb-hero-content-item-txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx ==0? 0 : 0.1 })),
-                ]
-            })
+                if(viewport.w > 991) {
+                    new MasterTimeline({
+                        timeline: this.tl,
+                        tweenArr: [
+                          new FadeSplitText({ el: $('.mb-hero-title').get(0), onMask: true }),
+                          ...Array.from($('.mb-hero-control-item')).flatMap((el, idx) => new FadeSplitText({ el: el, onMask: true, delay: idx ==0 ? .3 : 0.2 })),
+                          ...Array.from($('.mb-hero-card-item-inner')).flatMap((el, idx) => new ScaleInset({ el: $(el).get(0), delay: idx ==0? 0 : 0.2 })),
+                          ...Array.from($('.mb-hero-content-item-txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx ==0? 0 : 0.1 })),
+                        ]
+                    })
+                }
                 let lengthSlide = $(".mb-hero-card-item").length;
-                let stickyBot =  viewport.h - $('.mb-hero-card-main').height();
-                $('.mb-hero-card-main').css('margin-bottom', `${stickyBot}px`)
-                $('.mb-hero-content-wrap').css('margin-top', `-${stickyBot}px`)
-                $('.mb-hero-content-process').css('width', `${$('.mb-hero-content-inner').width()}px`)
                 let swiper = new Swiper(".mb-hero-card-wrap", {
                     slidesPerView: 'auto',
                     spaceBetween: parseRem(0),
@@ -2015,6 +2013,7 @@ const mainScript = () => {
         setup() {
             let content = new SplitType('.game-jackpot-main-ball-txt', {types: 'lines, words', lineClass: 'bp-line'});
             gsap.set(content.words, {yPercent: 100});
+            
             let fallingBubbles = new FallingBubbles( "game-jackpot-main-ball-canvas", ".game-jackpot-main-ball" );
             fallingBubbles.init();
             let tl = gsap.timeline({
@@ -2034,6 +2033,9 @@ const mainScript = () => {
                     trigger: ".game-jackpot-main",
                     start: "top top+=65%",
                 },
+                onComplete: () => {
+                    gsap.to($(`.game-jackpot-main-ball-txt.active .word`), {yPercent: 0, duration:.6, ease: 'power1.out'})
+                }
             })
             new MasterTimeline({
                 timeline: tlBall,
