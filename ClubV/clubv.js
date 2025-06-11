@@ -682,6 +682,13 @@ const mainScript = () => {
                 let linkCurrent = linkInner.attr('href');
                 linkInner.attr('href', `${linkCurrent}?detail=${dataLinkDetail}&type=${dataLinkType}`);
             })
+            $('.home-featured-left-inner').each((idx, el) => {
+                let linkInner = $(el).find('.home-featured-left-inner-link')
+                let dataLinkDetail = linkInner.attr('data-link-detail');
+                let dataLinkType = linkInner.attr('data-link-type');
+                let linkCurrent = linkInner.attr('href');
+                linkInner.attr('href', `${linkCurrent}&detail=${dataLinkDetail}`);
+            })
             $('.home-featured-img-item').each((idx, el) => {
                 let tlItem = gsap.timeline({
                     scrollTrigger: {
@@ -2147,7 +2154,6 @@ const mainScript = () => {
             let tagName = url.searchParams.get("type");
             let itemDetail = url.searchParams.get("detail");
             if(itemDetail) {
-                console.log($(`.event-hero-card-item[data-link-detail=${itemDetail}] `))
                 $(`.event-hero-card-item[data-link-detail=${itemDetail}] [data-link= "open-popup"]`).eq(0).click();
             }
             if(tagName) {
