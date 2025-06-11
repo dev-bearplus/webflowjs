@@ -194,6 +194,8 @@ const script = () => {
             $(el).css('display', 'block');
         }, $(window).width() < 767 ? 1000 : 300);
     })
+    $('.loader').animate({ opacity: 0 }, 1000, () => $('.loader').remove());
+
     // let isLoaded = sessionStorage.getItem('isLoaded') === 'true' ? true : false;
     // if (!isLoaded) {
     //     if ($(window).width() < 767) {
