@@ -1241,6 +1241,7 @@ const mainScript = () => {
                     })
                 }
                 let lengthSlide = $(".mb-hero-card-item").length;
+                $('.mb-hero-content-process').css('width', `${$('.mb-hero-content-inner').width()}px`)
                 let swiper = new Swiper(".mb-hero-card-wrap", {
                     slidesPerView: 'auto',
                     spaceBetween: parseRem(0),
