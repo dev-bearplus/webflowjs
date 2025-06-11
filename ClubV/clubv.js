@@ -1237,7 +1237,6 @@ const mainScript = () => {
                   ...Array.from($('.mb-hero-content-item-txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx ==0? 0 : 0.1 })),
                 ]
             })
-            if(viewport.w > 991) {
                 let lengthSlide = $(".mb-hero-card-item").length;
                 let stickyBot =  viewport.h - $('.mb-hero-card-main').height();
                 $('.mb-hero-card-main').css('margin-bottom', `${stickyBot}px`)
@@ -1263,32 +1262,39 @@ const mainScript = () => {
                     },
 
                 });
-                let widthProgressInner = $('.mb-hero-content-process').width()/swiper.slides.length;
-                $('.mb-hero-content-process-inner').css('width', widthProgressInner);
-                let widthContentTranslate = $('.mb-hero-content-inner').width() - $('.mb-hero-content-wrap').width() + parseRem(40);
-                console.log(widthContentTranslate);
-                swiper.on('slideChangeTransitionStart', (self) => {
-                    console.log('Progress:', self.progress  ); // 0 → 1
-                    gsap.to('.mb-hero-content-process-inner', {x: self.progress*($('.mb-hero-content-inner').width() - widthProgressInner) , duration: .4, ease: 'none'})
-                    gsap.to('.mb-hero-content-process', {x: -self.progress*widthContentTranslate, duration: .4, ease: 'none'})
-                    gsap.to('.mb-hero-content-item:not(:first-child)', {x: -self.progress*widthContentTranslate, duration: .4, ease: 'none'})
-                });
-                $(".mb-hero-control-item-wrap.item-prev").on("click", function () {
-                    swiper.slidePrev();
-                });
-                $(".mb-hero-control-item-wrap.item-next").on("click", function () {
-                    swiper.slideNext();
-                });
-            }
-            else {
-                $('.mb-hero-content-wrap').addClass('swiper')
-                $('.mb-hero-content-inner').addClass('swiper-wrapper')
-                $('.mb-hero-content-row').addClass('swiper-slide')
-                let swiper = new Swiper(".mb-hero-content-wrap", {
-                    slidesPerView: 'auto',
-                    spaceBetween: 0,
-                })
-            }
+                if(viewport.w > 991) {
+                    let widthProgressInner = $('.mb-hero-content-process').width()/swiper.slides.length;
+                    $('.mb-hero-content-process-inner').css('width', widthProgressInner);
+                    let widthContentTranslate = $('.mb-hero-content-inner').width() - $('.mb-hero-content-wrap').width() + parseRem(40);
+                    console.log(widthContentTranslate);
+                    swiper.on('slideChangeTransitionStart', (self) => {
+                        console.log('Progress:', self.progress  ); // 0 → 1
+                        gsap.to('.mb-hero-content-process-inner', {x: self.progress*($('.mb-hero-content-inner').width() - widthProgressInner) , duration: .4, ease: 'none'})
+                        gsap.to('.mb-hero-content-process', {x: -self.progress*widthContentTranslate, duration: .4, ease: 'none'})
+                        gsap.to('.mb-hero-content-item:not(:first-child)', {x: -self.progress*widthContentTranslate, duration: .4, ease: 'none'})
+                    });
+                    $(".mb-hero-control-item-wrap.item-prev").on("click", function () {
+                        swiper.slidePrev();
+                    });
+                    $(".mb-hero-control-item-wrap.item-next").on("click", function () {
+                        swiper.slideNext();
+                    });
+                }
+                else {
+                    activeContent(1)
+                    $(".mb-hero-content-item").eq(1).addClass('active');
+                    swiper.on('slideChange', (self) => {
+                        console.log(self.realIndex);
+                        activeContent(self.realIndex + 1)
+                    });
+                    function activeContent(index) {
+                        $('.mb-hero-content-row').each((idx, el) => {
+                            console.log($(el).find('.mb-hero-content-item').eq(index));
+                            $(el).find('.mb-hero-content-item').removeClass('active');
+                            $(el).find('.mb-hero-content-item').eq(index).addClass('active');
+                        })
+                    }
+                }
             
             let tl = gsap.timeline({
                 paused: true,
@@ -2058,7 +2064,15 @@ const mainScript = () => {
                 tweenArr : [
                     new FadeSplitText({el: $('.event-hero-title').get(0), onMask: true}),
                     new FadeSplitText({el: $('.event-hero-tag-title').get(0), onMask: true}),
-                    ...Array.from($('.event-hero-card-item')).flatMap((el, index) => new FadeIn({el: $(el), delay:.2})),
+                    ...Array.from($('.event-hero-card-item')).flatMap((el, index) => {
+                        return [
+                            new ScaleInset({el: $(el).find('.event-hero-card-item-img').get(0)}),
+                            new FadeIn({el: $(el).find('.event-hero-card-item-tag').get(0)}),
+                            new FadeIn({el: $(el).find('.event-hero-card-item-title').get(0)}),
+                            new FadeIn({el: $(el).find('.event-hero-card-item-time').get(0)}),
+                            new FadeIn({el: $(el).find('.event-hero-card-item-read').get(0), delay:.2}),
+                        ]
+                    }),
                     ...Array.from($('.event-hero-tag-item')).flatMap((el, index) => new FadeIn({el: $(el), delay: .2})),
                     new FadeSplitText({el: $('.event-hero-date-title').get(0), onMask: true}),
                     new FadeIn({el: $('.event-hero-date-reset').get(0), delay: .2}),
@@ -2130,23 +2144,29 @@ const mainScript = () => {
             })
         }
         activeTab(tagName) {
-            this.filterReset();
-            $('.event-hero-card-item').fadeOut(400);
-            $('.event-hero-card-item').removeClass('active');
+            $('.event-hero-date-filter-item').removeClass('active');
+            $('.event-calendar-item-date-txt').removeClass('active');
             $('.event-hero-card-item').each((i, el) => {
                 if($(el).attr('data-tag') == tagName) {
                     $(el).fadeIn(400);
                     $(el).addClass('active');
                 }
+                else {
+                    $(el).fadeOut(400);
+                    $(el).removeClass('active');
+                }
             })
         }
         initActiveTab(tagName) {
-            $('.event-hero-card-item').hide();
-            $('.event-hero-card-item').removeClass('active');
             $('.event-hero-card-item').each((i, el) => {
-                if($(el).attr('data-tag') == tagName) {
+                console.log($(el).attr('data-tag'))
+                if($(el).attr('data-tag') === tagName) {
                     $(el).show();
                     $(el).addClass('active');
+                }
+                else {
+                    $(el).hide();
+                    $(el).removeClass('active');
                 }
             })
         }
@@ -2244,16 +2264,12 @@ const mainScript = () => {
                 const today = new Date();
                 const year = today.getFullYear();
                 const month = today.getMonth();
-                //convert month to character english short
-
-
                 const day = today.getDate();
-            
-                // Xóa tất cả highlight trước
                 $('.event-calendar-item-date-txt').removeClass('active');
             
                 $('.event-calendar-item-date-txt').each( (i, el) => {
                     const itemDateStr = $(el).attr('data-date');
+                    if (!itemDateStr) return;
                     const parts = itemDateStr.split('/');
                     const itemDate = new Date(+parts[2], parts[1] - 1, +parts[0]);
             
@@ -2263,9 +2279,10 @@ const mainScript = () => {
                             itemDate.getMonth() === month &&
                             itemDate.getDate() === day
                         ) {
+                            
                             $(el).addClass('active');
-                            this.filterEvents(getDateRangeArray(today, today));
                         }
+                        this.filterEvents(getDateRangeArray(today, today));
                     }
             
                     if (range === 'this-week') {
@@ -2289,17 +2306,20 @@ const mainScript = () => {
             $('.event-calendar-close').on('click',  (e) => {
                 hideAllCalendars();
             })
-            $(document).on('click', function (e) {
-                if (!$(e.target).closest('.event-calendar-item-date-txt').length 
-                && !$(e.target).closest('.event-calendar-close').length && !$(e.target).closest('.event-calendar-inner').length 
-                && !$(e.target).closest('.event-hero-date-filter-item.only-tablet').length) {
-                    hideAllCalendars();
-                }
-            })
+            if(viewport.w < 992){
+                $(document).on('click', function (e) {
+                    if (!$(e.target).closest('.event-calendar-item-date-txt').length 
+                    && !$(e.target).closest('.event-calendar-close').length && !$(e.target).closest('.event-calendar-inner').length 
+                    && !$(e.target).closest('.event-hero-date-filter-item.only-tablet').length) {
+                        hideAllCalendars();
+                    }
+                })
+            }
             function hideAllCalendars() {
                 $('.header').removeClass('on-hide')
                 $('.event-calendar-list').removeClass('active');
                 $('.event-calendar-item-date-txt').removeClass('active');
+                $('.event-hero-date-filter-item').removeClass('active');
             }
             const activateThisWeekAcrossCalendars = () =>{
                 const today = new Date();
@@ -2336,7 +2356,6 @@ const mainScript = () => {
                     result.push(`${day}/${month}/${year}`);
                     current.setDate(current.getDate() + 1);
                 }
-            
                 return result;
             }
         }
@@ -2344,7 +2363,7 @@ const mainScript = () => {
             $('.event-hero-date-filter-item').removeClass('active');
             $('.event-calendar-item-date-txt').removeClass('active');
             let tagActive = $('.event-hero-tag-item.active').attr('data-tag');
-            this.initActiveTab(tagActive);
+            this.activeTab(tagActive);
         }
     }
     let eventHero = new EventHero();
@@ -3080,11 +3099,20 @@ const mainScript = () => {
                 if (isScrollHeader) {
                     if (inst.direction >= 1) {
                         $header.addClass('on-hide');
+                        if($('.mb-hero-card-main').length > 0) {
+                            $('.mb-hero-card-main').addClass('on-top');
+                        }
                     } else {
                         $header.removeClass('on-hide');
+                        if($('.mb-hero-card-main').length > 0) {
+                            $('.mb-hero-card-main').removeClass('on-top');
+                        }
                     }
                 } else {
                     $header.removeClass('on-hide');
+                    if($('.mb-hero-card-main').length > 0) {
+                        $('.mb-hero-card-main').removeClass('on-top');
+                    }
                 }
             }, 100);
         }
