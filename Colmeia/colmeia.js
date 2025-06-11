@@ -1989,8 +1989,9 @@ const mainScript = () => {
                             .from('.uc-hero-clip', { y: cvUnit(viewportBreak({ desktop: 76, mobile: 33 }), 'rem'), duration: 1.2, ease: 'power1.out', clearProps: 'all' }, '<=.1')
                             .to(heroTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, "<=.2")
                             .to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
-                            .from('.uc-hero-ic', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' }, '<=.1')
                             .to(heroDesc.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
+                            .from('.uc-hero-ic', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' }, '<=.1')
+                            .from('.uc-hero-btn .btn', { autoAlpha: 0, y: 20, duration: 1, stagger:  .1, clearProps: 'all' }, "<=.1")
                     }
                     animShowEl();
                 }
@@ -2287,6 +2288,7 @@ const mainScript = () => {
                         .from('.comp-hero-thumb-div', { autoAlpha: 0, scale: 1.2, duration: .8, clearProps: 'all' }, "<=.1")
                         .to(heroTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, "<=.1")
                         .to(heroDesc.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, "<=.1")
+                        .from('.comp-hero-btn .btn', { autoAlpha: 0, y: 20, duration: 1, stagger:  .1, clearProps: 'all' }, "<=.1")
                 }
                 scHero();
                 function scCompare() {
@@ -2504,6 +2506,17 @@ const mainScript = () => {
             namespace: 'schedule',
             afterEnter() {
                 initMeetingsEmbedCode();
+
+
+                function marqueeLogo() {
+                    const cloneAmount = 2;
+                    new Array(cloneAmount).fill().forEach((_, index) => {
+                        let itemClone = $('.schedule-hero-client-cms-list').clone();
+                        $('.schedule-hero-client-cms').append(itemClone);
+                    })
+                    $('.schedule-hero-client-cms-list').addClass('animMarquee')
+                }
+                marqueeLogo();
             }
         }
     }
