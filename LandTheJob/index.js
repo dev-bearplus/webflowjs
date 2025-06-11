@@ -221,5 +221,4 @@ const script = () => {
         SCRIPT[`${pageName}Script`]();
     }
 }
-
-window.onload = script;
+script();
