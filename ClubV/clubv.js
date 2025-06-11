@@ -1218,6 +1218,7 @@ const mainScript = () => {
         }
         trigger() {
             this.setup();
+            this.interact();
             super.init(this.play.bind(this));
         }
         setup() {
@@ -1322,6 +1323,41 @@ const mainScript = () => {
                 },
             });
             tl.play(); 
+        }
+        interact() {
+            if(viewport.w < 768) {
+                let itemHeaderToggle = $('.mb-hero-content-row.mb-hero-content-grid:not(.row-child) .mb-hero-content-item:first-child');
+                itemHeaderToggle.on('click', function(){
+                    $(this).toggleClass('active');
+                    if($(this).closest('.mb-hero-content-row').hasClass('no-line')) {
+                        $(this).closest('.mb-hero-content-row').toggleClass('active');
+                        slideToggleNextUntilEnd( $(this).closest('.mb-hero-content-row'), '.mb-hero-content-row', '.row-child-end');
+                    }
+                    else {
+                        $(this).siblings('.mb-hero-content-item').slideToggle();
+                    }
+                })
+                function slideToggleNextUntilEnd(clickedEl, itemSelector, stopClass) {
+                    const $clicked = $(clickedEl);
+                    const $nextItems = $clicked.nextAll(itemSelector);
+                    const collected = [];
+                  
+                    for (let i = 0; i < $nextItems.length; i++) {
+                      const $item = $($nextItems[i]);
+                      collected.push($item);
+                  
+                      if ($item.hasClass(stopClass.replace('.', ''))) {
+                        break;
+                      }
+                    }
+                  
+                    // Áp dụng slideToggle
+                    collected.forEach($el => {
+                      $el.stop(true, true).slideToggle(200);
+                    });
+                  }
+                  
+            }
         }
         play() {
             this.tl.play();
