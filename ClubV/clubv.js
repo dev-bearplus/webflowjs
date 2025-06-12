@@ -995,7 +995,7 @@ const mainScript = () => {
             let tlImg = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.home-service-img-cms',
-                    start: 'top top+=65%',
+                    start: 'top top+=80%',
                 }
             })
             new MasterTimeline({
@@ -3382,14 +3382,14 @@ const mainScript = () => {
        
     };
     /** (💡)  - START PAGE */
-    if (window.scrollY > 0) {
-        lenis.scrollTo(0, {
-        duration: 0.001,
-        onComplete: () => initGlobal(),
-        });
-    } else {
+    // if (window.scrollY > 0) {
+    //     lenis.scrollTo(0, {
+    //     duration: 0.001,
+    //     onComplete: () => initGlobal(),
+    //     });
+    // } else {
         initGlobal();
-    }
+    // }
     /** (💡) **/
 };
 window.onload = mainScript;
