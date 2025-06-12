@@ -552,8 +552,8 @@ const mainScript = () => {
                 })
             }
             else {
+                
                 let listBg = $(".home-senses-bg-item-inner");
-
                 listBg.each((i, el) => {
                     let tl = new gsap.timeline({
                         scrollTrigger: {
@@ -593,6 +593,12 @@ const mainScript = () => {
                     activeItem(['.home-popup-item'], index);
                     $(".global-popup-wrap").addClass('has-popup');
                     lenis.stop();
+                })
+                $('.home-popup-item').on('scroll', function(e){
+                    console.log($(this).scrollTop());
+                    if($(this).scrollTop()  < -100 ){
+                        $('.global-popup-wrap').removeClass('has-popup');
+                    }
                 })
             }
             $('.home-senses-popup-close').on('click', function(e){
@@ -1236,17 +1242,6 @@ const mainScript = () => {
                     },
                 }
             );
-                if(viewport.w > 991) {
-                    new MasterTimeline({
-                        timeline: this.tl,
-                        tweenArr: [
-                          new FadeSplitText({ el: $('.mb-hero-title').get(0), onMask: true }),
-                          ...Array.from($('.mb-hero-control-item')).flatMap((el, idx) => new FadeSplitText({ el: el, onMask: true, delay: idx ==0 ? .3 : 0.2 })),
-                          ...Array.from($('.mb-hero-card-item-inner')).flatMap((el, idx) => new ScaleInset({ el: $(el).get(0), delay: idx ==0? 0 : 0.2 })),
-                          ...Array.from($('.mb-hero-content-item-txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx ==0? 0 : 0.1 })),
-                        ]
-                    })
-                }
                 let lengthSlide = $(".mb-hero-card-item").length;
                 $('.mb-hero-content-process').css('width', `${$('.mb-hero-content-inner').width()}px`)
                 let swiper = new Swiper(".mb-hero-card-wrap", {
@@ -1270,6 +1265,15 @@ const mainScript = () => {
 
                 });
                 if(viewport.w > 991) {
+                    new MasterTimeline({
+                        timeline: this.tl,
+                        tweenArr: [
+                          new FadeSplitText({ el: $('.mb-hero-title').get(0), onMask: true }),
+                          ...Array.from($('.mb-hero-control-item')).flatMap((el, idx) => new FadeSplitText({ el: el, onMask: true, delay: idx ==0 ? .3 : 0.2 })),
+                          ...Array.from($('.mb-hero-card-item-inner')).flatMap((el, idx) => new ScaleInset({ el: $(el).get(0), delay: idx ==0? 0 : 0.2 })),
+                          ...Array.from($('.mb-hero-content-item-txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx ==0? 0 : 0.1 })),
+                        ]
+                    })
                     let widthProgressInner = $('.mb-hero-content-process').width()/swiper.slides.length;
                     $('.mb-hero-content-process-inner').css('width', widthProgressInner);
                     let widthContentTranslate = $('.mb-hero-content-inner').width() - $('.mb-hero-content-wrap').width() + parseRem(40);
@@ -1294,6 +1298,10 @@ const mainScript = () => {
                         console.log(self.realIndex);
                         activeContent(self.realIndex + 1)
                     });
+                    $('.mb-hero-card-item').on('click', function(){
+                        let index = $(this).index();
+                        swiper.slideTo(index);
+                    })
                     function activeContent(index) {
                         $('.mb-hero-content-row').each((idx, el) => {
                             console.log($(el).find('.mb-hero-content-item').eq(index));
