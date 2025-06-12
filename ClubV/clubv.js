@@ -148,15 +148,20 @@ const mainScript = () => {
         this.triggerEl = triggerEl;
         }
         setTrigger(setup) {
-        this.tlTrigger = gsap.timeline({
-            scrollTrigger: {
-            trigger: this.triggerEl,
-            start: "top bottom+=50%",
-            end: "bottom top",
-            once: true,
-            onEnter: () => setup(),
-            },
-        });
+            if(viewport.w > 767){
+                this.tlTrigger = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.triggerEl,
+                        start: "top bottom+=50%",
+                        end: "bottom top",
+                        once: true,
+                        onEnter: () => setup(),
+                    },
+                });
+            }
+            else {
+                setup();
+            }
         }
     }
     class Loading {
