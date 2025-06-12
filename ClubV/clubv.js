@@ -600,8 +600,7 @@ const mainScript = () => {
                     lenis.stop();
                 })
                 $('.home-popup-item').on('scroll', function(e){
-                    console.log($(this).scrollTop());
-                    if($(this).scrollTop()  < -100 ){
+                    if($(this).scrollTop()  < -80 ){
                         $('.global-popup-wrap').removeClass('has-popup');
                         lenis.start();
                         cursor.reset();
@@ -1834,7 +1833,7 @@ const mainScript = () => {
             }) 
             $('.work-popup-item').on('scroll', ()=> {
                 this.ItemContentActiveCheck('.work-popup-item.active .work-popup-item-content h6');
-                if($(this).scrollTop()  < -100 && viewport.w < 768) {
+                if($(e.target).scrollTop()  < -80 && viewport.w < 768) {
                     $('.global-popup-wrap').removeClass('has-popup');
                     lenis.start();
                     cursor.reset();
@@ -2823,7 +2822,7 @@ const mainScript = () => {
             }) 
             $('.work-popup-item').on('scroll', ()=> {
                 this.ItemContentActiveCheck('.work-popup-item.active .work-popup-item-content h6');
-                if($(this).scrollTop()  < -100 && viewport.w < 768) {
+                if($(e.target).scrollTop()  < -80 && viewport.w < 768) {
                     $('.global-popup-wrap').removeClass('has-popup');
                     lenis.start();
                     cursor.reset();
