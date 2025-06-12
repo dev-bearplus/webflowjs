@@ -188,12 +188,13 @@ const script = () => {
         setTimeout(() => {
             $('<script/>', {
                 src: `https://widget.senja.io/widget/${id}/platform.js`,
-                type: 'text/javascript',
-                async: true
+                type: 'text/javascript'
             }).appendTo('body');
             $(el).css('display', 'block');
-        }, $(window).width() < 767 ? 1000 : 300);
+        }, $(window).width() < 767 ? 3000 : 300);
     })
+    $('.loader').animate({ opacity: 0 }, 1000, () => $('.loader').remove());
+
     // let isLoaded = sessionStorage.getItem('isLoaded') === 'true' ? true : false;
     // if (!isLoaded) {
     //     if ($(window).width() < 767) {
@@ -219,5 +220,4 @@ const script = () => {
         SCRIPT[`${pageName}Script`]();
     }
 }
-
 window.onload = script;
