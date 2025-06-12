@@ -915,7 +915,7 @@ const mainScript = () => {
         swapMode: () => {
             $('.header').removeClass('on-light on-dark on-mix');
             $('.header').addClass(`on-${$('[data-header]').attr('data-header') || 'light'}`);
-            // $('.header').hasAttr('data-current-mode') && $('.header').removeAttr('data-current-mode');
+            $('.header').hasAttr('data-current-mode') && $('.header').removeAttr('data-current-mode');
         }
     }
 
@@ -1334,9 +1334,22 @@ const mainScript = () => {
 
                     animShowEl();
 
+                    let iframeSrc = new URL($('.home-hero-thumb-vid-inner').attr('data-iframe-src'));
                     $('.home-hero-thumb-btn a').on('click', function (e) {
                         e.preventDefault();
-                        $('.home-hero-thumb-vid iframe')[0].src += "&autoplay=1";
+                        iframeSrc += `?origin=${window.location.origin}&autoplay=1`;
+                        let iframe = $('<iframe></iframe>');
+                        iframe.attr({
+                            'src': iframeSrc,
+                            'allow': 'autoplay',
+                            'allowfullscreen': '',
+                            'width': '100%',
+                            'height': '100%',
+                            'frameborder': 0,
+                            'allow': 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+                            'referrerpolicy': 'strict-origin-when-cross-origin'
+                        });
+                        iframe.appendTo('.home-hero-thumb-vid-inner');
                         gsap.to('.home-hero-thumb-overlay, .home-hero-thumb-btn', {
                             autoAlpha: 0, onComplete: () => {
                             $('.home-hero-thumb-overlay').remove();
@@ -1976,8 +1989,9 @@ const mainScript = () => {
                             .from('.uc-hero-clip', { y: cvUnit(viewportBreak({ desktop: 76, mobile: 33 }), 'rem'), duration: 1.2, ease: 'power1.out', clearProps: 'all' }, '<=.1')
                             .to(heroTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, "<=.2")
                             .to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
-                            .from('.uc-hero-ic', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' }, '<=.1')
                             .to(heroDesc.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
+                            .from('.uc-hero-ic', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' }, '<=.1')
+                            .from('.uc-hero-btn .btn', { autoAlpha: 0, y: 20, duration: 1, stagger:  .1, clearProps: 'all' }, "<=.1")
                     }
                     animShowEl();
                 }
@@ -2093,9 +2107,24 @@ const mainScript = () => {
                     }
                     animShowEl();
 
+                    let iframeSrc = new URL($('.prod-hero-thumb-vid-inner').attr('data-iframe-src'));
+                    let iframeTitle = $('.prod-hero-thumb-vid-inner').attr('data-iframe-title');
                     $('.prod-hero-thumb-btn a').on('click', function (e) {
                         e.preventDefault();
-                        $('.prod-hero-thumb-vid iframe')[0].src += "&autoplay=1";
+                        iframeSrc += `?origin=${window.location.origin}&autoplay=1`;
+                        let iframe = $('<iframe></iframe>');
+                        iframe.attr({
+                            'src': iframeSrc,
+                            'title': iframeTitle,
+                            'allow': 'autoplay',
+                            'allowfullscreen': '',
+                            'width': '100%',
+                            'height': '100%',
+                            'frameborder': 0,
+                            'allow': 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+                            'referrerpolicy': 'strict-origin-when-cross-origin'
+                        });
+                        iframe.appendTo('.prod-hero-thumb-vid-inner');
                         gsap.to('.prod-hero-thumb-overlay, .prod-hero-thumb-btn', {
                             autoAlpha: 0, onComplete: () => {
                             $('.prod-hero-thumb-overlay').remove();
@@ -2259,6 +2288,7 @@ const mainScript = () => {
                         .from('.comp-hero-thumb-div', { autoAlpha: 0, scale: 1.2, duration: .8, clearProps: 'all' }, "<=.1")
                         .to(heroTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, "<=.1")
                         .to(heroDesc.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, "<=.1")
+                        .from('.comp-hero-btn .btn', { autoAlpha: 0, y: 20, duration: 1, stagger:  .1, clearProps: 'all' }, "<=.1")
                 }
                 scHero();
                 function scCompare() {
@@ -2381,10 +2411,6 @@ const mainScript = () => {
                             $('.ar-content-share-popup').removeClass('active');
                         }, 2000);
                     }
-
-                    if (viewport.w > 991) {
-                        $('.ar-content-cta').css('top', ($(window).height() - $('.ar-content-cta').height()) / 2)
-                    }
                 }
                 scContent();
 
@@ -2480,6 +2506,17 @@ const mainScript = () => {
             namespace: 'schedule',
             afterEnter() {
                 initMeetingsEmbedCode();
+
+
+                function marqueeLogo() {
+                    const cloneAmount = 2;
+                    new Array(cloneAmount).fill().forEach((_, index) => {
+                        let itemClone = $('.schedule-hero-client-cms-list').clone();
+                        $('.schedule-hero-client-cms').append(itemClone);
+                    })
+                    $('.schedule-hero-client-cms-list').addClass('animMarquee')
+                }
+                marqueeLogo();
             }
         }
     }

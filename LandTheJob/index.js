@@ -183,13 +183,41 @@ const script = () => {
     }
 
     scrollTop();
-    $('.loader').animate({ opacity: 0 }, 1000, () => $('.loader').remove());
+    $('.senja-embed').each((idx, el) => {
+        let id = $(el).attr('data-id');
+        setTimeout(() => {
+            $('<script/>', {
+                src: `https://widget.senja.io/widget/${id}/platform.js`,
+                type: 'text/javascript',
+                async: true
+            }).appendTo('body');
+            $(el).css('display', 'block');
+        }, $(window).width() < 767 ? 1000 : 300);
+    })
+    // let isLoaded = sessionStorage.getItem('isLoaded') === 'true' ? true : false;
+    // if (!isLoaded) {
+    //     if ($(window).width() < 767) {
+    //         $({foo:0}).animate({foo:100}, {
+    //             step: function(val) {
+    //                 $('.loader-logo-front').css('clip-path', `polygon(0 0, ${val}% 0, ${val}% 100%, 0% 100%)`)
+    //             },
+    //             duration: 1500,
+    //             complete: function() {
+    //                 $('.loader').animate({ opacity: 0 }, 1000, () => $('.loader').remove())
+    //                 sessionStorage.setItem('isLoaded', true);
+    //             }
+    //         });
+    //     }
+    //     else {
+    //         console.log(isLoaded)
+    //         $('.loader').animate({ opacity: 0 }, 1000, () => $('.loader').remove())
+    //     }
+    // }
     marquee($('.last-cta-strip-marquee-list'));
     const pageName = $('main.main').attr('data-namespace');
     if (pageName) {
         SCRIPT[`${pageName}Script`]();
     }
 }
-
 
 window.onload = script;
