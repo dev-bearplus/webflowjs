@@ -729,7 +729,6 @@ const mainScript = () => {
                 fields: [
                     { name: 'firstname', value: (data) => data['First-Name'] },
                     { name: 'lastname', value: (data) => data['Last-Name'] },
-                    { name: 'phone', value: (data) => data['Phone-Number'] },
                     { name: 'email', value: (data) => data['Business-Email'] },
                     { name: 'company', value: (data) => data['Company'] },
                     { name: 'document_whitepaper', value: (data) => data['Document-Whitepaper'] },
