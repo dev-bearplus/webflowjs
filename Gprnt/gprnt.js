@@ -331,23 +331,25 @@ const mainScript = () => {
       });
     }
     const handlePaginationClick = () => {
-      $('.about-list-post-pagi-item')?.each((idx, item) => {
-        $(item).on('click', function () {
-          if (!$(item).hasClass("w--current")) {
+      if (viewport.w > 767) {
+        $('.about-list-post-pagi-item')?.each((idx, item) => {
+          $(item).on('click', function () {
+            if (!$(item).hasClass("w--current")) {
+              handleScrollTop();
+            }
+          })
+        })
+        $('.about-list-post-pagi-next').on('click', function () {
+          if (!$(this).hasClass("is-list-pagination-disabled")) {
             handleScrollTop();
           }
         })
-      })
-      $('.about-list-post-pagi-next').on('click', function () {
-        if (!$(this).hasClass("is-list-pagination-disabled")) {
-          handleScrollTop();
-        }
-      })
-      $('.about-list-post-pagi-prev').on('click', function () {
-        if (!$(this).hasClass("is-list-pagination-disabled")) {
-          handleScrollTop();
-        }
-      })
+        $('.about-list-post-pagi-prev').on('click', function () {
+          if (!$(this).hasClass("is-list-pagination-disabled")) {
+            handleScrollTop();
+          }
+        })
+      }
     }
     const handleScrollTop = () => {
       lenis.scrollTo(0, {
