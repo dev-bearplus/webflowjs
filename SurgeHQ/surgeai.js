@@ -571,6 +571,10 @@ const mainScript = () => {
           transformOrigin: "center center",
           y: parseRem(80),
           autoAlpha: 0,
+          onComplete: () => {
+            //remove dive-hide
+            $card.removeClass('div-hide')
+          }
         });
         $card.each((idx, item) => {
           const tlCard = gsap.timeline({
