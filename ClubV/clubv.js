@@ -72,6 +72,17 @@ const mainScript = () => {
         navigator.msMaxTouchPoints > 0
         );
     };
+    window.addEventListener("pageshow", function (event) {
+        event.preventDefault();
+        var historyTraversal = event.persisted ||
+            (typeof window.performance != "undefined" &&
+                window.performance.navigation.type === 2);
+                console.log(historyTraversal)
+        if (historyTraversal) {
+            $('.header-menu-inner').removeAttr('style');
+            $('.header-menu-inner').removeClass('active');
+        }
+    })
     if (!isTouchDevice()) {
         $("html").attr("data-has-cursor", "true");
         window.addEventListener("pointermove", function (e) {
@@ -1647,8 +1658,13 @@ const mainScript = () => {
                     resetScrollPopup();
                 }
             })
-            $('.service-hero-popup-inner').on('scroll', ()=> {
+            $('.service-hero-popup-inner').on('scroll', (e)=> {
                 this.ItemContentActiveCheck('.service-hero-popup-inner.active h6');
+                if($(e.target).scrollTop()  < -80 && viewport.w < 768) {
+                    $('.service-hero-popup').removeClass('active');
+                    lenis.start();
+                    cursor.reset();
+                }
             })
             function resetScrollPopup() {
                 
@@ -1831,9 +1847,11 @@ const mainScript = () => {
                     resetScrollPopup();
                 }
             }) 
-            $('.work-popup-item').on('scroll', ()=> {
+            $('.work-popup-item').on('scroll', (e)=> {
                 this.ItemContentActiveCheck('.work-popup-item.active .work-popup-item-content h6');
+                console.log($(e.target).scrollTop())
                 if($(e.target).scrollTop()  < -80 && viewport.w < 768) {
+                    console.log('close')
                     $('.global-popup-wrap').removeClass('has-popup');
                     lenis.start();
                     cursor.reset();
@@ -2253,6 +2271,13 @@ const mainScript = () => {
             $('.event-hero-date-reset').on('click', (e) => {
                 e.preventDefault();
                 this.filterReset();
+            })
+            $('.event-popup-item').on('scroll', (e)=> {
+                if($(e.target).scrollTop()  < -80 && viewport.w < 768) {
+                    $('.global-popup-wrap').removeClass('has-popup');
+                    lenis.start();
+                    cursor.reset();
+                }
             })
         }
         activeTab(tagName) {
@@ -2820,7 +2845,7 @@ const mainScript = () => {
                     resetScrollPopup();
                 }
             }) 
-            $('.work-popup-item').on('scroll', ()=> {
+            $('.work-popup-item').on('scroll', (e)=> {
                 this.ItemContentActiveCheck('.work-popup-item.active .work-popup-item-content h6');
                 if($(e.target).scrollTop()  < -80 && viewport.w < 768) {
                     $('.global-popup-wrap').removeClass('has-popup');
@@ -3065,7 +3090,6 @@ const mainScript = () => {
                 onStart: () => {
                     console.log('init')
                     $('[data-init-df]').removeAttr('data-init-df');
-                    $('.header-menu-inner').removeClass('active')
                     this.init = true
                 },
                 onComplete(){
@@ -3167,12 +3191,9 @@ const mainScript = () => {
         }
         activeMenuTablet = () => {
             lenis.stop();
-            // gsap.to('.header-menu-inner', {duration: .8, opacity: 1, ease: "power2.out"});
             gsap.fromTo('.header-menu-label',{scale: 1.2}, {duration: .8, scale: 1, ease: "circ.inOut"});
             gsap.fromTo('.header-menu-list',{scale: 1.2}, {duration: 1, scale: 1, ease: "circ.inOut"});
-            // gsap.fromTo('.header-menu-bot',{scale: 1.2}, {duration: .8, scale: 1, ease: "circ.inOut"});
             gsap.fromTo('.header-menu-inner',{clipPath: 'polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)'}, {duration: 1, clipPath: 'polygon(0% 0%, 100% 0, 100% 100%, 0% 100%)', ease: "circ.inOut", onUpdate: function(){
-                console.log(this.progress());
                 if(this.progress() > .4) {
                     $('.header').removeClass('on-white');
                 }
