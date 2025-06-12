@@ -598,6 +598,8 @@ const mainScript = () => {
                     console.log($(this).scrollTop());
                     if($(this).scrollTop()  < -100 ){
                         $('.global-popup-wrap').removeClass('has-popup');
+                        lenis.start();
+                        cursor.reset();
                     }
                 })
             }
@@ -705,7 +707,7 @@ const mainScript = () => {
                 new MasterTimeline({
                     timeline: tlItem,
                     tweenArr: [
-                        new ScaleInset({ el: $(el).find('.home-featured-img-item-inner').get(0), onMask: true }),
+                        new ScaleInset({ el: $(el).find('.home-featured-img-item-inner').get(0)}),
                     ]
                 })
             })
@@ -1069,7 +1071,7 @@ const mainScript = () => {
                 tweenArr: [
                   new FadeSplitText({ el: $('.home-faq-label').get(0), onMask: true}),
                   new FadeSplitText({ el: $('.home-faq-title').get(0), onMask: true}),
-                  new FadeIn({ el: $('.home-faq-view-all').get(0), onMask: true}),
+                  new FadeIn({ el: $('.home-faq-view-all').get(0)}),
                   new FadeSplitText({ el: $('.home-faq-view-all-txt').get(0), onMask: true}),
                 ]
             })
@@ -1175,7 +1177,7 @@ const mainScript = () => {
                 tweenArr: [
                   new FadeSplitText({ el: $('.home-article-label').get(0), onMask: true}),
                   new FadeSplitText({ el: $('.home-article-title').get(0), onMask: true}),
-                  new FadeIn({ el: $('.home-article-view-all').get(0), onMask: true}),
+                  new FadeIn({ el: $('.home-article-view-all').get(0)}),
                   new FadeSplitText({ el: $('.home-article-view-all-txt').get(0), onMask: true}),
                 ]
             })
@@ -1599,7 +1601,7 @@ const mainScript = () => {
                 new MasterTimeline({
                     timeline: tlItem,
                     tweenArr: [
-                      new ScaleInset({ el: $(el).find('.service-hero-content-item-img').get(0), onMask: true }),
+                      new ScaleInset({ el: $(el).find('.service-hero-content-item-img').get(0)}),
                       new FadeSplitText({ el: $(el).find('.service-hero-content-item-title .txt').get(0), onMask: true, delay: 0.2 }),
                       new FadeSplitText({ el: $(el).find('.service-hero-content-item-sub').get(0), onMask: true, delay: 0.2 }),
                       new FadeSplitText({ el: $(el).find('.service-hero-content-item-link-txt').get(0), onMask: true })
@@ -1724,7 +1726,7 @@ const mainScript = () => {
                     allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $('.game-hero-sub').get(0), onMask: true }),
-                        new FadeIn({ el: $('.game-hero-title').get(0), onMask: true }),
+                        new FadeIn({ el: $('.game-hero-title').get(0) }),
                         new FadeSplitText({ el: $('.game-hero-machine').eq(0).find('.game-hero-machine-label').get(0), onMask: true }),
                         new ScaleInset({ el: $('.game-hero-img-item').get(0), duration: .6}),
                         new FadeIn({ el: $('.game-hero-right-link'), onStart: () => {
@@ -1829,6 +1831,8 @@ const mainScript = () => {
                 this.ItemContentActiveCheck('.work-popup-item.active .work-popup-item-content h6');
                 if($(this).scrollTop()  < -100 && viewport.w < 768) {
                     $('.global-popup-wrap').removeClass('has-popup');
+                    lenis.start();
+                    cursor.reset();
                 }
             })
             $('.work-popup-item-left-content').on('click', '.work-popup-item-left-title', function(e) {
@@ -2816,6 +2820,8 @@ const mainScript = () => {
                 this.ItemContentActiveCheck('.work-popup-item.active .work-popup-item-content h6');
                 if($(this).scrollTop()  < -100 && viewport.w < 768) {
                     $('.global-popup-wrap').removeClass('has-popup');
+                    lenis.start();
+                    cursor.reset();
                 }
             })
             $('.work-popup-item-left-content').on('click', '.work-popup-item-left-title', function(e) {
@@ -3248,7 +3254,7 @@ const mainScript = () => {
             new MasterTimeline({
                 timeline: tlImg,
                 tweenArr: [
-                    new ScaleInset({el: $('.footer-left-img-inner.active').get(0), onMask: true})
+                    new ScaleInset({el: $('.footer-left-img-inner.active').get(0)})
                 ]
             })
             let tlMenu = gsap.timeline({
