@@ -1412,7 +1412,7 @@ const mainScript = () => {
                 timeline: this.tl,
                 tweenArr: [
                     new FadeSplitText({ el: $('.contact-hero-title').get(0), onMask: true }),
-                    // new ScaleInset({ el: $('.contact-hero-right-img').get(0) }),
+                    
                     new FadeSplitText({ el: $('.contact-hero-label').get(0), onMask: true }),
                     new FadeSplitText({ el: $('.contact-hero-required').get(0), onMask: true }),
                     ...Array.from($('.contact-hero-form-label')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: idx == 0 ? 0 : 0.2 })),
@@ -1422,7 +1422,7 @@ const mainScript = () => {
                     ...Array.from($('.contact-hero-info-social .txt')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0),  delay: idx == 0 ? 0 : 0.2 })),
                     ...Array.from($('.contact-hero-info-social .contact-hero-social-item-link')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0),  delay: idx == 0 ? 0 : 0.2 })),
                     ...Array.from($('.contact-hero-content-bot .txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true,  delay: idx == 0 ? 0 : 0.2 })),
-                    ...Array.from($('.contact-hero-right-content .txt')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0), onMask: true,  delay: idx == 0? 0 : 0.2 })),
+                    ...Array.from($('.contact-hero-right-content .txt')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0) })),
                 ]
             })
             this.autosize();
@@ -1652,6 +1652,7 @@ const mainScript = () => {
                 resetScrollPopup();
             })
             $('.service-hero-popup').on('click', function(e) {
+                console.log('khánhdfas');
                 if($(e.target).closest('.service-hero-popup-inner').length == 0) {
                     $(this).removeClass('active');
                     lenis.start();
@@ -3375,7 +3376,7 @@ const mainScript = () => {
         }
         interact() {
             let zIndexVal = 1;
-            $('.footer-app-link').hover(
+            viewport.w > 991 && $('.footer-app-link').hover(
                 function() {
                     zIndexVal++;
                     let attr = $(this).attr('data-app');
