@@ -804,13 +804,14 @@ const mainScript = () => {
                 $('.home-featured-img-wrap').addClass('swiper');
                 $('.home-featured-img-inner').addClass('swiper-wrapper');
                 $('.home-featured-img-item').addClass('swiper-slide');
-                $('.home-featured-img-wrap').append('<div class="global-swiper-pagination"></div>')
+                $('.home-featured-img-wrap').append('<div class="home-featured-pagination"></div>')
+                let totalSlide = $('.home-featured-img-item').length;
                 let swiper = new Swiper(".home-featured-img-wrap", {
                     slidesPerView: 1,
                     spaceBetween: parseRem(40),
                     initialSlide: 1,
                     pagination: {
-                        el: '.global-swiper-pagination',
+                        el: '.home-featured-pagination',
                         bulletClass: 'global-swiper-pagination-item',
                         bulletActiveClass: 'active',
                         clickable: true,
@@ -822,7 +823,7 @@ const mainScript = () => {
                         },
                         slideChange: function(){
                             let index = this.realIndex;
-                            activeItem(['.home-featured-left-inner'], index)
+                            activeItem(['.home-featured-left-inner'], totalSlide - index - 1);
                         }
                     }
 
@@ -1474,7 +1475,7 @@ const mainScript = () => {
                         $('textarea').val('');
                         $('.contact-hero-form-success').fadeOut(300);
                         $('.contact-hero-form-submit-wrap').removeClass('disabled');
-                    }, 5000)
+                    }, 10000)
                 }
                 
             })
@@ -1703,8 +1704,7 @@ const mainScript = () => {
             this.interact();
             super.init(this.play.bind(this));
         }
-        setup() {
-            
+        setup() {    
             if( viewport.w > 767) {
                 let machineTitle = new SplitType('.game-hero-machine-title .txt-inline', {types: 'lines, words', lineClass: 'bp-line'});
                 let currentIndex = -1;
@@ -1793,6 +1793,7 @@ const mainScript = () => {
                     },
                 })
             }
+            this.initContentPopup();
         }
         interact() {
             $('.game-hero-img-item').on('click', function(e) {
@@ -1824,6 +1825,29 @@ const mainScript = () => {
                     resetScrollPopup();
                 }
             }) 
+            $('.work-popup-item').on('scroll', ()=> {
+                this.ItemContentActiveCheck('.work-popup-item.active .work-popup-item-content h6');
+                if($(this).scrollTop()  < -100 && viewport.w < 768) {
+                    $('.global-popup-wrap').removeClass('has-popup');
+                }
+            })
+            $('.work-popup-item-left-content').on('click', '.work-popup-item-left-title', function(e) {
+                e.preventDefault();
+                $('.work-popup-item-left-title').removeClass('active');
+                $(this).addClass('active');
+                let dataHeader = $(this).attr('data-title');
+                var scrollTop =  $('.work-popup-item.active').scrollTop() - $('.work-popup-item.active').offset().top + $(`.work-popup-item.active .work-popup-item-content h6[data-title="${dataHeader}"]`).offset().top   - parseFloat($('.work-popup-item-left-inner').css('top'));
+                $('.work-popup-item.active').animate({
+                    scrollTop: scrollTop
+                }, 1000);
+            })
+            function resetScrollPopup() {
+                setTimeout(() => {
+                    $('.service-hero-popup-inner').animate({
+                        scrollTop: 0
+                    }, 0);
+                }, 500);
+            }
         }
         activeTitle(index, direction) {
             activeItem(['.game-hero-machine-title'], index);
@@ -1839,6 +1863,33 @@ const mainScript = () => {
                 gsap.to($('.game-hero-machine-title').eq(index).find('.word'), {yPercent: 0, opacity: 1, delay: '.1', duration:.4, stagger:.01, ease: 'power1.out'})
                 gsap.to($('.game-hero-machine-title').eq(index).find('.game-hero-title-ic').find('img'), {yPercent: 0, opacity: 1, delay: '.1', duration:.4, ease: 'power1.out'})
             }
+        }
+        initContentPopup() {
+            let titleLeft = $('.work-popup-item-left-title').eq(0).clone();
+            $('.work-popup-item-left-title').remove();
+            $('.work-popup-item').each((idx, item) => {
+                let titlePopupHeight = $(item).find('.work-popup-item-title').outerHeight(true);
+                let heightLeftInner = viewport.h - titlePopupHeight;
+                $(item).find('.work-popup-item-left-inner').css('height', heightLeftInner);
+                $(item).find('.work-popup-item-left-inner').css('top', titlePopupHeight);
+                $(item).find('.work-popup-item-content h6').each((i, el) => {
+                    $(el).attr('data-title', `toch-${i}`);
+                    let titleLeftClone = titleLeft.clone();
+                    if(i == 0) {
+                        titleLeftClone.addClass('active');
+                    }
+                    $(item).find('.work-popup-item-left-content').append(titleLeftClone.text($(el).text()).attr('data-title', `toch-${i}`));
+                })
+            })
+        }
+        ItemContentActiveCheck(el) {
+            for (let i = 0; i < $(el).length; i++) {
+                let top = $(el).eq(i).get(0).getBoundingClientRect().top;
+                if (top > 0 && top + $(el).eq(i).height() < viewport.h/4*3 ) {
+                    $('.work-popup-item.active .work-popup-item-left-content .work-popup-item-left-title').removeClass('active');
+                    $('.work-popup-item.active .work-popup-item-left-content .work-popup-item-left-title').eq(i).addClass('active');
+                }
+                }
         }
         play() {
             this.tl.play();
@@ -2274,6 +2325,9 @@ const mainScript = () => {
                         $div.addClass("active");
                         arrDateFilter.push(formatDate(currentDate));
                         $('.event-hero-date-filter-item').removeClass('active');
+                        if(viewport.w < 991) {
+                            $('.event-calendar-list').removeClass('active');
+                        }
                         this.filterEvents(arrDateFilter);
                     });
         
@@ -2332,7 +2386,6 @@ const mainScript = () => {
                             itemDate.getMonth() === month &&
                             itemDate.getDate() === day
                         ) {
-                            
                             $(el).addClass('active');
                         }
                         this.filterEvents(getDateRangeArray(today, today));
@@ -2760,14 +2813,17 @@ const mainScript = () => {
                 }
             }) 
             $('.work-popup-item').on('scroll', ()=> {
-                this.ItemContentActiveCheck('.work-popup-item.active .work-popup-item-content h5');
+                this.ItemContentActiveCheck('.work-popup-item.active .work-popup-item-content h6');
+                if($(this).scrollTop()  < -100 && viewport.w < 768) {
+                    $('.global-popup-wrap').removeClass('has-popup');
+                }
             })
             $('.work-popup-item-left-content').on('click', '.work-popup-item-left-title', function(e) {
                 e.preventDefault();
                 $('.work-popup-item-left-title').removeClass('active');
                 $(this).addClass('active');
                 let dataHeader = $(this).attr('data-title');
-                var scrollTop =  $('.work-popup-inner').scrollTop() - $('.work-popup-inner').offset().top + $(`.work-popup-item-left-content .work-popup-item-left-title[data-title="${dataHeader}"]`).offset().top   - parseFloat($('.work-popup-item-left-content').css('top'));
+                var scrollTop =  $('.work-popup-item.active').scrollTop() - $('.work-popup-item.active').offset().top + $(`.work-popup-item.active .work-popup-item-content h6[data-title="${dataHeader}"]`).offset().top   - parseFloat($('.work-popup-item-left-inner').css('top'));
                 $('.work-popup-item.active').animate({
                     scrollTop: scrollTop
                 }, 1000);
@@ -2788,7 +2844,7 @@ const mainScript = () => {
                 let heightLeftInner = viewport.h - titlePopupHeight;
                 $(item).find('.work-popup-item-left-inner').css('height', heightLeftInner);
                 $(item).find('.work-popup-item-left-inner').css('top', titlePopupHeight);
-                $(item).find('.work-popup-item-content h5').each((i, el) => {
+                $(item).find('.work-popup-item-content h6').each((i, el) => {
                     $(el).attr('data-title', `toch-${i}`);
                     let titleLeftClone = titleLeft.clone();
                     if(i == 0) {
@@ -2833,10 +2889,8 @@ const mainScript = () => {
                 ease: 'none'
             })
             lenis.on('scroll', ({ velocity }) => {
-                // velocity thường là số dương nhỏ, có thể âm nếu scroll ngược
-                // Chúng ta lấy trị tuyệt đối, giới hạn speed từ 0.5 đến 3 để không quá nhanh/chậm
                 const speed = Math.min(Math.max(Math.abs(velocity) * 2, 0.5), 3)
-                tl.timeScale(speed) // điều chỉnh tốc độ timeline theo scroll velocity
+                tl.timeScale(speed)
               })
         }
     }
@@ -3001,6 +3055,7 @@ const mainScript = () => {
                 onStart: () => {
                     console.log('init')
                     $('[data-init-df]').removeAttr('data-init-df');
+                    $('.header-menu-inner').removeClass('active')
                     this.init = true
                 },
                 onComplete(){
@@ -3068,7 +3123,6 @@ const mainScript = () => {
             }
             else {
                 $(".header-menu-title-wrap").on("click", (e) => {
-                    console.log('click');   
                     e.preventDefault();
                     if($('.header-menu-inner').hasClass('active')){
                         
@@ -3102,6 +3156,7 @@ const mainScript = () => {
             }
         }
         activeMenuTablet = () => {
+            lenis.stop();
             // gsap.to('.header-menu-inner', {duration: .8, opacity: 1, ease: "power2.out"});
             gsap.fromTo('.header-menu-label',{scale: 1.2}, {duration: .8, scale: 1, ease: "circ.inOut"});
             gsap.fromTo('.header-menu-list',{scale: 1.2}, {duration: 1, scale: 1, ease: "circ.inOut"});
@@ -3114,9 +3169,9 @@ const mainScript = () => {
             }});
         }
         deactiveMenuTablet = () => {
+            lenis.start();
             gsap.fromTo('.header-menu-label',{scale: 1}, {duration: .8, scale: .8, ease: "circ.inOut"});
             gsap.fromTo('.header-menu-list',{scale: 1}, {duration: 1, scale: .8, ease: "circ.inOut"});
-            // gsap.fromTo('.header-menu-bot',{scale: 1}, {duration: .8, scale: .8, ease: "circ.inOut"});
             gsap.fromTo('.header-menu-inner',{clipPath: 'polygon(0% 0%, 100% 0, 100% 100%, 0% 100%)'}, {duration: 1, clipPath: 'polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)', ease: "circ.inOut", onComplete: () => {
             $('.header').removeClass('on-mode');
             }, onUpdate: function() {
@@ -3237,7 +3292,7 @@ const mainScript = () => {
                 timeline: tlApp,
                 tweenArr: [
                     ...Array.from($('.footer-app .txt')).flatMap((el, i) => new FadeSplitText({ el: $(el).get(0), onMask: true, delay: i == 0 ? 0 : .2}),),
-                    new FadeIn({el: $('.footer-touch-ic').get(0), onMask: true}),
+                    new FadeIn({el: $('.footer-touch-ic').get(0)}),
                     new FadeSplitText({ el: $('.footer-touch-txt').get(0), onMask: true})
                 ]
             })
@@ -3258,7 +3313,7 @@ const mainScript = () => {
                     })  ,
                     ...Array.from($('.footer-info .footer-info-item-social-ic')).flatMap((el, i) => {
                         return [
-                            new FadeIn({ el: $(el).get(0), onMask: true, delay: i == 0? 0 :.05}),
+                            new FadeIn({ el: $(el).get(0), delay: i == 0? 0 :.05}),
                         ]
                     })     
                 ]
@@ -3275,7 +3330,7 @@ const mainScript = () => {
                 tweenArr: [
                     ...Array.from($('.footer-left-social-list .txt')).flatMap((el, i) => {
                         return [
-                            new FadeIn({ el: $(el).get(0), onMask: true, delay: i == 0? 0 :.05}),
+                            new FadeIn({ el: $(el).get(0), delay: i == 0? 0 :.05}),
                         ]
                     }),
                     ...Array.from($('.footer-copyright-wrap .txt')).flatMap((el, i) => {
