@@ -7,9 +7,9 @@ const mainScript = () => {
         return this.attr(name) !== undefined;
     };
 
-    barba.use(barbaPrefetch);
+    // barba.use(barbaPrefetch);
     gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
-    const GLOBAL_DELAY = 1.5;
+    const GLOBAL_DELAY = 0;
 
     const lenis = new Lenis({})
 
@@ -105,7 +105,7 @@ const mainScript = () => {
                             offset: -100
                         })
                     }, 500);
-                    barba.history.add(`${window.location.pathname + target}`, 'barba', 'replace');
+                    // barba.history.add(`${window.location.pathname + target}`, 'barba', 'replace');
                 } else {
                     scrollTop()
                 }
@@ -791,7 +791,7 @@ const mainScript = () => {
         $("a").each(function (index, link) {
             if ($(this).attr('data-sub-link') && (!$(this).attr('href').includes('#')) && (!$(this).attr('href').includes('sc'))) {
                 $(this).attr('href', `${$(this).attr('href')}#${$(this).attr('data-sub-link')}`);
-                $(this).attr('data-barba-history', 'replace');
+                // $(this).attr('data-barba-history', 'replace');
             }
 
             const [urlPath, anchor] = $(this).attr('href').includes('#') ? $(this).attr('href').split('#') : $(this).attr('href').includes('sc') ? $(this).attr('href').split('?sc=') : [$(this).attr('href'), ''];
@@ -805,14 +805,15 @@ const mainScript = () => {
                     $(this).attr('href', `${window.location.pathname}#${anchor}`);
                 }
                 else {
-                    $(this).attr('href', `${urlPath}?sc=${anchor}`);
+                    //comment for disable barba
+                    // $(this).attr('href', `${urlPath}?sc=${anchor}`);
                 }
             }
         });
 
         $('a').on('click', function (e) {
             if ($(this).attr('data-sub-link')) {
-                barba.history.add(`${window.location.pathname + `#${$(this).attr('data-sub-link')}`}`, 'barba', 'replace');
+                // barba.history.add(`${window.location.pathname + `#${$(this).attr('data-sub-link')}`}`, 'barba', 'replace');
 
                 requestAnimationFrame(() => {
                     setTimeout(() => {
@@ -941,11 +942,7 @@ const mainScript = () => {
         }
     }
 
-    let isAnimFooter = false;
     function animFooter() {
-        if (isAnimFooter) return;
-        isAnimFooter = true;
-
         let titleCta = splitTextFadeUpSetup('.footer-cta-title-txt', { type: 'lines, words' });
         let addressLabel = splitTextFadeUpSetup('.footer-main-address-label', { type: 'lines, words' });
         let addressTxt = splitTextFadeUpSetup('.footer-main-address-txt', { type: 'lines, words' });
@@ -995,9 +992,6 @@ const mainScript = () => {
                     trigger: item,
                     start: 'top top+=85%',
                     default: { ease: 'power2.out' },
-                    onComplete: () => {
-                        isAnimFooter = false;
-                    }
                 }
             })
             requestAnimationFrame(() => {
@@ -1015,7 +1009,6 @@ const mainScript = () => {
                 onComplete: () => {
                     footerCopyright.revert();
                     footerTermLink.revert();
-                    isAnimFooter = false;
                 }
             }
         })
@@ -1787,7 +1780,7 @@ const mainScript = () => {
                             $("html, body").animate({ scrollTop: targetTop }, 1200, 'exponentialEaseOut');
                         }
 
-                        barba.history.add(`${window.location.pathname + target}`, 'barba', 'replace');
+                        // barba.history.add(`${window.location.pathname + target}`, 'barba', 'replace');
                         return false;
                     })
 
@@ -1798,7 +1791,7 @@ const mainScript = () => {
                         }, 10)
                     }
                     else {
-                        barba.history.add(`${window.location.pathname}`, 'barba', 'replace');
+                        // barba.history.add(`${window.location.pathname}`, 'barba', 'replace');
                     }
                     $('.data-content-toc-wrap').height() >= viewport.h && $('.data-content-toc').attr('data-lenis-prevent', '');
                 }
@@ -1829,7 +1822,6 @@ const mainScript = () => {
                 }
                 scHero();
             }
-
         },
         article: {
             namespace: 'article',
@@ -1964,7 +1956,7 @@ const mainScript = () => {
                         activeIndex(index);
                         $(this).find('.ins-listing-cms-item-link').addClass('w--current').parent().siblings().find('.ins-listing-cms-item-link').removeClass('w--current');
                         let id = $(this).find('.ins-listing-cms-item-link').attr('id');
-                        barba.history.add(`${window.location.pathname + `#${id}`}`, 'barba', 'replace');
+                        // barba.history.add(`${window.location.pathname + `#${id}`}`, 'barba', 'replace');
                     })
                     if (viewport.w <= 767) {
                         $('.ins-listing-content-cms').each((_, item) => {
@@ -2618,14 +2610,12 @@ const mainScript = () => {
         resetScroll();
         getAllScrollTrigger("refresh");
 
-        isAnimFooter = false;
         gsap.timeline({
             scrollTrigger: {
                 trigger: '.footer',
                 start: 'top bottom+=100vh',
                 once: true,
                 scrub: false,
-                onEnter: () => viewport.w > 767 && animFooter()
             }
         })
         reinitializeWebflow();
@@ -2650,72 +2640,76 @@ const mainScript = () => {
         setTimeout(() => {
             initAllForm();
             initAllPopup();
-            gsap.to('.loading', { opacity: 0, duration: .4, onComplete: () => setTimeout(() => {$('.loading').remove()}, 1000)});
+            gsap.to('.loading', { opacity: 0, duration: 0, onComplete: () => setTimeout(() => {$('.loading').remove()}, 1000)});
             $('[data-init-hidden]').removeAttr('data-init-hidden');
         }, 500);
         if (viewport.w > 767) {
             setTimeout(initAnimation, 500);
             documentHeightObserver('init');
-            gsap.timeline({
-                scrollTrigger: {
-                    trigger: '.footer',
-                    start: 'top bottom+=100vh',
-                    once: true,
-                    scrub: false,
-                    onEnter: () => animFooter()
-                }
-            })
+            animFooter();
         }
     }
 
     const VIEWS = Object.values(SCRIPTS);
 
-    barba.init({
-        debug: true,
-        timeout: 5000,
-        preventRunning: true,
-        transitions: [{
-            name: 'default-transition',
-            sync: true,
-            once(data) {
-                console.log('once global')
-                initOnce();
-            },
-            enter(data) {
-                console.log('enter global')
-            },
-            after(data) {
-                console.log('after global')
-            },
-            afterEnter(data) {
-                setTimeout(() => {
-                    $('[data-init-hidden]').removeAttr('data-init-hidden');
-                }, 1000);
-                setTimeout(initAllPopup, 500);
-                if (viewport.w > 767) {
-                    initAnimation();
-                }
-            },
-            beforeLeave({ current }) {
-                console.log('before leave global')
-            },
-            leave(data) {
-                console.log('leave global')
-                // await leaveTransition(data).then(() => {
-                //     enterTransition(data);
-                // });
-                updateAfterTrans(data);
-                setTimeout(() => {
-                    HEADER.toggleHide(lenis);
-                    HEADER.toggleScroll(lenis);
-                }, 300);
-            },
-            afterLeave(data) {
-                console.log('after leave global')
+    const initScriptPage = () => {
+        const dataNamespace = $('[data-barba-namespace]').attr('data-barba-namespace');
+        VIEWS.forEach(page => {
+            if (dataNamespace == page.namespace) {
+                page.afterEnter();
             }
-        }],
-        views: VIEWS
-    })
+        });
+    }
+
+    initOnce();
+    initScriptPage();
+
+    // barba.init({
+    //     debug: true,
+    //     timeout: 5000,
+    //     preventRunning: true,
+    //     transitions: [{
+    //         name: 'default-transition',
+    //         sync: true,
+    //         once(data) {
+    //             console.log('once global')
+    //             initOnce();
+    //         },
+    //         enter(data) {
+    //             console.log('enter global')
+    //         },
+    //         after(data) {
+    //             console.log('after global')
+    //         },
+    //         afterEnter(data) {
+    //             setTimeout(() => {
+    //                 $('[data-init-hidden]').removeAttr('data-init-hidden');
+    //             }, 1000);
+    //             setTimeout(initAllPopup, 500);
+    //             if (viewport.w > 767) {
+    //                 initAnimation();
+    //             }
+    //         },
+    //         beforeLeave({ current }) {
+    //             console.log('before leave global')
+    //         },
+    //         leave(data) {
+    //             console.log('leave global')
+    //             // await leaveTransition(data).then(() => {
+    //             //     enterTransition(data);
+    //             // });
+    //             updateAfterTrans(data);
+    //             setTimeout(() => {
+    //                 HEADER.toggleHide(lenis);
+    //                 HEADER.toggleScroll(lenis);
+    //             }, 300);
+    //         },
+    //         afterLeave(data) {
+    //             console.log('after leave global')
+    //         }
+    //     }],
+    //     views: VIEWS
+    // })
 }
 window.onload = mainScript
 
