@@ -100,7 +100,7 @@ const mainScript = () => {
         toggleHide: (inst) => {
             const scrollTop = document.documentElement.scrollTop || window.scrollY
             if ($('.header').hasClass('active')) return;
-            const isScrollHeader = scrollTop > $('.header-container').height() * (viewport.w > 767 ? 4 : 1.5)
+            const isScrollHeader = scrollTop > $('.header-container').height() * (viewport.w > 767 ? 5 : 1.5)
             let debounceTimer;
 
             debounceTimer && clearTimeout(debounceTimer);
@@ -179,7 +179,8 @@ const mainScript = () => {
             tl
                 .set('.loader', { autoAlpha: 1 })
                 .set('.faybl-logo', { opacity: 0 })
-                .fromTo('.loader', { yPercent: 100 }, { yPercent: 0, duration: .6, ease: 'circ.in' })
+                .fromTo('.loader', { clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)' }, { clipPath: 'polygon(0% 100%, 100% 100%, 100% 0%, 0% 0%)', duration: .6, ease: 'circ.in' })
+                .fromTo('.main', { y: 0 }, { y: -200, duration: .8, ease: 'circ.in', clearProps: 'all' }, 0.2)
         })
     }
     class TriggerSetup {
@@ -278,9 +279,13 @@ const mainScript = () => {
                     setTimeout(() => play(), viewport.w > 767 ? 2000 : 1200);
                 }
             });
+            // gsap.set('.loader', { yPercent: 0 });
+            gsap.set('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' })
+            gsap.set('.main', { y: 200 })
             tl
-                .fromTo('.loader', { yPercent: 0 }, { yPercent: -100, duration: .8, delay: viewport.w > 767 ? 1.6 : 1, ease: 'quart.in' })
-                .fromTo('.faybl-logo', { y: 0 }, { y: viewport.h + 20, duration: .8, ease: 'quart.in' }, '<=0')
+                .to('.loader',{ clipPath: 'polygon(0% 0%, 100% 0%, 100% 0%, 0 0%)', delay: viewport.w > 767 ? 1.6 : 1,  duration: .8, ease: 'quart.in' })
+                .to('.faybl-logo', { y: 5, duration: .8, ease: 'quart.in' }, '<=0')
+                .to('.main', { y: 0, duration: 1, clearProps: 'all' }, viewport.w > 767 ? 1.6 : 1)
 
             window.addEventListener("pageshow", function (event) {
                 event.preventDefault();
@@ -289,7 +294,7 @@ const mainScript = () => {
                         window.performance.navigation.type === 2);
                 if (historyTraversal) {
                     const href = window.location.href;
-                    gsap.fromTo('.loader', { yPercent: 0 }, { yPercent: 100, delay: 1, duration: .5, ease: 'circ.in' })
+                    gsap.fromTo('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' }, { clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)', delay: 1, duration: .5, ease: 'circ.in' })
                 }
             })
         }
