@@ -423,17 +423,17 @@ const mainScript = () => {
             super.init(this.play.bind(this));
         }
         setup() {
-            new MasterTimeline({
-                timeline: this.tl,
-                allowMobile: true,
-                tweenArr: [
-                    new FadeSplitText({ el: $('.home-hero-year').get(0), onMask: true }),
-                    new FadeSplitText({ el: $('.home-hero-title').get(0), onMask: true, headingType: true, delay: '<=0' }),
-                    new FadeSplitText({ el: $('.home-hero-intro-label').get(0), onMask: true, delay: '<=.1' }),
-                    new FadeSplitText({ el: $('.home-hero-intro-body').get(0), onMask: true, delay: '<=.1' }),
+            // new MasterTimeline({
+            //     timeline: this.tl,
+            //     allowMobile: true,
+            //     tweenArr: [
+            //         new FadeSplitText({ el: $('.home-hero-year').get(0), onMask: true }),
+            //         new FadeSplitText({ el: $('.home-hero-title').get(0), onMask: true, headingType: true, delay: '<=0' }),
+            //         new FadeSplitText({ el: $('.home-hero-intro-label').get(0), onMask: true, delay: '<=.1' }),
+            //         new FadeSplitText({ el: $('.home-hero-intro-body').get(0), onMask: true, delay: '<=.1' }),
                     
-                ]
-            });
+            //     ]
+            // });
         }
         play() {
             this.tl.play();
@@ -605,7 +605,6 @@ const mainScript = () => {
                 $('.home-senses-bg-item-content-link').on('click', function(e){
                     let index = $(this).closest('.home-senses-bg-item').index();
                     $('.header').addClass('on-hide');
-                    lenis.stop();
                     activeItem(['.home-popup-item'], index);
                     $(".global-popup-wrap").addClass('has-popup');
                     lenis.stop();
