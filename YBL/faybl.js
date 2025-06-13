@@ -279,7 +279,6 @@ const mainScript = () => {
                     setTimeout(() => play(), viewport.w > 767 ? 2000 : 1200);
                 }
             });
-            // gsap.set('.loader', { yPercent: 0 });
             gsap.set('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' })
             gsap.set('.main', { y: 200 })
             tl
