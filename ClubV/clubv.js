@@ -480,8 +480,9 @@ const mainScript = () => {
                     once: true,
                 },
             });
-            new MasterTimeline({
+            viewport.w > 991 && new MasterTimeline({
                 timeline: tl,
+                allowMobile: false,
                 tweenArr: [
                     new FadeSplitText({ el: $('.home-explore-title').get(0), onMask: true })
                 ]
@@ -1342,7 +1343,8 @@ const mainScript = () => {
                         console.log(self.realIndex);
                         activeContent(self.realIndex + 1)
                     });
-                    $('.mb-hero-card-item').on('click', function(){
+                    $('.mb-hero-card-item').on('click', function(e){
+                        e.preventDefault();
                         let index = $(this).index();
                         swiper.slideTo(index);
                     })
