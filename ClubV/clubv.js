@@ -10,7 +10,14 @@ const mainScript = () => {
         const scrollY = window.scrollY || window.pageYOffset
         console.log(scrollY)
         return scrollY >= element.offset().top - offset
-      }
+    }
+    function debounce(fn, delay) {
+    let timer = null;
+    return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+    }
       
     function raf(time) {
         lenis.raf(time);
@@ -1279,6 +1286,11 @@ const mainScript = () => {
                 let swiper = new Swiper(".mb-hero-card-wrap", {
                     slidesPerView: 'auto',
                     spaceBetween: parseRem(0),
+                    breakpoints: {
+                        768: {
+                            spaceBetween: parseRem(16),
+                        }
+                    },
                     on: {
                         slideChange: function () {
                             console.log('Slide index changed to: ', swiper.realIndex);
@@ -1342,33 +1354,32 @@ const mainScript = () => {
                         })
                     }
                 }
-            
+            const addSticky = debounce(() => {
+                $(".mb-hero-card-wrap").addClass("on-sticky");
+                ScrollTrigger.refresh();
+            }, 100); 
+                
+            const removeSticky = debounce(() => {
+            $(".mb-hero-card-wrap").removeClass("on-sticky");
+                ScrollTrigger.refresh();
+            }, 100);
             let tl = gsap.timeline({
                 paused: true,
                 scrollTrigger: {
-                    trigger: ".mb-hero-card-main",
-                    start: "top top",
-                    endTrigger: ".mb-hero-content-wrap",
-                    end: "bottom+=5% bottom",
-                    onEnter: () => {
-                        $(".mb-hero-card-wrap").addClass('on-sticky');
-                        ScrollTrigger.refresh();
-                    },
-                    onEnterBack: () => {
-                        $(".mb-hero-card-wrap").addClass('on-sticky');
-                        ScrollTrigger.refresh();
-                    },
-                    onLeaveBack: () => {
-                        $(".mb-hero-card-wrap").removeClass('on-sticky');
-                        ScrollTrigger.refresh();
-                    },
-                    onLeave: () => {
-                        // $(".mb-hero-card-wrap").removeClass('on-sticky');
-                        ScrollTrigger.refresh();
-                    }
+                  trigger: ".mb-hero-card-main",
+                  start: "top top",
+                  endTrigger: ".mb-hero-content-wrap",
+                  end: "bottom+=5% bottom",
+                  onEnter: addSticky,
+                  onEnterBack: addSticky,
+                  onLeaveBack: removeSticky,
+                  onLeave: debounce(() => {
+                    ScrollTrigger.refresh();
+                  }, 200)
                 },
             });
-            tl.play(); 
+            tl.play();
+              
         }
         interact() {
             if(viewport.w < 768) {
@@ -3282,7 +3293,7 @@ const mainScript = () => {
                         $('.mb-hero-card-main').removeClass('on-top');
                     }
                 }
-            }, 100);
+            }, 500);
         }
     }
     const header = new Header('.header'); 

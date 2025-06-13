@@ -4347,49 +4347,48 @@ const mainScript = () => {
         thankGetFaq();
     }
     SCRIPT.guaranteeScript = () => {
-        $('.guarantee-fee-form-input').on('input', function () {
-            let fee = $(this).val();
-        
-            // 1. Xoá toàn bộ ký tự không phải số hoặc dấu chấm / phẩy
-            let cleanedFee = fee.replace(/[^\d.,]/g, '');
-        
-            // 2. Nếu có cả ',' và '.', chỉ giữ dấu cuối cùng
-            const lastComma = cleanedFee.lastIndexOf(',');
-            const lastDot = cleanedFee.lastIndexOf('.');
-            
-            if (lastComma > -1 && lastDot > -1) {
-                // Giữ dấu xuất hiện sau cùng
-                if (lastComma > lastDot) {
-                    cleanedFee = cleanedFee.replace(/\./g, ''); // xoá hết dấu chấm
-                    cleanedFee = cleanedFee.replace(/(,)(?=.*\,)/g, ''); // giữ dấu phẩy cuối
+        const sgdToUsd = parseFloat($('.sgd-to-usd').text());
+        const usdToSgd = 1/sgdToUsd;
+        function guaranteeFee() {
+            $('.guarantee-fee-form-input').on('input', function () {
+                let fee = $(this).val();
+                // clean all text
+                let cleanedFee = fee.replace(/[^\d.,]/g, '');
+                const lastComma = cleanedFee.lastIndexOf(',');
+                const lastDot = cleanedFee.lastIndexOf('.');
+                // function only get one dot or one comma
+                if (lastComma > -1 && lastDot > -1) {
+                    if (lastComma > lastDot) {
+                        cleanedFee = cleanedFee.replace(/\./g, ''); 
+                        cleanedFee = cleanedFee.replace(/(,)(?=.*\,)/g, '');
+                    } else {
+                        cleanedFee = cleanedFee.replace(/\,/g, ''); 
+                        cleanedFee = cleanedFee.replace(/(\.)(?=.*\.)/g, '');
+                    }
                 } else {
-                    cleanedFee = cleanedFee.replace(/\,/g, ''); // xoá hết dấu phẩy
-                    cleanedFee = cleanedFee.replace(/(\.)(?=.*\.)/g, ''); // giữ dấu chấm cuối
+                    cleanedFee = cleanedFee
+                        .replace(/,/g, (match, offset) => offset === 0 ? '' : ',') 
+                        .replace(/(,)(?=.*\,)/g, '') 
+                        .replace(/\./g, (match, offset) => offset === 0 ? '' : '.') 
+                        .replace(/(\.)(?=.*\.)/g, ''); 
                 }
-            } else {
-                // Chỉ có 1 loại dấu => chỉ giữ dấu đầu tiên
-                cleanedFee = cleanedFee
-                    .replace(/,/g, (match, offset) => offset === 0 ? '' : ',') // không cho bắt đầu bằng ,
-                    .replace(/(,)(?=.*\,)/g, '') // chỉ giữ 1 dấu ,
-                    .replace(/\./g, (match, offset) => offset === 0 ? '' : '.') // không cho bắt đầu bằng .
-                    .replace(/(\.)(?=.*\.)/g, ''); // chỉ giữ 1 dấu .
-            }
-        
-            // 3. Nếu vẫn bắt đầu bằng dấu thì xoá
-            if (cleanedFee.startsWith(',') || cleanedFee.startsWith('.')) {
-                cleanedFee = cleanedFee.substring(1);
-            }
-        
-            // 4. Cập nhật lại input nếu có thay đổi
-            if (fee !== cleanedFee) {
-                $(this).val(cleanedFee);
-                fee = cleanedFee;
-            }
-        
-            // 5. Cập nhật text hiển thị
-            $('.guarantee-fee-form-input-val').text(fee);
-        });
-        
+                if (cleanedFee.startsWith(',') || cleanedFee.startsWith('.')) {
+                    cleanedFee = cleanedFee.substring(1);
+                }
+                // update value input
+                if (fee !== cleanedFee) {
+                    $(this).val(cleanedFee);
+                    fee = cleanedFee;
+                }
+                $('.guarantee-fee-form-input-val').text(fee);
+            });
+            $('.guarantee-fee-convert-ic').on('click', function () {
+                
+            })
+        }
+        function sgdToUsd(value) {
+            return parseFloat(value) * 0.000043;
+        }
         guaranteeFee();
     }
     const pageName = $('.main').attr('data-barba-namespace');
