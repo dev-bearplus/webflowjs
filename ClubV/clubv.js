@@ -998,7 +998,7 @@ const mainScript = () => {
             })
 
             $('.home-service-item').each((idx, el) => {
-                let linkItem = $(el).find('.home-service-item-link');
+                let linkItem = $(el).find('.home-service-item-inner');
                 let linkItemHref = linkItem.attr('href');
                 let dataLinkItem = linkItem.attr('data-link-item');
                 linkItem.attr('href', `${linkItemHref}?detail=${dataLinkItem}`);
