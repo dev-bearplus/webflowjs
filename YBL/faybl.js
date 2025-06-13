@@ -162,9 +162,11 @@ const mainScript = () => {
 
     const enterLeaveTransition = () => {
         $("a:not([data-link-prevent])").on('click', function (e) {
+            let isLoaded = sessionStorage.getItem('isLoaded');
             const href = $(this).attr('href');
             if ($(this).attr('target') === '_blank') return;
             if (href && href === '#') return;
+            if (isLoaded) return;
             e.preventDefault();
 
             const tl = gsap.timeline({
@@ -274,28 +276,38 @@ const mainScript = () => {
         constructor() {
         }
         init(play) {
-            let tl = gsap.timeline({
-                onStart: () => {
-                    setTimeout(() => play(), viewport.w > 767 ? 2000 : 1200);
-                }
-            });
-            gsap.set('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' })
-            gsap.set('.main', { y: 200 })
-            tl
-                .to('.loader',{ clipPath: 'polygon(0% 0%, 100% 0%, 100% 0%, 0 0%)', delay: viewport.w > 767 ? 1.6 : 1,  duration: .8, ease: 'quart.in' })
-                .to('.faybl-logo', { y: 5, duration: .8, ease: 'quart.in' }, '<=0')
-                .to('.main', { y: 0, duration: 1, clearProps: 'all' }, viewport.w > 767 ? 1.6 : 1)
+            let isLoaded = sessionStorage.getItem('isLoaded');
+            if (isLoaded) {
+                play();
+            }
+            else {
+                let tl = gsap.timeline({
+                    onStart: () => {
+                        setTimeout(() => play(), viewport.w > 767 ? 2000 : 1200);
+                    },
+                    onComplete: () => {
+                        sessionStorage.setItem('isLoaded', true);
+                    }
+                });
 
-            window.addEventListener("pageshow", function (event) {
-                event.preventDefault();
-                var historyTraversal = event.persisted ||
-                    (typeof window.performance != "undefined" &&
-                        window.performance.navigation.type === 2);
-                if (historyTraversal) {
-                    const href = window.location.href;
-                    gsap.fromTo('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' }, { clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)', delay: 1, duration: .5, ease: 'circ.in' })
-                }
-            })
+                gsap.set('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' })
+                gsap.set('.main', { y: 200 })
+                tl
+                    .to('.loader',{ clipPath: 'polygon(0% 0%, 100% 0%, 100% 0%, 0 0%)', delay: viewport.w > 767 ? 1.6 : 1,  duration: .8, ease: 'quart.in' })
+                    .to('.faybl-logo', { y: 5, duration: .8, ease: 'quart.in' }, '<=0')
+                    .to('.main', { y: 0, duration: 1, clearProps: 'all' }, viewport.w > 767 ? 1.6 : 1)
+
+                window.addEventListener("pageshow", function (event) {
+                    event.preventDefault();
+                    var historyTraversal = event.persisted ||
+                        (typeof window.performance != "undefined" &&
+                            window.performance.navigation.type === 2);
+                    if (historyTraversal) {
+                        const href = window.location.href;
+                        gsap.fromTo('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' }, { clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)', delay: 1, duration: .5, ease: 'circ.in' })
+                    }
+                })
+            }
         }
     }
     class HomeHero extends TriggerSetupHero {
