@@ -998,7 +998,7 @@ const mainScript = () => {
             })
 
             $('.home-service-item').each((idx, el) => {
-                let linkItem = $(el).find('.home-service-item-inner');
+                let linkItem = $(el).find('.home-service-item-');
                 let linkItemHref = linkItem.attr('href');
                 let dataLinkItem = linkItem.attr('data-link-item');
                 linkItem.attr('href', `${linkItemHref}?detail=${dataLinkItem}`);
@@ -3287,8 +3287,7 @@ const mainScript = () => {
             this.interact();
         }
         setup() {
-            let txtMap = new SplitType('.footer-info-link-map .footer-info-link-txt', {types: 'lines, words', lineClass: 'bp-line'});
-            multiLineText('.footer-info-link-map');
+            
             viewport.w < 768 && $('.footer-info-link-map .bp-line').css('margin-inline', 'auto')
             let tlImg = gsap.timeline({
                 scrollTrigger: {
@@ -3353,6 +3352,10 @@ const mainScript = () => {
                     trigger: '.footer-info',
                     start: 'top top+=80%',
                     once: true,
+                },
+                onComplete: () => {
+                    let txtMap = new SplitType('.footer-info-link-map .footer-info-link-txt', {types: 'lines, words', lineClass: 'bp-line'});
+                    multiLineText('.footer-info-link-map');
                 }
             })
             new MasterTimeline({
@@ -3360,12 +3363,12 @@ const mainScript = () => {
                 tweenArr: [
                     ...Array.from($('.footer-info .txt')).flatMap((el, i) => {
                         return [
-                            new FadeSplitText({ el: $(el).get(0), onMask: true, delay: i == 0? 0 :.1}),
+                            new FadeSplitText({ el: $(el).get(0), onMask: true}),
                         ]
                     })  ,
                     ...Array.from($('.footer-info .footer-info-item-social-ic')).flatMap((el, i) => {
                         return [
-                            new FadeIn({ el: $(el).get(0), delay: i == 0? 0 :.05}),
+                            new FadeIn({ el: $(el).get(0), delay:.2} ),
                         ]
                     })     
                 ]

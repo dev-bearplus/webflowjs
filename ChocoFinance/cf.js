@@ -4233,7 +4233,9 @@ const mainScript = () => {
                         slidesPerView: slideView,
                         mousewheel: {
                             enabled: true,
-                          },
+                            forceToAxis: true,
+                        },
+                        freeMode: true,
                         scrollbar: {
                             el: ".thank-review-process",
                             draggable: true,
@@ -4343,6 +4345,52 @@ const mainScript = () => {
             }
         }
         thankGetFaq();
+    }
+    SCRIPT.guaranteeScript = () => {
+        $('.guarantee-fee-form-input').on('input', function () {
+            let fee = $(this).val();
+        
+            // 1. Xoá toàn bộ ký tự không phải số hoặc dấu chấm / phẩy
+            let cleanedFee = fee.replace(/[^\d.,]/g, '');
+        
+            // 2. Nếu có cả ',' và '.', chỉ giữ dấu cuối cùng
+            const lastComma = cleanedFee.lastIndexOf(',');
+            const lastDot = cleanedFee.lastIndexOf('.');
+            
+            if (lastComma > -1 && lastDot > -1) {
+                // Giữ dấu xuất hiện sau cùng
+                if (lastComma > lastDot) {
+                    cleanedFee = cleanedFee.replace(/\./g, ''); // xoá hết dấu chấm
+                    cleanedFee = cleanedFee.replace(/(,)(?=.*\,)/g, ''); // giữ dấu phẩy cuối
+                } else {
+                    cleanedFee = cleanedFee.replace(/\,/g, ''); // xoá hết dấu phẩy
+                    cleanedFee = cleanedFee.replace(/(\.)(?=.*\.)/g, ''); // giữ dấu chấm cuối
+                }
+            } else {
+                // Chỉ có 1 loại dấu => chỉ giữ dấu đầu tiên
+                cleanedFee = cleanedFee
+                    .replace(/,/g, (match, offset) => offset === 0 ? '' : ',') // không cho bắt đầu bằng ,
+                    .replace(/(,)(?=.*\,)/g, '') // chỉ giữ 1 dấu ,
+                    .replace(/\./g, (match, offset) => offset === 0 ? '' : '.') // không cho bắt đầu bằng .
+                    .replace(/(\.)(?=.*\.)/g, ''); // chỉ giữ 1 dấu .
+            }
+        
+            // 3. Nếu vẫn bắt đầu bằng dấu thì xoá
+            if (cleanedFee.startsWith(',') || cleanedFee.startsWith('.')) {
+                cleanedFee = cleanedFee.substring(1);
+            }
+        
+            // 4. Cập nhật lại input nếu có thay đổi
+            if (fee !== cleanedFee) {
+                $(this).val(cleanedFee);
+                fee = cleanedFee;
+            }
+        
+            // 5. Cập nhật text hiển thị
+            $('.guarantee-fee-form-input-val').text(fee);
+        });
+        
+        guaranteeFee();
     }
     const pageName = $('.main').attr('data-barba-namespace');
     if (pageName) {
