@@ -710,7 +710,14 @@ const mainScript = () => {
                 let dataLinkDetail = linkInner.attr('data-link-detail');
                 let dataLinkType = linkInner.attr('data-link-type');
                 let linkCurrent = linkInner.attr('href');
-                linkInner.attr('href', `${linkCurrent}&detail=${dataLinkDetail}`);
+                linkInner.attr('href', `${linkCurrent}?detail=${dataLinkDetail}&type=${dataLinkType}`);
+            })
+            $('.home-featured-img-item').each((idx, el) => {
+                let linkInner = $(el).find('.home-featured-img-item-inner')
+                let dataLinkDetail = linkInner.attr('data-link-detail');
+                let dataLinkType = linkInner.attr('data-link-type');
+                let linkCurrent = linkInner.attr('href');
+                linkInner.attr('href', `${linkCurrent}?detail=${dataLinkDetail}&type=${dataLinkType}`);
             })
             $('.home-featured-img-item').each((idx, el) => {
                 let tlItem = gsap.timeline({
@@ -2330,50 +2337,64 @@ const mainScript = () => {
             const displayCalendar = () => {
                 const firstDay = new Date(year, month, 1);
                 const lastDay = new Date(year, month + 1, 0);
-                const firstDayIndex = firstDay.getDay();
+                let firstDayIndex = firstDay.getDay(); // 0 = Sunday
+              
+                // 👉 Điều chỉnh về Monday = 0
+                firstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+              
                 const numberOfDays = lastDay.getDate();
-        
+              
                 const formattedDate = new Date(year, month).toLocaleString("en-US", {
-                    month: "long",
-                    year: "numeric"
+                  month: "long",
+                  year: "numeric"
                 });
                 $dateHeader.html(formattedDate);
+              
+                // 🟡 Thêm các ô trống đầu tuần
                 for (let x = 1; x <= firstDayIndex; x++) {
-                    const $div = $('<div class=" txt txt-16 txt-label event-calendar-item-date-txt no-value"></div>');
-                    $days.append($div);
+                  const $div = $('<div class=" txt txt-16 txt-label event-calendar-item-date-txt no-value"></div>');
+                  $days.append($div);
                 }
+              
                 for (let i = 1; i <= numberOfDays; i++) {
-                    const today = new Date();
-                    const currentDate = new Date(year, month, i);
-                    const $div = $('<div class="txt txt-16 txt-label event-calendar-item-date-txt"></div>');
-                    $div.attr("data-date", formatDate(currentDate));
-                    let arrDateFilter=[];
-                    $div.append(i);
-                    if (currentDate < today) {
-                        $div.addClass("disable");
+                  const today = new Date();
+                  const currentDate = new Date(year, month, i);
+                  const $div = $('<div class="txt txt-16 txt-label event-calendar-item-date-txt"></div>');
+                  $div.attr("data-date", formatDate(currentDate));
+                  let arrDateFilter = [];
+              
+                  $div.append(i);
+              
+                  if (currentDate < today.setHours(0, 0, 0, 0)) {
+                    $div.addClass("disable");
+                  }
+              
+                  $days.append($div);
+              
+                  $div.on("click", () => {
+                    if ($div.hasClass("disable")) return;
+                    $('.event-calendar-item-date-txt').removeClass("active");
+                    $div.addClass("active");
+                    arrDateFilter.push(formatDate(currentDate));
+                    $('.event-hero-date-filter-item').removeClass('active');
+                    if (viewport.w < 991) {
+                      $('.event-calendar-list').removeClass('active');
                     }
-                    $days.append($div);
-                    $div.on("click",  () =>  {
-                        if ($div.hasClass("disable")) return;
-                        $('.event-calendar-item-date-txt').removeClass("active");
-                        $div.addClass("active");
-                        arrDateFilter.push(formatDate(currentDate));
-                        $('.event-hero-date-filter-item').removeClass('active');
-                        if(viewport.w < 991) {
-                            $('.event-calendar-list').removeClass('active');
-                        }
-                        this.filterEvents(arrDateFilter);
-                    });
-        
-                    if (
-                        currentDate.getFullYear() === today.getFullYear() &&
-                        currentDate.getMonth() === today.getMonth() &&
-                        currentDate.getDate() === today.getDate()
-                    ) {
-                        $div.addClass("current-date").removeClass("disable");
-                    }
+                    this.filterEvents(arrDateFilter);
+                  });
+              
+                  // Nếu là ngày hôm nay
+                  const todayDate = new Date();
+                  if (
+                    currentDate.getFullYear() === todayDate.getFullYear() &&
+                    currentDate.getMonth() === todayDate.getMonth() &&
+                    currentDate.getDate() === todayDate.getDate()
+                  ) {
+                    $div.addClass("current-date").removeClass("disable");
+                  }
                 }
-            };
+              };
+              
         
             displayCalendar();
             function formatDate(date) {
@@ -3353,7 +3374,7 @@ const mainScript = () => {
             let tlBot = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.footer-copyright-wrap',
-                    start: 'top bottom  ',
+                    start: 'top bottom+=20%  ',
                     once: true,
                 }
             })
