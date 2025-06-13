@@ -5,7 +5,13 @@ const mainScript = () => {
     $("html").css("height", "auto");
 
     let lenis = new Lenis({});
-
+    function hasReachedTop(element, offset = 0) {
+        console.log(element.offset().top)
+        const scrollY = window.scrollY || window.pageYOffset
+        console.log(scrollY)
+        return scrollY >= element.offset().top - offset
+      }
+      
     function raf(time) {
         lenis.raf(time);
         requestAnimationFrame(raf);
@@ -744,6 +750,8 @@ const mainScript = () => {
                    ...Array.from($('.home-featured-label')).flatMap((el, idx) => new FadeSplitText({ el: el, onMask: true})),
                 ]
             })
+            let flagAnimInit = hasReachedTop($('.home-featured'));
+            console.log(flagAnimInit);
             if(viewport.w > 768 ) {
                 $('.home-featured-left-inner').each((idx, el) => {
                     let title = new SplitType($(el).find('.home-featured-title'), {types: 'words, lines', lineClass: 'bp-line'});
@@ -752,7 +760,7 @@ const mainScript = () => {
                     gsap.set(title.words, {yPercent: 100});
                     gsap.set(sub.words, {yPercent: 100});
                     gsap.set(desc.words, {yPercent: 100});
-                    if(idx === 0) {
+                    if(idx === 0 && !flagAnimInit) {
                         tl
                         .to(title.words, {yPercent: 0, duration: .4, stagger: 0.015, ease: "power1.out"})
                     }
@@ -763,13 +771,13 @@ const mainScript = () => {
                         let itemTitle = new SplitType($(item).find('.home-featured-time-item-title'), {types: 'words, lines', lineClass: 'bp-line'});
                         gsap.set(itemLabel.words, {yPercent: 100});
                         gsap.set(itemTitle.words, {yPercent: 100});
-                        if(idx === 0) {
+                        if(idx === 0 && !flagAnimInit) {
                             tl
                             .to(itemLabel.words, {yPercent: 0, duration: .4, stagger: 0.015, ease: "power1.out"}, `<=0`)
                             .to(itemTitle.words, {yPercent: 0, duration: .4, stagger: 0.015, ease: "power1.out"}, '<=0')
                         }
                     })
-                    if(idx === 0) {
+                    if(idx === 0 && !flagAnimInit) {
                         tl
                         .to(sub.words, {yPercent: 0, duration: .3, stagger: 0.01, ease: "power1.out"}, `<=0`)
                         .to(desc.words, {yPercent: 0, duration: .3, stagger: 0.01, ease: "power1.out"}, '<=0')
@@ -1801,7 +1809,7 @@ const mainScript = () => {
                 $('.game-hero-left').addClass('swiper');
                 $('.game-hero-left-inner').addClass('swiper-wrapper');
                 $('.game-hero-machine').addClass('swiper-slide');
-                $('.game-hero-left').append('<div class="global-swiper-pagination"></div>')
+                $('.game-hero-left').append('<div class="global-swiper-pagination game-hero-pagination"></div>')
                 let swiper = new Swiper(".game-hero-right-content-wrap", {
                     slidesPerView: 1,
                     spaceBetween: parseRem(20),
@@ -3507,6 +3515,7 @@ const mainScript = () => {
     //     });
     // } else {
         initGlobal();
+        ScrollTrigger.refresh();
     // }
     /** (💡) **/
 };
