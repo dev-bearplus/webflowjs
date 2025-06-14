@@ -4347,6 +4347,7 @@ const mainScript = () => {
         thankGetFaq();
     }
     SCRIPT.guaranteeScript = () => {
+        if (!isStagging) return;
         const sgdToUsd = parseFloat($('.sgd-to-usd').text());
         const usdToSgd = 1/sgdToUsd;
         function guaranteeFee() {
@@ -4386,7 +4387,7 @@ const mainScript = () => {
                 
             })
         }
-        function sgdToUsd(value) {
+        function sgdToUsdFunc(value) {
             return parseFloat(value) * 0.000043;
         }
         guaranteeFee();
