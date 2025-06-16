@@ -1014,7 +1014,7 @@ const mainScript = () => {
             })
 
             $('.home-service-item').each((idx, el) => {
-                let linkItem = $(el).find('.home-service-item-');
+                let linkItem = $(el).find('.home-service-item-inner');
                 let linkItemHref = linkItem.attr('href');
                 let dataLinkItem = linkItem.attr('data-link-item');
                 linkItem.attr('href', `${linkItemHref}?detail=${dataLinkItem}`);
@@ -1225,7 +1225,6 @@ const mainScript = () => {
                 }
              })
              $('.home-article-item').each((idx, el) => {
-                console.log(el)
                 new MasterTimeline({
                     timeline: tlItem,
                     tweenArr: [
@@ -1239,7 +1238,7 @@ const mainScript = () => {
              })
              
             $('.home-article-item').each((idx, el) => {
-                let linkInner = $(el).find('.home-article-item-link')
+                let linkInner = $(el).find('.home-article-item-inner')
                 let dataLinkDetail = linkInner.attr('data-link-detail');
                 let dataLinkType = linkInner.attr('data-link-type');
                 let linkCurrent = linkInner.attr('href');
