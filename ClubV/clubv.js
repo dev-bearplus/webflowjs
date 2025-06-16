@@ -1356,31 +1356,7 @@ const mainScript = () => {
                         })
                     }
                 }
-            const addSticky = debounce(() => {
-                $(".mb-hero-card-wrap").addClass("on-sticky");
-                ScrollTrigger.refresh();
-            }, 100); 
-                
-            const removeSticky = debounce(() => {
-            $(".mb-hero-card-wrap").removeClass("on-sticky");
-                ScrollTrigger.refresh();
-            }, 100);
-            let tl = gsap.timeline({
-                paused: true,
-                scrollTrigger: {
-                  trigger: ".mb-hero-card-main",
-                  start: "top top",
-                  endTrigger: ".mb-hero-content-wrap",
-                  end: "bottom+=5% bottom",
-                  onEnter: addSticky,
-                  onEnterBack: addSticky,
-                  onLeaveBack: removeSticky,
-                  onLeave: debounce(() => {
-                    ScrollTrigger.refresh();
-                  }, 200)
-                },
-            });
-            tl.play();
+
               
         }
         interact() {
@@ -3120,6 +3096,7 @@ const mainScript = () => {
             this.menuTitle = new SplitType('.header-menu-title', {types: 'lines, words', lineClass: 'bp-line'});
             this.langText = new SplitType('.header-lang-item-txt', {types: "lines, words", lineClass: "bp-line"});
             this.init = false;
+            this.debounceTimer = null;
             
         }
         trigger() {
@@ -3273,30 +3250,31 @@ const mainScript = () => {
         toggleOnHide = (inst) => {
             const scrollTop = document.documentElement.scrollTop || window.scrollY;
             const $header = $('.header');
-            const isScrollHeader = scrollTop > $('.header').height() * (viewport.w > 767 ? 4 : 1.5) && !$header.hasClass('on-show-menu');
-            let debounceTimer;
-            debounceTimer && clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
+            const isScrollHeader =
+                scrollTop > $('.header').height() * (viewport.w > 767 ? 4 : 1.5) &&
+                !$header.hasClass('on-show-menu');
+            console.log(isScrollHeader)
+            clearTimeout(this.debounceTimer);
+            this.debounceTimer = setTimeout(() => {
                 if (isScrollHeader) {
-                    if (inst.direction >= 1) {
-                        $header.addClass('on-hide');
-                        if($('.mb-hero-card-main').length > 0) {
-                            $('.mb-hero-card-main').addClass('on-top');
-                        }
-                    } else {
-                        $header.removeClass('on-hide');
-                        if($('.mb-hero-card-main').length > 0) {
-                            $('.mb-hero-card-main').removeClass('on-top');
-                        }
+                if (inst.direction >= 1) {
+                    if ($('.header-lang').hasClass('active')) {
+                    this.toggleLang();
+                    $('.header-lang').removeClass('active');
                     }
+                    $header.addClass('on-hide');
+                    $('.mb-hero-card-main')?.addClass('on-top');
                 } else {
                     $header.removeClass('on-hide');
-                    if($('.mb-hero-card-main').length > 0) {
-                        $('.mb-hero-card-main').removeClass('on-top');
-                    }
+                    $('.mb-hero-card-main')?.removeClass('on-top');
                 }
-            }, 500);
+                } else {
+                $header.removeClass('on-hide');
+                $('.mb-hero-card-main')?.removeClass('on-top');
+                }
+            }, 20);
         }
+
     }
     const header = new Header('.header'); 
     class Footer extends TriggerSetup {
