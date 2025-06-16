@@ -3,7 +3,11 @@ const mainScript = () => {
 
     $("html").css("scroll-behavior", "auto");
     $("html").css("height", "auto");
-
+    function replaceHyphenWithSpan(el) {
+        $(el).html(function (index, oldHtml) {
+          return oldHtml.replaceAll("-", "<span>-</span>");
+        });
+      }
     let lenis = new Lenis({});
     function hasReachedTop(element, offset = 0) {
         console.log(element.offset().top)
@@ -623,6 +627,24 @@ const mainScript = () => {
                     $(".global-popup-wrap").addClass('has-popup');
                     lenis.stop();
                 })
+                if(viewport.w < 768) {
+                    let startY = 0;
+                    $('.home-popup-item').on('touchstart', function(e) {
+                        startY = e.originalEvent.touches[0].clientY;
+                    });
+
+                    $('.home-popup-item').on('touchmove', function(e) {
+                        let currentY = e.originalEvent.touches[0].clientY;
+                        let distance = currentY - startY;
+
+                        if($(this).scrollTop() === 0 && distance > 80) {
+                            // User pulled down while at top
+                            $('.global-popup-wrap').removeClass('has-popup');
+                            lenis.start();
+                            cursor.reset();
+                        }
+                    });
+                }
                 $('.home-popup-item').on('scroll', function(e){
                     if(viewport.w < 768) {
                         if($(this).scrollTop()  > 40) {
@@ -631,11 +653,6 @@ const mainScript = () => {
                         else {
                             $('[data-popup = "close"]').removeClass('hidden');
                         }
-                    }
-                    if($(this).scrollTop()  < -80 ){
-                        $('.global-popup-wrap').removeClass('has-popup');
-                        lenis.start();
-                        cursor.reset();
                     }
                 })
             }
@@ -1233,6 +1250,7 @@ const mainScript = () => {
                 }
              })
              $('.home-article-item').each((idx, el) => {
+                replaceHyphenWithSpan($(el).find('.home-article-item-sub'))
                 new MasterTimeline({
                     timeline: tlItem,
                     tweenArr: [
@@ -1243,7 +1261,7 @@ const mainScript = () => {
                         new FadeSplitText({ el: $(el).find('.home-article-item-link-txt').get(0), onMask: true}),
                     ]
                 })
-             })
+            })
              
             $('.home-article-item').each((idx, el) => {
                 let linkInner = $(el).find('.home-article-item-inner')
@@ -1689,6 +1707,24 @@ const mainScript = () => {
                     resetScrollPopup();
                 }
             })
+            if(viewport.w < 768) {
+                let startY = 0;
+                $('.service-hero-popup-inner').on('touchstart', function(e) {
+                    startY = e.originalEvent.touches[0].clientY;
+                });
+
+                $('.service-hero-popup-inner').on('touchmove', function(e) {
+                    let currentY = e.originalEvent.touches[0].clientY;
+                    let distance = currentY - startY;
+
+                    if($(this).scrollTop() === 0 && distance > 80) {
+                        // User pulled down while at top
+                        $('.global-popup-wrap').removeClass('has-popup');
+                        lenis.start();
+                        cursor.reset();
+                    }
+                });
+            }
             $('.service-hero-popup-inner').on('scroll', (e)=> {
                 this.ItemContentActiveCheck('.service-hero-popup-inner.active h6');
                 if(viewport.w < 768) {
@@ -1698,11 +1734,6 @@ const mainScript = () => {
                     else {
                         $('[data-popup = "close"]').removeClass('hidden');
                     }
-                }
-                if($(e.target).scrollTop()  < -80 && viewport.w < 768) {
-                    $('.service-hero-popup').removeClass('active');
-                    lenis.start();
-                    cursor.reset();
                 }
             })
             function resetScrollPopup() {
@@ -1889,6 +1920,24 @@ const mainScript = () => {
                     resetScrollPopup();
                 }
             }) 
+            if(viewport.w < 768) {
+                let startY = 0;
+                $('.work-popup-item').on('touchstart', function(e) {
+                    startY = e.originalEvent.touches[0].clientY;
+                });
+
+                $('.work-popup-item').on('touchmove', function(e) {
+                    let currentY = e.originalEvent.touches[0].clientY;
+                    let distance = currentY - startY;
+
+                    if($(this).scrollTop() === 0 && distance > 80) {
+                        // User pulled down while at top
+                        $('.global-popup-wrap').removeClass('has-popup');
+                        lenis.start();
+                        cursor.reset();
+                    }
+                });
+            }
             $('.work-popup-item').on('scroll', (e)=> {
                 if (viewport.w < 768) {
                     if($(e.target).scrollTop()  > 40) {
@@ -1899,13 +1948,6 @@ const mainScript = () => {
                     }
                 }
                 this.ItemContentActiveCheck('.work-popup-item.active .work-popup-item-content h6');
-                console.log($(e.target).scrollTop())
-                if($(e.target).scrollTop()  < -80 && viewport.w < 768) {
-                    console.log('close')
-                    $('.global-popup-wrap').removeClass('has-popup');
-                    lenis.start();
-                    cursor.reset();
-                }
             })
             $('.work-popup-item-left-content').on('click', '.work-popup-item-left-title', function(e) {
                 e.preventDefault();
@@ -2322,6 +2364,24 @@ const mainScript = () => {
                 $('.event-hero-date-reset').addClass('hidden')
                 this.filterReset();
             })
+            if(viewport.w < 768) {
+                let startY = 0;
+                $('.event-popup-item').on('touchstart', function(e) {
+                    startY = e.originalEvent.touches[0].clientY;
+                });
+
+                $('.event-popup-item').on('touchmove', function(e) {
+                    let currentY = e.originalEvent.touches[0].clientY;
+                    let distance = currentY - startY;
+
+                    if($(this).scrollTop() === 0 && distance > 80) {
+                        // User pulled down while at top
+                        $('.global-popup-wrap').removeClass('has-popup');
+                        lenis.start();
+                        cursor.reset();
+                    }
+                });
+            }
             $('.event-popup-item').on('scroll', (e)=> {
                 if(viewport.w < 768) {
                     if($(e.target).scrollTop()  > 40) {
@@ -2330,11 +2390,6 @@ const mainScript = () => {
                     else {
                         $('[data-popup = "close"]').removeClass('hidden');
                     }
-                }
-                if($(e.target).scrollTop()  < -80 && viewport.w < 768) {
-                    $('.global-popup-wrap').removeClass('has-popup');
-                    lenis.start();
-                    cursor.reset();
                 }
             })
         }
@@ -2919,6 +2974,24 @@ const mainScript = () => {
                     resetScrollPopup();
                 }
             }) 
+            if(viewport.w < 768) {
+                let startY = 0;
+                $('.work-popup-item').on('touchstart', function(e) {
+                    startY = e.originalEvent.touches[0].clientY;
+                });
+
+                $('.work-popup-item').on('touchmove', function(e) {
+                    let currentY = e.originalEvent.touches[0].clientY;
+                    let distance = currentY - startY;
+
+                    if($(this).scrollTop() === 0 && distance > 80) {
+                        // User pulled down while at top
+                        $('.global-popup-wrap').removeClass('has-popup');
+                        lenis.start();
+                        cursor.reset();
+                    }
+                });
+            }
             $('.work-popup-item').on('scroll', (e)=> {
                 if(viewport.w < 768) {
                     if($(e.target).scrollTop()  > 40) {
@@ -2929,11 +3002,6 @@ const mainScript = () => {
                     }
                 }
                 this.ItemContentActiveCheck('.work-popup-item.active .work-popup-item-content h6');
-                if($(e.target).scrollTop()  < -80 && viewport.w < 768) {
-                    $('.global-popup-wrap').removeClass('has-popup');
-                    lenis.start();
-                    cursor.reset();
-                }
             })
             $('.work-popup-item-left-content').on('click', '.work-popup-item-left-title', function(e) {
                 e.preventDefault();
@@ -3365,7 +3433,7 @@ const mainScript = () => {
             let tlMenu = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.footer-menu',
-                    start: 'top top+=75%',
+                    start: viewport.w > 991  ? 'top top+=75%' : 'top bottom',
                     once: true,
                 }
             })
@@ -3414,8 +3482,10 @@ const mainScript = () => {
                     once: true,
                 },
                 onComplete: () => {
-                    let txtMap = new SplitType('.footer-info-link-map .footer-info-link-txt', {types: 'lines, words', lineClass: 'bp-line'});
-                    multiLineText('.footer-info-link-map');
+                    if(viewport.w > 991) {
+                        let txtMap = new SplitType('.footer-info-link-map .footer-info-link-txt', {types: 'lines, words', lineClass: 'bp-line'});
+                        multiLineText('.footer-info-link-map');
+                    }
                 }
             })
             new MasterTimeline({
@@ -3436,7 +3506,7 @@ const mainScript = () => {
             let tlBot = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.footer-copyright-wrap',
-                    start: 'top bottom+=20%  ',
+                    start: 'top bottom',
                     once: true,
                 }
             })
