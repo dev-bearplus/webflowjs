@@ -624,6 +624,14 @@ const mainScript = () => {
                     lenis.stop();
                 })
                 $('.home-popup-item').on('scroll', function(e){
+                    if(viewport.w < 768) {
+                        if($(this).scrollTop()  > 40) {
+                            $('[data-popup = "close"]').addClass('hidden');
+                        }
+                        else {
+                            $('[data-popup = "close"]').removeClass('hidden');
+                        }
+                    }
                     if($(this).scrollTop()  < -80 ){
                         $('.global-popup-wrap').removeClass('has-popup');
                         lenis.start();
@@ -759,7 +767,6 @@ const mainScript = () => {
                 ]
             })
             let flagAnimInit = hasReachedTop($('.home-featured'));
-            console.log(flagAnimInit);
             if(viewport.w > 768 ) {
                 $('.home-featured-left-inner').each((idx, el) => {
                     let title = new SplitType($(el).find('.home-featured-title'), {types: 'words, lines', lineClass: 'bp-line'});
@@ -944,8 +951,9 @@ const mainScript = () => {
         handleSetter(this.listThumb, -20)
             lenis.on("scroll", (e) => {
                 if (isStartTranslate) {
-                    const velocity = viewport.w > 991 ? Math.abs(e.velocity / 1.8) : Math.abs(e.velocity / 5);
+                    const velocity = viewport.w > 991 ? Math.abs(e.velocity / 1) : Math.abs(e.velocity / 5);
                     let velocityScroller = Math.abs(velocity / window.innerWidth) * 100;
+                    console.log(velocity);
                     if(e.direction > 0) {
                         scrollWidth += velocityScroller;
                     }
@@ -1675,7 +1683,6 @@ const mainScript = () => {
                 resetScrollPopup();
             })
             $('.service-hero-popup').on('click', function(e) {
-                console.log('khánhdfas');
                 if($(e.target).closest('.service-hero-popup-inner').length == 0) {
                     $(this).removeClass('active');
                     lenis.start();
@@ -1684,6 +1691,14 @@ const mainScript = () => {
             })
             $('.service-hero-popup-inner').on('scroll', (e)=> {
                 this.ItemContentActiveCheck('.service-hero-popup-inner.active h6');
+                if(viewport.w < 768) {
+                    if($(e.target).scrollTop()  > 40) {
+                        $('[data-popup = "close"]').addClass('hidden');
+                    }
+                    else {
+                        $('[data-popup = "close"]').removeClass('hidden');
+                    }
+                }
                 if($(e.target).scrollTop()  < -80 && viewport.w < 768) {
                     $('.service-hero-popup').removeClass('active');
                     lenis.start();
@@ -1750,7 +1765,10 @@ const mainScript = () => {
             this.interact();
             super.init(this.play.bind(this));
         }
-        setup() {    
+        setup() {  
+            lenis.scrollTo(0, {
+                duration: 0.001,
+            });  
             if( viewport.w > 767) {
                 let machineTitle = new SplitType('.game-hero-machine-title .txt-inline', {types: 'lines, words', lineClass: 'bp-line'});
                 let currentIndex = -1;
@@ -1842,7 +1860,7 @@ const mainScript = () => {
             this.initContentPopup();
         }
         interact() {
-            $('.game-hero-img-item').on('click', function(e) {
+            $('.game-hero-img-item, .game-hero-machine').on('click', function(e) {
                 e.preventDefault();
                 let index = $(this).index() ;
                 console.log(index)
@@ -1872,6 +1890,14 @@ const mainScript = () => {
                 }
             }) 
             $('.work-popup-item').on('scroll', (e)=> {
+                if (viewport.w < 768) {
+                    if($(e.target).scrollTop()  > 40) {
+                        $('[data-popup = "close"]').addClass('hidden');
+                    }
+                    else {
+                        $('[data-popup = "close"]').removeClass('hidden');
+                    }
+                }
                 this.ItemContentActiveCheck('.work-popup-item.active .work-popup-item-content h6');
                 console.log($(e.target).scrollTop())
                 if($(e.target).scrollTop()  < -80 && viewport.w < 768) {
@@ -2230,7 +2256,6 @@ const mainScript = () => {
                     }),
                     ...Array.from($('.event-hero-tag-item')).flatMap((el, index) => new FadeIn({el: $(el), delay: .2})),
                     new FadeSplitText({el: $('.event-hero-date-title').get(0), onMask: true}),
-                    new FadeIn({el: $('.event-hero-date-reset').get(0), delay: .2}),
                     ...Array.from($('.event-hero-date-filter-item')).flatMap((el, index) => new FadeIn({el: $(el), delay: .2})),
                     ...Array.from($('.event-calendar-item')).flatMap((el, index) => new FadeIn({el: $(el), delay: .2})),
                 ]
@@ -2294,9 +2319,18 @@ const mainScript = () => {
             })
             $('.event-hero-date-reset').on('click', (e) => {
                 e.preventDefault();
+                $('.event-hero-date-reset').addClass('hidden')
                 this.filterReset();
             })
             $('.event-popup-item').on('scroll', (e)=> {
+                if(viewport.w < 768) {
+                    if($(e.target).scrollTop()  > 40) {
+                        $('[data-popup = "close"]').addClass('hidden');
+                    }
+                    else {
+                        $('[data-popup = "close"]').removeClass('hidden');
+                    }
+                }
                 if($(e.target).scrollTop()  < -80 && viewport.w < 768) {
                     $('.global-popup-wrap').removeClass('has-popup');
                     lenis.start();
@@ -2389,6 +2423,7 @@ const mainScript = () => {
               
                   $div.on("click", () => {
                     if ($div.hasClass("disable")) return;
+                    $('.event-hero-date-reset').removeClass('hidden')
                     $('.event-calendar-item-date-txt').removeClass("active");
                     $div.addClass("active");
                     arrDateFilter.push(formatDate(currentDate));
@@ -2438,6 +2473,7 @@ const mainScript = () => {
             $('.event-hero-date-filter-item').on('click',  (e) => {
                 $('.event-hero-date-filter-item').removeClass('active');
                 $(e.currentTarget).addClass('active');
+                $('.event-hero-date-reset').removeClass('hidden')
                 const range = $(e.currentTarget).data('filter-fast');
                 const today = new Date();
                 const year = today.getFullYear();
@@ -2884,6 +2920,14 @@ const mainScript = () => {
                 }
             }) 
             $('.work-popup-item').on('scroll', (e)=> {
+                if(viewport.w < 768) {
+                    if($(e.target).scrollTop()  > 40) {
+                        $('[data-popup = "close"]').addClass('hidden');
+                    }
+                    else {
+                        $('[data-popup = "close"]').removeClass('hidden');
+                    }
+                }
                 this.ItemContentActiveCheck('.work-popup-item.active .work-popup-item-content h6');
                 if($(e.target).scrollTop()  < -80 && viewport.w < 768) {
                     $('.global-popup-wrap').removeClass('has-popup');
