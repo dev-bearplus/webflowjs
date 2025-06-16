@@ -1287,11 +1287,9 @@ const mainScript = () => {
                 let swiper = new Swiper(".mb-hero-card-wrap", {
                     slidesPerView: 'auto',
                     spaceBetween: parseRem(0),
-                    allowTouchMove: false, 
                     breakpoints: {
                         768: {
                             spaceBetween: parseRem(16),
-                            allowTouchMove: true, 
                         }
                     },
                     on: {
@@ -1357,6 +1355,28 @@ const mainScript = () => {
                             $(el).find('.mb-hero-content-item').eq(index).addClass('active');
                         })
                     }
+                    let touchStartX = 0;
+                    let touchStartY = 0;
+
+                    $('.mb-hero-content-row').on('touchstart', function (e) {
+                        const touch = e.originalEvent.touches[0];
+                        touchStartX = touch.clientX;
+                        touchStartY = touch.clientY;
+                    });
+
+                    $('.mb-hero-content-row').on('touchend', function (e) {
+                        const touch = e.originalEvent.changedTouches[0];
+                        const deltaX = touch.clientX - touchStartX;
+                        const deltaY = touch.clientY - touchStartY;
+
+                        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40) {
+                            if (deltaX < 0) {
+                                swiper.slideNext();
+                            } else {
+                                swiper.slidePrev();
+                            }
+                        }
+                    });
                 }
 
               
@@ -1392,8 +1412,7 @@ const mainScript = () => {
                     collected.forEach($el => {
                       $el.stop(true, true).slideToggle(200);
                     });
-                  }
-                  
+                }   
             }
         }
         play() {
