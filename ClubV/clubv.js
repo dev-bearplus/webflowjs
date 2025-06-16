@@ -3263,14 +3263,11 @@ const mainScript = () => {
                     $('.header-lang').removeClass('active');
                     }
                     $header.addClass('on-hide');
-                    $('.mb-hero-card-main')?.addClass('on-top');
                 } else {
                     $header.removeClass('on-hide');
-                    $('.mb-hero-card-main')?.removeClass('on-top');
                 }
                 } else {
                 $header.removeClass('on-hide');
-                $('.mb-hero-card-main')?.removeClass('on-top');
                 }
             }, 20);
         }
