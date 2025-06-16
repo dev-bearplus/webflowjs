@@ -1287,9 +1287,11 @@ const mainScript = () => {
                 let swiper = new Swiper(".mb-hero-card-wrap", {
                     slidesPerView: 'auto',
                     spaceBetween: parseRem(0),
+                    allowTouchMove: false, 
                     breakpoints: {
                         768: {
                             spaceBetween: parseRem(16),
+                            allowTouchMove: true, 
                         }
                     },
                     on: {
@@ -3097,7 +3099,7 @@ const mainScript = () => {
             this.langText = new SplitType('.header-lang-item-txt', {types: "lines, words", lineClass: "bp-line"});
             this.init = false;
             this.debounceTimer = null;
-            
+            this.timeDebouce = viewport.w > 991? 10 : 20;
         }
         trigger() {
             this.setup();
@@ -3269,7 +3271,7 @@ const mainScript = () => {
                 } else {
                 $header.removeClass('on-hide');
                 }
-            }, 20);
+            }, this.timeDebouce);
         }
 
     }
