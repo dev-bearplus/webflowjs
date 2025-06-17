@@ -28,6 +28,10 @@ const mainScript = () => {
     const parseRem = (input) => {
         return (input / 10) * parseFloat($("html").css("font-size"));
       };
+    const schemaFAQParentAttrs = {
+    itemscope: true,
+    itemtype: 'https://schema.org/FAQPage'
+    };
     // Variables and Ultilities
     let unit;
     let slideUpDownTime = 400;
@@ -577,16 +581,16 @@ const mainScript = () => {
         let richTextArray = el.data.content_richtext;
             let ans = PrismicDOM.RichText.asHtml(richTextArray);
             let faqItem = $(`
-                <div class="home-faq-item" id="${el.uid.replaceAll('.','')}">
+                <div class="home-faq-item" id="${el.uid.replaceAll('.','')}" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
                     <a href="#" class="home-faq-item-head w-inline-block">
-                        <div class="txt-16 home-faq-item-ques">${el.data.question}</div>
+                        <div class="txt-16 home-faq-item-ques" itemprop="name">${el.data.question}</div>
                         <div class="ic-plus-wrap">
                             <div class="ic-plus-inner"></div>
                             <div class="ic-plus-inner mod-rotate"></div>
                         </div>
                     </a>
-                    <div class="home-faq-item-body">
-                        <div class="txt-16 home-faq--itemans">${ans}</div>
+                    <div class="home-faq-item-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <div class="txt-16 home-faq--itemans" itemprop="text">${ans}</div>
                     </div>
                     <div class="home-faq-bar">
                         <div class="home-faq-bar-inner"></div>
@@ -2460,7 +2464,7 @@ const mainScript = () => {
                 if (res) {
                     let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_homepage)
                     let allFaq = sortAsc(activeFaqItem, true, 'order_on_homepage', true)
-                    $('.home-faq-main').html('')
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs);
                     allFaq.forEach((i) => {
                         createFaqNew(i).appendTo($('.home-faq-main'))
                     })
@@ -2579,7 +2583,7 @@ const mainScript = () => {
                 if (res) {
                     let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_how_it_works)
                     let allFaq = sortAsc(activeFaqItem, true, 'order_on_how_it_works', true)
-                    $('.home-faq-main').html('')
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
                     allFaq.forEach((i) => {
                         createFaqNew(i).appendTo($('.home-faq-main'))
                     })
@@ -2759,7 +2763,7 @@ const mainScript = () => {
                 if (res) {
                     let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_about_us)
                     let allFaq = sortAsc(activeFaqItem, true, 'order_on_about_us', true)
-                    $('.home-faq-main').html('')
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
                     allFaq.forEach((i) => {
                         createFaqNew(i).appendTo($('.home-faq-main'))
                     })
@@ -3954,7 +3958,7 @@ const mainScript = () => {
                 if (res) {
                     let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_usd_page)
                     let allFaq = sortAsc(activeFaqItem, true, 'order_on_usd_page', true)
-                    $('.home-faq-main').html('')
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
                     allFaq.forEach((i) => {
                         createFaqNew(i).appendTo($('.home-faq-main'))
                     })
@@ -4027,7 +4031,7 @@ const mainScript = () => {
                 if (res) {
                     let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_corporate_page)
                     let allFaq = sortAsc(activeFaqItem, true, 'order_on_corporate_page', true)
-                    $('.home-faq-main').html('')
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
                     allFaq.forEach((i) => {
                         createFaqNew(i).appendTo($('.home-faq-main'))
                     })
@@ -4096,7 +4100,7 @@ const mainScript = () => {
                 if (res) {
                     let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_card_page)
                     let allFaq = sortAsc(activeFaqItem, true, 'order_on_card_page', true)
-                    $('.home-faq-main').html('')
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
                     allFaq.forEach((i) => {
                         createFaqNew(i).appendTo($('.home-faq-main'))
                     })
@@ -4320,7 +4324,7 @@ const mainScript = () => {
                 if (res) {
                     let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_homepage)
                     let allFaq = sortAsc(activeFaqItem, true, 'order_on_homepage', true)
-                    $('.home-faq-main').html('')
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
                     allFaq.forEach((i) => {
                         createFaqNew(i).appendTo($('.home-faq-main'))
                     })
