@@ -4387,6 +4387,7 @@ const mainScript = () => {
                 }
             })
         }
+        guaranteeFee();
         function validInputUsd(sgdValue) {
             let cleanedSgdValue = sgdValue.replace(/[^\d.,]/g, '');
             const lastComma = cleanedSgdValue.lastIndexOf(',');
@@ -4417,6 +4418,13 @@ const mainScript = () => {
             }
             return sgdValue;
         }
+        function usdSecu(){
+            let textCir;
+            textCir = new CircleType(document.querySelector('.mod-circletext.usd-secu-rate-txt'));
+            $('.mod-circletext').css('display','flex')
+            $('.text-cir-wrap').addClass('anim-rotate')
+        }
+        usdSecu();
         function homeGetFaq() {
             getAllDataByType('faq').then((res) => {
                 if (res) {
@@ -4447,7 +4455,24 @@ const mainScript = () => {
             }
         }
         homeGetFaq();
-        guaranteeFee();
+        
+        function usdBenefit(){
+            $('.usd-benefit-item').eq(0).addClass('active');
+            $('.usd-benefit-item').eq(0).find('.usd-benefit-item-body').slideDown();;
+            $('.usd-benefit-item').on('click', function(){
+                if($(this).hasClass('active')){
+                    $('.usd-benefit-item').removeClass('active')
+                    $(this).find('.usd-benefit-item-body').slideUp();
+                }
+                else{
+                    $('.usd-benefit-item-body').slideUp();
+                    $('.usd-benefit-item').removeClass('active')
+                    $(this).addClass('active')
+                    $(this).find('.usd-benefit-item-body').slideDown();
+                }
+            })
+        }
+        usdBenefit();
     }
     const pageName = $('.main').attr('data-barba-namespace');
     if (pageName) {
