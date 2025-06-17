@@ -3354,7 +3354,7 @@ const mainScript = () => {
         }
         faqGetFaq();
         function updateUICate(allFaqCate) {
-            $('.faq-cate-list').html('');
+            $('.faq-cate-list').html('').attr(schemaFAQParentAttrs);
             const faqListTemplate = $('.faq-cate-wrap').eq(0).clone();
             const faqTabTemplate = $('.faq-cate-btn-wrap').eq(0).clone();
             const stickySearchIcon = $('.faq-cate-inner .faq-stick-srch').eq(0).clone();
