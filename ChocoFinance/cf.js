@@ -29,8 +29,8 @@ const mainScript = () => {
         return (input / 10) * parseFloat($("html").css("font-size"));
       };
     const schemaFAQParentAttrs = {
-    itemscope: true,
-    itemtype: 'https://schema.org/FAQPage'
+        itemscope: true,
+        itemtype: 'https://schema.org/FAQPage'
     };
     // Variables and Ultilities
     let unit;
