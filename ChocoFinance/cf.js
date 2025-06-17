@@ -403,14 +403,14 @@ const mainScript = () => {
         ans.find('.limit-amount-sgd').attr('data-rate-sgd','amount');
         ans.find('.limit-date-sgd').attr('data-rate-sgd','date');
         ans.find('.minimum-sum-sgd').attr('data-rate-sgd','minimum-sum');
-        ans.find('.instant-withdrawal-limit-sgd').attr('data-rate-sgd','withdrawal');
+        ans.find('.withdrawal-sgd').attr('data-rate-sgd','withdrawal');
         ans.find('.big-rate-usd').attr('data-rate-usd','big');
         ans.find('.small-rate-usd').attr('data-rate-usd','small');
         ans.find('.other-rate-usd').attr('data-rate-usd','other');
         ans.find('.limit-amount-usd').attr('data-rate-usd','amount');
         ans.find('.limit-date-usd').attr('data-rate-usd','date');
         ans.find('.minimum-sum-usd').attr('data-rate-usd','minimum-sum');
-        ans.find('.instant-withdrawal-limit-usd').attr('data-rate-usd','withdrawal');
+        ans.find('.withdrawal-usd').attr('data-rate-usd','withdrawal');
         // Embed
         ans.find('[data-oembed]').addClass('art-embed-wrap mod-faq');
 
