@@ -4353,47 +4353,100 @@ const mainScript = () => {
     SCRIPT.guaranteeScript = () => {
         if (!isStagging) return;
         const sgdToUsd = parseFloat($('.sgd-to-usd').text());
-        const usdToSgd = 1/sgdToUsd;
+        const usdToSgd = (Math.floor((1/sgdToUsd)*100000)/100000).toFixed(5);
+        const feeSgdToUsd = 0.1;
+        let textUnitInit = $('.unit-init').text();
+        let textUnitWillChange = $('.unit-will-change').text();
+        let flagChangeSgdToUsd = true;
         function guaranteeFee() {
             $('.guarantee-fee-form-input').on('input', function () {
-                let fee = $(this).val();
+                let sgdValue = $(this).val();
                 // clean all text
-                let cleanedFee = fee.replace(/[^\d.,]/g, '');
-                const lastComma = cleanedFee.lastIndexOf(',');
-                const lastDot = cleanedFee.lastIndexOf('.');
-                // function only get one dot or one comma
-                if (lastComma > -1 && lastDot > -1) {
-                    if (lastComma > lastDot) {
-                        cleanedFee = cleanedFee.replace(/\./g, ''); 
-                        cleanedFee = cleanedFee.replace(/(,)(?=.*\,)/g, '');
-                    } else {
-                        cleanedFee = cleanedFee.replace(/\,/g, ''); 
-                        cleanedFee = cleanedFee.replace(/(\.)(?=.*\.)/g, '');
-                    }
-                } else {
-                    cleanedFee = cleanedFee
-                        .replace(/,/g, (match, offset) => offset === 0 ? '' : ',') 
-                        .replace(/(,)(?=.*\,)/g, '') 
-                        .replace(/\./g, (match, offset) => offset === 0 ? '' : '.') 
-                        .replace(/(\.)(?=.*\.)/g, ''); 
-                }
-                if (cleanedFee.startsWith(',') || cleanedFee.startsWith('.')) {
-                    cleanedFee = cleanedFee.substring(1);
-                }
-                // update value input
-                if (fee !== cleanedFee) {
-                    $(this).val(cleanedFee);
-                    fee = cleanedFee;
-                }
-                $('.guarantee-fee-form-input-val').text(fee);
+                let cleanedFee = validInputUsd(sgdValue);
+                $('.guarantee-fee-form-input-val').text(cleanedFee);
+                let usdConvertTotal = (Math.floor(cleanedFee * sgdToUsd * 100)/100).toFixed(2);
+                let usdConvertFinal =(Math.floor((usdConvertTotal - usdConvertTotal * feeSgdToUsd)*100)/100).toFixed(2);
+                let feeConvert = (usdConvertTotal - usdConvertFinal).toFixed(2);
+                console.log(usdConvertFinal)
+                $('.sgd-to-usd-total').text(usdConvertTotal);
+                $('.sgd-to-usd-fee').text(feeConvert);
+                $('.guarantee-fee-form-input-result').text(usdConvertFinal);
             });
             $('.guarantee-fee-convert-ic').on('click', function () {
-                
+                if (flagChangeSgdToUsd) {
+                    $('.unit-init').text(textUnitWillChange);
+                    $('.unit-will-change').text(textUnitInit);
+                    $('.sgd-to-usd').text(usdToSgd)
+                    flagChangeSgdToUsd = false;
+                }
+                else {
+                    $('.unit-init').text(textUnitInit);
+                    $('.unit-will-change').text(textUnitWillChange);
+                    $('.sgd-to-usd').text(sgdToUsd)
+                    flagChangeSgdToUsd = true;
+                }
             })
         }
-        function sgdToUsdFunc(value) {
-            return parseFloat(value) * 0.000043;
+        function validInputUsd(sgdValue) {
+            let cleanedSgdValue = sgdValue.replace(/[^\d.,]/g, '');
+            const lastComma = cleanedSgdValue.lastIndexOf(',');
+            const lastDot = cleanedSgdValue.lastIndexOf('.');
+            // function only get one dot or one comma
+            if (lastComma > -1 && lastDot > -1) {
+                if (lastComma > lastDot) {
+                    cleanedSgdValue = cleanedSgdValue.replace(/\./g, ''); 
+                    cleanedSgdValue = cleanedSgdValue.replace(/(,)(?=.*\,)/g, '');
+                } else {
+                    cleanedSgdValue = cleanedSgdValue.replace(/\,/g, ''); 
+                    cleanedSgdValue = cleanedSgdValue.replace(/(\.)(?=.*\.)/g, '');
+                }
+            } else {
+                cleanedSgdValue = cleanedSgdValue
+                    .replace(/,/g, (match, offset) => offset === 0 ? '' : ',') 
+                    .replace(/(,)(?=.*\,)/g, '') 
+                    .replace(/\./g, (match, offset) => offset === 0 ? '' : '.') 
+                    .replace(/(\.)(?=.*\.)/g, ''); 
+            }
+            if (cleanedSgdValue.startsWith(',') || cleanedSgdValue.startsWith('.')) {
+                cleanedSgdValue = cleanedSgdValue.substring(1);
+            }
+            // update value input
+            if (sgdValue !== cleanedSgdValue) {
+                $(this).val(cleanedSgdValue);
+                sgdValue = cleanedSgdValue;
+            }
+            return sgdValue;
         }
+        function homeGetFaq() {
+            getAllDataByType('faq').then((res) => {
+                if (res) {
+                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_homepage)
+                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_homepage', true)
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs);
+                    allFaq.forEach((i) => {
+                        createFaqNew(i).appendTo($('.home-faq-main'))
+                    })
+                    updateInterestRate('.home-faq-main');
+                    $('.home-faq-main').find('.load-ske').addClass('loaded')
+                    animateFaq();
+                    scrollToFaq();
+                }
+            });
+            function scrollToFaq() {
+                $('[data-scroll-faq]').on('click', function(e) {
+                    e.preventDefault();
+                    let target = $(this).attr('data-scroll-faq');
+                    if ($(`#${target}`).length >= 1) {
+                        lenis.scrollTo(target)
+                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
+                    } else {
+                        lenis.scrollTo(`${$(this).attr('href')}`)
+                    }
+
+                })
+            }
+        }
+        homeGetFaq();
         guaranteeFee();
     }
     const pageName = $('.main').attr('data-barba-namespace');
