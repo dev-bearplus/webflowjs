@@ -402,11 +402,15 @@ const mainScript = () => {
         ans.find('.other-rate-sgd').attr('data-rate-sgd','other');
         ans.find('.limit-amount-sgd').attr('data-rate-sgd','amount');
         ans.find('.limit-date-sgd').attr('data-rate-sgd','date');
+        ans.find('.minimum-sum-sgd').attr('data-rate-sgd','minimum-sum');
+        ans.find('.instant-withdrawal-limit-sgd').attr('data-rate-sgd','withdrawal');
         ans.find('.big-rate-usd').attr('data-rate-usd','big');
         ans.find('.small-rate-usd').attr('data-rate-usd','small');
         ans.find('.other-rate-usd').attr('data-rate-usd','other');
         ans.find('.limit-amount-usd').attr('data-rate-usd','amount');
         ans.find('.limit-date-usd').attr('data-rate-usd','date');
+        ans.find('.minimum-sum-usd').attr('data-rate-usd','minimum-sum');
+        ans.find('.instant-withdrawal-limit-usd').attr('data-rate-usd','withdrawal');
         // Embed
         ans.find('[data-oembed]').addClass('art-embed-wrap mod-faq');
 
@@ -1185,6 +1189,8 @@ const mainScript = () => {
         let SGDamount = $('[data-rate-source-sgd="amount"]').text();
         let SGDdate = $('[data-rate-source-sgd="date"]').text();
         let SGDwidthdrawal = $('[data-rate-source-sgd="withdrawal"]').text();
+        let SGDminimumsum = $('[data-rate-source-sgd="minimum-sum"]').text();
+
         let SGDallRates = $(wrapper).find('[data-rate-sgd]');
         SGDallRates.each(function(e) {
             let type = $(this).attr('data-rate-sgd');
@@ -1202,7 +1208,9 @@ const mainScript = () => {
                 $(this).text(SGDotherRate)
             } else if (type == 'withdrawal') {
                 $(this).text(SGDwidthdrawal)
-            } else if (type == 'fixed') {
+            }else if (type == 'minimum-sum') {
+                $(this).text(SGDminimumsum)
+            }else if (type == 'fixed') {
                 // $(this).text(fixedRate)
             }
         })
@@ -1214,7 +1222,8 @@ const mainScript = () => {
         // let USDfixedRate = $('[data-rate-source-usd="fixed"]').text();
         let USDamount = $('[data-rate-source-usd="amount"]').text();
         let USDdate = $('[data-rate-source-usd="date"]').text();
-        let USDwidthdrawal = $('[data-rate-source-sgd="withdrawal"]').text();
+        let USDwidthdrawal = $('[data-rate-source-usd="withdrawal"]').text();
+        let USDminimiumsum = $('[data-rate-source-usd="minimum-sum"]').text();
         let USDallRates = $(wrapper).find('[data-rate-usd]');
         USDallRates.each(function(e) {
             let type = $(this).attr('data-rate-usd');
@@ -1232,7 +1241,9 @@ const mainScript = () => {
                 $(this).text(USDotherRate)
             } else if (type == 'withdrawal') {
                 $(this).text(USDwidthdrawal)
-            } else if (type == 'fixed') {
+            }else if (type == 'minimum-sum') {
+                $(this).text(USDminimiumsum)
+            }else if (type == 'fixed') {
                 // $(this).text(USDfixedRate)
             }
         })
