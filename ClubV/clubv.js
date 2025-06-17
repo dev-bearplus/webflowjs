@@ -1452,7 +1452,31 @@ const mainScript = () => {
                         }
                     });
                 }
-
+                const addSticky = debounce(() => {
+                    $(".mb-hero-card-wrap").addClass("on-sticky");
+                    ScrollTrigger.refresh();
+                }, 100); 
+                    
+                const removeSticky = debounce(() => {
+                $(".mb-hero-card-wrap").removeClass("on-sticky");
+                    ScrollTrigger.refresh();
+                }, 100);
+                let tl = gsap.timeline({
+                    paused: true,
+                    scrollTrigger: {
+                      trigger: ".mb-hero-card-main",
+                      start: "top top",
+                      endTrigger: ".mb-hero-content-wrap",
+                      end: "bottom+=5% bottom",
+                      onEnter: addSticky,
+                      onEnterBack: addSticky,
+                      onLeaveBack: removeSticky,
+                      onLeave: debounce(() => {
+                        ScrollTrigger.refresh();
+                      }, 200)
+                    },
+                });
+                tl.play();
               
         }
         interact() {
