@@ -169,7 +169,56 @@ const mainScript = () => {
         }
         });
     }
+    const toggleLanguage = () => {
+        let domain = '';
+        function init(lang) {
+            $(`.header-lang-item`).show();
+            if (lang == 'en-US') {
+                lang = 'en'
+            }
+            $(`.header-lang-item[data-lang=${lang}]`).hide();
+            const name = $(`.header-lang-item[data-lang=${lang}] .header-lang-item-txt`).text();
+            $('.header-lang-title-wrap').attr('data-lang', lang)
+            $('.header-lang-title-txt').text(name);
+        }
+        let currentLanguage = $('html').attr('lang');
+        init(currentLanguage);
+        function switchLanguage(language) {
+            init(language);
+            var currentUrl = window.location.href;
+            var url = new URL(currentUrl);
+            var path = url.pathname.replace(/^\/[a-z]{2}\//, '/'); // Remove any existing language code at the start of the path
 
+            var newUrl;
+            var pathCheck;
+            if (path.startsWith('/')) {
+                pathCheck = path.substring(1);
+            }
+            if (pathCheck != currentLanguage) {
+                console.log(path)
+                if (language == 'en') {
+                    newUrl = domain + path + url.search + url.hash;
+                } else {
+                    newUrl = domain + '/'+ language + path + url.search + url.hash;
+                }
+            }
+            else {
+                if (language == 'en') {
+                    newUrl = domain +'/'+ url.search + url.hash;
+                }
+                else {
+                    newUrl = domain + '/' + language + url.search + url.hash;
+                }
+            }
+            window.location.href = newUrl;
+        }
+
+        $('.header-lang-item').on('click', function () {
+            const language = $(this).attr('data-lang')
+            switchLanguage(language)
+        })
+    }
+    toggleLanguage();
     class TriggerSetup {
         constructor(triggerEl) {
         this.tlTrigger;
