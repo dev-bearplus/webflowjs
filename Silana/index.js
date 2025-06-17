@@ -155,7 +155,7 @@ const script = () => {
             this.scroller.scrollY = e.scroll
 
             this.scroller.velocity = e.velocity * .2
-            this.scroller.direction = e.direction
+            this.scroller.direction = e.direction;
         }
     }
     const smoothScroll = new SmoothScroll();
@@ -207,6 +207,24 @@ const script = () => {
         }
     }
     const loader = new Loader();
+
+    class Marquee {
+        constructor(list, duration = 40) {
+            this.list = list;
+            this.duration = duration;
+        }
+        setup() {
+            const cloneAmount = Math.ceil($(window).width() / this.list.width()) + 1;
+            this.list.css('animation-duration', `${Math.ceil(this.list.width() / this.duration)}s`);
+
+            new Array(cloneAmount).fill().forEach(() => {
+                let itemClone = this.list.find('[data-marquee="item"]').clone();
+                this.list.append(itemClone);
+            });
+            this.list.addClass('anim-marquee');
+        }
+    }
+
 
     class GlobalChange {
         constructor() {
@@ -348,6 +366,8 @@ const script = () => {
                     this.setupEnter(data);
                 }
                 else return;
+
+                new Marquee($(this.el).find('[data-marquee="list"'), 40).setup();
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
