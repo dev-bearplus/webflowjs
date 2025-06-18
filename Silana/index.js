@@ -120,7 +120,13 @@ const script = () => {
         }
         reInit(data) {
             let namespace = data ? data.next.namespace : $('[data-barba="container"]').attr('data-barba-namespace');
-            this.lenis = new Lenis()
+            this.lenis = new Lenis({
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                orientation: "vertical",
+                gestureOrientation: "both",
+                smoothWheel: true,
+                infinite: false,
+            })
             this.lenis.on('scroll', ScrollTrigger.update)
             this.lenis.on('scroll', (e) => {
                 this.updateOnScroll(e);
@@ -350,6 +356,23 @@ const script = () => {
     }
     const pageTrans = new PageTrans();
 
+    class TriggerSetup {
+        constructor() {
+            this.tlTrigger;
+        }
+        setTrigger(triggerEl, setup) {
+            this.tlTrigger = gsap.timeline({
+                scrollTrigger: {
+                    trigger: triggerEl,
+                    start: 'top bottom+=50%',
+                    end: 'bottom top',
+                    once: true,
+                    onEnter: () => setup(),
+                }
+            })
+        }
+    }
+
     const HomePage = {
         Hero: class {
             constructor() {
@@ -359,7 +382,7 @@ const script = () => {
                 this.tlTriggerEnter = null;
             }
             setup(data, mode) {
-                this.el = data.next.container.querySelector('.home-hero');
+                this.el = data.next.container.querySelector('.home-hero-wrap');
                 if (mode === 'once') {
                     this.setupOnce(data);
                 } else if (mode === 'enter') {
@@ -411,6 +434,62 @@ const script = () => {
                 if (this.tlTriggerEnter) {
                     this.tlTriggerEnter.kill();
                 }
+            }
+        },
+        Solution: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.home-solution-wrap');
+                super.setTrigger(this.el, this.setup.bind(this));
+            }
+            setup() {
+                this.sections = this.el.querySelectorAll('section');
+                this.horizontalLayout(this.sections);
+            }
+            horizontalLayout(sections) {
+                let sizeScroller = 0;
+                let totalWidth = 0;
+                gsap.set(this.el.querySelector('.home-solution-inner'), { position: 'sticky', top: 0, display: 'flex' })
+
+                sections.forEach(function (slide, index) {
+                    gsap.set(slide, { width: window.innerWidth })
+                    if (index < sections.length - 1) {
+                        sizeScroller += slide.offsetWidth;
+                    }
+                    totalWidth += slide.offsetWidth;
+                });
+                gsap.set(this.el.querySelector('.solution-scroller'), { height: sizeScroller })
+                gsap.set(this.el.querySelector('.home-solution-inner'), { width: totalWidth })
+
+
+                gsap.to(this.el.querySelector('.home-solution-inner'),
+                    {
+                        scrollTrigger: {
+                            trigger: '.solution-scroller',
+                            start: 'top top',
+                            end: 'bottom bottom',
+                            scrub: true,
+                            // markers:true,
+                            invalidateOnRefresh: true,
+                            anticipatePin:1,
+                            fastScrollEnd:true
+                        },
+                        x: -sizeScroller,
+                        transformOrigin: "top",
+                        ease: "none",
+                        onUpdate:()=>{
+
+                        },
+                        onComplete: () => {
+                            ScrollTrigger.refresh();
+                        }
+                    }
+                )
+            }
+            destroy() {
             }
         }
     }
@@ -470,8 +549,13 @@ const script = () => {
             const data = event.detail;
             const mode = event.mode;
             this.sections.forEach(section => {
-                if (section.setup) {
-                    section.setup(data, mode);
+                if (section.trigger) {
+                    section.trigger(data);
+                }
+                else {
+                    if (section.setup) {
+                        section.setup(data, mode);
+                    }
                 }
             });
         }
@@ -488,7 +572,8 @@ const script = () => {
     class HomePageManager extends PageManager {
         constructor() {
             const hero = new HomePage.Hero();
-            super([hero]);
+            const solution = new HomePage.Solution();
+            super([hero, solution]);
         }
     }
 
