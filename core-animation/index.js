@@ -247,7 +247,7 @@ class RevealTextReset  {
     }
 }
 class FadeSplitText {
-    constructor({ el, delay, breakType, isDisableRevert, onMask, headingType = false, ...props }) {
+    constructor({ el, delay, breakType, isDisableRevert, onMask, isFast=false, headingType = false, ...props }) {
         if (!el || el.textContent === '') return;
         this.DOM = { el: el };
         this.onMask = onMask || false;
@@ -260,12 +260,13 @@ class FadeSplitText {
                     headingType: headingType
         }).DOM.splitType;
         this.delay = delay;
+        this.duration = isFast? 0.45 : .6;
         this.onMask && gsap.set(el.querySelectorAll('.line__mask'), { overflow: 'hidden' });
         this.animation = gsap.from(this.textSplit[this.breakType], {
             autoAlpha: 0,
             yPercent: 100,
             stagger: this.breakType == 'lines' ? 0.1 : 0.04,
-            duration: this.breakType == 'lines' ? .6 : 1,
+            duration: this.breakType == 'lines' ? this.duration : 1,
             ease: 'power2.out',
             onComplete: () => {
                 if (!isDisableRevert) {
