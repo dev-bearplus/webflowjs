@@ -2454,7 +2454,7 @@ const mainScript = () => {
                         $('.home-hero-client-item').on('click', function(e) {
                             e.preventDefault();
                             let video = $(this).find('video').get(0);
-                            if (video.paused) {
+                            if (video.querySelector('source').getAttribute('src') != '' & video.paused) {
                                 // Pause all videos first
                                 $('.home-hero-client-item video').each(function() {
                                     this.pause();
@@ -2467,12 +2467,14 @@ const mainScript = () => {
                         $('.home-hero-client-item').on('mouseenter', function(e) {
                             e.preventDefault();
                             let video = $(this).find('video').get(0)
+                            if (video.querySelector('source').getAttribute('src') == '') return;
                             video.currentTime = 0
                             video.play()
                         })
                         $('.home-hero-client-item').on('mouseleave', function(e) {
                             e.preventDefault();
                             let video = $(this).find('video').get(0)
+                            if (video.querySelector('source').getAttribute('src') == '') return;
                             video.pause()
                         })
                     }
