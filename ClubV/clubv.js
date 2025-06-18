@@ -2589,9 +2589,9 @@ const mainScript = () => {
                     : [];
                 const isMatch = filterDates.some(d => dateFilterList.includes(d));
                 if (isMatch) {
-                    $(el).fadeIn().addClass('show');
+                    $(el).show().addClass('show');
                 } else {
-                    $(el).fadeOut().removeClass('show');
+                    $(el).hide().removeClass('show');
                 }
             });
         }
