@@ -535,12 +535,11 @@ const mainScript = () => {
             });
             viewport.w > 991 && new MasterTimeline({
                 timeline: tl,
-                allowMobile: false,
                 tweenArr: [
-                    new FadeSplitText({ el: $('.home-explore-title').get(0), onMask: true })
+                    new FadeSplitText({ el: $('.home-explore-title').get(0), isFast: true, onMask: true })
                 ]
             })
-           viewport.w > 991 && new ImageTrail('.home-explore');
+        //    viewport.w > 991 && new ImageTrail('.home-explore');
         }
     }
     let homeExplore = new HomeExplore(".home-explore-wrap");
@@ -1105,7 +1104,7 @@ const mainScript = () => {
                     tweenArr: [
                         new FadeSplitText({ el: $(el).find('.home-service-item-number').get(0), onMask: true}),
                         new FadeSplitText({ el: $(el).find('.home-service-item-title').get(0), onMask: true}),
-                        new FadeSplitText({ el: $(el).find('.home-service-item-sub').get(0), onMask: true}),
+                        new FadeSplitText({ el: $(el).find('.home-service-item-sub').get(0), isFast: true, onMask: true}),
                         new FadeIn({ el: $(el).find('.home-service-item-link')}),
                         new ScaleLine({ el: $(el).find('.home-service-item-line-wrap')}),
                     ]
@@ -1200,7 +1199,7 @@ const mainScript = () => {
                     tweenArr: [
                         new ScaleLine({ el: $(el).find('.home-faq-item-line')}),   
                         new FadeIn({ el: $(el).find('.home-faq-item-number')}),
-                        new FadeSplitText({ el: $(el).find('.home-faq-item-title').get(0), onMask: true}),
+                        new FadeSplitText({ el: $(el).find('.home-faq-item-title').get(0), isFast : true, onMask: true}),
                         new FadeIn({ el: $(el).find('.home-faq-item-ic')}),
                     ]
                 })
@@ -1247,8 +1246,8 @@ const mainScript = () => {
                         return [
                             new FadeIn({ el: $(el).find('.home-testi-item-ic')}),
                             new FadeSplitText({ el: $(el).find('.home-testi-item-time').get(0), onMask: true}),
-                            new FadeSplitText({ el: $(el).find('.home-testi-item-body').get(0), onMask: true}),
-                            new FadeSplitText({ el: $(el).find('.home-testi-item-name').get(0), delay:1, onMask: true}),
+                            new FadeSplitText({ el: $(el).find('.home-testi-item-body').get(0), isFast: true, onMask: true}),
+                            new FadeSplitText({ el: $(el).find('.home-testi-item-name').get(0), onMask: true}),
                             new FadeSplitText({ el: $(el).find('.home-testi-item-position').get(0), onMask: true}),
                         ]
                     }),
@@ -1305,7 +1304,7 @@ const mainScript = () => {
                     tweenArr: [
                         new ScaleInset({ el: $(el).find('.home-article-item-img').get(0)}),
                         new FadeSplitText({ el: $(el).find('.home-article-item-title').get(0), onMask: true}),
-                        new FadeSplitText({ el: $(el).find('.home-article-item-sub').get(0), onMask: true}),
+                        new FadeSplitText({ el: $(el).find('.home-article-item-sub').get(0), isFast: true, onMask: true}),
                         new FadeIn({ el: $(el).find('.home-article-item-link').get(0)}),
                         new FadeSplitText({ el: $(el).find('.home-article-item-link-txt').get(0), onMask: true}),
                     ]
@@ -2721,8 +2720,8 @@ const mainScript = () => {
             new MasterTimeline({
                 timeline: this.tl,
                 tweenArr : [
-                    new FadeSplitText({el: $('.work-hero-title').get(0), onMask: true}),
-                    new FadeSplitText({el: $('.work-hero-label').get(0), onMask: true}),
+                    new FadeSplitText({el: $('.work-hero-title').get(0), isFast: true, onMask: true}),
+                    new FadeSplitText({el: $('.work-hero-label').get(0), isFast: true, onMask: true}),
                     new ScaleInset({el: $('.work-hero-sub-img-inner').get(0), delay: .2}),
                 ]
             })
@@ -2737,9 +2736,9 @@ const mainScript = () => {
                 new MasterTimeline({
                     timeline: tlItem,
                     tweenArr : [
-                        new  FadeSplitText({el: $(el).find('.work-hero-sub-item-num').get(0), onMask: true}),
-                        new  FadeSplitText({el: $(el).find('.work-hero-sub-item-title').get(0), onMask: true}),
-                        new  FadeSplitText({el: $(el).find('.work-hero-sub-item-sub').get(0), onMask: true}),
+                        new  FadeSplitText({el: $(el).find('.work-hero-sub-item-num').get(0), isFast: true, onMask: true}),
+                        new  FadeSplitText({el: $(el).find('.work-hero-sub-item-title').get(0), isFast: true, onMask: true}),
+                        new  FadeSplitText({el: $(el).find('.work-hero-sub-item-sub').get(0), isFast: true, onMask: true}),
                     ]
                 })
             })
@@ -2890,7 +2889,7 @@ const mainScript = () => {
             new MasterTimeline({
                 timeline: tlContent,
                 tweenArr: [
-                    new FadeSplitText({ el: $('.work-enviroment-title').get(0), onMask: true })
+                    new FadeSplitText({ el: $('.work-enviroment-title').get(0), isFast: true, onMask: true })
                 ]
             });
         }
@@ -2928,9 +2927,9 @@ const mainScript = () => {
                 new MasterTimeline({
                     timeline: tlItem,
                     tweenArr : [
-                        new  FadeSplitText({el: $(el).find('.work-workspace-left-item-num').get(0), onMask: true}),
-                        new  FadeSplitText({el: $(el).find('.work-workspace-left-item-title').get(0), onMask: true}),
-                        new  FadeSplitText({el: $(el).find('.work-workspace-left-item-sub').get(0), onMask: true}),
+                        new  FadeSplitText({el: $(el).find('.work-workspace-left-item-num').get(0), isFast: true, onMask: true}),
+                        new  FadeSplitText({el: $(el).find('.work-workspace-left-item-title').get(0), isFast: true, onMask: true}),
+                        new  FadeSplitText({el: $(el).find('.work-workspace-left-item-sub').get(0), isFast: true, onMask: true}),
                     ]
                 })
             })
@@ -3180,9 +3179,9 @@ const mainScript = () => {
                     timeline: tlInit,
                     tweenArr : [
                         new FadeSplitText({el: $(el).find('.work-info-content-item-label').get(0), onMask: true, delay: i==0? 0: i*.1}),
-                        ...Array.from($(el).find('.work-info-content-item-name')).flatMap((el,i) => new FadeSplitText({el: $(el).get(0), onMask: true, delay:.2})),
+                        ...Array.from($(el).find('.work-info-content-item-name')).flatMap((el,i) => new FadeSplitText({el: $(el).get(0), onMask: true})),
+                        new FadeSplitText({el: $(el).find('.work-info-content-item-title').get(0), isFast: true, delay: .6, onMask: true}),
                         ...Array.from($(el).find('.work-info-content-item-link')).flatMap((el,i) => new FadeIn({el: $(el).get(0)})),
-                        new FadeSplitText({el: $(el).find('.work-info-content-item-title').get(0), onMask: true, delay:.2})
                     ]
                 })
             })
