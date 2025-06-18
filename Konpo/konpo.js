@@ -1905,6 +1905,72 @@ const mainScript = () => {
         //entersite
 
     }
+    class Reel {
+        constructor(el) {
+            this.el = el
+            this.video = this.el.find('video').get(0)
+            this.videoToggle = this.el.find('[data-video]')
+            this.videoToggle.on('click', this.toggleReel.bind(this))
+            this.el.find('.popup-reel-close-btn, .popup-reel-close-btn-mb').on('click', this.closeReel.bind(this))
+        }
+        resetReel() {
+            this.closeReel()
+            this.video.currentTime = 0
+        }
+        toggleReel(e) {
+            e.preventDefault();
+            if (this.videoToggle.attr('data-video') == 'to-play') {
+                this.playReel()
+            } else {
+                this.pauseReel()
+            }
+        }
+        playReel() {
+            if ($(window).width() < 768) {
+                this.el.find('.popup-reel-mb-info').removeClass('active')
+            }
+            $(this.videoToggle).attr('data-video', 'to-pause')
+            this.el.find('.popup-reel-inner').addClass('on-play')
+            this.el.find('.popup-reel-video-main').addClass('on-play')
+            this.video.play()
+            this.el.find('.cursor-vid-prog').addClass('active')
+            requestAnimationFrame(this.updateReel.bind(this))
+            this.status = 'to-pause'
+        }
+        pauseReel() {
+            if ($(window).width() < 768) {
+                this.el.find('.popup-reel-mb-info').addClass('active')
+            }
+            $(this.videoToggle).attr('data-video', 'to-play')
+            this.el.find('.popup-reel-inner').removeClass('on-play')
+            this.el.find('.popup-reel-video-main').removeClass('on-play')
+            this.el.find('.popup-reel-video-main').find('video').get(0).pause()
+            gsap.set('.cursor-vid-prog', {'--vid-prog': '0deg', clearProps: 'all'})
+            cancelAnimationFrame(this.updateReel.bind(this))
+            this.status = 'to-play'
+        }
+        openReel() {
+            this.el.addClass('active')
+            this.el.find('.popup-reel-close-inner').addClass('active')
+            // video.currentTime = 0
+            this.playReel()
+        }
+        closeReel() {
+            this.el.removeClass('active')
+            this.el.find('.popup-reel-close-inner').removeClass('active')
+            this.pauseReel()
+        }
+        updateReel() {
+            let progress = (this.video.currentTime / this.video.duration) * 360;
+            gsap.set('.cursor-vid-prog', {'--vid-prog': `${progress}deg`});
+            requestAnimationFrame(this.updateReel.bind(this));
+        }
+    }
+    //Reel
+    let reel = null;
+    if ($('.popup-reel').length) {
+        reel = new Reel($('.popup-reel'))
+    }
 
     if ($('.loader24-idle').length) {
         $('.loader24-idle').addClass('done')
@@ -2090,14 +2156,9 @@ const mainScript = () => {
         yearDates.each((idx, el) => {
             $(el).text(dayjs(Date.now()).format('YYYY'))
         })
-        if ($('.popup-reel').length) {
-            $('.popup-reel').removeClass('active')
-            $('.popup-reel-close-inner').removeClass('active')
-            $('.popup-reel-inner').removeClass('on-play')
-            $('.popup-reel-video-main').removeClass('on-play')
-            $('.popup-reel-video-main').find('video').get(0).pause()
-            gsap.set('.cursor-vid-prog', {'--vid-prog': '0deg', clearProps: 'all'})
-            cancelAnimationFrame(updateReel)
+        if (reel) {
+            // Pause Reel
+            reel.resetReel()
         }
     }
     function addStickyFooter(data) {
@@ -2495,64 +2556,13 @@ const mainScript = () => {
                     }
                 }
 
-                if ($('.home-abt-btn-video').length > 0) { 
+                if ($('.home-abt-btn-video').length > 0) {
                     $('.home-abt-btn-video[data-popup="showreel"]').on('click', function(e) {
                         e.preventDefault();
-                        openReel()
-                    })
-                    $('.popup-reel [data-video]').on('click', function(e) {
-                        e.preventDefault();
-                        if ($('.popup-reel [data-video]').attr('data-video') == 'to-play') {
-                            playReel()
-                        } else {
-                            pauseReel()
+                        if (reel) {
+                            reel.openReel()
                         }
                     })
-                    function playReel() {
-                        if ($(window).width() < 768) {
-                            $('.popup-reel-mb-info').removeClass('active')
-                        }
-                        $('.popup-reel [data-video]').attr('data-video', 'to-pause')
-                        $('.popup-reel-inner').addClass('on-play')
-                        $('.popup-reel-video-main').addClass('on-play')
-                        $('.popup-reel-video-main').find('video').get(0).play()
-                        $('.cursor-vid-prog').addClass('active')
-                        requestAnimationFrame(updateReel)
-                    }
-                    function pauseReel() {
-                        if ($(window).width() < 768) {
-                            $('.popup-reel-mb-info').addClass('active')
-                        }
-                        $('.popup-reel [data-video]').attr('data-video', 'to-play')
-                        $('.popup-reel-inner').removeClass('on-play')
-                        $('.popup-reel-video-main').removeClass('on-play')
-                        $('.popup-reel-video-main').find('video').get(0).pause()
-                        gsap.set('.cursor-vid-prog', {'--vid-prog': '0deg', clearProps: 'all'})
-                        cancelAnimationFrame(updateReel)
-                    }
-                    function openReel() {
-                        $('.popup-reel').addClass('active')
-                        $('.popup-reel-close-inner').addClass('active')
-                        // video.currentTime = 0
-                        playReel()
-                    }
-                    function closeReel() {
-                        $('.popup-reel').removeClass('active')
-                        $('.popup-reel-close-inner').removeClass('active')
-                        pauseReel()
-                    }
-                    
-                    $('.popup-reel-close-btn, .popup-reel-close-btn-mb').on('click', function(e) {
-                        e.preventDefault();
-                        closeReel()
-                    })
-                    let video = $('.popup-reel-video-main').find('video').get(0)
-                    function updateReel() {
-                        let progress = (video.currentTime / video.duration) * 360;
-                        gsap.set('.cursor-vid-prog', {'--vid-prog': `${progress}deg`});
-                        requestAnimationFrame(updateReel);
-                    }
-                    
                 }
             }
             homeAbt()
