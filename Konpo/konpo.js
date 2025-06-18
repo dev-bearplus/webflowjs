@@ -909,6 +909,12 @@ const mainScript = () => {
                     } else {
                         $('.cursor-vid-prog').removeClass('active')
                     }
+                } else if ($('.popup-reel').length) {
+                    if ($('.popup-reel [data-video]:hover').length && $('.cursor-vid-prog').length) {
+                        $('.cursor-vid-prog').addClass('active')
+                    } else {
+                        $('.cursor-vid-prog').removeClass('active')
+                    }
                 }
                 requestAnimationFrame(moveCursor)
             }
@@ -1667,8 +1673,37 @@ const mainScript = () => {
                 ease: 'power2.inOut',
             })
         }
+        let videoRefEl;
+        let allClientCard;
+        if ($('.home-hero-thumb').length > 0) {
+            videoRefEl = $('.home-hero-thumb')
+        } else {
+            $('.home-hero-client-inner').css('pointer-events', 'none')
+            allClientCard = $('.home-hero-client-item')
+            videoRefEl = $('.home-hero-client-item-inner').eq(allClientCard.length - 1)
+            let lastImages;
+            allClientCard.each((idx, card) => {
+                if ($(window).width() >= 768) {
+                    lastImages = $('.home-hero-client-item-inner').eq(0).find('img').attr('src')
+                    $(card).css('z-index', allClientCard.length - idx)
+                    if (idx != (allClientCard.length - 1)) {
+                        let rightRect = $(window).width() - card.getBoundingClientRect().right - parseRem(20)
+                        console.log(rightRect)
+                        gsap.set(card, {x: rightRect})
+                    }
+                } else {
+                    lastImages = $('.home-hero-client-item-inner').eq(allClientCard.length - 1).find('img').attr('src')
+                    if (idx != 0) {
+                        let leftRect = card.getBoundingClientRect().left - parseRem(20)
+                        console.log(leftRect)
+                        gsap.set(card, {x: leftRect * -1})
+                    }
+                }
+            })
+            $('.loader-img-inner').eq($('.loader-img-inner').length - 1).find('img').attr('src', lastImages).attr('srcset', lastImages)
+        }
 
-        gsap.set('.loader-imgs-wrap', {width: $('.home-hero-thumb').get(0).getBoundingClientRect().width, height: $('.home-hero-thumb').get(0).getBoundingClientRect().height})
+        gsap.set('.loader-imgs-wrap', {width: videoRefEl.get(0).getBoundingClientRect().width, height: videoRefEl.get(0).getBoundingClientRect().height})
         let count = {val: 0};
 
         let tl = gsap.timeline({
@@ -1711,7 +1746,7 @@ const mainScript = () => {
                 } else {
                     scaleFactor = ($(window).width() / $('.loader-img-inner').width()) * 2;
                     distanceX = 0;
-                    distanceY = $('.home-hero-thumb').get(0).getBoundingClientRect().top - parseRem(20);
+                    distanceY = videoRefEl.get(0).getBoundingClientRect().top - parseRem(20);
                 }
                 $('.loader-img-inner').each((idx, el) => {
                     let childTl = gsap.timeline({
@@ -1720,7 +1755,7 @@ const mainScript = () => {
                             allowAnim = true;
                             gsap.to('.header', {autoAlpha: 1, duration: .8, onComplete: () => {
                                 lenis.start()
-                                $('.home-hero-vid-thumbnail').find('video').get(0).play()
+                                // $('.home-hero-vid-thumbnail').find('video').get(0).play()
                                 $('.home-hero-thumb-mobile-dot').addClass('active')
                                 if ($('.loader-24').length) {
                                     $('.loader-24').remove()
@@ -2055,6 +2090,15 @@ const mainScript = () => {
         yearDates.each((idx, el) => {
             $(el).text(dayjs(Date.now()).format('YYYY'))
         })
+        if ($('.popup-reel').length) {
+            $('.popup-reel').removeClass('active')
+            $('.popup-reel-close-inner').removeClass('active')
+            $('.popup-reel-inner').removeClass('on-play')
+            $('.popup-reel-video-main').removeClass('on-play')
+            $('.popup-reel-video-main').find('video').get(0).pause()
+            gsap.set('.cursor-vid-prog', {'--vid-prog': '0deg', clearProps: 'all'})
+            cancelAnimationFrame(updateReel)
+        }
     }
     function addStickyFooter(data) {
         if (data.next.namespace == 'home') {
@@ -2222,7 +2266,7 @@ const mainScript = () => {
                 gsap.set(homeHeroLabel.words, {yPercent: 100})
                 gsap.set(homeHeroSub.words, {yPercent: 100})
                 gsap.set(homeHeroCap.words, {yPercent: 100})
-
+                gsap.set('.home-hero-client-item-label, .home-hero-client-item-title', {autoAlpha: 0})
                 function checkToStart() {
                     if (allowAnim) {
                         let tl = gsap.timeline({
@@ -2248,12 +2292,18 @@ const mainScript = () => {
                                 homeHeroSub.revert()
                                 homeHeroCap.revert()
                             },
-                            delay: comingToHome ? delayTime : 0
+                            delay: comingToHome ? delayTime : $('.home-hero-thumb').length > 0 ? 0 : .8
                         })
+
 
                         tl
                         .set('.home-hero-title, .home-hero-sub', {opacity: 1})
                         .to(homeHeroTitle.words, {yPercent: 0, duration: .6, stagger: .03})
+                        .to('.home-hero-client-item', {'transition-property': 'none', clearProps: 'transition-property', x: 0, duration: .88, stagger: $(window).width() >= 768 ? .08 : -.08, ease: 'power2.out'}, 0)
+                        .to('.home-hero-client-item-label', {autoAlpha: 1, duration: .6, stagger: .03}, '<=0.2')
+                        .to('.home-hero-client-item-title', {autoAlpha: 1, duration: .6, stagger: .03, onComplete: () => {
+                            gsap.set('.home-hero-client-inner', {clearProps: 'all'})
+                        }}, '<=0.2')
                         .to(homeHeroSub.words, {yPercent: 0, duration: .6, stagger: .03}, '<=.2')
                         .from('.home-hero-sub-wrap .line', {scaleX: 0, transformOrigin: 'left', duration: .6, clearProps: 'all'}, '<=.2')
                         .from('.home-hero-award svg path', {autoAlpha: 0, drawSVG: '50% 50%', duration: .6, stagger: .1}, '<=0')
@@ -2319,8 +2369,69 @@ const mainScript = () => {
                     }
                 })
             }
-            homeHeroVid()
-
+            if ($('.home-hero-thumb').length > 0) {
+                homeHeroVid()
+            }
+            
+            function homeHeroClient() {
+                if ($(window).width() >= 768) {
+                    let maxHeight = $('.home-hero-client-cms').outerHeight()
+                    let tl = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: '.home-hero',
+                            start: `top top`,
+                            endTrigger: '.home-hero',
+                            end: 'bottom bottom',
+                            scrub: true
+                        }
+                    })
+                    tl
+                    .to('.home-hero-client-inner', {y: parseRem(45), height: maxHeight, ease: 'none'})
+                }
+                if ($(window).width() >= 768) {
+                    if (isTouchDevice()) {
+                        $('.home-hero-client-item').on('click', function(e) {
+                            e.preventDefault();
+                            let video = $(this).find('video').get(0);
+                            if (video.paused) {
+                                // Pause all videos first
+                                $('.home-hero-client-item video').each(function() {
+                                    this.pause();
+                                });
+                                video.currentTime = 0;
+                                video.play();
+                            }
+                        });
+                    } else {
+                        $('.home-hero-client-item').on('mouseenter', function(e) {
+                            e.preventDefault();
+                            let video = $(this).find('video').get(0)
+                            video.currentTime = 0
+                            video.play()
+                        })
+                        $('.home-hero-client-item').on('mouseleave', function(e) {
+                            e.preventDefault();
+                            let video = $(this).find('video').get(0)
+                            video.pause()
+                        })
+                    }
+                } else {
+                    $('.home-hero-client-cms').addClass('swiper')
+                    $('.home-hero-client-inner').addClass('swiper-wrapper')
+                    $('.home-hero-client-item').addClass('swiper-slide')
+                    let swiper = new Swiper('.home-hero-client-cms', {
+                        slidesPerView: 1,
+                    })
+                    swiper.on('slideChange', function() {
+                        let video = $('.home-hero-client-item-inner').eq(swiper.activeIndex).find('video').get(0)
+                        video.currentTime = 0
+                        video.play()
+                    })
+                }
+            }
+            if ($('.home-hero-client-cms').length > 0) {
+                homeHeroClient()
+            }
             function homeAbt() {
                 const homeAbtSub = new SplitText('.home-abt-title', typeOpts.chars);
                 if ($(window).width() >= 768) {
@@ -2367,14 +2478,81 @@ const mainScript = () => {
                     .from('.home-abt-label-wrap .line', {scaleX: 0, transformOrigin: 'left', duration: 1.1, clearProps: 'all'}, '<=.1')
                     .from(homeAbtSubTxt.words, {yPercent: 100, duration: .4, stagger: .015}, '<=.2')
                     .from('.home-abt-sub-logo', {autoAlpha: 0, duration: .4, stagger: .015}, '<=.2')
-                    .from('.home-abt-btn', {autoAlpha: 0, duration: .4}, '<=0')
-                    .from('.home-abt-btn .txt', {width: '0', marginLeft: '-1.2rem', duration: .4}, '<=0')
+                    if ($('.home-abt-btn-video').length <= 0) {
+                        tlAbt
+                        .from('.home-abt-btn', {autoAlpha: 0, duration: .4}, '<=0')
+                        .from('.home-abt-btn .txt', {width: '0', marginLeft: '-1.2rem', duration: .4}, '<=0')
+                    } else {
+                        tlAbt
+                        .from('.home-abt-btn-video', {autoAlpha: 0, duration: .4}, '<=0')
+                        .from('.home-abt-btn-video .ic-embed', {scale: .5, duration: .4}, '<=0')
+                    }
                 } else {
                     if ($('.home-abt-sub-logos').length) {
                         let logoGrp = $('.home-abt-sub-logos-inner').clone(true)
                         $('.home-abt-sub-logos').append(logoGrp);
                         $('.home-abt-sub-logos-inner').addClass('anim-marquee-mb')
                     }
+                }
+
+                if ($('.home-abt-btn-video').length > 0) { 
+                    $('.home-abt-btn-video[data-popup="showreel"]').on('click', function(e) {
+                        e.preventDefault();
+                        openReel()
+                    })
+                    $('.popup-reel [data-video]').on('click', function(e) {
+                        e.preventDefault();
+                        if ($('.popup-reel [data-video]').attr('data-video') == 'to-play') {
+                            playReel()
+                        } else {
+                            pauseReel()
+                        }
+                    })
+                    function playReel() {
+                        if ($(window).width() < 768) {
+                            $('.popup-reel-mb-info').removeClass('active')
+                        }
+                        $('.popup-reel [data-video]').attr('data-video', 'to-pause')
+                        $('.popup-reel-inner').addClass('on-play')
+                        $('.popup-reel-video-main').addClass('on-play')
+                        $('.popup-reel-video-main').find('video').get(0).play()
+                        $('.cursor-vid-prog').addClass('active')
+                        requestAnimationFrame(updateReel)
+                    }
+                    function pauseReel() {
+                        if ($(window).width() < 768) {
+                            $('.popup-reel-mb-info').addClass('active')
+                        }
+                        $('.popup-reel [data-video]').attr('data-video', 'to-play')
+                        $('.popup-reel-inner').removeClass('on-play')
+                        $('.popup-reel-video-main').removeClass('on-play')
+                        $('.popup-reel-video-main').find('video').get(0).pause()
+                        gsap.set('.cursor-vid-prog', {'--vid-prog': '0deg', clearProps: 'all'})
+                        cancelAnimationFrame(updateReel)
+                    }
+                    function openReel() {
+                        $('.popup-reel').addClass('active')
+                        $('.popup-reel-close-inner').addClass('active')
+                        // video.currentTime = 0
+                        playReel()
+                    }
+                    function closeReel() {
+                        $('.popup-reel').removeClass('active')
+                        $('.popup-reel-close-inner').removeClass('active')
+                        pauseReel()
+                    }
+                    
+                    $('.popup-reel-close-btn, .popup-reel-close-btn-mb').on('click', function(e) {
+                        e.preventDefault();
+                        closeReel()
+                    })
+                    let video = $('.popup-reel-video-main').find('video').get(0)
+                    function updateReel() {
+                        let progress = (video.currentTime / video.duration) * 360;
+                        gsap.set('.cursor-vid-prog', {'--vid-prog': `${progress}deg`});
+                        requestAnimationFrame(updateReel);
+                    }
+                    
                 }
             }
             homeAbt()
