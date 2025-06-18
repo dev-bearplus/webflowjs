@@ -698,12 +698,6 @@ const mainScript = () => {
         }
     })();
 
-    let isInitMeeting = false;
-    function initMeetingsEmbedCode() {
-        if (isInitMeeting) return;
-        MeetingsEmbedCode(MeetingsEmbedCode || {});
-        isInitMeeting = true;
-    }
     const initAllForm = () => {
         initForm({
             formName: 'Contact us',
@@ -741,8 +735,7 @@ const mainScript = () => {
         initPopup('demo', {
             onOpen: () => {
                 let iframe = $('.demo-vid-inner iframe').length > 0 ? $('.demo-vid-inner iframe'): $('<iframe></iframe>');
-                let iframeSrc = new URL($('.demo-vid-inner').attr('data-iframe-src'));
-                iframeSrc += `?origin=${window.location.origin}&autoplay=1`;
+                let iframeSrc = new URL(`https://www.youtube.com/embed/${$('.demo-vid-inner').attr('data-iframe-id')}?origin=${window.location.origin}&autoplay=1`);
                 iframe.attr({
                     'src': iframeSrc,
                     'allow': 'autoplay',
@@ -2519,9 +2512,6 @@ const mainScript = () => {
         schedule: {
             namespace: 'schedule',
             afterEnter() {
-                initMeetingsEmbedCode();
-
-
                 function marqueeLogo() {
                     const cloneAmount = 2;
                     new Array(cloneAmount).fill().forEach((_, index) => {
