@@ -3364,8 +3364,9 @@ const mainScript = () => {
             })
         }
         faqGetFaq();
+        $('.faq-main-wrap').attr(schemaFAQParentAttrs);
         function updateUICate(allFaqCate) {
-            $('.faq-cate-list').html('').attr(schemaFAQParentAttrs);
+            $('.faq-cate-list').html('');
             const faqListTemplate = $('.faq-cate-wrap').eq(0).clone();
             const faqTabTemplate = $('.faq-cate-btn-wrap').eq(0).clone();
             const stickySearchIcon = $('.faq-cate-inner .faq-stick-srch').eq(0).clone();
