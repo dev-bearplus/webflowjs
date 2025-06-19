@@ -789,7 +789,7 @@ const mainScript = () => {
 
             const [urlPath, anchor] = $(this).attr('href').includes('#') ? $(this).attr('href').split('#') : $(this).attr('href').includes('sc') ? $(this).attr('href').split('?sc=') : [$(this).attr('href'), ''];
 
-            $(this).toggleClass("w--current", $(this).attr("href") == `${window.location.pathname}${window.location.hash}`);
+            // $(this).toggleClass("w--current", $(this).attr("href") == `${window.location.pathname}${window.location.hash}`);
             if (!anchor) {
                 return;
             }
@@ -862,6 +862,7 @@ const mainScript = () => {
         let popupWrap = $(`[data-popup-${name}='wrap']`);
         const popupAction = {
             open: (e) => {
+                e.preventDefault();
                 $('.global-popup').addClass('active');
                 setTimeout(() => {
                     popupWrap.addClass('active');
