@@ -2091,7 +2091,6 @@ const mainScript = () => {
                     })
 
                     function animShowEl() {
-                        // $('.prod-hero-title').html($('.prod-hero-title').text());
                         const heroTitle = splitTextFadeUpSetup('.prod-hero-title');
                         const heroSub = splitTextFadeUpSetup('.prod-hero-sub');
                         const heroDesc = splitTextFadeUpSetup('.prod-hero-desc');
