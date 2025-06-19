@@ -1301,7 +1301,7 @@ const mainScript = () => {
                 new MasterTimeline({
                     timeline: tlItem,
                     tweenArr: [
-                        new ScaleInset({ el: $(el).find('.home-article-item-img').get(0)}),
+                        new FadeIn({ el: $(el).find('.home-article-item-img').get(0)}),
                         new FadeSplitText({ el: $(el).find('.home-article-item-title').get(0), onMask: true}),
                         new FadeSplitText({ el: $(el).find('.home-article-item-sub').get(0), isFast: true, onMask: true}),
                         new FadeIn({ el: $(el).find('.home-article-item-link').get(0)}),
@@ -3235,9 +3235,18 @@ const mainScript = () => {
         trigger() {
             this.setup();
             super.init(this.play.bind(this));
+            this.interact();
         }
         setup() {
-            this.interact();
+            new MasterTimeline({
+                timeline: this.tl,
+                tweenArr: [
+                    new FadeIn({el: $('.policy-hero-title').get(0)}),
+                    new FadeIn({el: $('.policy-hero-label').get(0)}),
+                    new FadeIn({el: $('.policy-hero-content').get(0)}),
+                    new FadeIn({el: $('.policy-hero-menu').get(0)}),
+                ]
+            })
             this.initContentPopup();
         }
         interact() {
