@@ -9,7 +9,7 @@ const mainScript = () => {
 
     // barba.use(barbaPrefetch);
     gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
-    const GLOBAL_DELAY = 0;
+    const GLOBAL_DELAY = 1;
 
     const lenis = new Lenis({})
 
@@ -2091,7 +2091,7 @@ const mainScript = () => {
                     })
 
                     function animShowEl() {
-                        $('.prod-hero-title').html($('.prod-hero-title').text());
+                        // $('.prod-hero-title').html($('.prod-hero-title').text());
                         const heroTitle = splitTextFadeUpSetup('.prod-hero-title');
                         const heroSub = splitTextFadeUpSetup('.prod-hero-sub');
                         const heroDesc = splitTextFadeUpSetup('.prod-hero-desc');
@@ -2538,15 +2538,15 @@ const mainScript = () => {
             }
         });
 
-        tlEnter.to(".loading-item", {
-            yPercent: 100,
-            stagger: 0.2,
-            duration: 0.8,
-            ease: "easeInOut",
-            onComplete: () => {
-                pointerEvents: "auto";
-            },
-        });
+        // tlEnter.to(".loading-item", {
+        //     yPercent: 100,
+        //     stagger: 0.2,
+        //     duration: 0.8,
+        //     ease: "easeInOut",
+        //     onComplete: () => {
+        //         pointerEvents: "auto";
+        //     },
+        // });
         return tlEnter;
     }
 
@@ -2630,7 +2630,7 @@ const mainScript = () => {
         setTimeout(() => {
             initAllForm();
             initAllPopup();
-            gsap.to('.loading', { opacity: 0, duration: 0, onComplete: () => setTimeout(() => {$('.loading').remove()}, 1000)});
+            gsap.to('.loading', { opacity: 0, duration: 0.3, onComplete: () => setTimeout(() => {$('.loading').remove()}, 1000)});
             $('[data-init-hidden]').removeAttr('data-init-hidden');
         }, 500);
         if (viewport.w > 767) {
@@ -2701,5 +2701,4 @@ const mainScript = () => {
     //     views: VIEWS
     // })
 }
-window.onload = mainScript
-
+export default mainScript;
