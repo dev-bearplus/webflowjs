@@ -779,9 +779,17 @@ const mainScript = () => {
             }
         });
     }
-
+    let pageName = $('[data-barba-namespace]').attr('data-barba-namespace');
+    let subPageName = $('[data-barba-namespace]').attr('data-barba-namespace') === $('[data-utm-source]').attr('data-utm-source') ? '' : $('[data-utm-source]').attr('data-utm-source').toLowerCase().replace(/[\s&/]+/g, '_').replace(/[^a-z0-9_]/g, '');
+    let utm_source = `${pageName}${subPageName.length === 0 ? '' : `_${subPageName}`}`;
     const updateCurrentNav = () => {
         $("a").each(function (index, link) {
+            let utm_medium = $(this).parents('[data-utm-medium]').length !== 0 ? $(this).parents('[data-utm-medium]').attr('data-utm-medium') : '';
+            let utm_content = $(this).parents('[data-utm-content]').attr('data-utm-content');
+            if (utm_medium) {
+                $(this).attr('href', `${$(this).attr('href')}?utm_source=${utm_source}&utm_content=${utm_content}&utm_medium=${utm_medium}`);
+            }
+
             if ($(this).attr('data-sub-link') && (!$(this).attr('href').includes('#')) && (!$(this).attr('href').includes('sc'))) {
                 $(this).attr('href', `${$(this).attr('href')}#${$(this).attr('data-sub-link')}`);
                 // $(this).attr('data-barba-history', 'replace');
@@ -789,7 +797,7 @@ const mainScript = () => {
 
             const [urlPath, anchor] = $(this).attr('href').includes('#') ? $(this).attr('href').split('#') : $(this).attr('href').includes('sc') ? $(this).attr('href').split('?sc=') : [$(this).attr('href'), ''];
 
-            // $(this).toggleClass("w--current", $(this).attr("href") == `${window.location.pathname}${window.location.hash}`);
+            $(this).toggleClass("w--current", $(this).attr("href") == `${window.location.pathname}${window.location.hash}`);
             if (!anchor) {
                 return;
             }
@@ -802,6 +810,9 @@ const mainScript = () => {
                     // $(this).attr('href', `${urlPath}?sc=${anchor}`);
                 }
             }
+            // if ($(this).parent().hasAttr('data-utm-medium')) {
+            //     console.log()
+            // }
         });
 
         $('a').on('click', function (e) {
@@ -1950,6 +1961,7 @@ const mainScript = () => {
                         activeIndex(index);
                         $(this).find('.ins-listing-cms-item-link').addClass('w--current').parent().siblings().find('.ins-listing-cms-item-link').removeClass('w--current');
                         let id = $(this).find('.ins-listing-cms-item-link').attr('id');
+                        window.history.pushState(null, null, `${window.location.pathname + `#${id}`}`);
                         // barba.history.add(`${window.location.pathname + `#${id}`}`, 'barba', 'replace');
                     })
                     if (viewport.w <= 767) {
@@ -2360,7 +2372,7 @@ const mainScript = () => {
                 scHero();
 
                 function scContent() {
-                    $('.ar-content-richtext a').each(function (_, el) {
+                    $('.ar-content a').each(function (_, el) {
                         if ($(el).attr('href').includes('#popup')) {
                             let isDownload = $(el).attr('href').includes('download');
                             let uid = isDownload ? $(el).attr('href').split('popup-download-')[1] : 0;
@@ -2374,6 +2386,9 @@ const mainScript = () => {
                                     ...(uid !== 0 && { 'data-uid': uid })
                                 });
                             });
+                        }
+                        if ($(el).attr('href').includes('/schedule-demo')) {
+                            $(el).attr('href', `${$(el).attr('href')}?utm_source=${utm_source}&utm_content=content&utm_medium=banner_cta`);
                         }
                     });
 
