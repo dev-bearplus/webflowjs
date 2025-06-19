@@ -389,7 +389,6 @@ const script = () => {
                     this.setupEnter(data);
                 }
                 else return;
-
                 new Marquee($(this.el).find('[data-marquee="list"'), 40).setup();
             }
             setupOnce(data) {
@@ -493,6 +492,163 @@ const script = () => {
             }
         }
     }
+    const ContactPage = {
+        Hero: class {
+            constructor() {
+                this.el = null;
+                this.tlOnce = null;
+                this.tlEnter = null;
+                this.tlTriggerEnter = null;
+            }
+            setup(data, mode) {
+                this.el = data.next.container.querySelector('.contact-hero-wrap');
+                if (mode === 'once') {
+                    this.setupOnce(data);
+                } else if (mode === 'enter') {
+                    this.setupEnter(data);
+                }
+                else return;
+                this.initInputValueCheck('.contact-hero-form-input');
+                this.interact();
+            }
+            initInputValueCheck(selector = 'input') {
+                $(document).on('input', selector, function () {
+                  const $this = $(this);
+                  if ($this.val().trim() !== '') {
+                    $this.addClass('has-value');
+                  } else {
+                    $this.removeClass('has-value');
+                  }
+                });
+            }
+            interact() {
+                $('.contact-hero-form-select').on('click', function(){
+                    $(this).find('.contact-hero-form-select-inner').toggleClass('active');
+                })
+                $(".contact-hero-form-option-item").on("click", function(){
+                    let text = $(this).find('.contact-hero-form-option-item-txt').text();
+                    $(".contact-hero-form-option-item").removeClass('active');
+                    $(this).addClass('active');
+                    $('.contact-hero-form-input[name="Subject"]').val(text);
+                    $('.contact-hero-form-select-title').text(text);
+                    $(".contact-hero-form-select").removeClass("active");
+                })
+                $('.contact-hero-form-submit-real').on('click', function(e){
+                    
+                    let name = $('.contact-hero-form-input[name="name"]');
+                    let email = $('.contact-hero-form-input[name="Email"]');
+                    let subject = $('.contact-hero-form-input[name="Subject"]');
+                    let flag = false;
+                    if(name.val() === ''){
+                        name.closest('.contact-hero-form-input-wrap').addClass('valid-null');
+                        flag = true;
+                    }
+                    else {
+                        name.closest('.contact-hero-form-input-wrap').removeClass('valid-null');
+                    }
+                    if(email.val() === ''){
+                        email.closest('.contact-hero-form-input-wrap').addClass('valid-null');
+                        flag = true;
+                    }
+                    else if(!validateEmail(email.val())){
+                        email.closest('.contact-hero-form-input-wrap').removeClass('valid-null');
+                        email.closest('.contact-hero-form-input-wrap').addClass('valid-format');
+                        flag = true;
+                    }
+                    else {
+                        email.closest('.contact-hero-form-input-wrap').removeClass('valid-null');
+                        email.closest('.contact-hero-form-input-wrap').removeClass('valid-format');
+                    }
+                    if(subject.val() === ''){
+                        subject.closest('.contact-hero-form-input-wrap').addClass('valid-null');
+                        flag = true;
+                    }
+                    else {
+                        subject.closest('.contact-hero-form-input-wrap').removeClass('valid-null');
+                    }
+                    if(flag){
+                        e.preventDefault();
+                        return;
+                    }
+                })
+                function validateEmail(email) {
+                    if (typeof email !== 'string') return false;
+                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    return emailPattern.test(email.trim());
+                }
+                $('.contact-hero-form .overlay-bg').on('click', function(){
+                    console.log('khanh')
+                    $('.contact-hero-form-success').removeClass('active');
+                })
+                function checkFormStatusWithRAF() {
+                    const formInner = document.querySelector('.contact-hero-form-inner');
+                    const successBox = document.querySelector('.contact-hero-form-success');
+                    if (!formInner || !successBox) return;
+                    let rafId;
+                    function check() {
+                      const isHidden = window.getComputedStyle(formInner).display === 'none';
+                      console.log('Display:', window.getComputedStyle(formInner).display);
+                  
+                      if (isHidden) {
+
+                        formInner.classList.add('active');
+                        successBox.classList.add('active');
+                        cancelAnimationFrame(rafId);
+                      } else {
+                        rafId = requestAnimationFrame(check);
+                      }
+                    }
+                    rafId = requestAnimationFrame(check);
+                  }
+                  checkFormStatusWithRAF();
+                  
+                  
+            }
+            setupOnce(data) {
+                this.tlOnce = gsap.timeline({
+                    paused: true,
+                    onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                })
+            }
+            setupEnter(data) {
+                this.tlEnter = gsap.timeline({
+                    paused: true
+                })
+
+                if (!isInViewport(this.el)) {
+                    this.tlTriggerEnter = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: this.el,
+                            start: 'top bottom+=50%',
+                            end: 'bottom top',
+                            once: true,
+                            onEnter: () => this.tlEnter.play(),
+                            onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                        }
+                    })
+                }
+            }
+            playOnce() {
+                this.tlOnce.play();
+            }
+            playEnter() {
+                if (isInViewport(this.el)) {
+                    this.tlEnter.play();
+                }
+            }
+            destroy() {
+                if (this.tlOnce) {
+                    this.tlOnce.kill();
+                }
+                if (this.tlEnter) {
+                    this.tlEnter.kill();
+                }
+                if (this.tlTriggerEnter) {
+                    this.tlTriggerEnter.kill();
+                }
+            }
+        }
+    }
 
     class PageManager {
         constructor(sections = []) {
@@ -578,7 +734,18 @@ const script = () => {
     }
 
     const homePageManager = new HomePageManager();
+    class ContactPageManager extends PageManager {
+        constructor() {
+            const hero = new ContactPage.Hero();
+            super([hero]);
+        }
+    }
 
+    const contactPageManager = new ContactPageManager();
+    const PageManagerRegistry = {
+        home: new HomePageManager(),
+        contact: new ContactPageManager()
+    };
     const SCRIPT = {
         home: {
             namespace: 'home',
@@ -589,10 +756,19 @@ const script = () => {
                 homePageManager.destroy(data);
             }
         },
+        contact: {
+            namespace: 'contact',
+            afterEnter(data) {
+                contactPageManager.initEnter(data);
+            },
+            beforeLeave(data) {
+                contactPageManager.destroy(data);
+            }
+        },
     }
     const VIEWS = Object.values(SCRIPT);
 
-
+    let namespace = $('.main-inner').attr('data-barba-namespace');
     barba.init({
         preventRunning: true,
         timeout: 5000,
@@ -607,7 +783,8 @@ const script = () => {
             once(data) {
                 loader.init(data);
                 loader.play(data);
-                homePageManager.initOnce(data);
+                PageManagerRegistry[namespace]?.initOnce?.(data);
+                
             },
             async leave(data) {
                 await pageTrans.play(data);
