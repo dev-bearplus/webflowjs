@@ -2666,8 +2666,8 @@ const mainScript = () => {
                 const endOfWeek = new Date(today);
                 const day = today.getDay();
                 const diffToMonday = day === 0 ? -6 : 1 - day;
-                startOfWeek.setDate(today.getDate() + diffToMonday);
-                endOfWeek.setDate(startOfWeek.getDate() + 6);
+                startOfWeek.setDate(today.getDate() + diffToMonday -1);
+                endOfWeek.setDate(startOfWeek.getDate() + 7);
                 this.filterEvents(getDateRangeArray(startOfWeek, endOfWeek));
                 $('.event-calendar-item-date-txt').each(function (e) {
                     const $item = $(this);
@@ -2676,7 +2676,7 @@ const mainScript = () => {
             
                     const [d, m, y] = dateStr.split('/').map(Number);
                     const itemDate = new Date(y, m - 1, d);
-            
+                    console.log(startOfWeek)
                     if (itemDate >= startOfWeek && itemDate <= endOfWeek) {
                         $item.addClass('active');
                     } else {
