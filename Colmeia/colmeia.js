@@ -2372,7 +2372,7 @@ const mainScript = () => {
                 scHero();
 
                 function scContent() {
-                    $('.ar-content a').each(function (_, el) {
+                    $('.ar-content-inner a').each(function (_, el) {
                         if ($(el).attr('href').includes('#popup')) {
                             let isDownload = $(el).attr('href').includes('download');
                             let uid = isDownload ? $(el).attr('href').split('popup-download-')[1] : 0;
