@@ -451,7 +451,6 @@ const script = () => {
             horizontalLayout(sections) {
                 let sizeScroller = 0;
                 let totalWidth = 0;
-                gsap.set(this.el, { position: 'sticky', top: 0, contain: 'paint' })
                 gsap.set(this.el.querySelector('.home-solution-inner'), { position: 'sticky', top: 0, display: 'flex' })
 
                 sections.forEach(function (slide, index) {
@@ -535,7 +534,7 @@ const script = () => {
                     $(".contact-hero-form-select").removeClass("active");
                 })
                 $('.contact-hero-form-submit-real').on('click', function(e){
-                    
+
                     let name = $('.contact-hero-form-input[name="name"]');
                     let email = $('.contact-hero-form-input[name="Email"]');
                     let phone = $('.contact-hero-form-input[name="Phone"]');
@@ -591,7 +590,7 @@ const script = () => {
                         }
                     }
                 });
-                
+
                 function validateEmail(email) {
                     if (typeof email !== 'string') return false;
                     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -609,7 +608,7 @@ const script = () => {
                     function check() {
                       const isHidden = window.getComputedStyle(formInner).display === 'none';
                       console.log('Display:', window.getComputedStyle(formInner).display);
-                  
+
                       if (isHidden) {
 
                         formInner.classList.add('active');
@@ -622,8 +621,8 @@ const script = () => {
                     rafId = requestAnimationFrame(check);
                   }
                   checkFormStatusWithRAF();
-                  
-                  
+
+
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
@@ -805,7 +804,7 @@ const script = () => {
                 loader.init(data);
                 loader.play(data);
                 PageManagerRegistry[namespace]?.initOnce?.(data);
-                
+
             },
             async leave(data) {
                 await pageTrans.play(data);
