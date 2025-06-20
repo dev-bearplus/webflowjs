@@ -451,18 +451,18 @@ const script = () => {
             horizontalLayout(sections) {
                 let sizeScroller = 0;
                 let totalWidth = 0;
+                gsap.set(this.el, { position: 'sticky', top: 0, contain: 'paint' })
                 gsap.set(this.el.querySelector('.home-solution-inner'), { position: 'sticky', top: 0, display: 'flex' })
 
                 sections.forEach(function (slide, index) {
-                    gsap.set(slide, { width: window.innerWidth })
+                    // gsap.set(slide, { width: window.innerWidth })
                     if (index < sections.length - 1) {
                         sizeScroller += slide.offsetWidth;
                     }
                     totalWidth += slide.offsetWidth;
                 });
                 gsap.set(this.el.querySelector('.solution-scroller'), { height: sizeScroller })
-                gsap.set(this.el.querySelector('.home-solution-inner'), { width: totalWidth })
-
+                // gsap.set(this.el.querySelector('.home-solution-inner'), { width: totalWidth })
 
                 gsap.to(this.el.querySelector('.home-solution-inner'),
                     {
