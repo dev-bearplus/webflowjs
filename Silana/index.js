@@ -451,7 +451,10 @@ const script = () => {
             horizontalLayout(sections) {
                 let sizeScroller = 0;
                 let totalWidth = 0;
+                let heightOverlap = $(window).height();
+                gsap.set(this.el, { marginTop: heightOverlap * -1 })
                 gsap.set(this.el.querySelector('.home-solution-inner'), { position: 'sticky', top: 0, display: 'flex' })
+                gsap.set(this.el.querySelector('.home-solution-stick'), { width: $(window).width() })
 
                 sections.forEach(function (slide, index) {
                     // gsap.set(slide, { width: window.innerWidth })
@@ -460,14 +463,14 @@ const script = () => {
                     }
                     totalWidth += slide.offsetWidth;
                 });
-                gsap.set(this.el.querySelector('.solution-scroller'), { height: sizeScroller })
+                gsap.set(this.el.querySelector('.solution-scroller'), { height: sizeScroller + heightOverlap })
                 // gsap.set(this.el.querySelector('.home-solution-inner'), { width: totalWidth })
 
                 gsap.to(this.el.querySelector('.home-solution-inner'),
                     {
                         scrollTrigger: {
                             trigger: '.solution-scroller',
-                            start: 'top top',
+                            start: `top+=${heightOverlap} top`,
                             end: 'bottom bottom',
                             scrub: true,
                             // markers:true,
