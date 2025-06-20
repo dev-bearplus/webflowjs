@@ -10,6 +10,11 @@ const script = () => {
     const parseRem = (input) => {
         return input / 10 * parseFloat($('html').css('font-size'))
     }
+    function validateEmail(email) {
+        if (typeof email !== 'string') return false;
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailPattern.test(email.trim());
+    }
     const debounce = (func, timeout = 300) => {
         let timer
 
@@ -360,7 +365,7 @@ const script = () => {
         constructor() {
             this.tlTrigger;
         }
-        setTrigger(triggerEl, setup) {
+        setTrigger(triggerEl) {
             this.tlTrigger = gsap.timeline({
                 scrollTrigger: {
                     trigger: triggerEl,
@@ -593,14 +598,7 @@ const script = () => {
                         }
                     }
                 });
-
-                function validateEmail(email) {
-                    if (typeof email !== 'string') return false;
-                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    return emailPattern.test(email.trim());
-                }
                 $('.contact-hero-form .overlay-bg').on('click', function(){
-                    console.log('khanh')
                     $('.contact-hero-form-success').removeClass('active');
                 })
                 function checkFormStatusWithRAF() {
@@ -610,10 +608,7 @@ const script = () => {
                     let rafId;
                     function check() {
                       const isHidden = window.getComputedStyle(formInner).display === 'none';
-                      console.log('Display:', window.getComputedStyle(formInner).display);
-
                       if (isHidden) {
-
                         formInner.classList.add('active');
                         successBox.classList.add('active');
                         cancelAnimationFrame(rafId);
@@ -672,7 +667,37 @@ const script = () => {
             }
         }
     }
-
+    class Footer extends TriggerSetup {
+        constructor() {
+            super();
+        }
+        setup() {
+            console.log('kádfhiahsdfjk')
+            $('.footer-cta-submit input[type="submit"]').on('click', function(e) {
+                let email = $('.footer-cta-input[name="email"]');
+                console.log(email.val());
+                let flag = false;
+                if(email.val() === ''){
+                    email.closest('.footer-cta-input-wrap').addClass('valid-null');
+                    flag = true;
+                }
+                else if(!validateEmail(email.val())){
+                    email.closest('.footer-cta-input-wrap').removeClass('valid-null');
+                    email.closest('.footer-cta-input-wrap').addClass('valid-format');
+                    flag = true;
+                }
+                else {
+                    email.closest('.footer-cta-input-wrap').removeClass('valid-null');
+                    email.closest('.footer-cta-input-wrap').removeClass('valid-format');
+                }
+                if(flag){
+                    e.preventDefault();
+                    return;
+                }
+            })
+        }
+    }
+    const footer = new Footer('.footer-cta');
     class PageManager {
         constructor(sections = []) {
             this.sections = sections;
@@ -806,6 +831,7 @@ const script = () => {
             once(data) {
                 loader.init(data);
                 loader.play(data);
+                footer.setup();
                 PageManagerRegistry[namespace]?.initOnce?.(data);
 
             },

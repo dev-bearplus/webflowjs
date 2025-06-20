@@ -489,12 +489,13 @@ const mainScript = () => {
             super.init(this.play.bind(this));
         }
         setup() {
+            replaceHyphenWithSpan($('.home-hero-title'))
             new MasterTimeline({
                 timeline: this.tl,
                 allowMobile: true,
                 tweenArr: [
                     new FadeSplitText({ el: $('.home-hero-year').get(0), isFast: true, onMask: true }),
-                    new FadeSplitText({ el: $('.home-hero-title').get(0), isFast: true, onMask: true, headingType: true, delay: '<=0' }),
+                    new FadeSplitText({ el: $('.home-hero-title').get(0), isFast: true, onMask: true, delay: '<=0' }),
                     new FadeSplitText({ el: $('.home-hero-intro-label').get(0), isFast: true, onMask: true, delay: '<=.1' }),
                     new FadeSplitText({ el: $('.home-hero-intro-body').get(0), isFast: true, onMask: true, delay: '<=.1' }),
                 ]
@@ -3485,7 +3486,7 @@ const mainScript = () => {
         }
 
     }
-    const header = new Header('.header'); 
+    const header = new Header(); 
     class Footer extends TriggerSetup {
         constructor(triggerEl) {
             super(triggerEl);
