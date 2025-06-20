@@ -528,6 +528,7 @@ const script = () => {
                 $(".contact-hero-form-option-item").on("click", function(){
                     let text = $(this).find('.contact-hero-form-option-item-txt').text();
                     $(".contact-hero-form-option-item").removeClass('active');
+                    $('.contact-hero-form-input-wrap.contact-hero-form-select-wrap').removeClass('valid-null');
                     $(this).addClass('active');
                     $('.contact-hero-form-input[name="Subject"]').val(text);
                     $('.contact-hero-form-select-title').text(text);
@@ -537,6 +538,7 @@ const script = () => {
                     
                     let name = $('.contact-hero-form-input[name="name"]');
                     let email = $('.contact-hero-form-input[name="Email"]');
+                    let phone = $('.contact-hero-form-input[name="Phone"]');
                     let subject = $('.contact-hero-form-input[name="Subject"]');
                     let flag = false;
                     if(name.val() === ''){
@@ -545,6 +547,13 @@ const script = () => {
                     }
                     else {
                         name.closest('.contact-hero-form-input-wrap').removeClass('valid-null');
+                    }
+                    if(phone.val() === ''){
+                        phone.closest('.contact-hero-form-input-wrap').addClass('valid-null');
+                        flag = true;
+                    }
+                    else {
+                        phone.closest('.contact-hero-form-input-wrap').removeClass('valid-null');
                     }
                     if(email.val() === ''){
                         email.closest('.contact-hero-form-input-wrap').addClass('valid-null');
@@ -571,6 +580,18 @@ const script = () => {
                         return;
                     }
                 })
+                $('.contact-hero-form-input').on('input', function() {
+                    const $wrap = $(this).closest('.contact-hero-form-input-wrap');
+                    if ($(this).val().trim() !== '') {
+                        $wrap.removeClass('valid-null');
+                    }
+                    if ($(this).attr('name') === 'Email') {
+                        if (validateEmail($(this).val().trim())) {
+                            $wrap.removeClass('valid-format');
+                        }
+                    }
+                });
+                
                 function validateEmail(email) {
                     if (typeof email !== 'string') return false;
                     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
