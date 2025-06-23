@@ -226,16 +226,17 @@ const script = () => {
         }
         setup() {
             const cloneAmount = Math.ceil($(window).width() / this.list.width()) + 1;
-            this.list.css('animation-duration', `${Math.ceil(this.list.width() / this.duration)}s`);
-
+            let itemClone = this.list.find('[data-marquee="item"]').clone();
+            let itemWidth = this.list.find('[data-marquee="item"]').width();
+            this.list.html('');
             new Array(cloneAmount).fill().forEach(() => {
-                let itemClone = this.list.find('[data-marquee="item"]').clone();
-                this.list.append(itemClone);
+                let html = itemClone.clone()
+                html.css('animation-duration', `${Math.ceil(itemWidth / this.duration)}s`);
+                html.addClass('anim-marquee');
+                this.list.append(html);
             });
-            this.list.addClass('anim-marquee');
         }
     }
-
 
     class GlobalChange {
         constructor() {
@@ -394,7 +395,7 @@ const script = () => {
                     this.setupEnter(data);
                 }
                 else return;
-                new Marquee($(this.el).find('[data-marquee="list"'), 40).setup();
+                new Marquee($(this.el).find('[data-marquee="list"]'), 100).setup();
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
@@ -438,6 +439,18 @@ const script = () => {
                 if (this.tlTriggerEnter) {
                     this.tlTriggerEnter.kill();
                 }
+            }
+        },
+        About: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.home-about-wrap');
+                super.setTrigger(this.el, this.setup.bind(this));
+            }
+            setup() {
             }
         },
         Solution: class extends TriggerSetup {
@@ -542,7 +555,6 @@ const script = () => {
                     $(".contact-hero-form-select").removeClass("active");
                 })
                 $('.contact-hero-form-submit-real').on('click', function(e){
-
                     let name = $('.contact-hero-form-input[name="name"]');
                     let email = $('.contact-hero-form-input[name="Email"]');
                     let phone = $('.contact-hero-form-input[name="Phone"]');
@@ -609,16 +621,16 @@ const script = () => {
                     function check() {
                         const isHidden = window.getComputedStyle(formInner).display === 'none';
                         if (isHidden) {
-                        formInner.classList.add('active');
-                        successBox.classList.add('active');
-                        cancelAnimationFrame(rafId);
+                            formInner.classList.add('active');
+                            successBox.classList.add('active');
+                            cancelAnimationFrame(rafId);
                         } else {
-                        rafId = requestAnimationFrame(check);
+                            rafId = requestAnimationFrame(check);
                         }
                     }
                     rafId = requestAnimationFrame(check);
-                    }
-                    checkFormStatusWithRAF();
+                }
+                checkFormStatusWithRAF();
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
@@ -674,6 +686,9 @@ const script = () => {
             super.setTrigger(this.el, this.setup.bind(this));
         }
         setup() {
+            new Marquee($(this.el).find('.footer-bot-text [data-marquee="list"]'), 40).setup();
+            new Marquee($(this.el).find('.footer-bot-ruler [data-marquee="list"]'), 10).setup();
+
             $('.footer-cta-submit input[type="submit"]').on('click', function(e) {
                 let email = $('.footer-cta-input[name="email"]');
                 let flag = false;
@@ -699,8 +714,8 @@ const script = () => {
     }
     const footer = new Footer();
     class PageManager {
-        constructor(sections = []) {
-            this.sections = sections;
+        constructor(page) {
+            this.sections = Object.values(page).map(section => new section());
 
             // Bind event handlers
             this.boundSetupHandler = this.setupHandler.bind(this);
@@ -774,43 +789,33 @@ const script = () => {
     }
 
     class HomePageManager extends PageManager {
-        constructor() {
-            const hero = new HomePage.Hero();
-            const solution = new HomePage.Solution();
-            super([hero, solution]);
-        }
+        constructor(page) { super(page); }
     }
-
-    const homePageManager = new HomePageManager();
     class ContactPageManager extends PageManager {
-        constructor() {
-            const hero = new ContactPage.Hero();
-            super([hero]);
-        }
+        constructor(page) { super(page); }
     }
 
-    const contactPageManager = new ContactPageManager();
     const PageManagerRegistry = {
-        home: new HomePageManager(),
-        contact: new ContactPageManager()
+        home: new HomePageManager(HomePage),
+        contact: new ContactPageManager(ContactPage)
     };
     const SCRIPT = {
         home: {
             namespace: 'home',
             afterEnter(data) {
-                homePageManager.initEnter(data);
+                PageManagerRegistry.home.initEnter(data);
             },
             beforeLeave(data) {
-                homePageManager.destroy(data);
+                PageManagerRegistry.home.destroy(data);
             }
         },
         contact: {
             namespace: 'contact',
             afterEnter(data) {
-                contactPageManager.initEnter(data);
+                PageManagerRegistry.contact.initEnter(data);
             },
             beforeLeave(data) {
-                contactPageManager.destroy(data);
+                PageManagerRegistry.contact.destroy(data);
             }
         },
     }
