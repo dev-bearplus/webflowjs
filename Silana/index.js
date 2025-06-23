@@ -672,7 +672,6 @@ const script = () => {
             super();
         }
         setup() {
-            console.log('kádfhiahsdfjk')
             $('.footer-cta-submit input[type="submit"]').on('click', function(e) {
                 let email = $('.footer-cta-input[name="email"]');
                 console.log(email.val());
