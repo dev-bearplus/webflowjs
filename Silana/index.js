@@ -593,7 +593,7 @@ const script = () => {
                     }
                 })
                 tl
-                    .fromTo('.home-solution-main-transform', { bottom: '100%' }, { bottom: '0%' })
+                    .fromTo('.home-solution-main-transform', { bottom: '100%' }, { bottom: '2%' })
                     .fromTo('.home-solution-main-vid-halftone', { height: '100%' }, { height: '2%' }, "<=0")
             }
             horizontalLayout(sections) {
