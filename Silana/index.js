@@ -503,9 +503,9 @@ const script = () => {
                             .timeline({
                                 scrollTrigger: {
                                     trigger: this.el,
-                                    start: `bottom-=${$(window).height() * 1.3} bottom`,
+                                    start: `bottom-=${$(window).height() * 1.5} bottom`,
                                     end: `bottom bottom`,
-                                    scrub: true
+                                    scrub: 1
                                 },
                             })
                             .to($(this.el).find('.home-about-story-content'), { scale: 0.8, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, 0)
@@ -541,7 +541,6 @@ const script = () => {
 
                 this.el.querySelectorAll('.home-challenge-item').forEach((item, index) => {
                     if (index == this.el.querySelectorAll('.home-challenge-item').length - 1) return;
-
 
                     index === 0 && gsap.set($(this.el).find('.home-challenge-item-content-overlay'), { autoAlpha: 1 });
                     gsap.set($(item), { 'flex-grow': index === 0 ? 1 : 0 });
@@ -580,8 +579,6 @@ const script = () => {
             setup() {
                 this.sections = this.el.querySelectorAll('section');
                 this.horizontalLayout(this.sections);
-
-
 
                 let tl = gsap.timeline({
                     scrollTrigger: {
