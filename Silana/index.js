@@ -588,7 +588,6 @@ const script = () => {
                         trigger: $(this.el).find('.home-solution'),
                         start: `top+=${$(window).height() * .5} top`,
                         end: 'bottom bottom',
-                        markers: true,
                         scrub: true
                     }
                 })
