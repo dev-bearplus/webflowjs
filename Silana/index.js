@@ -520,12 +520,12 @@ const script = () => {
             }
             initInputValueCheck(selector = 'input') {
                 $(document).on('input', selector, function () {
-                  const $this = $(this);
-                  if ($this.val().trim() !== '') {
-                    $this.addClass('has-value');
-                  } else {
-                    $this.removeClass('has-value');
-                  }
+                    const $this = $(this);
+                    if ($this.val().trim() !== '') {
+                        $this.addClass('has-value');
+                    } else {
+                        $this.removeClass('has-value');
+                    }
                 });
             }
             interact() {
@@ -607,20 +607,18 @@ const script = () => {
                     if (!formInner || !successBox) return;
                     let rafId;
                     function check() {
-                      const isHidden = window.getComputedStyle(formInner).display === 'none';
-                      if (isHidden) {
+                        const isHidden = window.getComputedStyle(formInner).display === 'none';
+                        if (isHidden) {
                         formInner.classList.add('active');
                         successBox.classList.add('active');
                         cancelAnimationFrame(rafId);
-                      } else {
+                        } else {
                         rafId = requestAnimationFrame(check);
-                      }
+                        }
                     }
                     rafId = requestAnimationFrame(check);
-                  }
-                  checkFormStatusWithRAF();
-
-
+                    }
+                    checkFormStatusWithRAF();
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
@@ -671,6 +669,10 @@ const script = () => {
         constructor() {
             super();
         }
+        trigger(data) {
+            this.el = document.querySelector('.footer');
+            super.setTrigger(this.el, this.setup.bind(this));
+        }
         setup() {
             $('.footer-cta-submit input[type="submit"]').on('click', function(e) {
                 let email = $('.footer-cta-input[name="email"]');
@@ -695,7 +697,7 @@ const script = () => {
             })
         }
     }
-    const footer = new Footer('.footer-cta');
+    const footer = new Footer();
     class PageManager {
         constructor(sections = []) {
             this.sections = sections;
@@ -829,9 +831,8 @@ const script = () => {
             once(data) {
                 loader.init(data);
                 loader.play(data);
-                footer.setup();
+                footer.trigger();
                 PageManagerRegistry[namespace]?.initOnce?.(data);
-
             },
             async leave(data) {
                 await pageTrans.play(data);
