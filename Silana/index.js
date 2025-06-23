@@ -395,7 +395,7 @@ const script = () => {
                     this.setupEnter(data);
                 }
                 else return;
-                new Marquee($(this.el).find('[data-marquee="list"]'), 100).setup();
+                new Marquee($(this.el).find('[data-marquee="list"]'), 40).setup();
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
@@ -451,6 +451,7 @@ const script = () => {
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
+
             }
         },
         Solution: class extends TriggerSetup {
