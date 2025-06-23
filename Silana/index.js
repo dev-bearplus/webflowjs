@@ -365,7 +365,7 @@ const script = () => {
         constructor() {
             this.tlTrigger;
         }
-        setTrigger(triggerEl) {
+        setTrigger(triggerEl, setup) {
             this.tlTrigger = gsap.timeline({
                 scrollTrigger: {
                     trigger: triggerEl,
@@ -674,7 +674,6 @@ const script = () => {
         setup() {
             $('.footer-cta-submit input[type="submit"]').on('click', function(e) {
                 let email = $('.footer-cta-input[name="email"]');
-                console.log(email.val());
                 let flag = false;
                 if(email.val() === ''){
                     email.closest('.footer-cta-input-wrap').addClass('valid-null');
