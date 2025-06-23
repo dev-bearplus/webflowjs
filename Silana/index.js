@@ -29,8 +29,8 @@ const script = () => {
         if (!el) return;
         const rect = el.getBoundingClientRect();
         return (
-            rect.left <= (window.innerWidth) &&
-            rect.right >= 0
+            rect.top <= (window.innerHeight) &&
+            rect.bottom >= 0
         );
     }
     class Mouse {
@@ -125,13 +125,7 @@ const script = () => {
         }
         reInit(data) {
             let namespace = data ? data.next.namespace : $('[data-barba="container"]').attr('data-barba-namespace');
-            this.lenis = new Lenis({
-                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                orientation: "vertical",
-                gestureOrientation: "both",
-                smoothWheel: true,
-                infinite: false,
-            })
+            this.lenis = new Lenis({})
             this.lenis.on('scroll', ScrollTrigger.update)
             this.lenis.on('scroll', (e) => {
                 this.updateOnScroll(e);
@@ -167,6 +161,9 @@ const script = () => {
 
             this.scroller.velocity = e.velocity * .2
             this.scroller.direction = e.direction;
+            if (header) {
+                header.updateOnScroll(smoothScroll.lenis);
+            };
         }
     }
     const smoothScroll = new SmoothScroll();
@@ -235,6 +232,39 @@ const script = () => {
                 html.addClass('anim-marquee');
                 this.list.append(html);
             });
+        }
+    }
+
+    class ParallaxImage {
+        constructor({ el }) {
+            this.el = el;
+            this.elWrap = null;
+            this.init();
+        }
+        init() {
+            this.elWrap = this.el.parentElement;
+            this.setup();
+        }
+        setup() {
+            gsap.set(this.el, { height: '120%' });
+            this.scrub();
+        }
+        scrub() {
+            let dist = this.el.offsetHeight - this.elWrap.offsetHeight;
+            let total = this.elWrap.getBoundingClientRect().height + window.innerHeight;
+            this.updateOnScroll(dist, total);
+            smoothScroll.lenis.on('scroll', () => {
+                this.updateOnScroll(dist, total);
+            });
+        }
+        updateOnScroll(dist, total) {
+            if (this.el) {
+                if (isInViewport(this.elWrap)) {
+                    let percent = this.elWrap.getBoundingClientRect().bottom / total;
+                    gsap.quickSetter(this.el, 'y', 'px')(-dist * percent * 1.2);
+                    gsap.set(this.el, { scale: 1 + (percent * 0.3) });
+                }
+            }
         }
     }
 
@@ -445,13 +475,97 @@ const script = () => {
             constructor() {
                 super();
                 this.el = null;
+                this.tlParallax = null;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-about-wrap');
+                this.tlParallax = [];
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
+                new ParallaxImage({el: this.el.querySelector('.home-about-thumb-inner img')});
+                this.el.querySelectorAll('.home-about-story-item').forEach((el, idx) => new ParallaxImage({el: el.querySelector('img')}))
+                this.tlParallax.push(
+                    gsap
+                        .timeline({
+                            scrollTrigger: {
+                                trigger: $(this.el).find('.home-about-story-list'),
+                                start: `top top+=50%`,
+                                end: 'bottom top+=50%',
+                                scrub: 1,
+                                defaults: { ease: 'none' }
+                            }
+                        })
+                        .fromTo($(this.el).find('.home-about-story-content-item'), { yPercent: -50 }, { yPercent: 50 }))
 
+                    this.tlParallax.push(
+                        gsap
+                            .timeline({
+                                scrollTrigger: {
+                                    trigger: this.el,
+                                    start: `bottom-=${$(window).height() * 1.3} bottom`,
+                                    end: `bottom bottom`,
+                                    scrub: true
+                                },
+                            })
+                            .to($(this.el).find('.home-about-story-content'), { scale: 0.8, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, 0)
+                            .to($(this.el).find('.home-about-story-item:last-child .home-about-story-item-img'), { scale: 1.3, transformOrigin: 'bottom', autoAlpha: 0.5, duration: 1, ease: 'none'}, 0));
+            }
+            destroy() {
+                if (this.tlParallax.length > 0) {
+                    this.tlParallax.forEach(tl => tl.kill());
+                }
+            }
+        },
+        Challenge: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+                this.tlParallax = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.home-challenge-wrap');
+                this.tlParallax = [];
+                super.setTrigger(this.el, this.setup.bind(this));
+            }
+            setup() {
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('.home-challenge-main'),
+                        scrub: 1.2,
+                        start: 'top-=5% top',
+                        end: 'bottom bottom',
+                        default: { ease: 'none' }
+                    }
+                })
+
+                this.el.querySelectorAll('.home-challenge-item').forEach((item, index) => {
+                    if (index == this.el.querySelectorAll('.home-challenge-item').length - 1) return;
+
+
+                    index === 0 && gsap.set($(this.el).find('.home-challenge-item-content-overlay'), { autoAlpha: 1 });
+                    gsap.set($(item), { 'flex-grow': index === 0 ? 1 : 0 });
+                    gsap.set($(item).find('.home-challenge-item-halftone'), { autoAlpha: index === 0 ? .08 : 0 });
+                    tl
+                        .to(item,
+                            { 'flex-grow': 0, duration: 1 })
+                        .to($(this.el).find('.home-challenge-item').eq(index + 1),
+                            { 'flex-grow': 1, duration: 1 }, "<=0")
+                        .to($(item).find('.home-challenge-item-halftone'),
+                            { autoAlpha: 0, duration: 1 }, "<=0")
+                        .to($(this.el).find('.home-challenge-item').eq(index + 1).find('.home-challenge-item-halftone'),
+                            { autoAlpha: 0.08, duration: 1 }, "<=0")
+                        .to($(this.el).find('.home-challenge-item').eq(index + 1).find('.home-challenge-item-content-overlay'),
+                            { autoAlpha: 1, duration: .2 }, '<=0.1')
+                        .to($(item).find('.home-challenge-item-content-overlay'),
+                            { autoAlpha: 0, duration: .2 }, "-=.6")
+                })
+
+            }
+            destroy() {
+                if (this.tlParallax.length > 0) {
+                    this.tlParallax.forEach(tl => tl.kill());
+                }
             }
         },
         Solution: class extends TriggerSetup {
@@ -466,48 +580,65 @@ const script = () => {
             setup() {
                 this.sections = this.el.querySelectorAll('section');
                 this.horizontalLayout(this.sections);
+
+
+
+                let tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('.home-solution'),
+                        start: `top+=${$(window).height() * .5} top`,
+                        end: 'bottom bottom',
+                        markers: true,
+                        scrub: true
+                    }
+                })
+                tl
+                    .fromTo('.home-solution-main-transform', { bottom: '100%' }, { bottom: '0%' })
+                    .fromTo('.home-solution-main-vid-halftone', { height: '100%' }, { height: '2%' }, "<=0")
             }
             horizontalLayout(sections) {
                 let sizeScroller = 0;
                 let totalWidth = 0;
                 let heightOverlap = $(window).height();
                 gsap.set(this.el, { marginTop: heightOverlap * -1 })
-                gsap.set(this.el.querySelector('.home-solution-inner'), { position: 'sticky', top: 0, display: 'flex' })
-                gsap.set(this.el.querySelector('.home-solution-stick'), { width: $(window).width() })
 
-                sections.forEach(function (slide, index) {
-                    // gsap.set(slide, { width: window.innerWidth })
-                    if (index < sections.length - 1) {
-                        sizeScroller += slide.offsetWidth;
-                    }
-                    totalWidth += slide.offsetWidth;
-                });
-                gsap.set(this.el.querySelector('.solution-scroller'), { height: sizeScroller + heightOverlap })
-                // gsap.set(this.el.querySelector('.home-solution-inner'), { width: totalWidth })
 
-                gsap.to(this.el.querySelector('.home-solution-inner'),
-                    {
-                        scrollTrigger: {
-                            trigger: '.solution-scroller',
-                            start: `top+=${heightOverlap} top`,
-                            end: 'bottom bottom',
-                            scrub: true,
-                            // markers:true,
-                            invalidateOnRefresh: true,
-                            anticipatePin:1,
-                            fastScrollEnd:true
-                        },
-                        x: -sizeScroller,
-                        transformOrigin: "top",
-                        ease: "none",
-                        onUpdate:()=>{
 
-                        },
-                        onComplete: () => {
-                            ScrollTrigger.refresh();
-                        }
-                    }
-                )
+                // gsap.set(this.el.querySelector('.home-solution-inner'), { position: 'sticky', top: 0, display: 'flex' })
+                // gsap.set(this.el.querySelector('.home-solution-stick'), { width: $(window).width() })
+
+                // sections.forEach(function (slide, index) {
+                //     // gsap.set(slide, { width: window.innerWidth })
+                //     if (index < sections.length - 1) {
+                //         sizeScroller += slide.offsetWidth;
+                //     }
+                //     totalWidth += slide.offsetWidth;
+                // });
+                // gsap.set(this.el.querySelector('.solution-scroller'), { height: sizeScroller + heightOverlap })
+
+                // gsap.to(this.el.querySelector('.home-solution-inner'),
+                //     {
+                //         scrollTrigger: {
+                //             trigger: '.solution-scroller',
+                //             start: `top+=${heightOverlap} top`,
+                //             end: 'bottom bottom',
+                //             scrub: true,
+                //             // markers:true,
+                //             invalidateOnRefresh: true,
+                //             anticipatePin:1,
+                //             fastScrollEnd:true
+                //         },
+                //         x: -sizeScroller,
+                //         transformOrigin: "top",
+                //         ease: "none",
+                //         onUpdate:()=>{
+
+                //         },
+                //         onComplete: () => {
+                //             ScrollTrigger.refresh();
+                //         }
+                //     }
+                // )
             }
             destroy() {
             }
@@ -678,6 +809,42 @@ const script = () => {
             }
         }
     }
+
+    class Header {
+        constructor() {
+            this.el = null;
+        }
+        init(data) {
+            this.el = document.querySelector('.header');
+        }
+        updateOnScroll(inst) {
+            this.toggleHide(inst);
+            this.toggleScroll(inst);
+        }
+        toggleScroll(inst) {
+            if (inst.scroll > $(this.el).height() * 2) $(this.el).addClass("on-scroll");
+            else $(this.el).removeClass("on-scroll");
+        }
+        toggleHide(inst) {
+            if (inst.direction == 1) {
+                if (inst.scroll > ($(this.el).height() * 3)) {
+                    $(this.el).addClass('on-hide');
+                }
+            } else if (inst.direction == -1) {
+                if (inst.scroll > ($(this.el).height() * 3)) {
+                    $(this.el).addClass("on-hide");
+                    $(this.el).removeClass("on-hide");
+                }
+            }
+            else {
+                $(this.el).removeClass("on-hide");
+            }
+        }
+        isOpen() {
+            return this.el.classList.contains('on-open-nav');
+        }
+    }
+    const header = new Header();
     class Footer extends TriggerSetup {
         constructor() {
             super();
@@ -837,6 +1004,7 @@ const script = () => {
             once(data) {
                 loader.init(data);
                 loader.play(data);
+                header.init(data);
                 footer.trigger();
                 PageManagerRegistry[namespace]?.initOnce?.(data);
             },
