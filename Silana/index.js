@@ -540,11 +540,11 @@ const script = () => {
                 })
 
                 this.el.querySelectorAll('.home-challenge-item').forEach((item, index) => {
-                    if (index == this.el.querySelectorAll('.home-challenge-item').length - 1) return;
-
+                    gsap.set($(item).find('.home-challenge-item-halftone'), { autoAlpha: index === 0 ? .08 : 0 });
                     index === 0 && gsap.set($(this.el).find('.home-challenge-item-content-overlay'), { autoAlpha: 1 });
                     gsap.set($(item), { 'flex-grow': index === 0 ? 1 : 0 });
-                    gsap.set($(item).find('.home-challenge-item-halftone'), { autoAlpha: index === 0 ? .08 : 0 });
+
+                    if (index == this.el.querySelectorAll('.home-challenge-item').length - 1) return;
                     tl
                         .to(item,
                             { 'flex-grow': 0, duration: 1 })
