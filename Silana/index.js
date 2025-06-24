@@ -1,6 +1,5 @@
 const script = () => {
     barba.use(barbaPrefetch);
-    gsap.registerPlugin(ScrollTrigger);
     if (history.scrollRestoration) {
         history.scrollRestoration = 'manual';
     }
