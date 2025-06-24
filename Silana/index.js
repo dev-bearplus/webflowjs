@@ -533,7 +533,7 @@ const script = () => {
                 const tl = gsap.timeline({
                     scrollTrigger: {
                         trigger: $(this.el).find('.home-challenge-main'),
-                        scrub: 1.2,
+                        scrub: 1,
                         start: 'top-=5% top',
                         end: 'bottom bottom',
                         default: { ease: 'none' }
@@ -589,7 +589,7 @@ const script = () => {
                         trigger: $(this.el).find('.home-solution'),
                         start: `top+=${$(window).height() * .8} top`,
                         end: `bottom-=${$(window).height() * 1.2} bottom`,
-                        scrub: true
+                        scrub: 1
                     }
                 })
 
@@ -600,7 +600,7 @@ const script = () => {
                 this.tlStickMade = gsap.timeline({
                     scrollTrigger: {
                         trigger: $(this.el).find('.home-made'),
-                        scrub: true,
+                        scrub: 1,
                         start: `top+=${$(this.el).find('.home-solution').height() - ($(window).height() * 2)} top`,
                         end: 'bottom bottom'
                     }
@@ -634,7 +634,7 @@ const script = () => {
                         trigger: $(this.el).find('.solution-scroller'),
                         start: `top+=${$(window).height() * 1.3} top`,
                         end: `bottom+=${$(window).height() * 1.3} bottom`,
-                        scrub: true,
+                        scrub: 1,
                         invalidateOnRefresh: true,
                         anticipatePin:1,
                         fastScrollEnd:true
@@ -658,19 +658,60 @@ const script = () => {
                 }
             }
         },
-        // Benefit: class extends TriggerSetup {
-        //     constructor() {
-        //         super();
-        //         this.el = null;
-        //     }
-        //     trigger(data) {
-        //         this.el = data.next.container.querySelector('.home-benefit-wrap');
-        //         super.setTrigger(this.el, this.setup.bind(this));
-        //     }
-        //     setup() {
-
-        //     }
-        // }
+        Benefit: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+                this.tlParallax = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.home-benefit-wrap');
+                this.tlParallax = [];
+                super.setTrigger(this.el, this.setup.bind(this));
+            }
+            setup() {
+                this.tlParallax.push(
+                    gsap
+                        .timeline({
+                            scrollTrigger: {
+                                trigger: this.el,
+                                start: `bottom-=${$(window).height() * 1.5} bottom`,
+                                end: `bottom bottom`,
+                                scrub: 1
+                            },
+                        })
+                        .to('.home-made-body', { scale: 0.8, transformOrigin: 'top', autoAlpha: 0.6, duration: 1, ease: 'power2.in' })
+                        .to('.home-made-title', { scale: .95, transformOrigin: 'bottom', autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
+                        .to('.home-made-map', { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in', onComplete: () => { ScrollTrigger.refresh() } }, "<=0"))
+            }
+        },
+        News: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+                this.tlParallax = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.home-news-wrap');
+                this.tlParallax = [];
+                super.setTrigger(this.el, this.setup.bind(this));
+            }
+            setup() {
+                new ParallaxImage({ el: this.el.querySelector('.home-news-thumb img') });
+                this.tlParallax.push(
+                    gsap
+                        .timeline({
+                            scrollTrigger: {
+                                trigger: this.el.querySelector('.home-news-thumb'),
+                                start: `top 10%`,
+                                end: `bottom bottom`,
+                                endTrigger: this.el,
+                                scrub: 1
+                            },
+                        })
+                        .to($(this.el).find('.home-news-thumb-inner'), { scale: .8, autoAlpha: 0.5, duration: 1, ease: 'none'}, 0));
+            }
+        }
     }
     const ContactPage = {
         Hero: class {
