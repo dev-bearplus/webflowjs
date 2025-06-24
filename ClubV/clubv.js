@@ -3206,7 +3206,7 @@ const mainScript = () => {
                 ]
             })
             $('.faq-hero-item').each((idx, el) => {
-                let number = idx <=9? `0${idx+1}` : idx+1;
+                let number = idx <9? `0${idx+1}` : idx+1;
                 $(el).find('.faq-hero-item-number').text(`(${number})`);
             })
             $('.faq-hero-item').on('click', function(){
