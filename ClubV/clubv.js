@@ -3390,16 +3390,15 @@ const mainScript = () => {
             else {
                 $(".header-menu-title-wrap").on("click", (e) => {
                     e.preventDefault();
-                    if($('.header-menu-inner').hasClass('active')){
-                        
-                        $('.header-menu-inner').removeClass('active');
+                    if($('.header').hasClass('active')){
+                        $('.header').removeClass('active');
                         gsap.to('.header-menu-title.close .word', {duration: .8, y: "100%", stagger: 0.015, ease: "power2.out"});
                         gsap.to('.header-menu-title.open .word', {duration: .8, y: "0%", stagger: 0.015, ease: "power2.out"});
                         this.deactiveMenuTablet();
                     }
                     else {
-                        $('.header-menu-inner').addClass('active');
-                        $('.header-menu-inner').addClass('active');
+                        $('.header').addClass('active');
+                        $('.header').addClass('active');
                         gsap.to('.header-menu-title.close .word', {duration: .8, y: "0%", stagger: 0.015, ease: "power2.out"});
                         gsap.to('.header-menu-title.open .word', {duration: .8, y: "-100%", stagger: 0.015, ease: "power2.out"});
                         this.activeMenuTablet();
