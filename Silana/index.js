@@ -3,6 +3,7 @@ const script = () => {
     if (history.scrollRestoration) {
         history.scrollRestoration = 'manual';
     }
+    gsap.registerPlugin(ScrollTrigger);
     ScrollTrigger.defaults({
         invalidateOnRefresh: true,
     });
