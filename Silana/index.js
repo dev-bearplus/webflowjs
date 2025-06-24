@@ -572,6 +572,9 @@ const script = () => {
             constructor() {
                 super();
                 this.el = null;
+                this.tlStickSol = null;
+                this.tlStickMade = null;
+                this.tlHorizontal = null;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-solution-wrap');
@@ -581,7 +584,7 @@ const script = () => {
                 this.sections = this.el.querySelectorAll('section');
                 this.horizontalLayout(this.sections);
 
-                let tlStickSol = gsap.timeline({
+                this.tlStickSol = gsap.timeline({
                     scrollTrigger: {
                         trigger: $(this.el).find('.home-solution'),
                         start: `top+=${$(window).height() * .8} top`,
@@ -590,35 +593,33 @@ const script = () => {
                     }
                 })
 
-                tlStickSol
-                    .fromTo('.home-solution-main-transform', { bottom: '100%' }, { bottom: '2%' })
-                    .fromTo('.home-solution-main-vid-halftone', { height: '100%' }, { height: '2%' }, "<=0")
+                this.tlStickSol
+                    .fromTo($(this.el).find('.home-solution-main-transform'), { bottom: '100%' }, { bottom: '2%' })
+                    .fromTo($(this.el).find('.home-solution-main-vid-halftone'), { height: '100%' }, { height: '2%' }, "<=0")
 
-                let tlStickMade = gsap.timeline({
+                this.tlStickMade = gsap.timeline({
                     scrollTrigger: {
                         trigger: $(this.el).find('.home-made'),
                         scrub: true,
                         start: `top+=${$(this.el).find('.home-solution').height() - ($(window).height() * 2)} top`,
-                        end: 'bottom bottom',
-                        markers: true
+                        end: 'bottom bottom'
                     }
                 })
 
                 const space_accord_process = parseInt($('.home-made-body-item-size').css('width'))
                 this.el.querySelectorAll('.home-made-body-item').forEach((item, index) => {
                     if ((this.el.querySelectorAll('.home-made-body-item').length - 1) > index) {
-                        tlStickMade.to(item, { width: space_accord_process, ease: 'none' })
-                        tlStickMade.to($(item).find('.home-made-body-item-desc'), {autoAlpha:0,ease:'none'}, '<')
+                        this.tlStickMade.to(item, { width: space_accord_process, ease: 'none' })
+                        this.tlStickMade.to($(item).find('.home-made-body-item-desc'), {autoAlpha:0,ease:'none'}, '<')
                     }
                     else {
                         let space_accord_remaining = $(window).width() - (space_accord_process * (this.el.querySelectorAll('.home-made-body-item').length - 1))
-                        tlStickMade.to(item, { width: space_accord_remaining, ease: 'none' }, 0)
+                        this.tlStickMade.to(item, { width: space_accord_remaining, ease: 'none' }, 0)
                     }
                 })
             }
             horizontalLayout(sections) {
                 let sizeScroller = 0;
-                let totalWidth = 0;
                 gsap.set(this.el, { marginTop: $(window).height() * -1 })
                 gsap.set(this.el.querySelector('.home-solution-inner'), { display: 'flex' })
 
@@ -626,35 +627,50 @@ const script = () => {
                     if (index < sections.length - 1) {
                         sizeScroller += slide.offsetWidth;
                     }
-                    totalWidth += slide.offsetWidth;
                 });
                 gsap.set(this.el.querySelector('.solution-scroller'), { height: sizeScroller })
-                gsap.to(this.el.querySelector('.home-solution-inner'),
-                    {
-                        scrollTrigger: {
-                            trigger: '.solution-scroller',
-                            start: `top+=${$(window).height() * 1.3} top`,
-                            end: `bottom+=${$(window).height() * 1.3} bottom`,
-                            scrub: true,
-                            invalidateOnRefresh: true,
-                            anticipatePin:1,
-                            fastScrollEnd:true
-                        },
-                        x: -sizeScroller,
-                        transformOrigin: "top",
-                        ease: "none",
-                        onUpdate:()=>{
-
-                        },
-                        onComplete: () => {
-                            ScrollTrigger.refresh();
-                        }
+                this.tlHorizontal = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('.solution-scroller'),
+                        start: `top+=${$(window).height() * 1.3} top`,
+                        end: `bottom+=${$(window).height() * 1.3} bottom`,
+                        scrub: true,
+                        invalidateOnRefresh: true,
+                        anticipatePin:1,
+                        fastScrollEnd:true
                     }
-                )
+                })
+
+                this.tlHorizontal
+                    .to($(this.el).find('.home-solution-main-inner'), { rotationX: '30deg' })
+                    .to($(this.el).find('.home-solution-main'), { xPercent: 10 }, "<=0")
+                    .to(this.el.querySelector('.home-solution-inner'), { x: -sizeScroller, transformOrigin: "top", ease: "none", onComplete: () => { ScrollTrigger.refresh() }}, "<=0")
             }
             destroy() {
+                if (this.tlStickSol) {
+                    this.tlStickSol.kill()
+                }
+                if (this.tlStickMade) {
+                    this.tlStickMade.kill()
+                }
+                if (this.tlHorizontal) {
+                    this.tlHorizontal.kill()
+                }
             }
-        }
+        },
+        // Benefit: class extends TriggerSetup {
+        //     constructor() {
+        //         super();
+        //         this.el = null;
+        //     }
+        //     trigger(data) {
+        //         this.el = data.next.container.querySelector('.home-benefit-wrap');
+        //         super.setTrigger(this.el, this.setup.bind(this));
+        //     }
+        //     setup() {
+
+        //     }
+        // }
     }
     const ContactPage = {
         Hero: class {
