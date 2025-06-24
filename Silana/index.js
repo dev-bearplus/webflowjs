@@ -589,7 +589,8 @@ const script = () => {
                         trigger: $(this.el).find('.home-solution'),
                         start: `top+=${$(window).height() * .8} top`,
                         end: `bottom-=${$(window).height() * 1.2} bottom`,
-                        scrub: 1
+                        scrub: 1,
+                        anticipatePin: 1
                     }
                 })
 
@@ -602,13 +603,14 @@ const script = () => {
                         trigger: $(this.el).find('.home-made'),
                         scrub: 1,
                         start: `top+=${$(this.el).find('.home-solution').height() - ($(window).height() * 2)} top`,
-                        end: 'bottom bottom'
+                        end: 'bottom bottom',
+                        anticipatePin: 1
                     }
                 })
 
-                const space_accord_process = parseInt($('.home-made-body-item-size').css('width'))
+                const space_accord_process = parseInt($(this.el).find('.home-made-body-item-size').css('width'))
                 this.el.querySelectorAll('.home-made-body-item').forEach((item, index) => {
-                    if ((this.el.querySelectorAll('.home-made-body-item').length - 1) > index) {
+                    if (($(this.el).find('.home-made-body-item').length - 1) > index) {
                         this.tlStickMade.to(item, { width: space_accord_process, ease: 'none' })
                         this.tlStickMade.to($(item).find('.home-made-body-item-desc'), {autoAlpha:0,ease:'none'}, '<')
                     }
@@ -619,32 +621,24 @@ const script = () => {
                 })
             }
             horizontalLayout(sections) {
-                let sizeScroller = 0;
-                gsap.set(this.el, { marginTop: $(window).height() * -1 })
+                let sizeScroller = $(this.el).find('.solution-scroller').height();
                 gsap.set(this.el.querySelector('.home-solution-inner'), { display: 'flex' })
 
-                sections.forEach(function (slide, index) {
-                    if (index < sections.length - 1) {
-                        sizeScroller += slide.offsetWidth;
-                    }
-                });
-                gsap.set(this.el.querySelector('.solution-scroller'), { height: sizeScroller })
                 this.tlHorizontal = gsap.timeline({
                     scrollTrigger: {
                         trigger: $(this.el).find('.solution-scroller'),
                         start: `top+=${$(window).height() * 1.3} top`,
                         end: `bottom+=${$(window).height() * 1.3} bottom`,
                         scrub: 1,
-                        invalidateOnRefresh: true,
-                        anticipatePin:1,
-                        fastScrollEnd:true
+                        anticipatePin: 1,
+                        snap: 1
                     }
                 })
 
                 this.tlHorizontal
                     .to($(this.el).find('.home-solution-main-inner'), { rotationX: '30deg' })
                     .to($(this.el).find('.home-solution-main'), { xPercent: 10 }, "<=0")
-                    .to(this.el.querySelector('.home-solution-inner'), { x: -sizeScroller, transformOrigin: "top", ease: "none", onComplete: () => { ScrollTrigger.refresh() }}, "<=0")
+                    .to(this.el.querySelector('.home-solution-inner'), { x: -sizeScroller, transformOrigin: "top", ease: "none" }, "<=0")
             }
             destroy() {
                 if (this.tlStickSol) {
@@ -670,6 +664,7 @@ const script = () => {
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
+                console.log("run benefit")
                 this.tlParallax.push(
                     gsap
                         .timeline({
@@ -682,7 +677,7 @@ const script = () => {
                         })
                         .to('.home-made-body', { scale: 0.8, transformOrigin: 'top', autoAlpha: 0.6, duration: 1, ease: 'power2.in' })
                         .to('.home-made-title', { scale: .95, transformOrigin: 'bottom', autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
-                        .to('.home-made-map', { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in', onComplete: () => { ScrollTrigger.refresh() } }, "<=0"))
+                        .to('.home-made-map', { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0"))
             }
         },
         News: class extends TriggerSetup {
@@ -697,6 +692,7 @@ const script = () => {
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
+                console.log("run news")
                 new ParallaxImage({ el: this.el.querySelector('.home-news-thumb img') });
                 this.tlParallax.push(
                     gsap
@@ -706,6 +702,7 @@ const script = () => {
                                 start: `top 10%`,
                                 end: `bottom bottom`,
                                 endTrigger: this.el,
+                                markers: true,
                                 scrub: 1
                             },
                         })
