@@ -116,7 +116,6 @@ const script = () => {
         }
         init(data) {
             this.reInit(data);
-            SimpleScrollbar.initAll();
             gsap.ticker.add((time) => {
                 if (this.lenis) {
                     this.lenis.raf(time * 1000);
@@ -582,25 +581,46 @@ const script = () => {
                 this.sections = this.el.querySelectorAll('section');
                 this.horizontalLayout(this.sections);
 
-                let tl = gsap.timeline({
+                let tlStickSol = gsap.timeline({
                     scrollTrigger: {
                         trigger: $(this.el).find('.home-solution'),
                         start: `top+=${$(window).height() * .8} top`,
-                        end: 'bottom bottom',
-                        scrub: true,
+                        end: `bottom-=${$(window).height() * 1.2} bottom`,
+                        scrub: true
                     }
                 })
 
-                tl
+                tlStickSol
                     .fromTo('.home-solution-main-transform', { bottom: '100%' }, { bottom: '2%' })
                     .fromTo('.home-solution-main-vid-halftone', { height: '100%' }, { height: '2%' }, "<=0")
+
+                let tlStickMade = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('.home-made'),
+                        scrub: true,
+                        start: `top+=${$(this.el).find('.home-solution').height() - ($(window).height() * 2)} top`,
+                        end: 'bottom bottom',
+                        markers: true
+                    }
+                })
+
+                const space_accord_process = parseInt($('.home-made-body-item-size').css('width'))
+                this.el.querySelectorAll('.home-made-body-item').forEach((item, index) => {
+                    if ((this.el.querySelectorAll('.home-made-body-item').length - 1) > index) {
+                        tlStickMade.to(item, { width: space_accord_process, ease: 'none' })
+                        tlStickMade.to($(item).find('.home-made-body-item-desc'), {autoAlpha:0,ease:'none'}, '<')
+                    }
+                    else {
+                        let space_accord_remaining = $(window).width() - (space_accord_process * (this.el.querySelectorAll('.home-made-body-item').length - 1))
+                        tlStickMade.to(item, { width: space_accord_remaining, ease: 'none' }, 0)
+                    }
+                })
             }
             horizontalLayout(sections) {
                 let sizeScroller = 0;
                 let totalWidth = 0;
-                let heightOverlap = $(window).height();
-                gsap.set(this.el, { marginTop: heightOverlap * -1 })
-                gsap.set(this.el.querySelector('.home-solution-inner'), { position: 'sticky', top: 0, display: 'flex' })
+                gsap.set(this.el, { marginTop: $(window).height() * -1 })
+                gsap.set(this.el.querySelector('.home-solution-inner'), { display: 'flex' })
 
                 sections.forEach(function (slide, index) {
                     if (index < sections.length - 1) {
@@ -613,8 +633,8 @@ const script = () => {
                     {
                         scrollTrigger: {
                             trigger: '.solution-scroller',
-                            start: `top-=${heightOverlap * 1.3} top`,
-                            end: 'bottom bottom',
+                            start: `top+=${$(window).height() * 1.3} top`,
+                            end: `bottom+=${$(window).height() * 1.3} bottom`,
                             scrub: true,
                             invalidateOnRefresh: true,
                             anticipatePin:1,
