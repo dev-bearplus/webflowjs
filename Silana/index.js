@@ -385,6 +385,7 @@ const script = () => {
         updateAfterTrans(data) {
             smoothScroll.reInit(data)
             globalChange.update(data)
+            smoothScroll.start();
             if (data.current.container) {
                 data.current.container.remove();
             }
