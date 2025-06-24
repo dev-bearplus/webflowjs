@@ -116,6 +116,7 @@ const script = () => {
         }
         init(data) {
             this.reInit(data);
+            SimpleScrollbar.initAll();
             gsap.ticker.add((time) => {
                 if (this.lenis) {
                     this.lenis.raf(time * 1000);
