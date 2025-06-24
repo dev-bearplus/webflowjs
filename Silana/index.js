@@ -398,15 +398,18 @@ const script = () => {
             this.tlTrigger;
         }
         setTrigger(triggerEl, setup) {
-            this.tlTrigger = gsap.timeline({
-                scrollTrigger: {
-                    trigger: triggerEl,
-                    start: 'top bottom+=50%',
-                    end: 'bottom top',
-                    once: true,
-                    onEnter: () => setup(),
-                }
-            })
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        setup();
+                        observer.unobserve(entry.target); // Only trigger once
+                    }
+                });
+            }, {
+                threshold: 0,
+                rootMargin: `-${window.innerHeight}px 0px 0px 0px`
+            });
+            observer.observe(triggerEl);
         }
     }
 
@@ -575,12 +578,14 @@ const script = () => {
                 this.tlStickSol = null;
                 this.tlStickMade = null;
                 this.tlHorizontal = null;
+                this.tlOverlap = null;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-solution-wrap');
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
+                console.log("run solution");
                 this.sections = this.el.querySelectorAll('section');
                 this.horizontalLayout(this.sections);
 
@@ -619,6 +624,18 @@ const script = () => {
                         this.tlStickMade.to(item, { width: space_accord_remaining, ease: 'none' }, 0)
                     }
                 })
+                this.tlOverlap = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: `bottom-=${$(window).height() * 1.5} bottom`,
+                        end: `bottom bottom`,
+                        scrub: 1
+                    },
+                })
+                this.tlOverlap
+                    .to('.home-made-body', { scale: 0.8, transformOrigin: 'top', autoAlpha: 0.6, duration: 1, ease: 'power2.in' })
+                    .to('.home-made-title', { scale: .95, transformOrigin: 'bottom', autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
+                    .to('.home-made-map', { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
             }
             horizontalLayout(sections) {
                 let sizeScroller = $(this.el).find('.solution-scroller').height();
@@ -650,34 +667,22 @@ const script = () => {
                 if (this.tlHorizontal) {
                     this.tlHorizontal.kill()
                 }
+                if (this.tlOverlap) {
+                    this.tlOverlap.kill()
+                }
             }
         },
         Benefit: class extends TriggerSetup {
             constructor() {
                 super();
                 this.el = null;
-                this.tlParallax = null;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-benefit-wrap');
-                this.tlParallax = [];
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
                 console.log("run benefit")
-                this.tlParallax.push(
-                    gsap
-                        .timeline({
-                            scrollTrigger: {
-                                trigger: this.el,
-                                start: `bottom-=${$(window).height() * 1.5} bottom`,
-                                end: `bottom bottom`,
-                                scrub: 1
-                            },
-                        })
-                        .to('.home-made-body', { scale: 0.8, transformOrigin: 'top', autoAlpha: 0.6, duration: 1, ease: 'power2.in' })
-                        .to('.home-made-title', { scale: .95, transformOrigin: 'bottom', autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
-                        .to('.home-made-map', { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0"))
             }
         },
         News: class extends TriggerSetup {
@@ -702,7 +707,6 @@ const script = () => {
                                 start: `top 10%`,
                                 end: `bottom bottom`,
                                 endTrigger: this.el,
-                                markers: true,
                                 scrub: 1
                             },
                         })
