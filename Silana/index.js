@@ -583,11 +583,12 @@ const script = () => {
                 let tl = gsap.timeline({
                     scrollTrigger: {
                         trigger: $(this.el).find('.home-solution'),
-                        start: `top+=${$(window).height() * .5} top`,
+                        start: `top+=${$(window).height() * .8} top`,
                         end: 'bottom bottom',
-                        scrub: true
+                        scrub: true,
                     }
                 })
+
                 tl
                     .fromTo('.home-solution-main-transform', { bottom: '100%' }, { bottom: '2%' })
                     .fromTo('.home-solution-main-vid-halftone', { height: '100%' }, { height: '2%' }, "<=0")
@@ -597,44 +598,37 @@ const script = () => {
                 let totalWidth = 0;
                 let heightOverlap = $(window).height();
                 gsap.set(this.el, { marginTop: heightOverlap * -1 })
+                gsap.set(this.el.querySelector('.home-solution-inner'), { position: 'sticky', top: 0, display: 'flex' })
 
+                sections.forEach(function (slide, index) {
+                    if (index < sections.length - 1) {
+                        sizeScroller += slide.offsetWidth;
+                    }
+                    totalWidth += slide.offsetWidth;
+                });
+                gsap.set(this.el.querySelector('.solution-scroller'), { height: sizeScroller })
+                gsap.to(this.el.querySelector('.home-solution-inner'),
+                    {
+                        scrollTrigger: {
+                            trigger: '.solution-scroller',
+                            start: `top-=${heightOverlap * 1.3} top`,
+                            end: 'bottom bottom',
+                            scrub: true,
+                            invalidateOnRefresh: true,
+                            anticipatePin:1,
+                            fastScrollEnd:true
+                        },
+                        x: -sizeScroller,
+                        transformOrigin: "top",
+                        ease: "none",
+                        onUpdate:()=>{
 
-
-                // gsap.set(this.el.querySelector('.home-solution-inner'), { position: 'sticky', top: 0, display: 'flex' })
-                // gsap.set(this.el.querySelector('.home-solution-stick'), { width: $(window).width() })
-
-                // sections.forEach(function (slide, index) {
-                //     // gsap.set(slide, { width: window.innerWidth })
-                //     if (index < sections.length - 1) {
-                //         sizeScroller += slide.offsetWidth;
-                //     }
-                //     totalWidth += slide.offsetWidth;
-                // });
-                // gsap.set(this.el.querySelector('.solution-scroller'), { height: sizeScroller + heightOverlap })
-
-                // gsap.to(this.el.querySelector('.home-solution-inner'),
-                //     {
-                //         scrollTrigger: {
-                //             trigger: '.solution-scroller',
-                //             start: `top+=${heightOverlap} top`,
-                //             end: 'bottom bottom',
-                //             scrub: true,
-                //             // markers:true,
-                //             invalidateOnRefresh: true,
-                //             anticipatePin:1,
-                //             fastScrollEnd:true
-                //         },
-                //         x: -sizeScroller,
-                //         transformOrigin: "top",
-                //         ease: "none",
-                //         onUpdate:()=>{
-
-                //         },
-                //         onComplete: () => {
-                //             ScrollTrigger.refresh();
-                //         }
-                //     }
-                // )
+                        },
+                        onComplete: () => {
+                            ScrollTrigger.refresh();
+                        }
+                    }
+                )
             }
             destroy() {
             }
