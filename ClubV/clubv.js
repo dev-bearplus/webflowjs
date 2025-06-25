@@ -2374,18 +2374,39 @@ const mainScript = () => {
                     ...Array.from($('.event-calendar-item')).flatMap((el, index) => new FadeIn({el: $(el), delay: .2})),
                 ]
             })
-
-            $('.event-calendar-item').each((i, el) => {
-                this.calendar($(el));
-            })
-            this.filterByTab();
+            let currentUrl = window.location.href;
+            let url = new URL(currentUrl);
+            let tagName = url.searchParams.get("type");
+            let itemDetail = url.searchParams.get("detail");
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
+                if(currentUrl.includes('promotion-events')) {
+                    let itemSlug = $(this).closest('.event-hero-card-item').attr('data-link-detail');
+                    history.replaceState({}, '', `/events/${itemSlug}`);
+                }
                 let index = $(this).closest('.event-hero-card-item').index();
                 activeItem(['.event-popup-item'], index)
                 $('.global-popup-wrap').addClass('has-popup');
                 lenis.stop();
             })
+            if(currentUrl.includes('promotion-events')) {
+                if(itemDetail) {
+                    $(`.event-hero-card-item[data-link-detail=${itemDetail}] [data-link= "open-popup"]`).eq(0).click();
+                }
+            }
+            else {
+                const parts = url.pathname.split('/').filter(Boolean);
+                const slug = parts.at(-1);
+                if(slug) {
+                    $(`.event-hero-card-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
+                    console.log($(`.event-hero-card-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0));
+                }
+            }
+            $('.event-calendar-item').each((i, el) => {
+                this.calendar($(el));
+            })
+            this.filterByTab();
+            
             $('.event-popup-close').on('click', function(e) {
                 e.preventDefault();
                 $('.global-popup-wrap').removeClass('has-popup');
@@ -2397,23 +2418,7 @@ const mainScript = () => {
                     lenis.start();
                 }
             })
-            let currentUrl = window.location.href;
-            let url = new URL(currentUrl);
-            let tagName = url.searchParams.get("type");
-            let itemDetail = url.searchParams.get("detail");
-            if(currentUrl.includes('promotion-events')) {
-                if(itemDetail) {
-                    $(`.event-hero-card-item[data-link-detail=${itemDetail}] [data-link= "open-popup"]`).eq(0).click();
-                }
-            }
-            else {
-                const parts = url.pathname.split('/').filter(Boolean);
-                const slug = parts.at(-1);
-                console.log(slug)
-                if(slug) {
-                    $(`.event-hero-card-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
-                }
-            }
+            
             if(tagName) {
                 $('.event-hero-tag-item').removeClass('active');
                 $(`.event-hero-tag-item[data-tag="${tagName}"]`).addClass('active');
