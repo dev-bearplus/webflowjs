@@ -28,6 +28,10 @@ const mainScript = () => {
     const parseRem = (input) => {
         return (input / 10) * parseFloat($("html").css("font-size"));
       };
+    const schemaFAQParentAttrs = {
+        itemscope: true,
+        itemtype: 'https://schema.org/FAQPage'
+    };
     // Variables and Ultilities
     let unit;
     let slideUpDownTime = 400;
@@ -398,11 +402,15 @@ const mainScript = () => {
         ans.find('.other-rate-sgd').attr('data-rate-sgd','other');
         ans.find('.limit-amount-sgd').attr('data-rate-sgd','amount');
         ans.find('.limit-date-sgd').attr('data-rate-sgd','date');
+        ans.find('.minimum-sum-sgd').attr('data-rate-sgd','minimum-sum');
+        ans.find('.withdrawal-sgd').attr('data-rate-sgd','withdrawal');
         ans.find('.big-rate-usd').attr('data-rate-usd','big');
         ans.find('.small-rate-usd').attr('data-rate-usd','small');
         ans.find('.other-rate-usd').attr('data-rate-usd','other');
         ans.find('.limit-amount-usd').attr('data-rate-usd','amount');
         ans.find('.limit-date-usd').attr('data-rate-usd','date');
+        ans.find('.minimum-sum-usd').attr('data-rate-usd','minimum-sum');
+        ans.find('.withdrawal-usd').attr('data-rate-usd','withdrawal');
         // Embed
         ans.find('[data-oembed]').addClass('art-embed-wrap mod-faq');
 
@@ -577,16 +585,16 @@ const mainScript = () => {
         let richTextArray = el.data.content_richtext;
             let ans = PrismicDOM.RichText.asHtml(richTextArray);
             let faqItem = $(`
-                <div class="home-faq-item" id="${el.uid.replaceAll('.','')}">
+                <div class="home-faq-item" id="${el.uid.replaceAll('.','')}" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
                     <a href="#" class="home-faq-item-head w-inline-block">
-                        <div class="txt-16 home-faq-item-ques">${el.data.question}</div>
+                        <div class="txt-16 home-faq-item-ques" itemprop="name">${el.data.question}</div>
                         <div class="ic-plus-wrap">
                             <div class="ic-plus-inner"></div>
                             <div class="ic-plus-inner mod-rotate"></div>
                         </div>
                     </a>
-                    <div class="home-faq-item-body">
-                        <div class="txt-16 home-faq--itemans">${ans}</div>
+                    <div class="home-faq-item-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                        <div class="txt-16 home-faq--itemans" itemprop="text">${ans}</div>
                     </div>
                     <div class="home-faq-bar">
                         <div class="home-faq-bar-inner"></div>
@@ -1181,6 +1189,8 @@ const mainScript = () => {
         let SGDamount = $('[data-rate-source-sgd="amount"]').text();
         let SGDdate = $('[data-rate-source-sgd="date"]').text();
         let SGDwidthdrawal = $('[data-rate-source-sgd="withdrawal"]').text();
+        let SGDminimumsum = $('[data-rate-source-sgd="minimum-sum"]').text();
+
         let SGDallRates = $(wrapper).find('[data-rate-sgd]');
         SGDallRates.each(function(e) {
             let type = $(this).attr('data-rate-sgd');
@@ -1198,7 +1208,9 @@ const mainScript = () => {
                 $(this).text(SGDotherRate)
             } else if (type == 'withdrawal') {
                 $(this).text(SGDwidthdrawal)
-            } else if (type == 'fixed') {
+            }else if (type == 'minimum-sum') {
+                $(this).text(SGDminimumsum)
+            }else if (type == 'fixed') {
                 // $(this).text(fixedRate)
             }
         })
@@ -1210,7 +1222,8 @@ const mainScript = () => {
         // let USDfixedRate = $('[data-rate-source-usd="fixed"]').text();
         let USDamount = $('[data-rate-source-usd="amount"]').text();
         let USDdate = $('[data-rate-source-usd="date"]').text();
-        let USDwidthdrawal = $('[data-rate-source-sgd="withdrawal"]').text();
+        let USDwidthdrawal = $('[data-rate-source-usd="withdrawal"]').text();
+        let USDminimiumsum = $('[data-rate-source-usd="minimum-sum"]').text();
         let USDallRates = $(wrapper).find('[data-rate-usd]');
         USDallRates.each(function(e) {
             let type = $(this).attr('data-rate-usd');
@@ -1228,7 +1241,9 @@ const mainScript = () => {
                 $(this).text(USDotherRate)
             } else if (type == 'withdrawal') {
                 $(this).text(USDwidthdrawal)
-            } else if (type == 'fixed') {
+            }else if (type == 'minimum-sum') {
+                $(this).text(USDminimiumsum)
+            }else if (type == 'fixed') {
                 // $(this).text(USDfixedRate)
             }
         })
@@ -2460,7 +2475,7 @@ const mainScript = () => {
                 if (res) {
                     let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_homepage)
                     let allFaq = sortAsc(activeFaqItem, true, 'order_on_homepage', true)
-                    $('.home-faq-main').html('')
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs);
                     allFaq.forEach((i) => {
                         createFaqNew(i).appendTo($('.home-faq-main'))
                     })
@@ -2579,7 +2594,7 @@ const mainScript = () => {
                 if (res) {
                     let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_how_it_works)
                     let allFaq = sortAsc(activeFaqItem, true, 'order_on_how_it_works', true)
-                    $('.home-faq-main').html('')
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
                     allFaq.forEach((i) => {
                         createFaqNew(i).appendTo($('.home-faq-main'))
                     })
@@ -2759,7 +2774,7 @@ const mainScript = () => {
                 if (res) {
                     let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_about_us)
                     let allFaq = sortAsc(activeFaqItem, true, 'order_on_about_us', true)
-                    $('.home-faq-main').html('')
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
                     allFaq.forEach((i) => {
                         createFaqNew(i).appendTo($('.home-faq-main'))
                     })
@@ -3349,6 +3364,7 @@ const mainScript = () => {
             })
         }
         faqGetFaq();
+        $('.faq-main-wrap').attr(schemaFAQParentAttrs);
         function updateUICate(allFaqCate) {
             $('.faq-cate-list').html('');
             const faqListTemplate = $('.faq-cate-wrap').eq(0).clone();
@@ -3954,7 +3970,7 @@ const mainScript = () => {
                 if (res) {
                     let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_usd_page)
                     let allFaq = sortAsc(activeFaqItem, true, 'order_on_usd_page', true)
-                    $('.home-faq-main').html('')
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
                     allFaq.forEach((i) => {
                         createFaqNew(i).appendTo($('.home-faq-main'))
                     })
@@ -4027,7 +4043,7 @@ const mainScript = () => {
                 if (res) {
                     let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_corporate_page)
                     let allFaq = sortAsc(activeFaqItem, true, 'order_on_corporate_page', true)
-                    $('.home-faq-main').html('')
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
                     allFaq.forEach((i) => {
                         createFaqNew(i).appendTo($('.home-faq-main'))
                     })
@@ -4096,7 +4112,7 @@ const mainScript = () => {
                 if (res) {
                     let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_card_page)
                     let allFaq = sortAsc(activeFaqItem, true, 'order_on_card_page', true)
-                    $('.home-faq-main').html('')
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
                     allFaq.forEach((i) => {
                         createFaqNew(i).appendTo($('.home-faq-main'))
                     })
@@ -4233,7 +4249,9 @@ const mainScript = () => {
                         slidesPerView: slideView,
                         mousewheel: {
                             enabled: true,
-                          },
+                            forceToAxis: true,
+                        },
+                        freeMode: true,
                         scrollbar: {
                             el: ".thank-review-process",
                             draggable: true,
@@ -4318,7 +4336,7 @@ const mainScript = () => {
                 if (res) {
                     let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_homepage)
                     let allFaq = sortAsc(activeFaqItem, true, 'order_on_homepage', true)
-                    $('.home-faq-main').html('')
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
                     allFaq.forEach((i) => {
                         createFaqNew(i).appendTo($('.home-faq-main'))
                     })
@@ -4343,6 +4361,130 @@ const mainScript = () => {
             }
         }
         thankGetFaq();
+    }
+    SCRIPT.guaranteeScript = () => {
+        if (!isStagging) return;
+        const sgdToUsd = parseFloat($('.sgd-to-usd').text());
+        const usdToSgd = (Math.floor((1/sgdToUsd)*100000)/100000).toFixed(5);
+        const feeSgdToUsd = 0.1;
+        let textUnitInit = $('.unit-init').text();
+        let textUnitWillChange = $('.unit-will-change').text();
+        let flagChangeSgdToUsd = true;
+        function guaranteeFee() {
+            $('.guarantee-fee-form-input').on('input', function () {
+                let sgdValue = $(this).val();
+                // clean all text
+                let cleanedFee = validInputUsd(sgdValue);
+                $('.guarantee-fee-form-input-val').text(cleanedFee);
+                let usdConvertTotal = (Math.floor(cleanedFee * sgdToUsd * 100)/100).toFixed(2);
+                let usdConvertFinal =(Math.floor((usdConvertTotal - usdConvertTotal * feeSgdToUsd)*100)/100).toFixed(2);
+                let feeConvert = (usdConvertTotal - usdConvertFinal).toFixed(2);
+                console.log(usdConvertFinal)
+                $('.sgd-to-usd-total').text(usdConvertTotal);
+                $('.sgd-to-usd-fee').text(feeConvert);
+                $('.guarantee-fee-form-input-result').text(usdConvertFinal);
+            });
+            $('.guarantee-fee-convert-ic').on('click', function () {
+                if (flagChangeSgdToUsd) {
+                    $('.unit-init').text(textUnitWillChange);
+                    $('.unit-will-change').text(textUnitInit);
+                    $('.sgd-to-usd').text(usdToSgd)
+                    flagChangeSgdToUsd = false;
+                }
+                else {
+                    $('.unit-init').text(textUnitInit);
+                    $('.unit-will-change').text(textUnitWillChange);
+                    $('.sgd-to-usd').text(sgdToUsd)
+                    flagChangeSgdToUsd = true;
+                }
+            })
+        }
+        guaranteeFee();
+        function validInputUsd(sgdValue) {
+            let cleanedSgdValue = sgdValue.replace(/[^\d.,]/g, '');
+            const lastComma = cleanedSgdValue.lastIndexOf(',');
+            const lastDot = cleanedSgdValue.lastIndexOf('.');
+            // function only get one dot or one comma
+            if (lastComma > -1 && lastDot > -1) {
+                if (lastComma > lastDot) {
+                    cleanedSgdValue = cleanedSgdValue.replace(/\./g, ''); 
+                    cleanedSgdValue = cleanedSgdValue.replace(/(,)(?=.*\,)/g, '');
+                } else {
+                    cleanedSgdValue = cleanedSgdValue.replace(/\,/g, ''); 
+                    cleanedSgdValue = cleanedSgdValue.replace(/(\.)(?=.*\.)/g, '');
+                }
+            } else {
+                cleanedSgdValue = cleanedSgdValue
+                    .replace(/,/g, (match, offset) => offset === 0 ? '' : ',') 
+                    .replace(/(,)(?=.*\,)/g, '') 
+                    .replace(/\./g, (match, offset) => offset === 0 ? '' : '.') 
+                    .replace(/(\.)(?=.*\.)/g, ''); 
+            }
+            if (cleanedSgdValue.startsWith(',') || cleanedSgdValue.startsWith('.')) {
+                cleanedSgdValue = cleanedSgdValue.substring(1);
+            }
+            // update value input
+            if (sgdValue !== cleanedSgdValue) {
+                $(this).val(cleanedSgdValue);
+                sgdValue = cleanedSgdValue;
+            }
+            return sgdValue;
+        }
+        function usdSecu(){
+            let textCir;
+            textCir = new CircleType(document.querySelector('.mod-circletext.usd-secu-rate-txt'));
+            $('.mod-circletext').css('display','flex')
+            $('.text-cir-wrap').addClass('anim-rotate')
+        }
+        usdSecu();
+        function homeGetFaq() {
+            getAllDataByType('faq').then((res) => {
+                if (res) {
+                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_homepage)
+                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_homepage', true)
+                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs);
+                    allFaq.forEach((i) => {
+                        createFaqNew(i).appendTo($('.home-faq-main'))
+                    })
+                    updateInterestRate('.home-faq-main');
+                    $('.home-faq-main').find('.load-ske').addClass('loaded')
+                    animateFaq();
+                    scrollToFaq();
+                }
+            });
+            function scrollToFaq() {
+                $('[data-scroll-faq]').on('click', function(e) {
+                    e.preventDefault();
+                    let target = $(this).attr('data-scroll-faq');
+                    if ($(`#${target}`).length >= 1) {
+                        lenis.scrollTo(target)
+                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
+                    } else {
+                        lenis.scrollTo(`${$(this).attr('href')}`)
+                    }
+
+                })
+            }
+        }
+        homeGetFaq();
+        
+        function usdBenefit(){
+            $('.usd-benefit-item').eq(0).addClass('active');
+            $('.usd-benefit-item').eq(0).find('.usd-benefit-item-body').slideDown();;
+            $('.usd-benefit-item').on('click', function(){
+                if($(this).hasClass('active')){
+                    $('.usd-benefit-item').removeClass('active')
+                    $(this).find('.usd-benefit-item-body').slideUp();
+                }
+                else{
+                    $('.usd-benefit-item-body').slideUp();
+                    $('.usd-benefit-item').removeClass('active')
+                    $(this).addClass('active')
+                    $(this).find('.usd-benefit-item-body').slideDown();
+                }
+            })
+        }
+        usdBenefit();
     }
     const pageName = $('.main').attr('data-barba-namespace');
     if (pageName) {

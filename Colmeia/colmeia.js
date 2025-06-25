@@ -7,9 +7,9 @@ const mainScript = () => {
         return this.attr(name) !== undefined;
     };
 
-    barba.use(barbaPrefetch);
+    // barba.use(barbaPrefetch);
     gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
-    const GLOBAL_DELAY = 1.5;
+    const GLOBAL_DELAY = 1;
 
     const lenis = new Lenis({})
 
@@ -105,7 +105,7 @@ const mainScript = () => {
                             offset: -100
                         })
                     }, 500);
-                    barba.history.add(`${window.location.pathname + target}`, 'barba', 'replace');
+                    // barba.history.add(`${window.location.pathname + target}`, 'barba', 'replace');
                 } else {
                     scrollTop()
                 }
@@ -698,12 +698,6 @@ const mainScript = () => {
         }
     })();
 
-    let isInitMeeting = false;
-    function initMeetingsEmbedCode() {
-        if (isInitMeeting) return;
-        MeetingsEmbedCode(MeetingsEmbedCode || {});
-        isInitMeeting = true;
-    }
     const initAllForm = () => {
         initForm({
             formName: 'Contact us',
@@ -729,7 +723,6 @@ const mainScript = () => {
                 fields: [
                     { name: 'firstname', value: (data) => data['First-Name'] },
                     { name: 'lastname', value: (data) => data['Last-Name'] },
-                    { name: 'phone', value: (data) => data['Phone-Number'] },
                     { name: 'email', value: (data) => data['Business-Email'] },
                     { name: 'company', value: (data) => data['Company'] },
                     { name: 'document_whitepaper', value: (data) => data['Document-Whitepaper'] },
@@ -739,9 +732,31 @@ const mainScript = () => {
         });
     }
     const initAllPopup = () => {
-        // initPopup('schedule', {
-        //     onOpen: () => initMeetingsEmbedCode()
-        // });
+        initPopup('demo', {
+            onOpen: () => {
+                let iframe = $('.demo-vid-inner iframe').length > 0 ? $('.demo-vid-inner iframe'): $('<iframe></iframe>');
+                let iframeSrc = new URL(`https://www.youtube.com/embed/${$('.demo-vid-inner').attr('data-iframe-id')}?origin=${window.location.origin}&autoplay=1`);
+                iframe.attr({
+                    'src': iframeSrc,
+                    'allow': 'autoplay',
+                    'title': 'COLMEIA - Job Architecture Made Easy!',
+                    'allowfullscreen': '',
+                    'width': '100%',
+                    'height': '100%',
+                    'frameborder': 0,
+                    'allow': 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+                    'referrerpolicy': 'strict-origin-when-cross-origin'
+                });
+                iframe.appendTo('.demo-vid-inner');
+            },
+            onClose: () => {
+                let iframe = $('.demo-vid-inner iframe');
+                if (iframe) {
+                    let iframeSrc = iframe.attr('src');
+                    iframe.attr('src', '');
+                }
+            }
+        });
         initPopup('contact', {
             onOpen: () => {
                 $(`[data-popup-contact='wrap'] .iti__country-list`).each(function () {
@@ -764,12 +779,20 @@ const mainScript = () => {
             }
         });
     }
-
+    let pageName = $('[data-barba-namespace]').attr('data-barba-namespace');
+    let subPageName = $('[data-barba-namespace]').attr('data-barba-namespace') === $('[data-utm-source]').attr('data-utm-source') ? '' : $('[data-utm-source]').attr('data-utm-source').toLowerCase().replace(/[\s&/]+/g, '_').replace(/[^a-z0-9_]/g, '');
+    let utm_source = `${pageName}${subPageName.length === 0 ? '' : `_${subPageName}`}`;
     const updateCurrentNav = () => {
         $("a").each(function (index, link) {
+            let utm_medium = $(this).parents('[data-utm-medium]').length !== 0 ? $(this).parents('[data-utm-medium]').attr('data-utm-medium') : '';
+            let utm_content = $(this).parents('[data-utm-content]').attr('data-utm-content');
+            if (utm_medium) {
+                $(this).attr('href', `${$(this).attr('href')}?utm_source=${utm_source}&utm_content=${utm_content}&utm_medium=${utm_medium}`);
+            }
+
             if ($(this).attr('data-sub-link') && (!$(this).attr('href').includes('#')) && (!$(this).attr('href').includes('sc'))) {
                 $(this).attr('href', `${$(this).attr('href')}#${$(this).attr('data-sub-link')}`);
-                $(this).attr('data-barba-history', 'replace');
+                // $(this).attr('data-barba-history', 'replace');
             }
 
             const [urlPath, anchor] = $(this).attr('href').includes('#') ? $(this).attr('href').split('#') : $(this).attr('href').includes('sc') ? $(this).attr('href').split('?sc=') : [$(this).attr('href'), ''];
@@ -783,14 +806,18 @@ const mainScript = () => {
                     $(this).attr('href', `${window.location.pathname}#${anchor}`);
                 }
                 else {
-                    $(this).attr('href', `${urlPath}?sc=${anchor}`);
+                    //comment for disable barba
+                    // $(this).attr('href', `${urlPath}?sc=${anchor}`);
                 }
             }
+            // if ($(this).parent().hasAttr('data-utm-medium')) {
+            //     console.log()
+            // }
         });
 
         $('a').on('click', function (e) {
             if ($(this).attr('data-sub-link')) {
-                barba.history.add(`${window.location.pathname + `#${$(this).attr('data-sub-link')}`}`, 'barba', 'replace');
+                // barba.history.add(`${window.location.pathname + `#${$(this).attr('data-sub-link')}`}`, 'barba', 'replace');
 
                 requestAnimationFrame(() => {
                     setTimeout(() => {
@@ -846,6 +873,7 @@ const mainScript = () => {
         let popupWrap = $(`[data-popup-${name}='wrap']`);
         const popupAction = {
             open: (e) => {
+                e.preventDefault();
                 $('.global-popup').addClass('active');
                 setTimeout(() => {
                     popupWrap.addClass('active');
@@ -919,11 +947,7 @@ const mainScript = () => {
         }
     }
 
-    let isAnimFooter = false;
     function animFooter() {
-        if (isAnimFooter) return;
-        isAnimFooter = true;
-
         let titleCta = splitTextFadeUpSetup('.footer-cta-title-txt', { type: 'lines, words' });
         let addressLabel = splitTextFadeUpSetup('.footer-main-address-label', { type: 'lines, words' });
         let addressTxt = splitTextFadeUpSetup('.footer-main-address-txt', { type: 'lines, words' });
@@ -973,9 +997,6 @@ const mainScript = () => {
                     trigger: item,
                     start: 'top top+=85%',
                     default: { ease: 'power2.out' },
-                    onComplete: () => {
-                        isAnimFooter = false;
-                    }
                 }
             })
             requestAnimationFrame(() => {
@@ -993,7 +1014,6 @@ const mainScript = () => {
                 onComplete: () => {
                     footerCopyright.revert();
                     footerTermLink.revert();
-                    isAnimFooter = false;
                 }
             }
         })
@@ -1765,7 +1785,7 @@ const mainScript = () => {
                             $("html, body").animate({ scrollTop: targetTop }, 1200, 'exponentialEaseOut');
                         }
 
-                        barba.history.add(`${window.location.pathname + target}`, 'barba', 'replace');
+                        // barba.history.add(`${window.location.pathname + target}`, 'barba', 'replace');
                         return false;
                     })
 
@@ -1776,7 +1796,7 @@ const mainScript = () => {
                         }, 10)
                     }
                     else {
-                        barba.history.add(`${window.location.pathname}`, 'barba', 'replace');
+                        // barba.history.add(`${window.location.pathname}`, 'barba', 'replace');
                     }
                     $('.data-content-toc-wrap').height() >= viewport.h && $('.data-content-toc').attr('data-lenis-prevent', '');
                 }
@@ -1807,7 +1827,6 @@ const mainScript = () => {
                 }
                 scHero();
             }
-
         },
         article: {
             namespace: 'article',
@@ -1942,7 +1961,8 @@ const mainScript = () => {
                         activeIndex(index);
                         $(this).find('.ins-listing-cms-item-link').addClass('w--current').parent().siblings().find('.ins-listing-cms-item-link').removeClass('w--current');
                         let id = $(this).find('.ins-listing-cms-item-link').attr('id');
-                        barba.history.add(`${window.location.pathname + `#${id}`}`, 'barba', 'replace');
+                        window.history.pushState(null, null, `${window.location.pathname + `#${id}`}`);
+                        // barba.history.add(`${window.location.pathname + `#${id}`}`, 'barba', 'replace');
                     })
                     if (viewport.w <= 767) {
                         $('.ins-listing-content-cms').each((_, item) => {
@@ -2084,7 +2104,6 @@ const mainScript = () => {
                     })
 
                     function animShowEl() {
-                        $('.prod-hero-title').html($('.prod-hero-title').text());
                         const heroTitle = splitTextFadeUpSetup('.prod-hero-title');
                         const heroSub = splitTextFadeUpSetup('.prod-hero-sub');
                         const heroDesc = splitTextFadeUpSetup('.prod-hero-desc');
@@ -2353,7 +2372,7 @@ const mainScript = () => {
                 scHero();
 
                 function scContent() {
-                    $('.ar-content-richtext a').each(function (_, el) {
+                    $('.ar-content-inner a').each(function (_, el) {
                         if ($(el).attr('href').includes('#popup')) {
                             let isDownload = $(el).attr('href').includes('download');
                             let uid = isDownload ? $(el).attr('href').split('popup-download-')[1] : 0;
@@ -2367,6 +2386,9 @@ const mainScript = () => {
                                     ...(uid !== 0 && { 'data-uid': uid })
                                 });
                             });
+                        }
+                        if ($(el).attr('href').includes('/schedule-demo')) {
+                            $(el).attr('href', `${$(el).attr('href')}?utm_source=${utm_source}&utm_content=content&utm_medium=banner_cta`);
                         }
                     });
 
@@ -2505,9 +2527,6 @@ const mainScript = () => {
         schedule: {
             namespace: 'schedule',
             afterEnter() {
-                initMeetingsEmbedCode();
-
-
                 function marqueeLogo() {
                     const cloneAmount = 2;
                     new Array(cloneAmount).fill().forEach((_, index) => {
@@ -2534,15 +2553,15 @@ const mainScript = () => {
             }
         });
 
-        tlEnter.to(".loading-item", {
-            yPercent: 100,
-            stagger: 0.2,
-            duration: 0.8,
-            ease: "easeInOut",
-            onComplete: () => {
-                pointerEvents: "auto";
-            },
-        });
+        // tlEnter.to(".loading-item", {
+        //     yPercent: 100,
+        //     stagger: 0.2,
+        //     duration: 0.8,
+        //     ease: "easeInOut",
+        //     onComplete: () => {
+        //         pointerEvents: "auto";
+        //     },
+        // });
         return tlEnter;
     }
 
@@ -2596,14 +2615,12 @@ const mainScript = () => {
         resetScroll();
         getAllScrollTrigger("refresh");
 
-        isAnimFooter = false;
         gsap.timeline({
             scrollTrigger: {
                 trigger: '.footer',
                 start: 'top bottom+=100vh',
                 once: true,
                 scrub: false,
-                onEnter: () => viewport.w > 767 && animFooter()
             }
         })
         reinitializeWebflow();
@@ -2628,72 +2645,75 @@ const mainScript = () => {
         setTimeout(() => {
             initAllForm();
             initAllPopup();
-            gsap.to('.loading', { opacity: 0, duration: .4, onComplete: () => setTimeout(() => {$('.loading').remove()}, 1000)});
+            gsap.to('.loading', { opacity: 0, duration: 0.3, onComplete: () => setTimeout(() => {$('.loading').remove()}, 1000)});
             $('[data-init-hidden]').removeAttr('data-init-hidden');
         }, 500);
         if (viewport.w > 767) {
             setTimeout(initAnimation, 500);
             documentHeightObserver('init');
-            gsap.timeline({
-                scrollTrigger: {
-                    trigger: '.footer',
-                    start: 'top bottom+=100vh',
-                    once: true,
-                    scrub: false,
-                    onEnter: () => animFooter()
-                }
-            })
+            animFooter();
         }
     }
 
     const VIEWS = Object.values(SCRIPTS);
 
-    barba.init({
-        debug: true,
-        timeout: 5000,
-        preventRunning: true,
-        transitions: [{
-            name: 'default-transition',
-            sync: true,
-            once(data) {
-                console.log('once global')
-                initOnce();
-            },
-            enter(data) {
-                console.log('enter global')
-            },
-            after(data) {
-                console.log('after global')
-            },
-            afterEnter(data) {
-                setTimeout(() => {
-                    $('[data-init-hidden]').removeAttr('data-init-hidden');
-                }, 1000);
-                setTimeout(initAllPopup, 500);
-                if (viewport.w > 767) {
-                    initAnimation();
-                }
-            },
-            beforeLeave({ current }) {
-                console.log('before leave global')
-            },
-            leave(data) {
-                console.log('leave global')
-                // await leaveTransition(data).then(() => {
-                //     enterTransition(data);
-                // });
-                updateAfterTrans(data);
-                setTimeout(() => {
-                    HEADER.toggleHide(lenis);
-                    HEADER.toggleScroll(lenis);
-                }, 300);
-            },
-            afterLeave(data) {
-                console.log('after leave global')
+    const initScriptPage = () => {
+        const dataNamespace = $('[data-barba-namespace]').attr('data-barba-namespace');
+        VIEWS.forEach(page => {
+            if (dataNamespace == page.namespace) {
+                page.afterEnter();
             }
-        }],
-        views: VIEWS
-    })
-}
-window.onload = mainScript
+        });
+    }
 
+    initOnce();
+    initScriptPage();
+
+    // barba.init({
+    //     debug: true,
+    //     timeout: 5000,
+    //     preventRunning: true,
+    //     transitions: [{
+    //         name: 'default-transition',
+    //         sync: true,
+    //         once(data) {
+    //             console.log('once global')
+    //             initOnce();
+    //         },
+    //         enter(data) {
+    //             console.log('enter global')
+    //         },
+    //         after(data) {
+    //             console.log('after global')
+    //         },
+    //         afterEnter(data) {
+    //             setTimeout(() => {
+    //                 $('[data-init-hidden]').removeAttr('data-init-hidden');
+    //             }, 1000);
+    //             setTimeout(initAllPopup, 500);
+    //             if (viewport.w > 767) {
+    //                 initAnimation();
+    //             }
+    //         },
+    //         beforeLeave({ current }) {
+    //             console.log('before leave global')
+    //         },
+    //         leave(data) {
+    //             console.log('leave global')
+    //             // await leaveTransition(data).then(() => {
+    //             //     enterTransition(data);
+    //             // });
+    //             updateAfterTrans(data);
+    //             setTimeout(() => {
+    //                 HEADER.toggleHide(lenis);
+    //                 HEADER.toggleScroll(lenis);
+    //             }, 300);
+    //         },
+    //         afterLeave(data) {
+    //             console.log('after leave global')
+    //         }
+    //     }],
+    //     views: VIEWS
+    // })
+}
+export default mainScript;

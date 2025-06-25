@@ -10,6 +10,11 @@ const script = () => {
     const parseRem = (input) => {
         return input / 10 * parseFloat($('html').css('font-size'))
     }
+    function validateEmail(email) {
+        if (typeof email !== 'string') return false;
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailPattern.test(email.trim());
+    }
     const debounce = (func, timeout = 300) => {
         let timer
 
@@ -120,7 +125,13 @@ const script = () => {
         }
         reInit(data) {
             let namespace = data ? data.next.namespace : $('[data-barba="container"]').attr('data-barba-namespace');
-            this.lenis = new Lenis()
+            this.lenis = new Lenis({
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                orientation: "vertical",
+                gestureOrientation: "both",
+                smoothWheel: true,
+                infinite: false,
+            })
             this.lenis.on('scroll', ScrollTrigger.update)
             this.lenis.on('scroll', (e) => {
                 this.updateOnScroll(e);
@@ -155,7 +166,7 @@ const script = () => {
             this.scroller.scrollY = e.scroll
 
             this.scroller.velocity = e.velocity * .2
-            this.scroller.direction = e.direction
+            this.scroller.direction = e.direction;
         }
     }
     const smoothScroll = new SmoothScroll();
@@ -207,6 +218,24 @@ const script = () => {
         }
     }
     const loader = new Loader();
+
+    class Marquee {
+        constructor(list, duration = 40) {
+            this.list = list;
+            this.duration = duration;
+        }
+        setup() {
+            const cloneAmount = Math.ceil($(window).width() / this.list.width()) + 1;
+            this.list.css('animation-duration', `${Math.ceil(this.list.width() / this.duration)}s`);
+
+            new Array(cloneAmount).fill().forEach(() => {
+                let itemClone = this.list.find('[data-marquee="item"]').clone();
+                this.list.append(itemClone);
+            });
+            this.list.addClass('anim-marquee');
+        }
+    }
+
 
     class GlobalChange {
         constructor() {
@@ -332,6 +361,23 @@ const script = () => {
     }
     const pageTrans = new PageTrans();
 
+    class TriggerSetup {
+        constructor() {
+            this.tlTrigger;
+        }
+        setTrigger(triggerEl) {
+            this.tlTrigger = gsap.timeline({
+                scrollTrigger: {
+                    trigger: triggerEl,
+                    start: 'top bottom+=50%',
+                    end: 'bottom top',
+                    once: true,
+                    onEnter: () => setup(),
+                }
+            })
+        }
+    }
+
     const HomePage = {
         Hero: class {
             constructor() {
@@ -341,13 +387,240 @@ const script = () => {
                 this.tlTriggerEnter = null;
             }
             setup(data, mode) {
-                this.el = data.next.container.querySelector('.home-hero');
+                this.el = data.next.container.querySelector('.home-hero-wrap');
                 if (mode === 'once') {
                     this.setupOnce(data);
                 } else if (mode === 'enter') {
                     this.setupEnter(data);
                 }
                 else return;
+                new Marquee($(this.el).find('[data-marquee="list"'), 40).setup();
+            }
+            setupOnce(data) {
+                this.tlOnce = gsap.timeline({
+                    paused: true,
+                    onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                })
+            }
+            setupEnter(data) {
+                this.tlEnter = gsap.timeline({
+                    paused: true
+                })
+
+                if (!isInViewport(this.el)) {
+                    this.tlTriggerEnter = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: this.el,
+                            start: 'top bottom+=50%',
+                            end: 'bottom top',
+                            once: true,
+                            onEnter: () => this.tlEnter.play(),
+                            onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                        }
+                    })
+                }
+            }
+            playOnce() {
+                this.tlOnce.play();
+            }
+            playEnter() {
+                if (isInViewport(this.el)) {
+                    this.tlEnter.play();
+                }
+            }
+            destroy() {
+                if (this.tlOnce) {
+                    this.tlOnce.kill();
+                }
+                if (this.tlEnter) {
+                    this.tlEnter.kill();
+                }
+                if (this.tlTriggerEnter) {
+                    this.tlTriggerEnter.kill();
+                }
+            }
+        },
+        Solution: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.home-solution-wrap');
+                super.setTrigger(this.el, this.setup.bind(this));
+            }
+            setup() {
+                this.sections = this.el.querySelectorAll('section');
+                this.horizontalLayout(this.sections);
+            }
+            horizontalLayout(sections) {
+                let sizeScroller = 0;
+                let totalWidth = 0;
+                let heightOverlap = $(window).height();
+                gsap.set(this.el, { marginTop: heightOverlap * -1 })
+                gsap.set(this.el.querySelector('.home-solution-inner'), { position: 'sticky', top: 0, display: 'flex' })
+                gsap.set(this.el.querySelector('.home-solution-stick'), { width: $(window).width() })
+
+                sections.forEach(function (slide, index) {
+                    // gsap.set(slide, { width: window.innerWidth })
+                    if (index < sections.length - 1) {
+                        sizeScroller += slide.offsetWidth;
+                    }
+                    totalWidth += slide.offsetWidth;
+                });
+                gsap.set(this.el.querySelector('.solution-scroller'), { height: sizeScroller + heightOverlap })
+                // gsap.set(this.el.querySelector('.home-solution-inner'), { width: totalWidth })
+
+                gsap.to(this.el.querySelector('.home-solution-inner'),
+                    {
+                        scrollTrigger: {
+                            trigger: '.solution-scroller',
+                            start: `top+=${heightOverlap} top`,
+                            end: 'bottom bottom',
+                            scrub: true,
+                            // markers:true,
+                            invalidateOnRefresh: true,
+                            anticipatePin:1,
+                            fastScrollEnd:true
+                        },
+                        x: -sizeScroller,
+                        transformOrigin: "top",
+                        ease: "none",
+                        onUpdate:()=>{
+
+                        },
+                        onComplete: () => {
+                            ScrollTrigger.refresh();
+                        }
+                    }
+                )
+            }
+            destroy() {
+            }
+        }
+    }
+    const ContactPage = {
+        Hero: class {
+            constructor() {
+                this.el = null;
+                this.tlOnce = null;
+                this.tlEnter = null;
+                this.tlTriggerEnter = null;
+            }
+            setup(data, mode) {
+                this.el = data.next.container.querySelector('.contact-hero-wrap');
+                if (mode === 'once') {
+                    this.setupOnce(data);
+                } else if (mode === 'enter') {
+                    this.setupEnter(data);
+                }
+                else return;
+                this.initInputValueCheck('.contact-hero-form-input');
+                this.interact();
+            }
+            initInputValueCheck(selector = 'input') {
+                $(document).on('input', selector, function () {
+                  const $this = $(this);
+                  if ($this.val().trim() !== '') {
+                    $this.addClass('has-value');
+                  } else {
+                    $this.removeClass('has-value');
+                  }
+                });
+            }
+            interact() {
+                $('.contact-hero-form-select').on('click', function(){
+                    $(this).find('.contact-hero-form-select-inner').toggleClass('active');
+                })
+                $(".contact-hero-form-option-item").on("click", function(){
+                    let text = $(this).find('.contact-hero-form-option-item-txt').text();
+                    $(".contact-hero-form-option-item").removeClass('active');
+                    $('.contact-hero-form-input-wrap.contact-hero-form-select-wrap').removeClass('valid-null');
+                    $(this).addClass('active');
+                    $('.contact-hero-form-input[name="Subject"]').val(text);
+                    $('.contact-hero-form-select-title').text(text);
+                    $(".contact-hero-form-select").removeClass("active");
+                })
+                $('.contact-hero-form-submit-real').on('click', function(e){
+
+                    let name = $('.contact-hero-form-input[name="name"]');
+                    let email = $('.contact-hero-form-input[name="Email"]');
+                    let phone = $('.contact-hero-form-input[name="Phone"]');
+                    let subject = $('.contact-hero-form-input[name="Subject"]');
+                    let flag = false;
+                    if(name.val() === ''){
+                        name.closest('.contact-hero-form-input-wrap').addClass('valid-null');
+                        flag = true;
+                    }
+                    else {
+                        name.closest('.contact-hero-form-input-wrap').removeClass('valid-null');
+                    }
+                    if(phone.val() === ''){
+                        phone.closest('.contact-hero-form-input-wrap').addClass('valid-null');
+                        flag = true;
+                    }
+                    else {
+                        phone.closest('.contact-hero-form-input-wrap').removeClass('valid-null');
+                    }
+                    if(email.val() === ''){
+                        email.closest('.contact-hero-form-input-wrap').addClass('valid-null');
+                        flag = true;
+                    }
+                    else if(!validateEmail(email.val())){
+                        email.closest('.contact-hero-form-input-wrap').removeClass('valid-null');
+                        email.closest('.contact-hero-form-input-wrap').addClass('valid-format');
+                        flag = true;
+                    }
+                    else {
+                        email.closest('.contact-hero-form-input-wrap').removeClass('valid-null');
+                        email.closest('.contact-hero-form-input-wrap').removeClass('valid-format');
+                    }
+                    if(subject.val() === ''){
+                        subject.closest('.contact-hero-form-input-wrap').addClass('valid-null');
+                        flag = true;
+                    }
+                    else {
+                        subject.closest('.contact-hero-form-input-wrap').removeClass('valid-null');
+                    }
+                    if(flag){
+                        e.preventDefault();
+                        return;
+                    }
+                })
+                $('.contact-hero-form-input').on('input', function() {
+                    const $wrap = $(this).closest('.contact-hero-form-input-wrap');
+                    if ($(this).val().trim() !== '') {
+                        $wrap.removeClass('valid-null');
+                    }
+                    if ($(this).attr('name') === 'Email') {
+                        if (validateEmail($(this).val().trim())) {
+                            $wrap.removeClass('valid-format');
+                        }
+                    }
+                });
+                $('.contact-hero-form .overlay-bg').on('click', function(){
+                    $('.contact-hero-form-success').removeClass('active');
+                })
+                function checkFormStatusWithRAF() {
+                    const formInner = document.querySelector('.contact-hero-form-inner');
+                    const successBox = document.querySelector('.contact-hero-form-success');
+                    if (!formInner || !successBox) return;
+                    let rafId;
+                    function check() {
+                      const isHidden = window.getComputedStyle(formInner).display === 'none';
+                      if (isHidden) {
+                        formInner.classList.add('active');
+                        successBox.classList.add('active');
+                        cancelAnimationFrame(rafId);
+                      } else {
+                        rafId = requestAnimationFrame(check);
+                      }
+                    }
+                    rafId = requestAnimationFrame(check);
+                  }
+                  checkFormStatusWithRAF();
+
+
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
@@ -394,7 +667,37 @@ const script = () => {
             }
         }
     }
-
+    class Footer extends TriggerSetup {
+        constructor() {
+            super();
+        }
+        setup() {
+            console.log('kádfhiahsdfjk')
+            $('.footer-cta-submit input[type="submit"]').on('click', function(e) {
+                let email = $('.footer-cta-input[name="email"]');
+                console.log(email.val());
+                let flag = false;
+                if(email.val() === ''){
+                    email.closest('.footer-cta-input-wrap').addClass('valid-null');
+                    flag = true;
+                }
+                else if(!validateEmail(email.val())){
+                    email.closest('.footer-cta-input-wrap').removeClass('valid-null');
+                    email.closest('.footer-cta-input-wrap').addClass('valid-format');
+                    flag = true;
+                }
+                else {
+                    email.closest('.footer-cta-input-wrap').removeClass('valid-null');
+                    email.closest('.footer-cta-input-wrap').removeClass('valid-format');
+                }
+                if(flag){
+                    e.preventDefault();
+                    return;
+                }
+            })
+        }
+    }
+    const footer = new Footer('.footer-cta');
     class PageManager {
         constructor(sections = []) {
             this.sections = sections;
@@ -450,8 +753,13 @@ const script = () => {
             const data = event.detail;
             const mode = event.mode;
             this.sections.forEach(section => {
-                if (section.setup) {
-                    section.setup(data, mode);
+                if (section.trigger) {
+                    section.trigger(data);
+                }
+                else {
+                    if (section.setup) {
+                        section.setup(data, mode);
+                    }
                 }
             });
         }
@@ -468,12 +776,24 @@ const script = () => {
     class HomePageManager extends PageManager {
         constructor() {
             const hero = new HomePage.Hero();
-            super([hero]);
+            const solution = new HomePage.Solution();
+            super([hero, solution]);
         }
     }
 
     const homePageManager = new HomePageManager();
+    class ContactPageManager extends PageManager {
+        constructor() {
+            const hero = new ContactPage.Hero();
+            super([hero]);
+        }
+    }
 
+    const contactPageManager = new ContactPageManager();
+    const PageManagerRegistry = {
+        home: new HomePageManager(),
+        contact: new ContactPageManager()
+    };
     const SCRIPT = {
         home: {
             namespace: 'home',
@@ -484,10 +804,19 @@ const script = () => {
                 homePageManager.destroy(data);
             }
         },
+        contact: {
+            namespace: 'contact',
+            afterEnter(data) {
+                contactPageManager.initEnter(data);
+            },
+            beforeLeave(data) {
+                contactPageManager.destroy(data);
+            }
+        },
     }
     const VIEWS = Object.values(SCRIPT);
 
-
+    let namespace = $('.main-inner').attr('data-barba-namespace');
     barba.init({
         preventRunning: true,
         timeout: 5000,
@@ -502,7 +831,9 @@ const script = () => {
             once(data) {
                 loader.init(data);
                 loader.play(data);
-                homePageManager.initOnce(data);
+                footer.setup();
+                PageManagerRegistry[namespace]?.initOnce?.(data);
+
             },
             async leave(data) {
                 await pageTrans.play(data);

@@ -127,43 +127,43 @@ const script = () => {
     }
     SCRIPT.portalScript = () => {
         console.log("portal");
-        // let headings = $('.portal-main-content-richtext h1');
-        // let tocWrap = $('.portal-main-toc-body');
+        let headings = $('.portal-main-content-richtext h1');
+        let tocWrap = $('.portal-main-toc-body');
 
-        // function setupTOC() {
-        //     if (headings.length <= 1) {
-        //         tocWrap.parent().remove();
-        //     }
+        function setupTOC() {
+            if (headings.length <= 1) {
+                tocWrap.parent().remove();
+            }
 
-        //     let cloneTOC = $('.portal-main-toc-item').eq(0).clone();
-        //     tocWrap.html('');
-        //     headings.each((idx, heading) => {
-        //         $(heading).attr('id', `toc-${idx}`);
-        //         let clone = cloneTOC.clone();
-        //         clone.find('.portal-main-toc-item-txt').attr('href', `#${$(heading).attr('id')}`).text($(heading).text());
-        //         idx === 0 && clone.addClass('active');
-        //         tocWrap.append(clone);
-        //     })
-        // }
+            let cloneTOC = $('.portal-main-toc-item').eq(0).clone();
+            tocWrap.html('');
+            headings.each((idx, heading) => {
+                $(heading).attr('id', `toc-${idx}`);
+                let clone = cloneTOC.clone();
+                clone.find('.portal-main-toc-item-txt').attr('href', `#${$(heading).attr('id')}`).text($(heading).text());
+                idx === 0 && clone.addClass('active');
+                tocWrap.append(clone);
+            })
+        }
 
-        // function handleScrollDesktop() {
-        //     $(window).on('scroll', function (e) {
-        //         const scrollTop = document.documentElement.scrollTop || window.scrollY
-        //         headings.each((idx, heading) => {
-        //             if (scrollTop > $(heading).offset().top - 200) {
-        //                 $(`.portal-main-toc-item-txt[href="#${$(heading).attr('id')}"]`).parent().addClass('active');;
-        //                 $(`.portal-main-toc-item-txt[href="#${$(heading).attr('id')}"]`).parent().siblings().removeClass('active');
+        function handleScrollDesktop() {
+            $(window).on('scroll', function (e) {
+                const scrollTop = document.documentElement.scrollTop || window.scrollY
+                headings.each((idx, heading) => {
+                    if (scrollTop > $(heading).offset().top - 200) {
+                        $(`.portal-main-toc-item-txt[href="#${$(heading).attr('id')}"]`).parent().addClass('active');;
+                        $(`.portal-main-toc-item-txt[href="#${$(heading).attr('id')}"]`).parent().siblings().removeClass('active');
 
-        //                 if ($(window).width() < 767) {
-        //                     $('.portal-main-toc-curr-txt').text($(heading).text());
-        //                 }
-        //             }
-        //         })
-        //     })
-        // }
+                        if ($(window).width() < 767) {
+                            $('.portal-main-toc-curr-txt').text($(heading).text());
+                        }
+                    }
+                })
+            })
+        }
 
-        // setupTOC();
-        // handleScrollDesktop();
+        setupTOC();
+        handleScrollDesktop();
 
         // if ($(window).width() < 767) {
         //     let stickyTop = $('.header').outerHeight();
@@ -188,12 +188,13 @@ const script = () => {
         setTimeout(() => {
             $('<script/>', {
                 src: `https://widget.senja.io/widget/${id}/platform.js`,
-                type: 'text/javascript',
-                async: true
+                type: 'text/javascript'
             }).appendTo('body');
             $(el).css('display', 'block');
-        }, $(window).width() < 767 ? 1000 : 300);
+        }, $(window).width() < 767 ? 3000 : 300);
     })
+    $('.loader').animate({ opacity: 0 }, 1000, () => $('.loader').remove());
+
     // let isLoaded = sessionStorage.getItem('isLoaded') === 'true' ? true : false;
     // if (!isLoaded) {
     //     if ($(window).width() < 767) {
@@ -219,5 +220,4 @@ const script = () => {
         SCRIPT[`${pageName}Script`]();
     }
 }
-
 window.onload = script;
