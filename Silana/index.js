@@ -33,6 +33,25 @@ const script = () => {
             rect.bottom >= 0
         );
     }
+    const getAllScrollTrigger = (fn) => {
+        let triggers = ScrollTrigger.getAll();
+        triggers.forEach(trigger => {
+            trigger[fn]();
+        });
+    }
+    function scrollTop(onComplete) {
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+        smoothScroll.lenis.scrollTo("top", {
+            duration: .0001, lock: true,
+            onComplete: () => {
+                onComplete?.();
+                getAllScrollTrigger("refresh");
+            }
+        });
+    }
     class Mouse {
         constructor() {
             this.mousePos = {x: 0, y: 0};
@@ -262,9 +281,72 @@ const script = () => {
                 if (isInViewport(this.elWrap)) {
                     let percent = this.elWrap.getBoundingClientRect().bottom / total;
                     gsap.quickSetter(this.el, 'y', 'px')(-dist * percent * 1.2);
-                    gsap.set(this.el, { scale: 1 + (percent * 0.3) });
+                    gsap.set(this.el, { scale: 1 + (percent * 0.2) });
                 }
             }
+        }
+    }
+    class FlipText {
+        constructor(wrapEl, onCycleComplete = () => {}) {
+            this.wrapEl = wrapEl;
+            this.tlMaster;
+            this.onCycleComplete = onCycleComplete; // Store callback
+        }
+        setup() {
+            let allSlideItems = $(this.wrapEl).find('.txt-slider-inner > *');
+            this.tlMaster = gsap.timeline({
+                paused: true,
+                onStart: () => {
+                },
+                onComplete: () => {
+                    this.tlMaster.progress(0);
+                }
+            });
+
+            const DEFAULT = {
+                duration: 3,
+                ease: 'expo.inOut',
+                transform: {
+                    out: `translate3d(0px, ${parseRem(25.5961)}px, -${parseRem(26.0468)}px) rotateX(-91deg)`,
+                    in: `translate3d(0px, -${parseRem(25.5961)}px, -${parseRem(26.0468)}px) rotateX(91deg)`,
+                }
+            }
+            gsap.set(this.wrapEl, { perspective: parseRem(82.5) })
+            gsap.set(allSlideItems, {
+                transformOrigin: true
+                    ? 'center center -.1em !important'
+                    : 'center center -.26em !important',
+            });
+
+            allSlideItems.each((idx, text) => {
+                if (idx == allSlideItems.length - 1) {
+                    gsap.set(text, { transform: 'none', autoAlpha: 1 });
+                } else {
+                    gsap.set(text, { transform: DEFAULT.transform.out, autoAlpha: 0 });
+                }
+                let tlChild = gsap.timeline({});
+
+                if (idx === allSlideItems.length - 1) {
+                    tlChild
+                        .set(text, { transform: 'none', autoAlpha: 1 })
+                        .to(text, { transform: DEFAULT.transform.in, autoAlpha: 0, duration: DEFAULT.duration, ease: DEFAULT.ease, onStart: () => { this.onCycleComplete(idx) } }, '<=0')
+                        .to(text, { duration: DEFAULT.duration * idx - 1 * DEFAULT.duration })
+                        .set(text, { transform: DEFAULT.transform.out, autoAlpha: 0 })
+                        .to(text, { transform: 'none', autoAlpha: 1, duration: DEFAULT.duration, ease: DEFAULT.ease });
+                } else {
+                    tlChild
+                        .set(text, { transform: DEFAULT.transform.out, autoAlpha: 0 })
+                        .to(text, { duration: DEFAULT.duration * idx }, '<=0')
+                        .to(text, { transform: 'none', autoAlpha: 1, duration: DEFAULT.duration, ease: DEFAULT.ease })
+                        .to(text, { transform: DEFAULT.transform.in, autoAlpha: 0, duration: DEFAULT.duration, ease: DEFAULT.ease, onStart: () => { this.onCycleComplete(idx) } })
+                        .to(text, { duration: (allSlideItems.length - 2 - idx) * DEFAULT.duration });
+                }
+                this.tlMaster.add(tlChild, 0);
+            });
+            this.tlMaster.progress((1 / allSlideItems.length).toFixed(2));
+        }
+        play() {
+            this.tlMaster.play();
         }
     }
 
@@ -585,9 +667,18 @@ const script = () => {
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
-                console.log("run solution");
                 this.sections = this.el.querySelectorAll('section');
                 this.horizontalLayout(this.sections);
+
+
+                let headingFlipping = new FlipText('.home-made-title-slide .txt-slider-wrap',
+                    (idx) =>
+                        setTimeout(() => {
+                            $(this.el).find('.home-made-map-img').eq(idx).addClass('active').siblings().removeClass('active');
+                        }, 1000)
+                    );
+                headingFlipping.setup();
+                headingFlipping.play();
 
                 this.tlStickSol = gsap.timeline({
                     scrollTrigger: {
@@ -689,28 +780,25 @@ const script = () => {
             constructor() {
                 super();
                 this.el = null;
-                this.tlParallax = null;
+                this.tlOverlap = null;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-news-wrap');
-                this.tlParallax = [];
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
                 console.log("run news")
                 new ParallaxImage({ el: this.el.querySelector('.home-news-thumb img') });
-                this.tlParallax.push(
-                    gsap
-                        .timeline({
-                            scrollTrigger: {
-                                trigger: this.el.querySelector('.home-news-thumb'),
-                                start: `top 10%`,
-                                end: `bottom bottom`,
-                                endTrigger: this.el,
-                                scrub: 1
-                            },
-                        })
-                        .to($(this.el).find('.home-news-thumb-inner'), { scale: .8, autoAlpha: 0.5, duration: 1, ease: 'none'}, 0));
+                this.tlOverlap = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el.querySelector('.home-news-thumb'),
+                        start: `top 10%`,
+                        end: `bottom bottom`,
+                        endTrigger: this.el,
+                        scrub: 1
+                    },
+                })
+                .to($(this.el).find('.home-news-thumb-inner'), { scale: .9, autoAlpha: 0.5, duration: 1, ease: 'power2.in' })
             }
         }
     }
@@ -1074,9 +1162,9 @@ const script = () => {
             once(data) {
                 loader.init(data);
                 loader.play(data);
+                scrollTop(PageManagerRegistry[namespace]?.initOnce?.(data));
                 header.init(data);
                 footer.trigger();
-                PageManagerRegistry[namespace]?.initOnce?.(data);
             },
             async leave(data) {
                 await pageTrans.play(data);
