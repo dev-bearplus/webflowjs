@@ -804,6 +804,61 @@ const script = () => {
             }
         }
     }
+    const formSubmitEvent = (function () {
+        const init = ({
+            onlyWorkOnThisFormName,
+            onSuccess,
+            onFail
+        }) => {
+            let inputSubmitWrap = $('.contact-hero-form-submit-wrap');
+            let inputSubmitText = $('.contact-hero-form-submit .txt');
+            let inputSubmitTextFirst = $('.contact-hero-form-submit .top').text();
+            const isWorkOnAllForm = onlyWorkOnThisFormName == undefined
+            $(document).on('ajaxSend', function (event, xhr, settings) {
+                if (settings.url.includes("https://webflow.com/api/v1/form/")) {
+                    const isCorrectForm = !isWorkOnAllForm && settings.data.includes(getSanitizedFormName(onlyWorkOnThisFormName));
+
+                    if (isCorrectForm) {
+                        inputSubmitWrap.addClass('disable');
+                        inputSubmitText.text('Please wait...');
+                    }
+                }
+            });
+
+            $(document).on('ajaxComplete', function (event, xhr, settings) {
+                if (settings.url.includes("https://webflow.com/api/v1/form/")) {
+                    const isSuccessful = xhr.status === 200
+                    const isCorrectForm = !isWorkOnAllForm && settings.data.includes(getSanitizedFormName(onlyWorkOnThisFormName));
+
+                    if (isWorkOnAllForm) {
+                        if (isSuccessful) {
+                            onSuccess?.()
+                            inputSubmitWrap.removeClass('disable');
+                            inputSubmitText.text(inputSubmitTextFirst);
+
+                        } else {
+                            onFail?.()
+                        }
+                    } else if (isCorrectForm) {
+                        if (isSuccessful) {
+                            onSuccess?.()
+                            console.log(inputSubmitText)
+                            inputSubmitWrap.removeClass('disable');
+                            inputSubmitText.text(inputSubmitTextFirst);
+                        } else {
+                            onFail?.()
+                        }
+                    }
+                }
+            });
+        }
+        function getSanitizedFormName(name) {
+            return name.replaceAll(" ", "+")
+        }
+        return {
+            init
+        }
+    })();
     const ContactPage = {
         Hero: class {
             constructor() {
@@ -834,6 +889,7 @@ const script = () => {
                 });
             }
             interact() {
+                let initTextSubject = $('.contact-hero-form-select-title').text();
                 $('.contact-hero-form-select').on('click', function(){
                     $(this).find('.contact-hero-form-select-inner').toggleClass('active');
                 })
@@ -905,24 +961,23 @@ const script = () => {
                 $('.contact-hero-form .overlay-bg').on('click', function(){
                     $('.contact-hero-form-success').removeClass('active');
                 })
-                function checkFormStatusWithRAF() {
-                    const formInner = document.querySelector('.contact-hero-form-inner');
-                    const successBox = document.querySelector('.contact-hero-form-success');
-                    if (!formInner || !successBox) return;
-                    let rafId;
-                    function check() {
-                        const isHidden = window.getComputedStyle(formInner).display === 'none';
-                        if (isHidden) {
-                            formInner.classList.add('active');
-                            successBox.classList.add('active');
-                            cancelAnimationFrame(rafId);
-                        } else {
-                            rafId = requestAnimationFrame(check);
-                        }
+                const formInner = $('.contact-hero-form-inner');
+                const successBox = $('.contact-hero-form-success');
+                formSubmitEvent.init({
+                    onlyWorkOnThisFormName: 'Contact Form',
+                    onSuccess: () => {
+                        console.log('success');
+                        formInner.addClass('active');
+                        successBox.addClass('active');
+                        $('input, textarea').val('');
+                        $('.contact-hero-form-select-title').text(initTextSubject);
+                        $('.contact-hero-form-option-item').removeClass('active');
+                    },
+                    onFail: () => {
+                        console.log('fail')
                     }
-                    rafId = requestAnimationFrame(check);
-                }
-                checkFormStatusWithRAF();
+                })
+                
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
