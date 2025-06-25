@@ -2407,11 +2407,13 @@ const mainScript = () => {
             
             $('.event-popup-close').on('click', function(e) {
                 e.preventDefault();
+                history.replaceState({}, '', `/promotion-events`);
                 $('.global-popup-wrap').removeClass('has-popup');
                 lenis.start();
             })
             $('.global-popup-wrap').on('click', function(e) {
                 if($(e.target).closest('.event-popup-inner').length == 0) {
+                    history.replaceState({}, '', `/promotion-events`);
                     $(this).removeClass('has-popup');
                     lenis.start();
                 }
