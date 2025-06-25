@@ -792,10 +792,9 @@ const mainScript = () => {
             })
             $('.home-featured-left-inner').each((idx, el) => {
                 let linkInner = $(el).find('.home-featured-left-inner-link')
-                let dataLinkDetail = linkInner.attr('data-link-detail');
                 let dataLinkType = linkInner.attr('data-link-type');
                 let linkCurrent = linkInner.attr('href');
-                linkInner.attr('href', `${linkCurrent}?detail=${dataLinkDetail}&type=${dataLinkType}`);
+                linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
             })
             $('.home-featured-img-item').each((idx, el) => {
                 let linkInner = $(el).find('.home-featured-img-item-inner')
