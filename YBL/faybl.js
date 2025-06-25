@@ -1040,6 +1040,7 @@ const mainScript = () => {
                     tweenArr: [
                         new FadeSplitText({ el: $(item).find('.product-service-content-title').get(0), onMask: true, headingType: true }),
                         ...Array.from($(item).find('.product-service-content-sub')).flatMap((el, idx) => new FadeSplitText({ el, onMask: true, delay: "<=.3" })),
+                        new FadeIn({ el: $(item).find('.product-services-link-fade').get(0), delay: "<=.15" }),
                         $(item).find('.product-service-content-ic').length > 0 && new FadeIn({ el: $(item).find('.product-service-content-ic').get(0), delay: "<=.3" }),
                     ]
                 })
