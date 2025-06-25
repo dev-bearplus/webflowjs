@@ -804,9 +804,6 @@ const mainScript = () => {
                     // $(this).attr('href', `${urlPath}?sc=${anchor}`);
                 }
             }
-            // if ($(this).parent().hasAttr('data-utm-medium')) {
-            //     console.log()
-            // }
         });
 
         $('a').on('click', function (e) {
@@ -835,8 +832,6 @@ const mainScript = () => {
         })
 
         $('[data-gtm-medium]').each(function (index, el) {
-            console.log($(el))
-            console.log(gtm_page)
             $(el).attr('data-gtm-page', gtm_page);
         })
     };
