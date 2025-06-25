@@ -1,9 +1,9 @@
 const script = () => {
     barba.use(barbaPrefetch);
-    gsap.registerPlugin(ScrollTrigger);
     if (history.scrollRestoration) {
         history.scrollRestoration = 'manual';
     }
+    gsap.registerPlugin(ScrollTrigger);
     ScrollTrigger.defaults({
         invalidateOnRefresh: true,
     });
@@ -29,8 +29,8 @@ const script = () => {
         if (!el) return;
         const rect = el.getBoundingClientRect();
         return (
-            rect.left <= (window.innerWidth) &&
-            rect.right >= 0
+            rect.top <= (window.innerHeight) &&
+            rect.bottom >= 0
         );
     }
     class Mouse {
@@ -125,13 +125,7 @@ const script = () => {
         }
         reInit(data) {
             let namespace = data ? data.next.namespace : $('[data-barba="container"]').attr('data-barba-namespace');
-            this.lenis = new Lenis({
-                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                orientation: "vertical",
-                gestureOrientation: "both",
-                smoothWheel: true,
-                infinite: false,
-            })
+            this.lenis = new Lenis({})
             this.lenis.on('scroll', ScrollTrigger.update)
             this.lenis.on('scroll', (e) => {
                 this.updateOnScroll(e);
@@ -167,6 +161,9 @@ const script = () => {
 
             this.scroller.velocity = e.velocity * .2
             this.scroller.direction = e.direction;
+            if (header) {
+                header.updateOnScroll(smoothScroll.lenis);
+            };
         }
     }
     const smoothScroll = new SmoothScroll();
@@ -226,16 +223,50 @@ const script = () => {
         }
         setup() {
             const cloneAmount = Math.ceil($(window).width() / this.list.width()) + 1;
-            this.list.css('animation-duration', `${Math.ceil(this.list.width() / this.duration)}s`);
-
+            let itemClone = this.list.find('[data-marquee="item"]').clone();
+            let itemWidth = this.list.find('[data-marquee="item"]').width();
+            this.list.html('');
             new Array(cloneAmount).fill().forEach(() => {
-                let itemClone = this.list.find('[data-marquee="item"]').clone();
-                this.list.append(itemClone);
+                let html = itemClone.clone()
+                html.css('animation-duration', `${Math.ceil(itemWidth / this.duration)}s`);
+                html.addClass('anim-marquee');
+                this.list.append(html);
             });
-            this.list.addClass('anim-marquee');
         }
     }
 
+    class ParallaxImage {
+        constructor({ el }) {
+            this.el = el;
+            this.elWrap = null;
+            this.init();
+        }
+        init() {
+            this.elWrap = this.el.parentElement;
+            this.setup();
+        }
+        setup() {
+            gsap.set(this.el, { height: '120%' });
+            this.scrub();
+        }
+        scrub() {
+            let dist = this.el.offsetHeight - this.elWrap.offsetHeight;
+            let total = this.elWrap.getBoundingClientRect().height + window.innerHeight;
+            this.updateOnScroll(dist, total);
+            smoothScroll.lenis.on('scroll', () => {
+                this.updateOnScroll(dist, total);
+            });
+        }
+        updateOnScroll(dist, total) {
+            if (this.el) {
+                if (isInViewport(this.elWrap)) {
+                    let percent = this.elWrap.getBoundingClientRect().bottom / total;
+                    gsap.quickSetter(this.el, 'y', 'px')(-dist * percent * 1.2);
+                    gsap.set(this.el, { scale: 1 + (percent * 0.3) });
+                }
+            }
+        }
+    }
 
     class GlobalChange {
         constructor() {
@@ -354,6 +385,7 @@ const script = () => {
         updateAfterTrans(data) {
             smoothScroll.reInit(data)
             globalChange.update(data)
+            smoothScroll.start();
             if (data.current.container) {
                 data.current.container.remove();
             }
@@ -365,16 +397,19 @@ const script = () => {
         constructor() {
             this.tlTrigger;
         }
-        setTrigger(triggerEl) {
-            this.tlTrigger = gsap.timeline({
-                scrollTrigger: {
-                    trigger: triggerEl,
-                    start: 'top bottom+=50%',
-                    end: 'bottom top',
-                    once: true,
-                    onEnter: () => setup(),
-                }
-            })
+        setTrigger(triggerEl, setup) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        setup();
+                        observer.unobserve(entry.target); // Only trigger once
+                    }
+                });
+            }, {
+                threshold: 0,
+                rootMargin: `-${window.innerHeight}px 0px 0px 0px`
+            });
+            observer.observe(triggerEl);
         }
     }
 
@@ -394,7 +429,7 @@ const script = () => {
                     this.setupEnter(data);
                 }
                 else return;
-                new Marquee($(this.el).find('[data-marquee="list"'), 40).setup();
+                new Marquee($(this.el).find('[data-marquee="list"]'), 40).setup();
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
@@ -440,62 +475,242 @@ const script = () => {
                 }
             }
         },
+        About: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+                this.tlParallax = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.home-about-wrap');
+                this.tlParallax = [];
+                super.setTrigger(this.el, this.setup.bind(this));
+            }
+            setup() {
+                new ParallaxImage({el: this.el.querySelector('.home-about-thumb-inner img')});
+                this.el.querySelectorAll('.home-about-story-item').forEach((el, idx) => new ParallaxImage({el: el.querySelector('img')}))
+                this.tlParallax.push(
+                    gsap
+                        .timeline({
+                            scrollTrigger: {
+                                trigger: $(this.el).find('.home-about-story-list'),
+                                start: `top top+=50%`,
+                                end: 'bottom top+=50%',
+                                scrub: 1,
+                                defaults: { ease: 'none' }
+                            }
+                        })
+                        .fromTo($(this.el).find('.home-about-story-content-item'), { yPercent: -50 }, { yPercent: 50 }))
+
+                    this.tlParallax.push(
+                        gsap
+                            .timeline({
+                                scrollTrigger: {
+                                    trigger: this.el,
+                                    start: `bottom-=${$(window).height() * 1.5} bottom`,
+                                    end: `bottom bottom`,
+                                    scrub: 1
+                                },
+                            })
+                            .to($(this.el).find('.home-about-story-content'), { scale: 0.8, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, 0)
+                            .to($(this.el).find('.home-about-story-item:last-child .home-about-story-item-img'), { scale: 1.3, transformOrigin: 'bottom', autoAlpha: 0.5, duration: 1, ease: 'none'}, 0));
+            }
+            destroy() {
+                if (this.tlParallax.length > 0) {
+                    this.tlParallax.forEach(tl => tl.kill());
+                }
+            }
+        },
+        Challenge: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+                this.tlParallax = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.home-challenge-wrap');
+                this.tlParallax = [];
+                super.setTrigger(this.el, this.setup.bind(this));
+            }
+            setup() {
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('.home-challenge-main'),
+                        scrub: 1,
+                        start: 'top-=5% top',
+                        end: 'bottom bottom',
+                        default: { ease: 'none' }
+                    }
+                })
+
+                this.el.querySelectorAll('.home-challenge-item').forEach((item, index) => {
+                    gsap.set($(item).find('.home-challenge-item-halftone'), { autoAlpha: index === 0 ? .08 : 0 });
+                    index === 0 && gsap.set($(this.el).find('.home-challenge-item-content-overlay'), { autoAlpha: 1 });
+                    gsap.set($(item), { 'flex-grow': index === 0 ? 1 : 0 });
+
+                    if (index == this.el.querySelectorAll('.home-challenge-item').length - 1) return;
+                    tl
+                        .to(item,
+                            { 'flex-grow': 0, duration: 1 })
+                        .to($(this.el).find('.home-challenge-item').eq(index + 1),
+                            { 'flex-grow': 1, duration: 1 }, "<=0")
+                        .to($(item).find('.home-challenge-item-halftone'),
+                            { autoAlpha: 0, duration: 1 }, "<=0")
+                        .to($(this.el).find('.home-challenge-item').eq(index + 1).find('.home-challenge-item-halftone'),
+                            { autoAlpha: 0.08, duration: 1 }, "<=0")
+                        .to($(this.el).find('.home-challenge-item').eq(index + 1).find('.home-challenge-item-content-overlay'),
+                            { autoAlpha: 1, duration: .2 }, '<=0.1')
+                        .to($(item).find('.home-challenge-item-content-overlay'),
+                            { autoAlpha: 0, duration: .2 }, "-=.6")
+                })
+
+            }
+            destroy() {
+                if (this.tlParallax.length > 0) {
+                    this.tlParallax.forEach(tl => tl.kill());
+                }
+            }
+        },
         Solution: class extends TriggerSetup {
             constructor() {
                 super();
                 this.el = null;
+                this.tlStickSol = null;
+                this.tlStickMade = null;
+                this.tlHorizontal = null;
+                this.tlOverlap = null;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-solution-wrap');
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
+                console.log("run solution");
                 this.sections = this.el.querySelectorAll('section');
                 this.horizontalLayout(this.sections);
+
+                this.tlStickSol = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('.home-solution'),
+                        start: `top+=${$(window).height() * .8} top`,
+                        end: `bottom-=${$(window).height() * 1.2} bottom`,
+                        scrub: 1,
+                        anticipatePin: 1
+                    }
+                })
+
+                this.tlStickSol
+                    .fromTo($(this.el).find('.home-solution-main-transform'), { bottom: '100%' }, { bottom: '2%' })
+                    .fromTo($(this.el).find('.home-solution-main-vid-halftone'), { height: '100%' }, { height: '2%' }, "<=0")
+
+                this.tlStickMade = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('.home-made'),
+                        scrub: 1,
+                        start: `top+=${$(this.el).find('.home-solution').height() - ($(window).height() * 2)} top`,
+                        end: 'bottom bottom',
+                        anticipatePin: 1
+                    }
+                })
+
+                const space_accord_process = parseInt($(this.el).find('.home-made-body-item-size').css('width'))
+                this.el.querySelectorAll('.home-made-body-item').forEach((item, index) => {
+                    if (($(this.el).find('.home-made-body-item').length - 1) > index) {
+                        this.tlStickMade.to(item, { width: space_accord_process, ease: 'none' })
+                        this.tlStickMade.to($(item).find('.home-made-body-item-desc'), {autoAlpha:0,ease:'none'}, '<')
+                    }
+                    else {
+                        let space_accord_remaining = $(window).width() - (space_accord_process * (this.el.querySelectorAll('.home-made-body-item').length - 1))
+                        this.tlStickMade.to(item, { width: space_accord_remaining, ease: 'none' }, 0)
+                    }
+                })
+                this.tlOverlap = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: `bottom-=${$(window).height() * 1.5} bottom`,
+                        end: `bottom bottom`,
+                        scrub: 1
+                    },
+                })
+                this.tlOverlap
+                    .to('.home-made-body', { scale: 0.8, transformOrigin: 'top', autoAlpha: 0.6, duration: 1, ease: 'power2.in' })
+                    .to('.home-made-title', { scale: .95, transformOrigin: 'bottom', autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
+                    .to('.home-made-map', { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
             }
             horizontalLayout(sections) {
-                let sizeScroller = 0;
-                let totalWidth = 0;
-                let heightOverlap = $(window).height();
-                gsap.set(this.el, { marginTop: heightOverlap * -1 })
-                gsap.set(this.el.querySelector('.home-solution-inner'), { position: 'sticky', top: 0, display: 'flex' })
-                gsap.set(this.el.querySelector('.home-solution-stick'), { width: $(window).width() })
+                let sizeScroller = $(this.el).find('.solution-scroller').height();
+                gsap.set(this.el.querySelector('.home-solution-inner'), { display: 'flex' })
 
-                sections.forEach(function (slide, index) {
-                    // gsap.set(slide, { width: window.innerWidth })
-                    if (index < sections.length - 1) {
-                        sizeScroller += slide.offsetWidth;
+                this.tlHorizontal = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('.solution-scroller'),
+                        start: `top+=${$(window).height() * 1.3} top`,
+                        end: `bottom+=${$(window).height() * 1.3} bottom`,
+                        scrub: 1,
+                        anticipatePin: 1,
+                        snap: 1
                     }
-                    totalWidth += slide.offsetWidth;
-                });
-                gsap.set(this.el.querySelector('.solution-scroller'), { height: sizeScroller + heightOverlap })
-                // gsap.set(this.el.querySelector('.home-solution-inner'), { width: totalWidth })
+                })
 
-                gsap.to(this.el.querySelector('.home-solution-inner'),
-                    {
-                        scrollTrigger: {
-                            trigger: '.solution-scroller',
-                            start: `top+=${heightOverlap} top`,
-                            end: 'bottom bottom',
-                            scrub: true,
-                            // markers:true,
-                            invalidateOnRefresh: true,
-                            anticipatePin:1,
-                            fastScrollEnd:true
-                        },
-                        x: -sizeScroller,
-                        transformOrigin: "top",
-                        ease: "none",
-                        onUpdate:()=>{
-
-                        },
-                        onComplete: () => {
-                            ScrollTrigger.refresh();
-                        }
-                    }
-                )
+                this.tlHorizontal
+                    .to($(this.el).find('.home-solution-main-inner'), { rotationX: '30deg' })
+                    .to($(this.el).find('.home-solution-main'), { xPercent: 10 }, "<=0")
+                    .to(this.el.querySelector('.home-solution-inner'), { x: -sizeScroller, transformOrigin: "top", ease: "none" }, "<=0")
             }
             destroy() {
+                if (this.tlStickSol) {
+                    this.tlStickSol.kill()
+                }
+                if (this.tlStickMade) {
+                    this.tlStickMade.kill()
+                }
+                if (this.tlHorizontal) {
+                    this.tlHorizontal.kill()
+                }
+                if (this.tlOverlap) {
+                    this.tlOverlap.kill()
+                }
+            }
+        },
+        Benefit: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.home-benefit-wrap');
+                super.setTrigger(this.el, this.setup.bind(this));
+            }
+            setup() {
+                console.log("run benefit")
+            }
+        },
+        News: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+                this.tlParallax = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.home-news-wrap');
+                this.tlParallax = [];
+                super.setTrigger(this.el, this.setup.bind(this));
+            }
+            setup() {
+                console.log("run news")
+                new ParallaxImage({ el: this.el.querySelector('.home-news-thumb img') });
+                this.tlParallax.push(
+                    gsap
+                        .timeline({
+                            scrollTrigger: {
+                                trigger: this.el.querySelector('.home-news-thumb'),
+                                start: `top 10%`,
+                                end: `bottom bottom`,
+                                endTrigger: this.el,
+                                scrub: 1
+                            },
+                        })
+                        .to($(this.el).find('.home-news-thumb-inner'), { scale: .8, autoAlpha: 0.5, duration: 1, ease: 'none'}, 0));
             }
         }
     }
@@ -520,12 +735,12 @@ const script = () => {
             }
             initInputValueCheck(selector = 'input') {
                 $(document).on('input', selector, function () {
-                  const $this = $(this);
-                  if ($this.val().trim() !== '') {
-                    $this.addClass('has-value');
-                  } else {
-                    $this.removeClass('has-value');
-                  }
+                    const $this = $(this);
+                    if ($this.val().trim() !== '') {
+                        $this.addClass('has-value');
+                    } else {
+                        $this.removeClass('has-value');
+                    }
                 });
             }
             interact() {
@@ -542,7 +757,6 @@ const script = () => {
                     $(".contact-hero-form-select").removeClass("active");
                 })
                 $('.contact-hero-form-submit-real').on('click', function(e){
-
                     let name = $('.contact-hero-form-input[name="name"]');
                     let email = $('.contact-hero-form-input[name="Email"]');
                     let phone = $('.contact-hero-form-input[name="Phone"]');
@@ -607,20 +821,18 @@ const script = () => {
                     if (!formInner || !successBox) return;
                     let rafId;
                     function check() {
-                      const isHidden = window.getComputedStyle(formInner).display === 'none';
-                      if (isHidden) {
-                        formInner.classList.add('active');
-                        successBox.classList.add('active');
-                        cancelAnimationFrame(rafId);
-                      } else {
-                        rafId = requestAnimationFrame(check);
-                      }
+                        const isHidden = window.getComputedStyle(formInner).display === 'none';
+                        if (isHidden) {
+                            formInner.classList.add('active');
+                            successBox.classList.add('active');
+                            cancelAnimationFrame(rafId);
+                        } else {
+                            rafId = requestAnimationFrame(check);
+                        }
                     }
                     rafId = requestAnimationFrame(check);
-                  }
-                  checkFormStatusWithRAF();
-
-
+                }
+                checkFormStatusWithRAF();
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
@@ -667,15 +879,56 @@ const script = () => {
             }
         }
     }
+
+    class Header {
+        constructor() {
+            this.el = null;
+        }
+        init(data) {
+            this.el = document.querySelector('.header');
+        }
+        updateOnScroll(inst) {
+            this.toggleHide(inst);
+            this.toggleScroll(inst);
+        }
+        toggleScroll(inst) {
+            if (inst.scroll > $(this.el).height() * 2) $(this.el).addClass("on-scroll");
+            else $(this.el).removeClass("on-scroll");
+        }
+        toggleHide(inst) {
+            if (inst.direction == 1) {
+                if (inst.scroll > ($(this.el).height() * 3)) {
+                    $(this.el).addClass('on-hide');
+                }
+            } else if (inst.direction == -1) {
+                if (inst.scroll > ($(this.el).height() * 3)) {
+                    $(this.el).addClass("on-hide");
+                    $(this.el).removeClass("on-hide");
+                }
+            }
+            else {
+                $(this.el).removeClass("on-hide");
+            }
+        }
+        isOpen() {
+            return this.el.classList.contains('on-open-nav');
+        }
+    }
+    const header = new Header();
     class Footer extends TriggerSetup {
         constructor() {
             super();
         }
+        trigger(data) {
+            this.el = document.querySelector('.footer');
+            super.setTrigger(this.el, this.setup.bind(this));
+        }
         setup() {
-            console.log('kádfhiahsdfjk')
+            new Marquee($(this.el).find('.footer-bot-text [data-marquee="list"]'), 40).setup();
+            new Marquee($(this.el).find('.footer-bot-ruler [data-marquee="list"]'), 10).setup();
+
             $('.footer-cta-submit input[type="submit"]').on('click', function(e) {
                 let email = $('.footer-cta-input[name="email"]');
-                console.log(email.val());
                 let flag = false;
                 if(email.val() === ''){
                     email.closest('.footer-cta-input-wrap').addClass('valid-null');
@@ -697,10 +950,10 @@ const script = () => {
             })
         }
     }
-    const footer = new Footer('.footer-cta');
+    const footer = new Footer();
     class PageManager {
-        constructor(sections = []) {
-            this.sections = sections;
+        constructor(page) {
+            this.sections = Object.values(page).map(section => new section());
 
             // Bind event handlers
             this.boundSetupHandler = this.setupHandler.bind(this);
@@ -774,43 +1027,33 @@ const script = () => {
     }
 
     class HomePageManager extends PageManager {
-        constructor() {
-            const hero = new HomePage.Hero();
-            const solution = new HomePage.Solution();
-            super([hero, solution]);
-        }
+        constructor(page) { super(page); }
     }
-
-    const homePageManager = new HomePageManager();
     class ContactPageManager extends PageManager {
-        constructor() {
-            const hero = new ContactPage.Hero();
-            super([hero]);
-        }
+        constructor(page) { super(page); }
     }
 
-    const contactPageManager = new ContactPageManager();
     const PageManagerRegistry = {
-        home: new HomePageManager(),
-        contact: new ContactPageManager()
+        home: new HomePageManager(HomePage),
+        contact: new ContactPageManager(ContactPage)
     };
     const SCRIPT = {
         home: {
             namespace: 'home',
             afterEnter(data) {
-                homePageManager.initEnter(data);
+                PageManagerRegistry.home.initEnter(data);
             },
             beforeLeave(data) {
-                homePageManager.destroy(data);
+                PageManagerRegistry.home.destroy(data);
             }
         },
         contact: {
             namespace: 'contact',
             afterEnter(data) {
-                contactPageManager.initEnter(data);
+                PageManagerRegistry.contact.initEnter(data);
             },
             beforeLeave(data) {
-                contactPageManager.destroy(data);
+                PageManagerRegistry.contact.destroy(data);
             }
         },
     }
@@ -831,9 +1074,9 @@ const script = () => {
             once(data) {
                 loader.init(data);
                 loader.play(data);
-                footer.setup();
+                header.init(data);
+                footer.trigger();
                 PageManagerRegistry[namespace]?.initOnce?.(data);
-
             },
             async leave(data) {
                 await pageTrans.play(data);
