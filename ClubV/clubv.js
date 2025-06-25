@@ -786,10 +786,9 @@ const mainScript = () => {
             })
             $('.home-featured-right-item').each((idx, el) => {
                 let linkInner = $(el).find('.home-featured-right-item-inner')
-                let dataLinkDetail = linkInner.attr('data-link-detail');
                 let dataLinkType = linkInner.attr('data-link-type');
                 let linkCurrent = linkInner.attr('href');
-                linkInner.attr('href', `${linkCurrent}?detail=${dataLinkDetail}&type=${dataLinkType}`);
+                linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
             })
             $('.home-featured-left-inner').each((idx, el) => {
                 let linkInner = $(el).find('.home-featured-left-inner-link')
@@ -800,10 +799,9 @@ const mainScript = () => {
             })
             $('.home-featured-img-item').each((idx, el) => {
                 let linkInner = $(el).find('.home-featured-img-item-inner')
-                let dataLinkDetail = linkInner.attr('data-link-detail');
                 let dataLinkType = linkInner.attr('data-link-type');
                 let linkCurrent = linkInner.attr('href');
-                linkInner.attr('href', `${linkCurrent}?detail=${dataLinkDetail}&type=${dataLinkType}`);
+                linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
             })
             $('.home-featured-img-item').each((idx, el) => {
                 let tlItem = gsap.timeline({
@@ -1313,10 +1311,9 @@ const mainScript = () => {
              
             $('.home-article-item').each((idx, el) => {
                 let linkInner = $(el).find('.home-article-item-inner')
-                let dataLinkDetail = linkInner.attr('data-link-detail');
                 let dataLinkType = linkInner.attr('data-link-type');
                 let linkCurrent = linkInner.attr('href');
-                linkInner.attr('href', `${linkCurrent}?detail=${dataLinkDetail}&type=${dataLinkType}`);
+                linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
             })
             if(viewport.w < 991) {
                 $('.home-article-cms').addClass('swiper')
@@ -2381,25 +2378,23 @@ const mainScript = () => {
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
                 let itemSlug = $(this).closest('.event-hero-card-item').attr('data-link-detail');
-                history.replaceState({}, '', `/events/${itemSlug}`);
+                history.replaceState({}, '', `/promotion-events/${itemSlug}`);
                 let index = $(this).closest('.event-hero-card-item').index();
                 console.log(index)
                 activeItem(['.event-popup-item'], index)
                 $('.global-popup-wrap').addClass('has-popup');
                 lenis.stop();
             })
-            if(currentUrl.includes('promotion-events')) {
                 if(itemDetail) {
                     $(`.event-hero-card-item[data-link-detail=${itemDetail}] [data-link= "open-popup"]`).eq(0).click();
                 }
-            }
-            else {
-                const parts = url.pathname.split('/').filter(Boolean);
-                const slug = parts.at(-1);
-                if(slug) {
-                    $(`.event-hero-card-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
+                else {
+                    const parts = url.pathname.split('/').filter(Boolean);
+                    const slug = parts.at(-1);
+                    if(slug) {
+                        $(`.event-hero-card-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
+                    }
                 }
-            }
             $('.event-calendar-item').each((i, el) => {
                 this.calendar($(el));
             })
