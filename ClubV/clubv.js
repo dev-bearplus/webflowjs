@@ -2380,11 +2380,10 @@ const mainScript = () => {
             let itemDetail = url.searchParams.get("detail");
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
-                if(currentUrl.includes('promotion-events')) {
-                    let itemSlug = $(this).closest('.event-hero-card-item').attr('data-link-detail');
-                    history.replaceState({}, '', `/events/${itemSlug}`);
-                }
+                let itemSlug = $(this).closest('.event-hero-card-item').attr('data-link-detail');
+                history.replaceState({}, '', `/events/${itemSlug}`);
                 let index = $(this).closest('.event-hero-card-item').index();
+                console.log(index)
                 activeItem(['.event-popup-item'], index)
                 $('.global-popup-wrap').addClass('has-popup');
                 lenis.stop();
@@ -2399,7 +2398,6 @@ const mainScript = () => {
                 const slug = parts.at(-1);
                 if(slug) {
                     $(`.event-hero-card-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
-                    console.log($(`.event-hero-card-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0));
                 }
             }
             $('.event-calendar-item').each((i, el) => {
@@ -2425,7 +2423,7 @@ const mainScript = () => {
                 this.initActiveTab(tagName);
             }
             else {
-                activeItem(['.event-hero-tag-item', '.event-popup-item'], 0)
+                activeItem(['.event-hero-tag-item'], 0)
                 let tagNameInit = $('.event-hero-tag-item.active').attr('data-tag');
                 this.initActiveTab(tagNameInit);
             }
