@@ -2401,8 +2401,18 @@ const mainScript = () => {
             let url = new URL(currentUrl);
             let tagName = url.searchParams.get("type");
             let itemDetail = url.searchParams.get("detail");
-            if(itemDetail) {
-                $(`.event-hero-card-item[data-link-detail=${itemDetail}] [data-link= "open-popup"]`).eq(0).click();
+            if(currentUrl.includes('promotion-events')) {
+                if(itemDetail) {
+                    $(`.event-hero-card-item[data-link-detail=${itemDetail}] [data-link= "open-popup"]`).eq(0).click();
+                }
+            }
+            else {
+                const parts = url.pathname.split('/').filter(Boolean);
+                const slug = parts.at(-1);
+                console.log(slug)
+                if(slug) {
+                    $(`.event-hero-card-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
+                }
             }
             if(tagName) {
                 $('.event-hero-tag-item').removeClass('active');
