@@ -304,6 +304,7 @@ const script = () => {
                 }
             });
 
+
             const DEFAULT = {
                 duration: 3,
                 ease: 'expo.inOut',
