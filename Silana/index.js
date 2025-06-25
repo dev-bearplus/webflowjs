@@ -255,9 +255,10 @@ const script = () => {
     }
 
     class ParallaxImage {
-        constructor({ el }) {
+        constructor({ el, scaleOffset = 0.3 }) {
             this.el = el;
             this.elWrap = null;
+            this.scaleOffset = scaleOffset;
             this.init();
         }
         init() {
@@ -281,7 +282,7 @@ const script = () => {
                 if (isInViewport(this.elWrap)) {
                     let percent = this.elWrap.getBoundingClientRect().bottom / total;
                     gsap.quickSetter(this.el, 'y', 'px')(-dist * percent * 1.2);
-                    gsap.set(this.el, { scale: 1 + (percent * 0.2) });
+                    gsap.set(this.el, { scale: 1 + (percent * this.scaleOffset) });
                 }
             }
         }
@@ -570,7 +571,7 @@ const script = () => {
             }
             setup() {
                 new ParallaxImage({el: this.el.querySelector('.home-about-thumb-inner img')});
-                this.el.querySelectorAll('.home-about-story-item').forEach((el, idx) => new ParallaxImage({el: el.querySelector('img')}))
+                this.el.querySelectorAll('.home-about-story-item').forEach((el, idx) => new ParallaxImage({el: el.querySelector('img'), scaleOffset: 0.2 }))
                 this.tlParallax.push(
                     gsap
                         .timeline({
