@@ -33,12 +33,73 @@ const script = () => {
             rect.bottom >= 0
         );
     }
+    function reinitializeWebflow() {
+        console.log('reinitialize webflow');
+        window.Webflow && window.Webflow.destroy();
+        window.Webflow && window.Webflow.ready();
+    }
     const getAllScrollTrigger = (fn) => {
         let triggers = ScrollTrigger.getAll();
         triggers.forEach(trigger => {
             trigger[fn]();
         });
     }
+    const formSubmitEvent = (function () {
+        const init = ({
+            onlyWorkOnThisFormName,
+            onSuccess,
+            onFail
+        }) => {
+            let inputSubmitWrap = $('.contact-hero-form-submit-wrap');
+            let inputSubmitText = $('.contact-hero-form-submit .txt');
+            let inputSubmitTextFirst = $('.contact-hero-form-submit .top').text();
+            const isWorkOnAllForm = onlyWorkOnThisFormName == undefined
+            $(document).on('ajaxSend', function (event, xhr, settings) {
+                if (settings.url.includes("https://webflow.com/api/v1/form/")) {
+                    const isCorrectForm = !isWorkOnAllForm && settings.data.includes(getSanitizedFormName(onlyWorkOnThisFormName));
+
+                    if (isCorrectForm) {
+                        inputSubmitWrap.addClass('disable');
+                        inputSubmitText.text('Please wait...');
+                    }
+                }
+            });
+
+            $(document).on('ajaxComplete', function (event, xhr, settings) {
+                if (settings.url.includes("https://webflow.com/api/v1/form/")) {
+                    const isSuccessful = xhr.status === 200
+                    const isCorrectForm = !isWorkOnAllForm && settings.data.includes(getSanitizedFormName(onlyWorkOnThisFormName));
+
+                    if (isWorkOnAllForm) {
+                        if (isSuccessful) {
+                            onSuccess?.()
+                            inputSubmitWrap.removeClass('disable');
+                            inputSubmitText.text(inputSubmitTextFirst);
+
+                        } else {
+                            onFail?.()
+                        }
+                    } else if (isCorrectForm) {
+                        if (isSuccessful) {
+                            onSuccess?.()
+                            console.log(inputSubmitText)
+                            inputSubmitWrap.removeClass('disable');
+                            inputSubmitText.text(inputSubmitTextFirst);
+                        } else {
+                            onFail?.()
+                        }
+                    }
+                }
+            });
+        }
+        function getSanitizedFormName(name) {
+            return name.replaceAll(" ", "+")
+        }
+        return {
+            init
+        }
+    })();
+
     function scrollTop(onComplete) {
         if ('scrollRestoration' in history) {
             history.scrollRestoration = 'manual';
@@ -470,6 +531,7 @@ const script = () => {
             smoothScroll.reInit(data)
             globalChange.update(data)
             smoothScroll.start();
+            reinitializeWebflow();
             if (data.current.container) {
                 data.current.container.remove();
             }
@@ -496,7 +558,7 @@ const script = () => {
             observer.observe(triggerEl);
         }
     }
-
+    // p-home
     const HomePage = {
         Hero: class {
             constructor() {
@@ -802,63 +864,107 @@ const script = () => {
                 })
                 .to($(this.el).find('.home-news-thumb-inner'), { scale: .9, autoAlpha: 0.5, duration: 1, ease: 'power2.in' })
             }
+            destroy() {
+                if (this.tlOverlap) {
+                    this.tlOverlap.kill();
+                }
+            }
         }
     }
-    const formSubmitEvent = (function () {
-        const init = ({
-            onlyWorkOnThisFormName,
-            onSuccess,
-            onFail
-        }) => {
-            let inputSubmitWrap = $('.contact-hero-form-submit-wrap');
-            let inputSubmitText = $('.contact-hero-form-submit .txt');
-            let inputSubmitTextFirst = $('.contact-hero-form-submit .top').text();
-            const isWorkOnAllForm = onlyWorkOnThisFormName == undefined
-            $(document).on('ajaxSend', function (event, xhr, settings) {
-                if (settings.url.includes("https://webflow.com/api/v1/form/")) {
-                    const isCorrectForm = !isWorkOnAllForm && settings.data.includes(getSanitizedFormName(onlyWorkOnThisFormName));
+    // p-about
+    const AboutPage = {
+        Team: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+                this.tlOverlap = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.about-team-wrap');
+                super.setTrigger(this.el, this.setup.bind(this));
+            }
+            setup() {
+                let itemLength = $(this.el).find('.about-team-info-avt-item').length;
+                console.log(itemLength)
+                const activeIndex = (index) => {
+                    $(this.el).find('.about-team-avt-item').eq(index).addClass('active').siblings().removeClass('active');
+                    $(this.el).find('.about-team-info-item').eq(index).addClass('active').siblings().removeClass('active');
 
-                    if (isCorrectForm) {
-                        inputSubmitWrap.addClass('disable');
-                        inputSubmitText.text('Please wait...');
-                    }
+                    gsap.to($(this.el).find('.about-team-info-avt-active-inner'), { scale: .8, filter: 'blur(2px)', duration: .4, clearProps: 'all' });
+                    gsap.to($(this.el).find('.about-team-info-avt-active-ic'), { filter: 'contrast(0.3)', duration: .4, clearProps: 'all' });
+                    $(this.el).find('.about-team-info-avt-item').eq(index).addClass('active').siblings().removeClass('active');
+                    setTimeout(() => {
+                        $(this.el).find('.about-team-info-avt-active').css('grid-template-columns', `${index}fr 1fr ${itemLength - index - 1}fr`)
+                    }, 100);
                 }
-            });
-
-            $(document).on('ajaxComplete', function (event, xhr, settings) {
-                if (settings.url.includes("https://webflow.com/api/v1/form/")) {
-                    const isSuccessful = xhr.status === 200
-                    const isCorrectForm = !isWorkOnAllForm && settings.data.includes(getSanitizedFormName(onlyWorkOnThisFormName));
-
-                    if (isWorkOnAllForm) {
-                        if (isSuccessful) {
-                            onSuccess?.()
-                            inputSubmitWrap.removeClass('disable');
-                            inputSubmitText.text(inputSubmitTextFirst);
-
-                        } else {
-                            onFail?.()
-                        }
-                    } else if (isCorrectForm) {
-                        if (isSuccessful) {
-                            onSuccess?.()
-                            console.log(inputSubmitText)
-                            inputSubmitWrap.removeClass('disable');
-                            inputSubmitText.text(inputSubmitTextFirst);
-                        } else {
-                            onFail?.()
-                        }
-                    }
+                activeIndex(0);
+                $(this.el).find('.about-team-info-avt-item').on('click', function () {
+                    activeIndex($(this).index());
+                })
+            }
+        },
+        Job: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+                this.tlOverlap = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.home-job-wrap');
+                super.setTrigger(this.el, this.setup.bind(this));
+            }
+            setup() {
+                new ParallaxImage({ el: this.el.querySelector('.home-job-thumb img') });
+                this.tlOverlap = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el.querySelector('.home-job-thumb'),
+                        start: `top 10%`,
+                        end: `bottom bottom`,
+                        endTrigger: this.el,
+                        scrub: 1
+                    },
+                })
+                .to($(this.el).find('.home-job-thumb-inner'), { scale: .9, autoAlpha: 0.5, duration: 1, ease: 'power2.in' })
+                console.log(KeenSlider)
+                $(this.el).find(".home-job-main-list").addClass('keen-slider');
+                $(this.el).find(".home-job-main-list").css('grid-column-gap', 0);
+                $(this.el).find(".home-job-main-item").addClass('keen-slider__slide');
+                let slider = new KeenSlider(".home-job-main-list", {
+                    slides: {
+                        perView: 4,
+                        spacing: parseRem(32),
+                    },
+                    defaultAnimation: {
+                        duration: 1000
+                    },
+                    dragSpeed: 1.2,
+                    rubberband: false,
+                    // breakpoints: {
+                    //     "(min-width: 768px)": {
+                    //         slides: { perView: 2, spacing: parseRem(32) },
+                    //     },
+                    // },
+                    dragStarted: () => {
+                        $('.home-job-main-item').css('pointer-events', 'none');
+                    },
+                    dragEnded: () => {
+                        // Add delay before re-enabling pointer events
+                        setTimeout(() => {
+                            $('.home-job-main-item').css('pointer-events', '');
+                        }, 250);
+                    },
+                })
+                $(this.el).find('.slide-control.next').on('click', slider.next);
+                $(this.el).find('.slide-control.prev').on('click', slider.prev);
+            }
+            destroy() {
+                if (this.tlOverlap) {
+                    this.tlOverlap.kill();
                 }
-            });
+            }
         }
-        function getSanitizedFormName(name) {
-            return name.replaceAll(" ", "+")
-        }
-        return {
-            init
-        }
-    })();
+    }
+    // p-contact
     const ContactPage = {
         Hero: class {
             constructor() {
@@ -977,7 +1083,7 @@ const script = () => {
                         console.log('fail')
                     }
                 })
-                
+
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
@@ -1174,12 +1280,16 @@ const script = () => {
     class HomePageManager extends PageManager {
         constructor(page) { super(page); }
     }
+    class AboutPageManager extends PageManager {
+        constructor(page) { super(page); }
+    }
     class ContactPageManager extends PageManager {
         constructor(page) { super(page); }
     }
 
     const PageManagerRegistry = {
         home: new HomePageManager(HomePage),
+        about:  new AboutPageManager(AboutPage),
         contact: new ContactPageManager(ContactPage)
     };
     const SCRIPT = {
@@ -1190,6 +1300,15 @@ const script = () => {
             },
             beforeLeave(data) {
                 PageManagerRegistry.home.destroy(data);
+            }
+        },
+        about: {
+            namespace: 'about',
+            afterEnter(data) {
+                PageManagerRegistry.about.initEnter(data);
+            },
+            beforeLeave(data) {
+                PageManagerRegistry.about.destroy(data);
             }
         },
         contact: {
