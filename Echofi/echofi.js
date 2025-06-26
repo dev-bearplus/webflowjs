@@ -20,7 +20,7 @@ const script = () => {
             this.allLeft.forEach((item, i) => {
                 let tlLeft = gsap.timeline({
                     repeat: -1,
-                    delay: i * (-duration / 7),
+                    delay: i * (-duration / 6),
                 })
                 gsap.set(item, {
                     'transform': 'translate3d(100%, 0px, 0px)',
@@ -28,11 +28,7 @@ const script = () => {
                 })
                 tlLeft.to(item, {
                     keyframes: [
-                        {
-                            'transform': 'translate3d(100%, 0px, 0px)',
-                            autoAlpha: 1,
-                            ease: 'power2.inOut',
-                        },
+                        
                         {
                             'transform': 'translate3d(0%, 0px, 0px)',
                             autoAlpha: 1,
@@ -71,7 +67,7 @@ const script = () => {
             this.allRight.forEach((item, i) => {
                 let tlRight = gsap.timeline({
                     repeat: -1,
-                    delay: i * (-duration / 7),
+                    delay: i * (-duration / 6),
                 })
                 gsap.set(item, {
                     'transform': 'translate3d(-100%, 0px, 0px)',
@@ -79,11 +75,7 @@ const script = () => {
                 })
                 tlRight.to(item, {
                     keyframes: [
-                        {
-                            'transform': 'translate3d(-100%, 0px, 0px)',
-                            autoAlpha: 1,
-                            ease: 'power2.inOut',
-                        },
+                        
                         {
                             'transform': 'translate3d(0%, 0px, 0px)',
                             autoAlpha: 1,
