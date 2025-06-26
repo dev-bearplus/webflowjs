@@ -95,6 +95,10 @@ const mainScript = () => {
             (typeof window.performance != "undefined" &&
                 window.performance.navigation.type === 2);
                 console.log(historyTraversal)
+                if($('.header').hasClass('active')) {
+                    header.deactiveMenuTablet();
+                    $('.header').removeClass('active');
+                }
         if (historyTraversal) {
             $('.header-menu-inner').removeAttr('style');
             $('.header-menu-inner').removeClass('active');
@@ -694,7 +698,7 @@ const mainScript = () => {
                     });
                 }
                 $('.home-popup-item').on('scroll', function(e){
-                    if(viewport.w < 768) {
+                    if(viewport.w < 992) {
                         if($(this).scrollTop()  > 40) {
                             $('[data-popup = "close"]').addClass('hidden');
                         }
@@ -1772,7 +1776,9 @@ const mainScript = () => {
             const parts = url.pathname.split('/').filter(Boolean);
             const slug = parts.at(-1);
             if(slug) {
-                $(`.service-hero-content-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
+                if($(`.service-hero-content-item[data-link-detail=${slug}] [data-link= "open-popup"]`).length > 0) {
+                    $(`.service-hero-content-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
+                }
             }
             if(viewport.w < 768) {
                 let startY = 0;
@@ -1794,7 +1800,7 @@ const mainScript = () => {
             }
             $('.service-hero-popup-inner').on('scroll', (e)=> {
                 this.ItemContentActiveCheck('.service-hero-popup-inner.active h6');
-                if(viewport.w < 768) {
+                if(viewport.w < 992) {
                     if($(e.target).scrollTop()  > 40) {
                         $('[data-popup = "close"]').addClass('hidden');
                     }
@@ -2006,7 +2012,7 @@ const mainScript = () => {
                 });
             }
             $('.work-popup-item').on('scroll', (e)=> {
-                if (viewport.w < 768) {
+                if (viewport.w < 992) {
                     if($(e.target).scrollTop()  > 40) {
                         $('[data-popup = "close"]').addClass('hidden');
                     }
@@ -2379,12 +2385,14 @@ const mainScript = () => {
                 let index = $(this).closest('.event-hero-card-item').index();
                 activeItem(['.event-popup-item'], index)
                 $('.global-popup-wrap').addClass('has-popup');
-                lenis.stop();
+                // lenis.stop();
             })
             const parts = url.pathname.split('/').filter(Boolean);
             const slug = parts.at(-1);
             if(slug) {
-                $(`.event-hero-card-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
+                if($(`.event-hero-card-item[data-link-detail=${slug}] [data-link= "open-popup"]`).length > 0) {
+                    $(`.event-hero-card-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
+                }
             }
             $('.event-calendar-item').each((i, el) => {
                 this.calendar($(el));
@@ -2456,7 +2464,7 @@ const mainScript = () => {
                 });
             }
             $('.event-popup-item').on('scroll', (e)=> {
-                if(viewport.w < 768) {
+                if(viewport.w < 992) {
                     if($(e.target).scrollTop()  > 40) {
                         $('[data-popup = "close"]').addClass('hidden');
                     }
@@ -3048,7 +3056,9 @@ const mainScript = () => {
                     offset: -100,
                 })
                 setTimeout(() => {
-                    $(`.work-job-item-wrap[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
+                    if($(`.work-job-item-wrap[data-link-detail=${slug}] [data-link= "open-popup"]`).length > 0) {
+                        $(`.work-job-item-wrap[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
+                    }
                 }, 10);
             }
             $('.work-popup-close').on('click', function(e) {
@@ -3085,7 +3095,7 @@ const mainScript = () => {
                 });
             }
             $('.work-popup-item').on('scroll', (e)=> {
-                if(viewport.w < 768) {
+                if(viewport.w < 992) {
                     if($(e.target).scrollTop()  > 40) {
                         $('[data-popup = "close"]').addClass('hidden');
                     }
@@ -3483,21 +3493,19 @@ const mainScript = () => {
             const scrollTop = document.documentElement.scrollTop || window.scrollY;
             const $header = $('.header');
             const isScrollHeader =
-                scrollTop > $('.header').height() * (viewport.w > 767 ? 4 : 1.5) &&
-                !$header.hasClass('on-show-menu');
-            console.log(isScrollHeader)
+                scrollTop > $('.header').height() * (viewport.w > 767 ? 4 : 1.5) ;
             clearTimeout(this.debounceTimer);
             this.debounceTimer = setTimeout(() => {
                 if (isScrollHeader) {
-                if (inst.direction >= 1) {
-                    if ($('.header-lang').hasClass('active')) {
-                    this.toggleLang();
-                    $('.header-lang').removeClass('active');
+                    if (inst.direction >= 0) {
+                        if ($('.header-lang').hasClass('active')) {
+                            this.toggleLang();
+                            $('.header-lang').removeClass('active');
+                        }
+                        $header.addClass('on-hide');
+                    } else {
+                        $header.removeClass('on-hide');
                     }
-                    $header.addClass('on-hide');
-                } else {
-                    $header.removeClass('on-hide');
-                }
                 } else {
                 $header.removeClass('on-hide');
                 }
