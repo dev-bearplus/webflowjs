@@ -3343,7 +3343,7 @@ const mainScript = () => {
                 if(i == 0) {
                     titleLeftClone.addClass('active');
                 }
-                titleLeftClone.find('.policy-hero-menu-item-number').text(i>9? `(${i+1})` : `(0${i+1})`);
+                titleLeftClone.find('.policy-hero-menu-item-number').text(i>8? `(${i+1})` : `(0${i+1})`);
                 titleLeftClone.find('.policy-hero-menu-item-title').text($(el).text());
                 titleLeftClone.attr('data-title', `toch-${i}`);
                 $('.policy-hero-menu').append(titleLeftClone);
