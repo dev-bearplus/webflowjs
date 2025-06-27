@@ -45,6 +45,14 @@ const mainScript = () => {
     const lerp = (a, b, t = 0.08) => {
         return a + (b - a) * t;
     };
+    function resetScrollPopup() {
+                
+        setTimeout(() => {
+            $('[data-popup="popup-item"]').animate({
+                scrollTop: 0
+            }, 0);
+        }, 500);
+    }
     function setupIframe() {
         let iframes = $("iframe");
         iframes.each(function (idx, item) {
@@ -1747,34 +1755,45 @@ const mainScript = () => {
             this.tl.play();
         }
         interact() {
+            let currentUrl = window.location.href;
+            let url = new URL(currentUrl);
+            const parts = url.pathname.split('/').filter(Boolean);
+            const slug = parts.at(-1);
+            const partsWithoutSlug = parts.slice(0, -1);
+            const newPathname = `/${partsWithoutSlug.join('/')}`;
+            let newURL = '';
+            if(slug !== 'service') {
+                newURL = url.origin + newPathname + url.search + url.hash;
+            }
+            else {
+                newURL = currentUrl
+            }
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
                 let itemSlug = $(this).closest('.service-hero-content-item').attr('data-link-detail');
-                history.replaceState({}, '', `/service/${itemSlug}`);
+                history.replaceState({}, '', `${newURL}/${itemSlug}`);
                 let index = $(this).closest('.service-hero-content-item').index();
                 activeItem(['.service-hero-popup-inner'], index)
                 $('.service-hero-popup').addClass('active');
                 lenis.stop();
             })
+            
             $('.service-hero-popup-close').on('click', function(e) {
                 e.preventDefault();
-                history.replaceState({}, '', `/service`);
+                history.replaceState({}, '', newURL);
                 $('.service-hero-popup').removeClass('active');
                 lenis.start();
                 resetScrollPopup();
             })
             $('.service-hero-popup').on('click', function(e) {
                 if($(e.target).closest('.service-hero-popup-inner').length == 0) {
-                    history.replaceState({}, '', `/service`);
+                    history.replaceState({}, '', newURL);
                     $(this).removeClass('active');
                     lenis.start();
                     resetScrollPopup();
                 }
             })
-            let currentUrl = window.location.href;
-            let url = new URL(currentUrl);
-            const parts = url.pathname.split('/').filter(Boolean);
-            const slug = parts.at(-1);
+            
             if(slug) {
                 if($(`.service-hero-content-item[data-link-detail=${slug}] [data-link= "open-popup"]`).length > 0) {
                     $(`.service-hero-content-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
@@ -1809,14 +1828,7 @@ const mainScript = () => {
                     }
                 }
             })
-            function resetScrollPopup() {
-                
-                setTimeout(() => {
-                    $('.service-hero-popup-inner').animate({
-                        scrollTop: 0
-                    }, 0);
-                }, 500);
-            }
+            
             $('.service-hero-popup-menu-inner').on('click', '.service-hero-popup-menu-item', function(e) {
                 e.preventDefault();
                 $('.service-hero-popup-menu-item').removeClass('active');
@@ -2032,13 +2044,6 @@ const mainScript = () => {
                     scrollTop: scrollTop
                 }, 1000);
             })
-            function resetScrollPopup() {
-                setTimeout(() => {
-                    $('.service-hero-popup-inner').animate({
-                        scrollTop: 0
-                    }, 0);
-                }, 500);
-            }
         }
         activeTitle(index, direction) {
             activeItem(['.game-hero-machine-title'], index);
@@ -2378,17 +2383,27 @@ const mainScript = () => {
             let currentUrl = window.location.href;
             let url = new URL(currentUrl);
             let tagName = url.searchParams.get("type");
+            const parts = url.pathname.split('/').filter(Boolean);
+            const slug = parts.at(-1);
+            const partsWithoutSlug = parts.slice(0, -1);
+            const newPathname = `/${partsWithoutSlug.join('/')}`;
+            let newURL = '';
+            if(slug !== 'promotion-events') {
+                newURL = url.origin + newPathname + url.search + url.hash;
+            }
+            else {
+                newURL = currentUrl
+            }
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
                 let itemSlug = $(this).closest('.event-hero-card-item').attr('data-link-detail');
-                history.replaceState({}, '', `/promotion-events/${itemSlug}`);
+                history.replaceState({}, '', `${newURL}/${itemSlug}`);
                 let index = $(this).closest('.event-hero-card-item').index();
                 activeItem(['.event-popup-item'], index)
                 $('.global-popup-wrap').addClass('has-popup');
                 // lenis.stop();
             })
-            const parts = url.pathname.split('/').filter(Boolean);
-            const slug = parts.at(-1);
+            
             if(slug) {
                 if($(`.event-hero-card-item[data-link-detail=${slug}] [data-link= "open-popup"]`).length > 0) {
                     $(`.event-hero-card-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
@@ -2401,15 +2416,17 @@ const mainScript = () => {
             
             $('.event-popup-close').on('click', function(e) {
                 e.preventDefault();
-                history.replaceState({}, '', `/promotion-events`);
+                history.replaceState({}, '', newURL);
                 $('.global-popup-wrap').removeClass('has-popup');
                 lenis.start();
+                resetScrollPopup();
             })
             $('.global-popup-wrap').on('click', function(e) {
                 if($(e.target).closest('.event-popup-inner').length == 0) {
-                    history.replaceState({}, '', `/promotion-events`);
+                    history.replaceState({}, '', newURL);
                     $(this).removeClass('has-popup');
                     lenis.start();
+                    resetScrollPopup();
                 }
             })
             
@@ -3036,19 +3053,27 @@ const mainScript = () => {
         interact() {
             let currentUrl = window.location.href;
             let url = new URL(currentUrl);
+            const parts = url.pathname.split('/').filter(Boolean);
+            const slug = parts.at(-1);
+            const partsWithoutSlug = parts.slice(0, -1);
+            const newPathname = `/${partsWithoutSlug.join('/')}`;
+            let newURL = '';
+            if(slug !== 'work-with-us') {
+                newURL = url.origin + newPathname + url.search + url.hash;
+            }
+            else {
+                newURL = currentUrl
+            }
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
                 let itemSlug = $(this).closest('.work-job-item-wrap').attr('data-link-detail');
-                history.replaceState({}, '', `/work-with-us/${itemSlug}`);
+                history.replaceState({}, '', `${newURL}/${itemSlug}`);
                 let index = $(this).closest('.work-job-item-wrap').index();
                 console.log(index)
                 activeItem(['.work-popup-item'], index)
                 $('.global-popup-wrap').addClass('has-popup');
                 lenis.stop();
             })
-            
-            const parts = url.pathname.split('/').filter(Boolean);
-            const slug = parts.at(-1);
             if(slug && slug != 'work-with-us') {
                 console.log(slug)
                 lenis.scrollTo($('.work-job').get(0), {
@@ -3063,14 +3088,14 @@ const mainScript = () => {
             }
             $('.work-popup-close').on('click', function(e) {
                 e.preventDefault();
-                history.replaceState({}, '', '/work-with-us/');
+                history.replaceState({}, '', newURL);
                 $('.global-popup-wrap').removeClass('has-popup');
                 lenis.start();
                 resetScrollPopup();
             })
             $('.global-popup-wrap').on('click', function(e) {
                 if($(e.target).closest('.work-popup-inner').length == 0) {
-                    history.replaceState({}, '', '/work-with-us/');
+                    history.replaceState({}, '', newURL);
                     $(this).removeClass('has-popup');
                     lenis.start();
                     resetScrollPopup();
