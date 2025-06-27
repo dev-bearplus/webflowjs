@@ -288,7 +288,6 @@ const script = () => {
             })
         }
     }
-
     customElements.define('home-nft-wrap', HomeNFT);
 
     class HomeRoad extends HTMLElement {
@@ -311,8 +310,8 @@ const script = () => {
                 }
             })
             tl
-            .fromTo(this.el.querySelector('.home-road-stick'),{x: containerWidth/2}, {x: `-${distance + containerWidth/2}px`, ease: 'none' })
-            .fromTo(this.el.querySelector('.home-road-line-vert'), {x: -containerWidth/2}, {x: `${((this.el.querySelector('.home-road-main-item').offsetWidth + parseRem(16)) * 5) + containerWidth/2}px`, ease: 'none' }, '<=0')
+            .fromTo(this.el.querySelector('.home-road-stick'),{x: containerWidth}, {x: `-${distance + containerWidth}px`, ease: 'none' })
+            .fromTo(this.el.querySelector('.home-road-line-vert'), {x: -containerWidth}, {x: `${((this.el.querySelector('.home-road-main-item').offsetWidth + parseRem(16)) * 5) + containerWidth}px`, ease: 'none' }, '<=0')
         }
     }
     customElements.define('home-road-wrap', HomeRoad);
