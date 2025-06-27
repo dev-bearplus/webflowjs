@@ -8,6 +8,23 @@ const script = () => {
         return input / 10 * parseFloat($('html').css('font-size'))
     }
 
+    function getMostInViewSection(allSections) {
+        if (allSections) {
+            const mostInViewSection = Array.from(allSections).reduce((mostInView, section) => {
+                const rect = section.getBoundingClientRect();
+                const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+                const visibleWidth = Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0);
+                const visibleArea = Math.max(0, visibleHeight) * Math.max(0, visibleWidth);
+
+                if (!mostInView || visibleArea > mostInView.visibleArea) {
+                    return { section, visibleArea };
+                }
+                return mostInView;
+            }, null);
+
+            return mostInViewSection;
+        }
+    }
     const lenis = new Lenis({
         // wrapper: document.querySelector('.main-inner'),
         // smoothTouch: false,
@@ -30,6 +47,8 @@ const script = () => {
             this.stickyEls = this.el.querySelectorAll('.header-grid, .header-links, .header-logo, .header-link');
             this.allItem = this.el.querySelectorAll('.header-link');
             this.currentIndex = 0;
+            this.allSections = document.querySelectorAll('[data-sc-name]');
+            this.mostInViewSection = getMostInViewSection(this.allSections);
         }
         connectedCallback() {
             this.setup();
@@ -69,6 +88,16 @@ const script = () => {
             })
         }
         update() {
+            this.mostInViewSection = getMostInViewSection(this.allSections);
+            let scName = this.mostInViewSection.section.getAttribute('data-sc-name');
+            if (this.el.querySelector(`.header-link[data-sc-link="${scName}"]`)) {
+                this.currentIndex = $(this.el).find(`.header-link[data-sc-link="${scName}"]`).index();
+                this.active(this.currentIndex);
+            } else {
+                this.currentIndex = -1;
+                this.active(-1);
+            }
+            
             if (lenis.scroll > this.el.offsetHeight) {
                 this.toggleSticky(true);
             } else {
@@ -175,7 +204,6 @@ const script = () => {
                 })
                 tlLeft.to(item, {
                     keyframes: [
-                        
                         {
                             'transform': 'translate3d(0%, 0px, 0px)',
                             autoAlpha: 1,
@@ -288,6 +316,9 @@ const script = () => {
         }
     }
     customElements.define('home-road-wrap', HomeRoad);
+
+    let lastItem = document.querySelectorAll('.home-art-main-item')[document.querySelectorAll('.home-art-main-item').length - 1];
+    let firstItem = document.querySelectorAll('.home-art-main-item')[0];
 
 }
 
