@@ -330,6 +330,7 @@ const script = () => {
                     this.active(i);
                 })
             })
+            this.active(0);
         }
         active(index) {
             this.allItems.forEach((item, i) => {
