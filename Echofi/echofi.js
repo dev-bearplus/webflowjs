@@ -317,6 +317,32 @@ const script = () => {
     }
     customElements.define('home-road-wrap', HomeRoad);
 
+    class HomeFAQ extends HTMLElement {
+        constructor() {
+            super();
+            this.el = this;
+            this.allItems = this.el.querySelectorAll('.home-faq-main-item');
+            this.allHead = this.el.querySelectorAll('.home-faq-main-item-head');
+        }
+        connectedCallback() {
+            this.allHead.forEach((item, i) => {
+                item.addEventListener('click', () => {
+                    this.active(i);
+                })
+            })
+        }
+        active(index) {
+            this.allItems.forEach((item, i) => {
+                if (i === index) {
+                    item.setAttribute('data-open', 'true');
+                } else {
+                    item.setAttribute('data-open', 'false');
+                }
+            })
+        }
+    }
+    customElements.define('home-faq-wrap', HomeFAQ);
+
     let lastItem = document.querySelectorAll('.home-art-main-item')[document.querySelectorAll('.home-art-main-item').length - 1];
     let firstItem = document.querySelectorAll('.home-art-main-item')[0];
 
