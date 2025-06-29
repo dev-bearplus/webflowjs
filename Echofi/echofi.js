@@ -51,23 +51,38 @@ const script = () => {
             this.mostInViewSection = getMostInViewSection(this.allSections);
         }
         connectedCallback() {
-            this.setup();
-            this.active(0);
+            if (window.innerWidth > 991) {
+                this.setupDesktop();
+                this.active(0);
             this.update();
+    
+            } else {
+                this.setupMobile();
+            }
+            
         }
-        setup() {
+        setupMobile() {
+            console.log('mobile')
+            this.el.querySelector('.header-menu-toggle').addEventListener('click', (e) => {
+                console.log('click')
+                e.preventDefault();
+                this.toggleMenu();
+            })
+        }
+        setupDesktop() {
             this.allItem.forEach((item, i) => {
                 let width = item.offsetWidth;
                 item.style.setProperty('--max-width', width + 'px');
                 item.addEventListener('mouseenter', () => {
                     this.active(i);
                 })
-                item.addEventListener('mouseleave', () => {
+                item.addEventListener('mouseleave', (e) => {
                     this.active(this.currentIndex);
                 })
             })
         }
         toggleSticky(state) {
+            if (window.innerWidth < 991) return;
             if (state) {
                 this.stickyEls.forEach((item) => {
                     item.classList.add('on-sticky');
@@ -104,6 +119,16 @@ const script = () => {
                 this.toggleSticky(false);
             }
         }
+        toggleMenu() {
+            console.log(this.el.querySelector('.header-links-wrap').classList.contains('on-open'))
+            if (this.el.querySelector('.header-links-wrap').classList.contains('on-open')) {
+                this.el.querySelector('.header-links-wrap').classList.remove('on-open')
+                this.el.querySelector('.header-menu-toggle').classList.remove('on-open')
+            } else {
+                this.el.querySelector('.header-links-wrap').classList.add('on-open')
+                this.el.querySelector('.header-menu-toggle').classList.add('on-open')
+            }
+        }
     }
     customElements.define('header-inner', Header);
 
@@ -111,13 +136,16 @@ const script = () => {
         constructor() {
             super();
             this.el = this;
-            this.scrubber = this.el.querySelector('.prog-inner');
         }
         connectedCallback() {
             this.update();
         }
         update() {
-            gsap.set(this.scrubber, {scaleX: lenis.scroll / lenis.limit})
+            if (window.innerWidth > 991) {
+                gsap.set(this.el.querySelector('.prog-inner'), {scaleX: lenis.scroll / lenis.limit})
+            } else {
+                gsap.set(document.querySelector('.header-menu-toggle .el-prog'), {'stroke-dashoffset': (1 - (lenis.scroll / lenis.limit)) * 100})
+            }
         }
     }
     customElements.define('prog-wrap', PageProgress);
@@ -153,6 +181,60 @@ const script = () => {
         }
     }
     customElements.define('home-hero-wrap', HomeHero);
+    class HomeHow extends HTMLElement {
+        constructor() {
+            super();
+            this.el = this;
+            this.allItem = this.el.querySelectorAll('.home-how-main-item');
+        }
+        connectedCallback() {
+            console.log('connected')
+            if (window.innerWidth > 767) return;
+            let tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: this.el.querySelector('.home-how-main-wrap'),
+                    start: 'top 15%',
+                    end: 'bottom 75%',
+                    scrub: true,
+                }
+            })
+            this.allItem.forEach((item, i) => {
+                if (i === 0) {
+                    tl.to(this.allItem[i], {
+                        yPercent: 164.26592798,
+                        scale: 0.7229916898,
+                        opacity: .3,
+                        duration: 2,
+                        ease: 'none',
+                    }, 0)
+                } else if (i === 1) {
+                    tl.to(this.allItem[i], {
+                        yPercent: 80.0554016620,
+                        scale: 0.861495844875,
+                        opacity: 1,
+                        duration: 1,
+                        ease: 'none',
+                    }, 1)
+                    tl.to(this.allItem[i].querySelector('.home-how-main-item-inner'), {
+                        backgroundColor: '#140E0A',
+                        duration: 1,
+                        ease: 'none',
+                    }, 1)
+                    tl.to(this.allItem[i].querySelector('.home-how-main-item-head'), {
+                        opacity: .6,
+                        duration: 1,
+                        ease: 'none',
+                    }, 1)
+                    tl.to(this.allItem[i].querySelector('.home-how-main-item-content'), {
+                        opacity: .6,
+                        duration: 1,
+                        ease: 'none',
+                    }, 1)
+                }
+            })
+        }
+    }
+    customElements.define('home-how-wrap', HomeHow);
     class HomeCoin extends HTMLElement {
         constructor() {
             super();
@@ -297,7 +379,15 @@ const script = () => {
         }
         connectedCallback() {
             console.log('connected')
-            let containerWidth = this.el.querySelector('.container').offsetWidth - (parseRem(160));
+            if (window.innerWidth > 767) {
+                this.desktop();
+            } else {
+                this.mobile();
+            }
+        }
+        desktop() {
+            let padding = $(window).width() > 991 ? parseRem(160) : parseRem(64);
+            let containerWidth = this.el.querySelector('.container').offsetWidth - padding;
             let totalWidth = this.el.querySelector('.home-road-sub-wrap').offsetWidth + ((this.el.querySelector('.home-road-main-item').offsetWidth + parseRem(16)) * 5);
             let distance = totalWidth - containerWidth;
             console.log(distance / $(window).height())
@@ -312,6 +402,24 @@ const script = () => {
             tl
             .fromTo(this.el.querySelector('.home-road-stick'),{x: containerWidth}, {x: `-${distance + containerWidth}px`, ease: 'none' })
             .fromTo(this.el.querySelector('.home-road-line-vert'), {x: -containerWidth}, {x: `${((this.el.querySelector('.home-road-main-item').offsetWidth + parseRem(16)) * 5) + containerWidth}px`, ease: 'none' }, '<=0')
+        }
+        mobile() {
+            let padding = parseRem(32);
+            let containerWidth = this.el.querySelector('.container').offsetWidth - padding;
+            let totalWidth = this.el.querySelector('.home-road-sub-wrap').offsetWidth + ((this.el.querySelector('.home-road-main-item').offsetWidth + parseRem(16)) * 5);
+            let distance = totalWidth - containerWidth;
+            console.log(distance / $(window).height())
+            let tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: this.el.querySelector('.home-road-main'),
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: .5,
+                }
+            })
+            tl
+            .fromTo(this.el.querySelector('.home-road-main-inner'),{x: 0}, {x: `-${distance + containerWidth}px`, ease: 'none' })
+            .fromTo(this.el.querySelector('.home-road-line-vert'), {x: 0}, {x: containerWidth, ease: 'none' }, '<=0')
         }
     }
     customElements.define('home-road-wrap', HomeRoad);
