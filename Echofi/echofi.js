@@ -372,6 +372,39 @@ const script = () => {
     }
     customElements.define('home-nft-wrap', HomeNFT);
 
+    class HomeToken extends HTMLElement {
+        constructor() {
+            super();
+            this.el = this;
+        }
+        connectedCallback() {
+            console.log('connected')
+            this.setup();
+        }
+        setup() {
+            if (window.innerWidth > 991) return;
+            this.update();
+        }
+        update() {
+            if (window.innerWidth > 991) return;
+            let headRight = this.el.querySelector('.home-token-table-cell.first').getBoundingClientRect().right
+            let contentLeft = this.el.querySelector('.home-token-table-row-content').getBoundingClientRect().left 
+            
+            let gap = (contentLeft - headRight) * -1
+            this.el.querySelectorAll('.home-token-table-row-content').forEach((item, i) => {
+                let parent = item.parentElement;
+                if (gap > 1) {
+                    parent.querySelector('.home-token-table-cell.first').classList.add('on-sticky')
+                } else {
+                    parent.querySelector('.home-token-table-cell.first').classList.remove('on-sticky')
+                }
+                item.style.setProperty('clip-path', `inset(0px 0px 0px ${gap}px)`)
+            })
+            requestAnimationFrame(this.update.bind(this))
+        }
+    }
+    customElements.define('home-token-wrap', HomeToken);
+
     class HomeRoad extends HTMLElement {
         constructor() {
             super();
