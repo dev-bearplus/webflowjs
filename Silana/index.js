@@ -37,6 +37,23 @@ const script = () => {
         w: window.innerWidth,
         h: window.innerHeight,
     };
+    const device = { desktop: 991, tablet: 767, mobile: 479 }
+    const viewportBreak = (options) => {
+        const { desktop, tablet, mobile } = options;
+        let result;
+        switch (true) {
+            case viewport.w <= device.tablet:
+                result = mobile;
+                break;
+            case viewport.w <= device.desktop:
+                result = tablet;
+                break;
+            default:
+                result = desktop;
+                break;
+        }
+        return (result instanceof Function) ? result() : result;
+    }
     function reinitializeWebflow() {
         console.log('reinitialize webflow');
         window.Webflow && window.Webflow.destroy();
@@ -180,7 +197,6 @@ const script = () => {
         }
     }
     // const mouse = new Mouse();
-
     class SmoothScroll {
         constructor() {
             this.lenis = null;
@@ -356,19 +372,16 @@ const script = () => {
         constructor(wrapEl, onCycleComplete = () => {}) {
             this.wrapEl = wrapEl;
             this.tlMaster;
-            this.onCycleComplete = onCycleComplete; // Store callback
+            this.onCycleComplete = onCycleComplete;
         }
         setup() {
             let allSlideItems = $(this.wrapEl).find('.txt-slider-inner > *');
             this.tlMaster = gsap.timeline({
                 paused: true,
-                onStart: () => {
-                },
                 onComplete: () => {
                     this.tlMaster.progress(0);
                 }
             });
-
 
             const DEFAULT = {
                 duration: 3,
@@ -586,6 +599,18 @@ const script = () => {
                     paused: true,
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
+
+                new MasterTimeline({
+                    timeline: this.tlOnce,
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.home-hero-title').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-hero-desc-txt').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-hero-cta').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.home-hero-main-gif').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.home-hero-client').get(0), delay: "<=.3" }),
+                    ]
+                });
             }
             setupEnter(data) {
                 this.tlEnter = gsap.timeline({
@@ -629,17 +654,34 @@ const script = () => {
             constructor() {
                 super();
                 this.el = null;
-                this.tlParallax = null;
+                this.tlOverlap = null;
+                this.tlChangeText = null;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-about-wrap');
-                this.tlParallax = [];
+                this.tlOverlap = [];
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
+                // this.animationReveal();
+                this.animationScrub();
+            }
+            animationReveal() {
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: this.el },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.home-about-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-about-title').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-about-desc-txt').get(0) })
+                    ]
+                })
+            }
+            animationScrub() {
                 new ParallaxImage({el: this.el.querySelector('.home-about-thumb-inner img')});
                 this.el.querySelectorAll('.home-about-story-item').forEach((el, idx) => new ParallaxImage({el: el.querySelector('img'), scaleOffset: 0.2 }))
-                this.tlParallax.push(
+                this.tlOverlap.push(
                     gsap
                         .timeline({
                             scrollTrigger: {
@@ -652,22 +694,90 @@ const script = () => {
                         .from($(this.el).find('.home-about-story-content'), { scale: 0.95, autoAlpha: 0.8, duration: 1, ease: 'power2.out'  }, 0)
                         .from($(this.el).find('.home-about-story-item:first-child .home-about-story-item-img'), { scale: 1.2, transformOrigin: 'top', autoAlpha: 0.5, duration: 1, ease: 'none' }, 0));
 
-                    this.tlParallax.push(
-                        gsap
-                            .timeline({
-                                scrollTrigger: {
-                                    trigger: this.el,
-                                    start: `bottom-=${$(window).height() * 1.5} bottom`,
-                                    end: `bottom bottom`,
-                                    scrub: 1
-                                },
-                            })
-                            .to($(this.el).find('.home-about-story-content'), { scale: 0.8, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, 0)
-                            .to($(this.el).find('.home-about-story-item:last-child .home-about-story-item-img'), { scale: 1.3, transformOrigin: 'bottom', autoAlpha: 0.5, duration: 1, ease: 'none'}, 0));
+                this.tlOverlap.push(
+                    gsap
+                        .timeline({
+                            scrollTrigger: {
+                                trigger: this.el,
+                                start: `bottom-=${$(window).height() * 1.5} bottom`,
+                                end: `bottom bottom`,
+                                scrub: 1
+                            },
+                        })
+                        .to($(this.el).find('.home-about-story-content'), { scale: 0.8, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, 0)
+                        .to($(this.el).find('.home-about-story-item:last-child .home-about-story-item-img'), { scale: 1.3, transformOrigin: 'bottom', autoAlpha: 0.5, duration: 1, ease: 'none'}, 0));
+
+                this.changeTextOnScroll();
+            }
+            changeTextOnScroll() {
+                let wrapTextSlide = $(this.el).find('.home-about-story-content-text .txt-slider-wrap')
+                let allSlideItems = $(wrapTextSlide).find('.txt-slider-inner > *');
+                const DEFAULT = {
+                    duration: .7,
+                    ease: 'power1.inOut',
+                    transform: {
+                        out: `translate3d(0px, ${parseRem(25.5961)}px, -${parseRem(26.0468)}px) rotateX(-91deg)`,
+                        in: `translate3d(0px, -${parseRem(25.5961)}px, -${parseRem(26.0468)}px) rotateX(91deg)`,
+                    }
+                }
+                gsap.set(wrapTextSlide, { perspective: parseRem(82.5) })
+                gsap.set(allSlideItems, {
+                    transformOrigin: true
+                        ? 'center center -.1em !important'
+                        : 'center center -.26em !important',
+                });
+
+
+                gsap.set(allSlideItems, { transform: (i) => i === 0 ? 'none' : DEFAULT.transform.out, autoAlpha: (i) => i === 0 ? 1 : 0 });
+
+                let lastIndex = 0;
+                this.tlChangeText = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: `top+=${$(window).height() * 1.2} top`,
+                        end: `bottom-=${$(window).height() * 1.2} bottom`,
+                        scrub: true,
+                        fastScrollEnd: true,
+                        onUpdate: ({ progress }) => {
+                            let index = this.getProgressIndex({ progress, N: allSlideItems.length, rootMargin: -0.01 });
+                            if (index === lastIndex) return;
+
+                            gsap.to(allSlideItems[index], { transform: 'translate(0px, 0px)', autoAlpha: 1, duration: DEFAULT.duration, ease: DEFAULT.ease } )
+                            gsap.to(allSlideItems[lastIndex], { transform: DEFAULT.transform[index > lastIndex ? 'in' : 'out'], autoAlpha: 0, duration: DEFAULT.duration, ease: DEFAULT.ease } )
+
+                            lastIndex = index;
+                        }
+                    }
+                });
+                this.tlChangeText.to('.home-about-story-content-item', { autoAlpha: 1 });
+            }
+            getProgressIndex({ progress, N, rootMargin = 0}) {
+                const headSegment = 0.5 / (N - 1);
+                const middleSegment = headSegment * 2;
+                const totalLength = headSegment + middleSegment * (N - 2) + headSegment;
+                const scale = 1 / totalLength;
+                const scaledHead = headSegment * scale;
+                const scaledMiddle = middleSegment * scale;
+
+                let thresholds = [];
+                let acc = scaledHead;
+                for (let i = 1; i < N - 1; i++) {
+                    thresholds.push(acc);
+                    acc += scaledMiddle;
+                }
+                thresholds.push(acc);
+                thresholds = thresholds.map(threshold => threshold + rootMargin);
+                console.log(thresholds)
+                for (let i = 0; i < thresholds.length; i++) {
+                    if (progress < thresholds[i]) {
+                        return i;
+                    }
+                }
+                return N - 1;
             }
             destroy() {
-                if (this.tlParallax.length > 0) {
-                    this.tlParallax.forEach(tl => tl.kill());
+                if (this.tlOverlap.length > 0) {
+                    this.tlOverlap.forEach(tl => tl.kill());
                 }
             }
         },
