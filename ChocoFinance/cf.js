@@ -1542,23 +1542,24 @@ const mainScript = () => {
                     allPartner.forEach(({ data }, i) => {
                         if (i < 5) createPartnerHTML(template, data).appendTo($('.home-partner-inner'))
                     })
-                    if (isStagging()) {
-                        let columnGap = viewport.w > 767 ? '6rem' : '2.4rem';
-                        if(viewport.w < 767 ) {
-                            $('.home-partner-item-img-wrap').css('height', '4.1rem')
-                        }
-                        $('.home-partner-inner').css('column-gap', columnGap);
-                        $('.home-partner').css('height', 'auto');
-                        $('.home-partner-item').css('justify-content', 'space-between')
-                        let textTemplate = $('.home-partner-inner').find('.home-partner-item').eq(0).clone();
-                        textTemplate.find('.home-partner-item-img-wrap').remove();
-                        textTemplate.find('.home-partner-item-label').text('Chocolate Finance is not a bank. We’re an asset manager built to target a happier return on your spare cash.');
-                        textTemplate.css('max-width', '18.6rem')
-                        $('.home-partner-inner').find('.home-partner-item').eq(1).before(textTemplate);
-                    }
+                    homePartnerAppendDisclaimer();
                     $('.home-partner-inner').find('.load-ske').addClass('loaded')
                 }
             });
+            function homePartnerAppendDisclaimer() {
+                let columnGap = viewport.w > 767 ? '6rem' : '2.4rem';
+                if(viewport.w < 767 ) {
+                    $('.home-partner-item-img-wrap').css('height', '4.1rem')
+                }
+                $('.home-partner-inner').css('column-gap', columnGap);
+                $('.home-partner').css('height', 'auto');
+                $('.home-partner-item').css('justify-content', 'space-between')
+                let textTemplate = $('.home-partner-inner').find('.home-partner-item').eq(0).clone();
+                textTemplate.find('.home-partner-item-img-wrap').remove();
+                textTemplate.find('.home-partner-item-label').text('Chocolate Finance is not a bank. We’re an asset manager built to target a happier return on your spare cash.');
+                textTemplate.css('max-width', '18.6rem')
+                $('.home-partner-inner').find('.home-partner-item').eq(1).before(textTemplate);
+            }
         }
         getHomePartners()
         function homeHeroHandle() {
@@ -2993,9 +2994,7 @@ const mainScript = () => {
             console.log('update')
             socialShare();
             updateMobileTable();
-            if (isStagging) {
-                updateTabTable();
-            }
+            updateTabTable();
         }
         currentUpdate();
         
@@ -4364,7 +4363,8 @@ const mainScript = () => {
         thankGetFaq();
     }
     SCRIPT.guaranteeScript = () => {
-        if (!isStagging) return;
+        console.log(!isStagging())
+        if (!isStagging()) return;
         const sgdToUsd = parseFloat($('.sgd-to-usd').text());
         const usdToSgd = (Math.floor((1/sgdToUsd)*100000)/100000).toFixed(5);
         const feeSgdToUsd = 0.1;
