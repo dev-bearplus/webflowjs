@@ -3,7 +3,7 @@ const script = () => {
     if (history.scrollRestoration) {
         history.scrollRestoration = 'manual';
     }
-    gsap.registerPlugin(ScrollTrigger);
+    gsap.registerPlugin(ScrollTrigger, SplitText);
     ScrollTrigger.defaults({
         invalidateOnRefresh: true,
     });
@@ -179,7 +179,7 @@ const script = () => {
             return false;
         }
     }
-    const mouse = new Mouse();
+    // const mouse = new Mouse();
 
     class SmoothScroll {
         constructor() {
@@ -643,14 +643,14 @@ const script = () => {
                     gsap
                         .timeline({
                             scrollTrigger: {
-                                trigger: $(this.el).find('.home-about-story-list'),
-                                start: `top top+=50%`,
-                                end: 'bottom top+=50%',
-                                scrub: 1,
-                                defaults: { ease: 'none' }
+                                trigger: $(this.el).find('.home-about-main'),
+                                start: 'top top',
+                                end: `bottom+=${$(window).height() * 0.5} top`,
+                                scrub: 1
                             }
                         })
-                        .fromTo($(this.el).find('.home-about-story-content-item'), { yPercent: -50 }, { yPercent: 50 }))
+                        .from($(this.el).find('.home-about-story-content'), { scale: 0.95, autoAlpha: 0.8, duration: 1, ease: 'power2.out'  }, 0)
+                        .from($(this.el).find('.home-about-story-item:first-child .home-about-story-item-img'), { scale: 1.2, transformOrigin: 'top', autoAlpha: 0.5, duration: 1, ease: 'none' }, 0));
 
                     this.tlParallax.push(
                         gsap
@@ -709,15 +709,15 @@ const script = () => {
                     [
                         slider => {
                             slider.on("detailsChanged", () => {
-                              const details = slider.track.details;
-                              const current = details.rel + 1; // chỉ số slide hiện tại (0-based)
-                              const total = details.slides.length;
-                              const progress = current / (total );
-                        
-                              // Cập nhật thanh tiến trình tổng
-                              $(".home-challenge-progress-inner").css('width', `${progress * 100}%`);
+                                const details = slider.track.details;
+                                const current = details.rel + 1; // chỉ số slide hiện tại (0-based)
+                                const total = details.slides.length;
+                                const progress = current / (total );
+
+                                // Cập nhật thanh tiến trình tổng
+                                $(".home-challenge-progress-inner").css('width', `${progress * 100}%`);
                             });
-                          }
+                        }
                     ]
                 )
                 }
@@ -786,14 +786,14 @@ const script = () => {
                     })
 
                     this.tlStickSol
-                        .fromTo($(this.el).find('.home-solution-main-transform'), { bottom: '100%' }, { bottom: '2%' })
-                        .fromTo($(this.el).find('.home-solution-main-vid-halftone'), { height: '100%' }, { height: '2%' }, "<=0")
+                        .fromTo($(this.el).find('.home-solution-main-transform'), { bottom: '100%' }, { bottom: '0%' })
+                        .fromTo($(this.el).find('.home-solution-main-vid-halftone'), { height: '100%' }, { height: '0%' }, "<=0")
 
                     this.tlStickMade = gsap.timeline({
                         scrollTrigger: {
                             trigger: $(this.el).find('.home-made'),
                             scrub: 1,
-                            start: `top+=${$(this.el).find('.home-solution').height() - ($(window).height() * 2)} top`,
+                            start: `top+=${$(this.el).find('.home-solution').height() - ($(window).height() * 1.9)} top`,
                             end: 'bottom bottom',
                             anticipatePin: 1
                         }
