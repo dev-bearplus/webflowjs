@@ -4178,30 +4178,18 @@ const mainScript = () => {
     }
     SCRIPT.thankyouScript = () => {
         function thankHero() {
-            let tlHeart = gsap.timeline({
+            let tl = gsap.timeline({
                 scrollTrigger: {
-                    trigger: '.thank-hero-ic-heart',
-                    start: 'top bottom',
-                    end: 'bottom top',
-                    scrub: 1,
+                  trigger: '.thank-hero',
+                  start: 'top bottom',
+                  end: 'bottom top',
+                  scrub: 1
                 }
-            });
-            requestAnimationFrame(() => {
-                tlHeart
-                .fromTo('.thank-hero-ic-heart', { yPercent: -40 }, {yPercent: 40})    
-            })
-            let tlHand = gsap.timeline({
-                scrollTrigger: {
-                    trigger: '.thank-hero-ic-hand',
-                    start: 'top bottom',
-                    end: 'bottom top',
-                    scrub: 1
-                }
-            });
-            requestAnimationFrame(() => {
-                tlHand
-                .fromTo('.thank-hero-ic-hand', { yPercent: -40 }, {yPercent: 40})    
-            })
+              });
+              
+              tl
+                .fromTo('.thank-hero-ic-heart', { yPercent: 40 }, { yPercent: -40 }, 0)
+                .fromTo('.thank-hero-ic-hand', { yPercent: 40 }, { yPercent: -40 }, 0);  
         }
         thankHero();
         function thankReview() {
@@ -4339,9 +4327,9 @@ const mainScript = () => {
                 }
             });
             tl
-               .fromTo('.thank-community-fashion-row.item1 .thank-community-fashion-item', { yPercent: -20 }, {yPercent: 20})
-               .fromTo('.thank-community-fashion-row.item2 .thank-community-fashion-item', { yPercent: 20 }, {yPercent: -20}, '<=0')
-               .fromTo('.thank-community-fashion-row.item3 .thank-community-fashion-item', { yPercent: -20 }, {yPercent: 20}, '<=0')
+               .fromTo('.thank-community-fashion-row.item1 .thank-community-fashion-item', { yPercent: -50 }, {yPercent: 50})
+               .fromTo('.thank-community-fashion-row.item2 .thank-community-fashion-item', { yPercent: 30 }, {yPercent: -30}, '<=0')
+               .fromTo('.thank-community-fashion-row.item3 .thank-community-fashion-item', { yPercent: -50 }, {yPercent: 40}, '<=0')
         }
         homeCommunity();
         function thankGetFaq() {
