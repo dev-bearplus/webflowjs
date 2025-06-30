@@ -156,7 +156,11 @@ const script = () => {
             this.uiScreen = this.el.querySelector('.home-hero-ui-inner');
         }
         connectedCallback() {
-
+            if (window.innerWidth > 991) {
+                this.desktop();
+            }
+        }
+        desktop() {
             let tlBg = gsap.timeline({
                 scrollTrigger: {
                     trigger: this.el.querySelector('.home-hero-bg'),
@@ -251,7 +255,7 @@ const script = () => {
                     trigger: this.el.querySelector('.home-coin-sub'),
                     start: 'top bottom',
                     end: 'bottom 35%',
-                    scrub: .5,
+                    scrub: true,
                 }
             })
             console.log(splitEl)
@@ -429,7 +433,7 @@ const script = () => {
                     trigger: this.el.querySelector('.home-road-stick-wrap'),
                     start: 'top bottom',
                     end: 'bottom top',
-                    scrub: .5,
+                    scrub: true,
                 }
             })
             tl
@@ -447,7 +451,7 @@ const script = () => {
                     trigger: this.el.querySelector('.home-road-main'),
                     start: 'top top',
                     end: 'bottom top',
-                    scrub: .5,
+                    scrub: true,
                 }
             })
             tl
