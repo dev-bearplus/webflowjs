@@ -33,6 +33,10 @@ const script = () => {
             rect.bottom >= 0
         );
     }
+    const viewport = {
+        w: window.innerWidth,
+        h: window.innerHeight,
+    };
     function reinitializeWebflow() {
         console.log('reinitialize webflow');
         window.Webflow && window.Webflow.destroy();
@@ -688,7 +692,35 @@ const script = () => {
                         default: { ease: 'none' }
                     }
                 })
-
+                if(viewport.w < 768) {
+                    $(this.el).find(".home-challenge-list").addClass('keen-slider');
+                    $(this.el).find(".home-challenge-list").css('grid-column-gap', 0);
+                    $(this.el).find(".home-challenge-item").addClass('keen-slider__slide');
+                    let slider = new KeenSlider(".home-challenge-list", {
+                        slides: {
+                            perView: 1.1,
+                            spacing: parseRem(16),
+                        },
+                        defaultAnimation: {
+                            duration: 1000
+                        },
+                        dragSpeed: 1.2,
+                    },
+                    [
+                        slider => {
+                            slider.on("detailsChanged", () => {
+                              const details = slider.track.details;
+                              const current = details.rel + 1; // chỉ số slide hiện tại (0-based)
+                              const total = details.slides.length;
+                              const progress = current / (total );
+                        
+                              // Cập nhật thanh tiến trình tổng
+                              $(".home-challenge-progress-inner").css('width', `${progress * 100}%`);
+                            });
+                          }
+                    ]
+                )
+                }
                 this.el.querySelectorAll('.home-challenge-item').forEach((item, index) => {
                     gsap.set($(item).find('.home-challenge-item-halftone'), { autoAlpha: index === 0 ? .08 : 0 });
                     index === 0 && gsap.set($(this.el).find('.home-challenge-item-content-overlay'), { autoAlpha: 1 });
@@ -731,10 +763,6 @@ const script = () => {
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
-                this.sections = this.el.querySelectorAll('section');
-                this.horizontalLayout(this.sections);
-
-
                 let headingFlipping = new FlipText('.home-made-title-slide .txt-slider-wrap',
                     (idx) =>
                         setTimeout(() => {
@@ -743,54 +771,58 @@ const script = () => {
                     );
                 headingFlipping.setup();
                 headingFlipping.play();
+                if(viewport.w > 767)  {
+                    this.sections = this.el.querySelectorAll('section');
+                    this.horizontalLayout(this.sections);
 
-                this.tlStickSol = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this.el).find('.home-solution'),
-                        start: `top+=${$(window).height() * .8} top`,
-                        end: `bottom-=${$(window).height() * 1.2} bottom`,
-                        scrub: 1,
-                        anticipatePin: 1
-                    }
-                })
+                    this.tlStickSol = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: $(this.el).find('.home-solution'),
+                            start: `top+=${$(window).height() * .8} top`,
+                            end: `bottom-=${$(window).height() * 1.2} bottom`,
+                            scrub: 1,
+                            anticipatePin: 1
+                        }
+                    })
 
-                this.tlStickSol
-                    .fromTo($(this.el).find('.home-solution-main-transform'), { bottom: '100%' }, { bottom: '2%' })
-                    .fromTo($(this.el).find('.home-solution-main-vid-halftone'), { height: '100%' }, { height: '2%' }, "<=0")
+                    this.tlStickSol
+                        .fromTo($(this.el).find('.home-solution-main-transform'), { bottom: '100%' }, { bottom: '2%' })
+                        .fromTo($(this.el).find('.home-solution-main-vid-halftone'), { height: '100%' }, { height: '2%' }, "<=0")
 
-                this.tlStickMade = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this.el).find('.home-made'),
-                        scrub: 1,
-                        start: `top+=${$(this.el).find('.home-solution').height() - ($(window).height() * 2)} top`,
-                        end: 'bottom bottom',
-                        anticipatePin: 1
-                    }
-                })
+                    this.tlStickMade = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: $(this.el).find('.home-made'),
+                            scrub: 1,
+                            start: `top+=${$(this.el).find('.home-solution').height() - ($(window).height() * 2)} top`,
+                            end: 'bottom bottom',
+                            anticipatePin: 1
+                        }
+                    })
 
-                const space_accord_process = parseInt($(this.el).find('.home-made-body-item-size').css('width'))
-                this.el.querySelectorAll('.home-made-body-item').forEach((item, index) => {
-                    if (($(this.el).find('.home-made-body-item').length - 1) > index) {
-                        this.tlStickMade.to(item, { width: space_accord_process, ease: 'none' })
-                        this.tlStickMade.to($(item).find('.home-made-body-item-desc'), {autoAlpha:0,ease:'none'}, '<')
-                    }
-                    else {
-                        let space_accord_remaining = $(window).width() - (space_accord_process * (this.el.querySelectorAll('.home-made-body-item').length - 1))
-                        this.tlStickMade.to(item, { width: space_accord_remaining, ease: 'none' }, 0)
-                    }
-                })
-                this.tlOverlap = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: this.el,
-                        start: `bottom-=${$(window).height() * 1.5} bottom`,
-                        end: `bottom bottom`,
-                        scrub: 1
-                    },
-                })
-                this.tlOverlap
-                    .to('.home-made-body', { scale: 0.8, transformOrigin: 'top', autoAlpha: 0.6, duration: 1, ease: 'power2.in' })
-                    .to('.home-made-title', { scale: .95, transformOrigin: 'bottom', autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
-                    .to('.home-made-map', { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
+                    const space_accord_process = parseInt($(this.el).find('.home-made-body-item-size').css('width'))
+                    this.el.querySelectorAll('.home-made-body-item').forEach((item, index) => {
+                        if (($(this.el).find('.home-made-body-item').length - 1) > index) {
+                            this.tlStickMade.to(item, { width: space_accord_process, ease: 'none' })
+                            this.tlStickMade.to($(item).find('.home-made-body-item-desc'), {autoAlpha:0,ease:'none'}, '<')
+                        }
+                        else {
+                            let space_accord_remaining = $(window).width() - (space_accord_process * (this.el.querySelectorAll('.home-made-body-item').length - 1))
+                            this.tlStickMade.to(item, { width: space_accord_remaining, ease: 'none' }, 0)
+                        }
+                    })
+                    this.tlOverlap = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: this.el,
+                            start: `bottom-=${$(window).height() * 1.5} bottom`,
+                            end: `bottom bottom`,
+                            scrub: 1
+                        },
+                    })
+                    this.tlOverlap
+                        .to('.home-made-body', { scale: 0.8, transformOrigin: 'top', autoAlpha: 0.6, duration: 1, ease: 'power2.in' })
+                        .to('.home-made-title', { scale: .95, transformOrigin: 'bottom', autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
+                        .to('.home-made-map', { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
+                }
             }
             horizontalLayout(sections) {
                 let sizeScroller = $(this.el).find('.solution-scroller').height();
