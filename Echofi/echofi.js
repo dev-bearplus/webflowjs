@@ -437,8 +437,8 @@ const script = () => {
                 }
             })
             tl
-            .fromTo(this.el.querySelector('.home-road-stick'),{x: containerWidth}, {x: `-${distance + containerWidth}px`, ease: 'none' })
-            .fromTo(this.el.querySelector('.home-road-line-vert'), {x: -containerWidth}, {x: `${((this.el.querySelector('.home-road-main-item').offsetWidth + parseRem(16)) * 5) + containerWidth}px`, ease: 'none' }, '<=0')
+            .fromTo(this.el.querySelector('.home-road-stick'),{x: containerWidth}, {x: `-${distance + containerWidth * 1.5}px`, ease: 'none' })
+            .fromTo(this.el.querySelector('.home-road-line-vert'), {x: -containerWidth}, {x: `${((this.el.querySelector('.home-road-main-item').offsetWidth + parseRem(16)) * 5) + containerWidth * 1.5}px`, ease: 'none' }, '<=0')
         }
         mobile() {
             let padding = parseRem(32);
