@@ -7,7 +7,7 @@ const mainScript = () => {
     gsap.registerPlugin(ScrollTrigger, SplitText);
     gsap.config({ nullTargetWarn: false });
 
-    const isStaging = window.location.hostname.includes('webflow')
+    const isStaging = $('.home-hero-client-cms-wrap').length > 0
     
     const lenis = new Lenis({
         lerp: false,

@@ -73,7 +73,7 @@ const script = () => {
             this.allItem.forEach((item, i) => {
                 let width = item.offsetWidth;
                 item.style.setProperty('--max-width', width + 'px');
-                item.addEventListener('mouseenter', () => {
+                item.addEventListener('mouseover', () => {
                     this.active(i);
                 })
                 item.addEventListener('mouseleave', (e) => {
