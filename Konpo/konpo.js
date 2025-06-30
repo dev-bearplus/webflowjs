@@ -7,6 +7,8 @@ const mainScript = () => {
     gsap.registerPlugin(ScrollTrigger, SplitText);
     gsap.config({ nullTargetWarn: false });
 
+    const isStaging = window.location.hostname.includes('webflow')
+    
     const lenis = new Lenis({
         lerp: false,
         duration: 1.6
@@ -1684,12 +1686,20 @@ const mainScript = () => {
             let lastImages;
             allClientCard.each((idx, card) => {
                 if ($(window).width() >= 768) {
-                    lastImages = $('.home-hero-client-item-inner').eq(0).find('img').attr('src')
-                    $(card).css('z-index', allClientCard.length - idx)
-                    if (idx != (allClientCard.length - 1)) {
-                        let rightRect = $(window).width() - card.getBoundingClientRect().right - parseRem(20)
-                        console.log(rightRect)
-                        gsap.set(card, {x: rightRect})
+                    if (isStaging) {
+                        lastImages = $('.home-hero-client-item-inner').eq(allClientCard.length - 1).find('img').attr('src')
+                        if (idx != 0) {
+                            let leftRect = card.getBoundingClientRect().left - $('.home-hero-client-inner').get(0).getBoundingClientRect().left
+                            gsap.set(card, {x: leftRect * -1})
+                        }
+                    } else {
+                        lastImages = $('.home-hero-client-item-inner').eq(0).find('img').attr('src')
+                        $(card).css('z-index', allClientCard.length - idx)
+                        if (idx != (allClientCard.length - 1)) {
+                            let rightRect = $(window).width() - card.getBoundingClientRect().right - parseRem(20)
+                            console.log(rightRect)
+                            gsap.set(card, {x: rightRect})
+                        }
                     }
                 } else {
                     lastImages = $('.home-hero-client-item-inner').eq(allClientCard.length - 1).find('img').attr('src')
@@ -1737,11 +1747,19 @@ const mainScript = () => {
                 let scaleFactor, distanceX, distanceY;
                 if ($(window).width() > 991) {
                     scaleFactor = $(window).height() / $('.loader-img-inner').height();
-                    distanceX = $(window).width() - $('.loader-img-inner').width() - parseRem(40);
+                    if (isStaging) {
+                        distanceX = ($(window).width() - $('.loader-img-inner').width() - parseRem(40) - parseRem(80)) * -1;
+                    } else {
+                        distanceX = $(window).width() - $('.loader-img-inner').width() - parseRem(40);
+                    }
                     distanceY = $(window).height() - $('.loader-img-inner').height() - parseRem(40);
                 } else if ($(window).width() > 767) {
                     scaleFactor = ($(window).width() / $('.loader-img-inner').width()) * 1.5;
-                    distanceX = $(window).width() - $('.loader-img-inner').width() - parseRem(40);
+                    if (isStaging) {
+                        distanceX = ($(window).width() - $('.loader-img-inner').width() - parseRem(40)) * -1;
+                    } else {
+                        distanceX = $(window).width() - $('.loader-img-inner').width() - parseRem(40);
+                    }
                     distanceY = $(window).height() - $('.loader-img-inner').height() - parseRem(40);
                 } else {
                     scaleFactor = ($(window).width() / $('.loader-img-inner').width()) * 2;
@@ -2360,7 +2378,7 @@ const mainScript = () => {
                         tl
                         .set('.home-hero-title, .home-hero-sub', {opacity: 1})
                         .to(homeHeroTitle.words, {yPercent: 0, duration: .6, stagger: .03})
-                        .to('.home-hero-client-item', {'transition-property': 'none', clearProps: 'transition-property', x: 0, duration: .88, stagger: $(window).width() >= 768 ? .08 : -.08, ease: 'power2.out'}, 0)
+                        .to('.home-hero-client-item', {'transition-property': 'none', clearProps: 'transition-property', x: 0, duration: .88, stagger: isStaging ? -.08 : $(window).width() >= 768 ? .08 : -.08, ease: 'power2.out'}, 0)
                         .to('.home-hero-client-item-label', {autoAlpha: 1, duration: .6, stagger: .03}, '<=0.2')
                         .to('.home-hero-client-item-title', {autoAlpha: 1, duration: .6, stagger: .03, onComplete: () => {
                             gsap.set('.home-hero-client-inner', {clearProps: 'all'})
@@ -2436,7 +2454,12 @@ const mainScript = () => {
             
             function homeHeroClient() {
                 if ($(window).width() >= 768) {
-                    let maxHeight = $('.home-hero-client-cms').outerHeight()
+                    let maxHeight; 
+                    if (isStaging) {
+                        maxHeight = $('.home-hero-client-cms-wrap').outerHeight()
+                    } else {
+                        maxHeight = $('.home-hero-client-cms').outerHeight()
+                    }
                     let tl = gsap.timeline({
                         scrollTrigger: {
                             trigger: '.home-hero',
@@ -2446,8 +2469,20 @@ const mainScript = () => {
                             scrub: true
                         }
                     })
-                    tl
-                    .to('.home-hero-client-inner', {y: parseRem(45), height: maxHeight, ease: 'none'})
+                    if (isStaging) {
+                        tl
+                        .to('.home-hero-client-cms', {y: parseRem(45), height: maxHeight, ease: 'none'})
+                        $('.home-hero-client-cms').addClass('swiper')
+                        $('.home-hero-client-inner').addClass('swiper-wrapper')
+                        $('.home-hero-client-item').addClass('swiper-slide')
+                        let swiper = new Swiper('.home-hero-client-cms', {
+                            slidesPerView: 'auto',
+                            watchSlidesProgress: true,
+                        })
+                    } else {
+                        tl
+                        .to('.home-hero-client-inner', {y: parseRem(45), height: maxHeight, ease: 'none'})
+                    }
                 }
                 if ($(window).width() >= 768) {
                     if (isTouchDevice()) {
