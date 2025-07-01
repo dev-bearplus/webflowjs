@@ -38,6 +38,7 @@ const script = () => {
         h: window.innerHeight,
     };
     const device = { desktop: 991, tablet: 767, mobile: 479 }
+
     const viewportBreak = (options) => {
         const { desktop, tablet, mobile } = options;
         let result;
@@ -322,7 +323,7 @@ const script = () => {
             this.duration = duration;
         }
         setup() {
-            const cloneAmount = Math.ceil($(window).width() / this.list.width()) + 1;
+            const cloneAmount = Math.ceil(viewport.w / this.list.width()) + 1;
             let itemClone = this.list.find('[data-marquee="item"]').clone();
             let itemWidth = this.list.find('[data-marquee="item"]').width();
             this.list.html('');
@@ -451,10 +452,10 @@ const script = () => {
         }
         refreshOnBreakpoint() {
             const breakpoints = [479, 767, 991];
-            const initialViewportWidth = window.innerWidth || document.documentElement.clientWidth;
+            const initialViewportWidth = viewport.w || document.documentElement.clientWidth;
             const breakpoint = breakpoints.find(bp => initialViewportWidth < bp) || breakpoints[breakpoints.length - 1];
             window.addEventListener('resize', debounce(function () {
-                const newViewportWidth = window.innerWidth || document.documentElement.clientWidth;
+                const newViewportWidth = viewport.w || document.documentElement.clientWidth;
                 if ((initialViewportWidth < breakpoint && newViewportWidth >= breakpoint) ||
                     (initialViewportWidth >= breakpoint && newViewportWidth < breakpoint)) {
                     location.reload();
@@ -532,6 +533,7 @@ const script = () => {
         }
         enterSetup(data) {
             globalHooks.triggerEnterSetup(data);
+            footer.setup(data, 'enter');
         }
         enterPlay(data) {
             globalHooks.triggerEnterPlay(data);
@@ -570,7 +572,7 @@ const script = () => {
                 });
             }, {
                 threshold: 0,
-                rootMargin: `-${window.innerHeight}px 0px 0px 0px`
+                rootMargin: `-${window.innerHeight * 1.5}px 0px 0px 0px`
             });
             observer.observe(triggerEl);
         }
@@ -614,8 +616,21 @@ const script = () => {
             }
             setupEnter(data) {
                 this.tlEnter = gsap.timeline({
-                    paused: true
+                    paused: true,
+                    onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
+
+                new MasterTimeline({
+                    timeline: this.tlEnter,
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.home-hero-title').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-hero-desc-txt').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-hero-cta').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.home-hero-main-gif').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.home-hero-client').get(0), delay: "<=.3" }),
+                    ]
+                });
 
                 if (!isInViewport(this.el)) {
                     this.tlTriggerEnter = gsap.timeline({
@@ -663,7 +678,7 @@ const script = () => {
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
-                // this.animationReveal();
+                this.animationReveal();
                 this.animationScrub();
             }
             animationReveal() {
@@ -672,14 +687,39 @@ const script = () => {
                     scrollTrigger: { trigger: this.el },
                     allowMobile: true,
                     tweenArr: [
+                        new ScaleInset({ el: $(this.el).find('.home-about-thumb-inner').get(0), elInner: $(this.el).find('.home-about-thumb-inner video') }),
                         new FadeSplitText({ el: $(this.el).find('.home-about-label').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-about-title').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-about-desc-txt').get(0) })
+                        new FadeSplitText({ el: $(this.el).find('.home-about-title').get(0) })
+                    ]
+                })
+
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.home-about-desc'), start: 'top top+=90%' },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.home-about-desc-txt').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.home-about-btn').get(0), delay: "<=.3" })
+                    ]
+                })
+
+                gsap.set($(this.el).find('.home-about-story-content-text .txt-slider-wrap .heading:not(:first-child)'), { autoAlpha: 0 })
+
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: {
+                        trigger: $(this.el).find('.home-about-main'),
+                        start: `bottom top+=${viewport.h * 0.5 - $('.home-about-story-content-item').height()}`
+                    },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.home-about-story-content-text .heading').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-about-story-content-text .txt-slider-wrap .heading:first-child').get(0), delay: "<=.04", onComplete: () => this.changeTextOnScroll() })
                     ]
                 })
             }
             animationScrub() {
-                new ParallaxImage({el: this.el.querySelector('.home-about-thumb-inner img')});
+                // new ParallaxImage({el: this.el.querySelector('.home-about-thumb-inner video'), scaleOffset: 0.1 });
                 this.el.querySelectorAll('.home-about-story-item').forEach((el, idx) => new ParallaxImage({el: el.querySelector('img'), scaleOffset: 0.2 }))
                 this.tlOverlap.push(
                     gsap
@@ -687,7 +727,7 @@ const script = () => {
                             scrollTrigger: {
                                 trigger: $(this.el).find('.home-about-main'),
                                 start: 'top top',
-                                end: `bottom+=${$(window).height() * 0.5} top`,
+                                end: `bottom+=${viewport.h * 0.5} top`,
                                 scrub: 1
                             }
                         })
@@ -699,15 +739,13 @@ const script = () => {
                         .timeline({
                             scrollTrigger: {
                                 trigger: this.el,
-                                start: `bottom-=${$(window).height() * 1.5} bottom`,
+                                start: `bottom-=${viewport.h * 1.5} bottom`,
                                 end: `bottom bottom`,
                                 scrub: 1
                             },
                         })
                         .to($(this.el).find('.home-about-story-content'), { scale: 0.8, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, 0)
                         .to($(this.el).find('.home-about-story-item:last-child .home-about-story-item-img'), { scale: 1.3, transformOrigin: 'bottom', autoAlpha: 0.5, duration: 1, ease: 'none'}, 0));
-
-                this.changeTextOnScroll();
             }
             changeTextOnScroll() {
                 let wrapTextSlide = $(this.el).find('.home-about-story-content-text .txt-slider-wrap')
@@ -734,8 +772,8 @@ const script = () => {
                 this.tlChangeText = gsap.timeline({
                     scrollTrigger: {
                         trigger: this.el,
-                        start: `top+=${$(window).height() * 1.2} top`,
-                        end: `bottom-=${$(window).height() * 1.2} bottom`,
+                        start: `top+=${viewport.h * 1.2} top`,
+                        end: `bottom-=${viewport.h * 1.2} bottom`,
                         scrub: true,
                         fastScrollEnd: true,
                         onUpdate: ({ progress }) => {
@@ -767,7 +805,6 @@ const script = () => {
                 }
                 thresholds.push(acc);
                 thresholds = thresholds.map(threshold => threshold + rootMargin);
-                console.log(thresholds)
                 for (let i = 0; i < thresholds.length; i++) {
                     if (progress < thresholds[i]) {
                         return i;
@@ -786,6 +823,7 @@ const script = () => {
                 super();
                 this.el = null;
                 this.tlParallax = null;
+                this.tlCardStack = null;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-challenge-wrap');
@@ -793,7 +831,44 @@ const script = () => {
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
-                const tl = gsap.timeline({
+                if (viewport.w > 767) {
+                    this.animationScrub();
+                }
+                else {
+                    this.slideCard();
+                }
+
+                this.animationReveal();
+            }
+            animationReveal() {
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: this.el },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.home-challenge-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-challenge-title').get(0) })
+                    ]
+                })
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: this.el },
+                    allowMobile: true,
+                    tweenArr: [
+                        ...Array.from($(this.el).find('.home-challenge-item')).flatMap((el, idx) => (
+                            [
+                                new ScaleLine({ el: $(el).find('.home-challenge-item-line').get(0) }),
+                                new FadeSplitText({ el: $(el).find('.home-challenge-item-label').get(0) }),
+                                new FadeSplitText({ el: $(el).find('.home-challenge-item-title').get(0) }),
+                                new FadeSplitText({ el: $(el).find('.home-challenge-item-desc').get(0) }),
+                                new FadeIn({ el: $(el).find('.home-challenge-item-ic').get(0) })
+                            ]
+                        ))
+                    ]
+                })
+            }
+            animationScrub() {
+                this.tlCardStack = gsap.timeline({
                     scrollTrigger: {
                         trigger: $(this.el).find('.home-challenge-main'),
                         scrub: 1,
@@ -802,42 +877,14 @@ const script = () => {
                         default: { ease: 'none' }
                     }
                 })
-                if(viewport.w < 768) {
-                    $(this.el).find(".home-challenge-list").addClass('keen-slider');
-                    $(this.el).find(".home-challenge-list").css('grid-column-gap', 0);
-                    $(this.el).find(".home-challenge-item").addClass('keen-slider__slide');
-                    let slider = new KeenSlider(".home-challenge-list", {
-                        slides: {
-                            perView: 1.1,
-                            spacing: parseRem(16),
-                        },
-                        defaultAnimation: {
-                            duration: 1000
-                        },
-                        dragSpeed: 1.2,
-                    },
-                    [
-                        slider => {
-                            slider.on("detailsChanged", () => {
-                                const details = slider.track.details;
-                                const current = details.rel + 1; // chỉ số slide hiện tại (0-based)
-                                const total = details.slides.length;
-                                const progress = current / (total );
 
-                                // Cập nhật thanh tiến trình tổng
-                                $(".home-challenge-progress-inner").css('width', `${progress * 100}%`);
-                            });
-                        }
-                    ]
-                )
-                }
                 this.el.querySelectorAll('.home-challenge-item').forEach((item, index) => {
                     gsap.set($(item).find('.home-challenge-item-halftone'), { autoAlpha: index === 0 ? .08 : 0 });
                     index === 0 && gsap.set($(this.el).find('.home-challenge-item-content-overlay'), { autoAlpha: 1 });
                     gsap.set($(item), { 'flex-grow': index === 0 ? 1 : 0 });
 
                     if (index == this.el.querySelectorAll('.home-challenge-item').length - 1) return;
-                    tl
+                    this.tlCardStack
                         .to(item,
                             { 'flex-grow': 0, duration: 1 })
                         .to($(this.el).find('.home-challenge-item').eq(index + 1),
@@ -851,11 +898,39 @@ const script = () => {
                         .to($(item).find('.home-challenge-item-content-overlay'),
                             { autoAlpha: 0, duration: .2 }, "-=.6")
                 })
+            }
+            slideCard() {
+                $(this.el).find(".home-challenge-list").addClass('keen-slider');
+                $(this.el).find(".home-challenge-list").css('grid-column-gap', 0);
+                $(this.el).find(".home-challenge-item").addClass('keen-slider__slide');
+                let slider = new KeenSlider(".home-challenge-list", {
+                    slides: {
+                        perView: 1.1,
+                        spacing: parseRem(16),
+                    },
+                    defaultAnimation: {
+                        duration: 1000
+                    },
+                    dragSpeed: 1.2,
+                },
+                [slider => {
+                    slider.on("detailsChanged", () => {
+                        const details = slider.track.details;
+                        const current = details.rel + 1; // chỉ số slide hiện tại (0-based)
+                        const total = details.slides.length;
+                        const progress = current / (total );
 
+                        // Cập nhật thanh tiến trình tổng
+                        $(".home-challenge-progress-inner").css('width', `${progress * 100}%`);
+                    });
+                }])
             }
             destroy() {
                 if (this.tlParallax.length > 0) {
                     this.tlParallax.forEach(tl => tl.kill());
+                }
+                if (this.tlCardStack) {
+                    this.tlCardStack.kill();
                 }
             }
         },
@@ -873,6 +948,12 @@ const script = () => {
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
+                if(viewport.w > 767)  {
+                    this.animationScrub();
+                }
+                this.animationReveal();
+            }
+            animationReveal() {
                 let headingFlipping = new FlipText('.home-made-title-slide .txt-slider-wrap',
                     (idx) =>
                         setTimeout(() => {
@@ -880,59 +961,118 @@ const script = () => {
                         }, 1000)
                     );
                 headingFlipping.setup();
-                headingFlipping.play();
-                if(viewport.w > 767)  {
-                    this.sections = this.el.querySelectorAll('section');
-                    this.horizontalLayout(this.sections);
 
-                    this.tlStickSol = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: $(this.el).find('.home-solution'),
-                            start: `top+=${$(window).height() * .8} top`,
-                            end: `bottom-=${$(window).height() * 1.2} bottom`,
-                            scrub: 1,
-                            anticipatePin: 1
-                        }
-                    })
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: this.el, start: `top+=${viewport.h - $(this.el).find('.home-solution-label').get(0).offsetTop} top` },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.home-solution-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-solution-title').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-solution-desc').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.home-solution-main-transform').get(0), clearProps: 'transform, opacity' }),
+                        new FadeIn({ el: $(this.el).find('.home-solution-main-decor').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.home-solution-main-vid').get(0) })
+                    ]
+                })
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: {
+                        trigger: $(this.el).find('.home-made'),
+                        start: `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.9)} top`
+                    },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.home-made-title').get(0), onComplete: () => headingFlipping.play() }),
+                    ],
+                })
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: {
+                        trigger: $(this.el).find('.home-made'),
+                        start: `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 2.2)} top`,
+                        fastScrollEnd: true
+                    },
+                    allowMobile: true,
+                    tweenArr: [
+                        new ScaleLine({ el: $(this.el).find('.home-solution-line').get(0) }),
+                        new ScaleLine({ el: $(this.el).find('.home-made-head-line').get(0) }),
+                        ...Array.from($(this.el).find('.home-made-body-item')).flatMap((el, idx) => (
+                            [
+                                new FadeSplitText({ el: $(el).find('.home-made-body-item-title').get(0) }),
+                                new FadeIn({ el: $(el).find('.home-made-body-item-title-ic').get(0) }),
+                                new FadeSplitText({ el: $(el).find('.home-made-body-item-desc').get(0) }),
+                                new FadeIn({ el: $(el).find('.home-made-body-item-ic').get(0) }),
+                                new ScaleLine({ el: $(el).find('.home-made-body-item-line').get(0) })
+                            ]
+                        ))
+                    ],
+                    stagger: .08
+                })
 
-                    this.tlStickSol
-                        .fromTo($(this.el).find('.home-solution-main-transform'), { bottom: '100%' }, { bottom: '0%' })
-                        .fromTo($(this.el).find('.home-solution-main-vid-halftone'), { height: '100%' }, { height: '0%' }, "<=0")
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: {
+                        trigger: $(this.el).find('.home-made'),
+                        start: `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.7)} top`
+                    },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeIn({ el: $(this.el).find('.home-made-map').get(0) })
+                    ]
+                })
+            }
+            animationScrub() {
+                this.sections = this.el.querySelectorAll('section');
+                this.horizontalLayout(this.sections);
 
-                    this.tlStickMade = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: $(this.el).find('.home-made'),
-                            scrub: 1,
-                            start: `top+=${$(this.el).find('.home-solution').height() - ($(window).height() * 1.9)} top`,
-                            end: 'bottom bottom',
-                            anticipatePin: 1
-                        }
-                    })
+                this.tlStickSol = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('.home-solution'),
+                        start: `top+=${viewport.h * .8} top`,
+                        end: `bottom-=${viewport.h * 1.2} bottom`,
+                        scrub: 1,
+                        anticipatePin: 1,
+                    }
+                })
 
-                    const space_accord_process = parseInt($(this.el).find('.home-made-body-item-size').css('width'))
-                    this.el.querySelectorAll('.home-made-body-item').forEach((item, index) => {
-                        if (($(this.el).find('.home-made-body-item').length - 1) > index) {
-                            this.tlStickMade.to(item, { width: space_accord_process, ease: 'none' })
-                            this.tlStickMade.to($(item).find('.home-made-body-item-desc'), {autoAlpha:0,ease:'none'}, '<')
-                        }
-                        else {
-                            let space_accord_remaining = $(window).width() - (space_accord_process * (this.el.querySelectorAll('.home-made-body-item').length - 1))
-                            this.tlStickMade.to(item, { width: space_accord_remaining, ease: 'none' }, 0)
-                        }
-                    })
-                    this.tlOverlap = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: this.el,
-                            start: `bottom-=${$(window).height() * 1.5} bottom`,
-                            end: `bottom bottom`,
-                            scrub: 1
-                        },
-                    })
-                    this.tlOverlap
-                        .to('.home-made-body', { scale: 0.8, transformOrigin: 'top', autoAlpha: 0.6, duration: 1, ease: 'power2.in' })
-                        .to('.home-made-title', { scale: .95, transformOrigin: 'bottom', autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
-                        .to('.home-made-map', { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
-                }
+                this.tlStickSol
+                    .fromTo($(this.el).find('.home-solution-main-transform'), { bottom: '100%' }, { bottom: '0%' })
+                    .fromTo($(this.el).find('.home-solution-main-vid-halftone'), { height: '100%' }, { height: '0%' }, "<=0")
+
+                this.tlStickMade = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('.home-made'),
+                        scrub: 1,
+                        start: `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.9)} top`,
+                        end: 'bottom bottom',
+                        anticipatePin: 1
+                    }
+                })
+
+                const space_accord_process = parseInt($(this.el).find('.home-made-body-item-size').css('width'))
+                this.el.querySelectorAll('.home-made-body-item').forEach((item, index) => {
+                    if (($(this.el).find('.home-made-body-item').length - 1) > index) {
+                        this.tlStickMade.to(item, { width: space_accord_process, ease: 'none' })
+                        this.tlStickMade.to($(item).find('.home-made-body-item-desc'), {autoAlpha:0,ease:'none'}, '<')
+                    }
+                    else {
+                        let space_accord_remaining = viewport.w - (space_accord_process * (this.el.querySelectorAll('.home-made-body-item').length - 1))
+                        this.tlStickMade.to(item, { width: space_accord_remaining, ease: 'none' }, 0)
+                    }
+                })
+                this.tlOverlap = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: `bottom-=${viewport.h * 1.5} bottom`,
+                        end: `bottom bottom`,
+                        scrub: 1
+                    },
+                })
+                this.tlOverlap
+                    .to('.home-made-body', { scale: 0.8, transformOrigin: 'top', autoAlpha: 0.6, duration: 1, ease: 'power2.in' })
+                    .to('.home-made-title', { scale: .95, transformOrigin: 'bottom', autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
+                    .to('.home-made-map', { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
             }
             horizontalLayout(sections) {
                 let sizeScroller = $(this.el).find('.solution-scroller').height();
@@ -941,8 +1081,8 @@ const script = () => {
                 this.tlHorizontal = gsap.timeline({
                     scrollTrigger: {
                         trigger: $(this.el).find('.solution-scroller'),
-                        start: `top+=${$(window).height() * 1.3} top`,
-                        end: `bottom+=${$(window).height() * 1.3} bottom`,
+                        start: `top+=${viewport.h * 1.5} top`,
+                        end: `bottom+=${viewport.h * 1.3} bottom`,
                         scrub: 1,
                         anticipatePin: 1,
                         snap: 1
@@ -979,7 +1119,38 @@ const script = () => {
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
-                console.log("run benefit")
+                this.animationReveal();
+            }
+            animationReveal() {
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: `top top+=50%`
+                    },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.home-benefit-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-benefit-title').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.home-benefit-btn').get(0) })
+                    ]
+                })
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: `top top+=50%`
+                    },
+                    allowMobile: true,
+                    tweenArr: [
+                        ...Array.from($(this.el).find('.home-benefit-item')).flatMap((el, idx) => [
+                            new ScaleLine({ el: $(el).find('.line').get(0) }),
+                            new FadeIn({ el: $(el).find('.home-benefit-item-ic').get(0) }),
+                            new FadeSplitText({ el: $(el).find('.home-benefit-item-content').get(0) })
+                        ])
+                    ],
+                    stagger: .08
+                })
             }
         },
         News: class extends TriggerSetup {
@@ -993,7 +1164,40 @@ const script = () => {
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
-                console.log("run news")
+                this.animationScrub();
+                this.animationReveal();
+            }
+            animationReveal() {
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.home-news-main') },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.home-news-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-news-title').get(0) }),
+                        new ScaleLine({ el: $(this.el).find('.line-ver.home-news-main-line').get(0) }),
+                        new ScaleLine({ el: $(this.el).find('.home-news-main-line').get(0) }),
+                        ...Array.from($(this.el).find('.home-news-main-item')).flatMap((el, idx) => [
+                            new FadeSplitText({ el: $(el).find('.home-news-main-item-label').get(0) }),
+                            new FadeSplitText({ el: $(el).find('.home-news-main-item-title').get(0) }),
+                            new ScaleLine({ el: $(el).find('.home-news-main-item-line').get(0) })
+                        ])
+                    ]
+                })
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.main-cta-inner'), start: 'top top+=50%' },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeIn({ el: $(this.el).find('.main-cta-bg').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.main-cta-title').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.main-cta-desc').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.main-cta-btn').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.main-cta-decor').get(0) })
+                    ]
+                })
+            }
+            animationScrub() {
                 new ParallaxImage({ el: this.el.querySelector('.home-news-thumb img') });
                 this.tlOverlap = gsap.timeline({
                     scrollTrigger: {
@@ -1027,7 +1231,6 @@ const script = () => {
             }
             setup() {
                 let itemLength = $(this.el).find('.about-team-info-avt-item').length;
-                console.log(itemLength)
                 const activeIndex = (index) => {
                     $(this.el).find('.about-team-avt-item').eq(index).addClass('active').siblings().removeClass('active');
                     $(this.el).find('.about-team-info-item').eq(index).addClass('active').siblings().removeClass('active');
@@ -1067,7 +1270,7 @@ const script = () => {
                     },
                 })
                 .to($(this.el).find('.home-job-thumb-inner'), { scale: .9, autoAlpha: 0.5, duration: 1, ease: 'power2.in' })
-                console.log(KeenSlider)
+
                 $(this.el).find(".home-job-main-list").addClass('keen-slider');
                 $(this.el).find(".home-job-main-list").css('grid-column-gap', 0);
                 $(this.el).find(".home-job-main-item").addClass('keen-slider__slide');
@@ -1308,15 +1511,20 @@ const script = () => {
         }
     }
     const header = new Header();
-    class Footer extends TriggerSetup {
+    class Footer {
         constructor() {
-            super();
+            this.el = null;
         }
-        trigger(data) {
+        setup(data, mode) {
             this.el = document.querySelector('.footer');
-            super.setTrigger(this.el, this.setup.bind(this));
+            if (mode === 'once') {
+                this.setupOnce(data);
+            } else if (mode === 'enter') {
+                this.setupEnter(data);
+            }
+            else return;
         }
-        setup() {
+        setupOnce() {
             new Marquee($(this.el).find('.footer-bot-text [data-marquee="list"]'), 40).setup();
             new Marquee($(this.el).find('.footer-bot-ruler [data-marquee="list"]'), 10).setup();
 
@@ -1341,6 +1549,72 @@ const script = () => {
                     return;
                 }
             })
+
+            this.setupEnter();
+        }
+        setupEnter() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        this.animationReveal();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0,
+                rootMargin: `-${window.innerHeight * 1.5}px 0px 0px 0px`
+            });
+            observer.observe(this.el);
+        }
+        animationReveal() {
+            new MasterTimeline({
+                triggerInit: this.el,
+                scrollTrigger: { trigger: $(this.el).find('.footer-cta-content') },
+                allowMobile: true,
+                tweenArr: [
+                    new FadeSplitText({ el: $(this.el).find('.footer-cta-title').get(0) }),
+                    new FadeSplitText({ el: $(this.el).find('.footer-cta-desc').get(0) }),
+                    new FadeIn({ el: $(this.el).find('.footer-cta-main').get(0) }),
+                    new ScaleLine({ el: $(this.el).find('.footer-cta-line').get(0) })
+                ]
+            })
+            new MasterTimeline({
+                triggerInit: this.el,
+                scrollTrigger: { trigger: $(this.el).find('.footer-main-menu') },
+                allowMobile: true,
+                tweenArr: [
+                    ...Array.from($(this.el).find('.footer-main-link')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0) }))
+                ]
+            })
+            new MasterTimeline({
+                triggerInit: this.el,
+                scrollTrigger: { trigger: $(this.el).find('.footer-main-info') },
+                allowMobile: true,
+                tweenArr: [
+                    ...Array.from($(this.el).find('.footer-main-info-col')).flatMap((el, idx) => ([
+                        new FadeSplitText({ el: $(el).find('.footer-main-info-label').get(0) }),
+                        ...Array.from($(el).find('.footer-main-info-val-item')).flatMap((item, idx) => new FadeSplitText({ el: $(item).get(0) })),
+                    ])),
+                    new ScaleLine({ el: $(this.el).find('.footer-main-logo-line').get(0) }),
+                    new FadeIn({ el: $(this.el).find('.footer-main-logo-inner').get(0) }),
+                    new FadeIn({ el: $(this.el).find('.footer-main-decor').get(0) })
+                ]
+            })
+            new MasterTimeline({
+                triggerInit: this.el,
+                scrollTrigger: { trigger: $(this.el).find('.footer-main-wrap'), start: 'bottom top+=80%' },
+                allowMobile: true,
+                tweenArr: [
+                    new FadeIn({ el: $(this.el).find('.footer-bot-text').get(0) }),
+                    new FadeIn({ el: $(this.el).find('.footer-bot-ruler').get(0) }),
+                    ...Array.from($(this.el).find('.footer-bot-link')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0) })),
+                    new FadeSplitText({ el: $(this.el).find('.footer-copyright-main').get(0) }),
+                    new ScaleLine({ el: $(this.el).find('.footer-main-line').get(0) })
+                ]
+            })
+        }
+        destroy() {
+
         }
     }
     const footer = new Footer();
@@ -1482,7 +1756,7 @@ const script = () => {
                 loader.play(data);
                 scrollTop(PageManagerRegistry[namespace]?.initOnce?.(data));
                 header.init(data);
-                footer.trigger();
+                footer.setup(data, 'once');
             },
             async leave(data) {
                 await pageTrans.play(data);

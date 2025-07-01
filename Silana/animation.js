@@ -25,7 +25,7 @@ class MasterTimeline {
         this.tweenArr = tweenArr;
         this.stagger = stagger;
         this.allowMobile = getScreenType().isMobile ? allowMobile : true;
-        this.setup();
+        document.fonts.ready.then(() => this.setup());
     }
     setup() {
         if (!this.allowMobile) return;
@@ -227,36 +227,42 @@ class RevealTextReset  {
     }
 }
 class FadeSplitText {
-    constructor({ el, delay, breakType, isDisableRevert, ...props }) {
+    constructor({ el, delay, isDisableRevert, ...props }) {
         if (!el || el.textContent === '') return;
         this.DOM = { el: el };
-        this.breakType = breakType || 'words';
         this.delay = delay;
-
-        this.textSplit = SplitText.create(this.DOM.el, {
-            type: 'lines, words',
-            autoSplit: true,
-            mask: "lines",
-        });
-        this.animation = gsap.from(this.textSplit[this.breakType], {
-            autoAlpha: 0,
-            yPercent: 100,
-            stagger: 0.02,
-            duration: .8,
-            ease: 'power2.out',
-            onComplete: () => {
-                if (!isDisableRevert) {
-                    this.textSplit.revert();
-                    convertHyphen(this.DOM.el);
+        this.textSplit = null;
+        let animation;
+        document.fonts.ready.then(() => {
+            this.textSplit = SplitText.create(this.DOM.el, {
+                type: "lines words",
+                mask: "lines",
+                autoSplit: true,
+                onSplit: (self) => {
+                    gsap.set(self.words, { autoAlpha: 0, yPercent: 100 });
+                    animation = gsap.to(self.words, {
+                        autoAlpha: 1,
+                        yPercent: 0,
+                        stagger: 0.02,
+                        duration: .8,
+                        ease: 'power2.out',
+                        onComplete: () => {
+                            if (!isDisableRevert) {
+                                self.revert();
+                                convertHyphen(self.elements[0]);
+                            }
+                        },
+                        ...props
+                    });
                 }
-            },
-            ...props
-        });
+            });
+            this.animation = animation;
+        })
     }
     init() {
-        document.fonts.onloadingdone = () => {
-            gsap.set(this.textSplit[this.breakType], { autoAlpha: 0, yPercent: 100 });
-        }
+        document.fonts.ready.then(() => {
+
+        })
     }
 }
 class FadeIn {
