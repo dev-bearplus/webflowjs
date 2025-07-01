@@ -1882,22 +1882,29 @@ const mainScript = () => {
         }
         setup() {
             this.initContentPopup(); 
+            if($('.tp-hero-opera').length > 0) {
+                new FadeIn({el: '.tp-hero-opera'});
+            }
+            if($('.tp-hero-menu-wrap').length > 0) {
+                new FadeIn({el: '.tp-hero-menu-wrap'});
+            }
+            new FadeIn({el: '.tp-hero-title'})
+            new FadeIn({el: '.tp-hero-thumb'})
+            new FadeIn({el: '.tp-hero-content-wrap'})
         }
         play() {
             this.tl.play();
         }
         interact() {
             $(window).on('scroll', (e)=> {
-                console.log('khanh')
-                this.ItemContentActiveCheck('.service-hero-popup-content-txt h6');
+                this.ItemContentActiveCheck('.tp-hero-content h6');
             })
-            
-            $('.service-hero-popup-menu-inner').on('click', '.service-hero-popup-menu-item', function(e) {
+            $('.tp-hero-menu-inner').on('click', '.tp-hero-menu-item', function(e) {
                 e.preventDefault();
-                $('.service-hero-popup-menu-item').removeClass('active');
+                $('.tp-hero-menu-item').removeClass('active');
                 $(this).addClass('active');
                 let dataHeader = $(this).attr('data-title');
-                var scrollTop =   $(`.service-hero-popup-content-txt h6[data-title="${dataHeader}"]`).offset().top  - parseFloat($('.service-hero-popup-menu-inner').css('top'));
+                var scrollTop =   $(`.tp-hero-content h6[data-title="${dataHeader}"]`).offset().top  - parseFloat($('.tp-hero-menu-inner').css('top'));
                 console.log(scrollTop )
                 $('html').animate({
                     scrollTop: scrollTop
@@ -1905,28 +1912,28 @@ const mainScript = () => {
             })
         }
         ItemContentActiveCheck(el) {
-            console.log('khanh')
+            if($('.tp-hero-menu-item').length == 0) return;
             for (let i = 0; i < $(el).length; i++) {
                 let top = $(el).eq(i).get(0).getBoundingClientRect().top;
                 if (top > 0 && top - $(el).eq(i).height()   < ($(window).height() / 3)) {
-                    $(' .service-hero-popup-menu-item').removeClass('active');
-                    $(' .service-hero-popup-menu-item').eq(i).addClass('active');
+                    $(' .tp-hero-menu-item').removeClass('active');
+                    $(' .tp-hero-menu-item').eq(i).addClass('active');
                 }
                 }
         }
         initContentPopup() {
-            let titleLeft = $('.service-hero-popup-menu-item').eq(0).clone();
-            $('.service-hero-popup-menu-item').remove();
-            let parentContent = $('.tp-service-hero-inner')
-            $('.service-hero-popup-content-txt h6').each((i, el) => {
+            if($('.tp-hero-menu-item').length == 0) return;
+            let titleLeft = $('.tp-hero-menu-item').eq(0).clone();
+            $('.tp-hero-menu-item').remove();
+            $('.tp-hero-content h6').each((i, el) => {
                 $(el).attr('data-title', `toch-${i}`);
                 let titleLeftClone = titleLeft.clone();
                 if(i == 0) {
                     titleLeftClone.addClass('active');
                 }
-                titleLeftClone.find('.service-hero-popup-menu-item-txt').text($(el).text());
+                titleLeftClone.find('.tp-hero-menu-item-txt').text($(el).text());
                 titleLeftClone.attr('data-title', `toch-${i}`);
-                $('.service-hero-popup-menu-inner').append(titleLeftClone);
+                $('.tp-hero-menu-inner').append(titleLeftClone);
             })
 
         }
