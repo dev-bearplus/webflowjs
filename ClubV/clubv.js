@@ -2453,8 +2453,9 @@ const mainScript = () => {
             const partsWithoutSlug = parts.slice(0, -1);
             const newPathname = `/${partsWithoutSlug.join('/')}`;
             let newURL = '';
+            url.searchParams.delete('type');
             if(slug !== 'promotion-events') {
-                newURL = url.origin + newPathname ;
+                newURL = url.href + newPathname ;
             }
             else {
                 newURL = currentUrl
