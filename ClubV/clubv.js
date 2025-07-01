@@ -2499,6 +2499,10 @@ const mainScript = () => {
                 $('.event-hero-tag-item').removeClass('active');
                 $(`.event-hero-tag-item[data-tag="${tagName}"]`).addClass('active');
                 this.initActiveTab(tagName);
+                //remove param type on href
+                let url = new URL(window.location.href);
+                url.searchParams.delete('type');
+                window.history.replaceState({}, '', url.href);
             }
             else {
                 activeItem(['.event-hero-tag-item'], 0)
