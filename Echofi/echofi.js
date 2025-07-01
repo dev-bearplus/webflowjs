@@ -37,9 +37,12 @@ const script = () => {
     gsap.ticker.lagSmoothing(0);
     lenis.on('scroll', ScrollTrigger.update)
     lenis.on('scroll', () => {
-        document.querySelector('.prog-wrap').update();
+        if (pageName === 'home') {
+            document.querySelector('.prog-wrap').update();
+        }
         document.querySelector('header-inner').update();
     })
+    const pageName = $('.main-inner').attr('data-barba-namespace');
     class Header extends HTMLElement {
         constructor() {
             super();
@@ -53,7 +56,7 @@ const script = () => {
         connectedCallback() {
             if (window.innerWidth > 991) {
                 this.setupDesktop();
-                this.active(0);
+                // this.active(0);
             this.update();
     
             } else {
@@ -103,11 +106,16 @@ const script = () => {
             })
         }
         update() {
-            this.mostInViewSection = getMostInViewSection(this.allSections);
-            let scName = this.mostInViewSection.section.getAttribute('data-sc-name');
-            if (this.el.querySelector(`.header-link[data-sc-link="${scName}"]`)) {
-                this.currentIndex = $(this.el).find(`.header-link[data-sc-link="${scName}"]`).index();
-                this.active(this.currentIndex);
+            if (pageName == 'home') {
+                this.mostInViewSection = getMostInViewSection(this.allSections);
+                let scName = this.mostInViewSection.section.getAttribute('data-sc-name');
+                if (this.el.querySelector(`.header-link[data-sc-link="${scName}"]`)) {
+                    this.currentIndex = $(this.el).find(`.header-link[data-sc-link="${scName}"]`).index();
+                    this.active(this.currentIndex);
+                } else {
+                    this.currentIndex = -1;
+                    this.active(-1);
+                }
             } else {
                 this.currentIndex = -1;
                 this.active(-1);
@@ -120,7 +128,6 @@ const script = () => {
             }
         }
         toggleMenu() {
-            console.log(this.el.querySelector('.header-links-wrap').classList.contains('on-open'))
             if (this.el.querySelector('.header-links-wrap').classList.contains('on-open')) {
                 this.el.querySelector('.header-links-wrap').classList.remove('on-open')
                 this.el.querySelector('.header-menu-toggle').classList.remove('on-open')
