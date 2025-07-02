@@ -107,6 +107,9 @@ const mainScript = () => {
             $('.header-menu-inner').removeClass('active'); 
         }
     })
+    window.addEventListener('popstate', function(event) {
+        location.reload();
+    });
       
     if (!isTouchDevice()) {
         $("html").attr("data-has-cursor", "true");
@@ -1763,11 +1766,11 @@ const mainScript = () => {
             }
             else {
                 newURL = currentUrl
-            }
+            }  
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
                 let itemSlug = $(this).closest('.service-hero-content-item').attr('data-link-detail');
-                history.replaceState({}, '', `${newURL}/${itemSlug}`);
+                history.pushState({}, '', `${newURL}/${itemSlug}`);
                 let index = $(this).closest('.service-hero-content-item').index();
                 activeItem(['.service-hero-popup-inner'], index)
                 $('.service-hero-popup').addClass('active');
@@ -2464,7 +2467,7 @@ const mainScript = () => {
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
                 let itemSlug = $(this).closest('.event-hero-card-item').attr('data-link-detail');
-                history.replaceState({}, '', `${newURL}/${itemSlug}`);
+                history.pushState({}, '', `${newURL}/${itemSlug}`);
                 console.log(`${newURL}/${itemSlug}`)
                 let index = $(this).closest('.event-hero-card-item').index();
                 activeItem(['.event-popup-item'], index)
@@ -3152,7 +3155,7 @@ const mainScript = () => {
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
                 let itemSlug = $(this).closest('.work-job-item-wrap').attr('data-link-detail');
-                history.replaceState({}, '', `${newURL}/${itemSlug}`);
+                history.pushState({}, '', `${newURL}/${itemSlug}`);
                 let index = $(this).closest('.work-job-item-wrap').index();
                 console.log(index)
                 activeItem(['.work-popup-item'], index)
