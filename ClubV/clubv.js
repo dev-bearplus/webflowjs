@@ -2740,10 +2740,12 @@ const mainScript = () => {
                         $('.header').addClass('on-hide')
                         $('.event-calendar-list').addClass('active');
                     }
-                    lenis.scrollTo($('.event-hero-title').get(0), {
-                        duration: 1,
-                        offset: -200,
-                    })
+                    setTimeout(() => {
+                        lenis.scrollTo($('.event-hero-title').get(0), {
+                            duration: 1,
+                            offset: -200,
+                        })
+                    }, 20)
                 });
             });
             $('.event-calendar-close').on('click',  (e) => {
