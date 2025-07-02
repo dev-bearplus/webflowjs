@@ -1,4 +1,4 @@
-  const siteName = "seek.ad";
+  let siteName = "seek.ad";
   const wxcs = window;
   const lcvd = location;
 
