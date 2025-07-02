@@ -2660,6 +2660,12 @@ const mainScript = () => {
                       $('.event-calendar-list').removeClass('active');
                     }
                     this.filterEvents(arrDateFilter);
+                    setTimeout(() => {
+                        lenis.scrollTo($('.event-hero-title').get(0), {
+                            duration: 1,
+                            offset: -200,
+                        })
+                    }, 20)
                   });
               
                   // Nếu là ngày hôm nay
