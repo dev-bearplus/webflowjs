@@ -1,10 +1,6 @@
-  let siteName = "seek.ad";
-  const wxcs = window;
-  const lcvd = location;
-
-  if (
-    siteName === wxcs.lcvd.hostname ||
-    lcvd.hostname === "www.seek.ad"
+if (
+    window.location.hostname === "seek.ad" ||
+    location.hostname === "www.seek.ad"
   ) {
     (function () {
       const scriptMap = new Map();
