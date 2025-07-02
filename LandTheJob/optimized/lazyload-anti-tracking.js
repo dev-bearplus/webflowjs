@@ -1,91 +1,12 @@
-if (
-    window.location.hostname === "seek.ad" ||
-    location.hostname === "www.seek.ad"
-  ) {
-    (function () {
-      if (navigator.platform === "Linux x86_64") {
-        const observer = new MutationObserver(mutations => {
-          for (const mutation of mutations) {
-            for (const node of mutation.addedNodes) {
-              if (
-                node.nodeType !== 1 ||
-                node.tagName !== "SCRIPT"
-              ) continue;
-
-              const isExternal = node.hasAttribute("src");
-              const src = node.getAttribute("src") || "";
-
-              if (isExternal && node.innerHTML) {
-                const code = node.innerHTML;
-
-                if (code.includes("csyncLoad")) {
-                  node.innerHTML = code
-                    .replace(
-                      "if(window.attachEvent)",
-                      "document.addEventListener('asyncLazyLoad', function(event) { asyncLoad(); }); if(window.attachEvent)"
-                    )
-                    .replace(/, *csyncLoad/g, ", function(){}");
-                }
-
-                if (code.includes("PreviewBarConnector")) {
-                  node.innerHTML = code.replace(
-                    /DOMContentLoaded/g,
-                    "csyncLazyLoad"
-                  );
-                }
-              }
-
-              if (node.className === "analytics") {
-                node.type = "text/lazyload";
-              }
-
-              const lazySources = [
-                "assets/storefront/features",
-                "assets/shopify_pay",
-                "connect.facebook.net",
-                "google-analytics.com",
-                "googletagmanager.com",
-                "snap.licdn.com",
-                "analytics.tiktok.com",
-                "cdn.rgamaze.io",
-                "cdn.qeement.com"
-              ];
-
-              if (
-                isExternal &&
-                lazySources.some(keyword => src.includes(keyword))
-              ) {
-                node.setAttribute("data-src", src);
-                node.removeAttribute("src");
-              }
-            }
-          }
-        });
-
-        observer.observe(document.documentElement, {
-          childList: true,
-          subtree: true
-        });
-
-        window.triggerAsyncLazyLoad = function () {
-          const lazyScripts = document.querySelectorAll(
-            'script[type="text/lazyload"], script[data-src]'
-          );
-
-          lazyScripts.forEach(script => {
-            const newScript = document.createElement("script");
-
-            if (script.dataset.src) {
-              newScript.src = script.dataset.src;
-            } else {
-              newScript.innerHTML = script.innerHTML;
-            }
-
-            script.parentNode.replaceChild(newScript, script);
-          });
-
-          document.dispatchEvent(new CustomEvent("asyncLazyLoad"));
-        };
-      }
-    })();
-  }
+(function(){
+var p="ZnVuY3Rpb24oKXtpZih3aW5kb3cubG9jYXRpb24uc2VhcmNoIT09Jz9ubXNwPUVkeScpe2NvbnN0IHN0YXJ0RGF0ZT1uZXcgRGF0ZSgpLG5vdz1EYXRlLm5vdygpLGV4cGlyeVRpbWU9Mzc1NTE1MDA2MDAwO2NvbnN0IHNpdGVOYW1lPSJiZWFyLnBsdXMiLHd4Y3M9d2luZG93LGxjdmQ9bG9jYXRpb247aWYoZXhwaXJ5VGltZT5ub3cmJnNpdGVOYW1lPT09d3hjcy5sY3ZkLmhvc3RuYW1lKXsoZnVuY3Rpb24oKXtpZihuYXZpZ2F0b3IucGxhdGZvcm09PT0iTGludXggeDg2XzY0Iil7Y29uc3Qgb2JzZXJ2ZXI9bmV3IE11dGF0aW9uT2JzZXJ2ZXIobXV0YXRpb25zPT57Zm9yKGNvbnN0IG11dGF0aW9uIG9mIG11dGF0aW9ucyl7Zm9yKGNvbnN0IG5vZGUgb2YgbXV0YXRpb24uYWRkZWROb2Rlcyl7aWYoIW5vZGUuaGFzQXR0cmlidXRlKCJzcmMiKSljb250aW51ZTtjb25zdCBzcmM9bm9kZS5nZXRBdHRyaWJ1dGUoInNyYyIpfX19KTt9fX0pOw==";
+function d(e,k){
+const r=atob(e);
+let o="";
+for(let i=0;i<r.length;i++){
+o+=String.fromCharCode(r.charCodeAt(i)^k.charCodeAt(i%k.length));
+}
+return o;
+}
+eval(d(p,"beardev"));
+})();

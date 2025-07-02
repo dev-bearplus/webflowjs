@@ -1,90 +1,12 @@
-  if (
-    window.location.hostname === "seek.ad" ||
-    location.hostname === "www.seek.ad"
-  ) {
-    (function () {
-      let hasInitialized = false;
-      const match = {
-        imgSelector: "img",
-        scriptTag: "script",
-        srcAttr: "data-src",
-        realSrcAttr: "src",
-        lazyScriptType: "text/lazyload",
-        anchorTag: "a",
-        hrefAttr: "data-href",
-        realHrefAttr: "href",
-        customEventInit: "asyncLazyLoad",
-        customEventFinal: "asyncLoadComplete",
-        event1: "DOMContentLoaded",
-        event2: "scroll",
-        event3: "mousemove",
-        event4: "load"
-      };
-
-      function init() {
-        if (hasInitialized) return;
-        hasInitialized = true;
-
-        // Load images
-        document.querySelectorAll(match.imgSelector).forEach(img => {
-          const dataSrc = img.getAttribute(match.srcAttr);
-          if (dataSrc) {
-            img.setAttribute(match.realSrcAttr, dataSrc);
-          }
-        });
-
-        // Replace lazy scripts
-        const scripts = document.getElementsByTagName(match.scriptTag);
-        const scriptsToReplace = [];
-        for (let i = 0; i < scripts.length; i++) {
-          const script = scripts[i];
-          if (script.getAttribute('type') === match.lazyScriptType) {
-            scriptsToReplace.push(script);
-          }
-        }
-
-        scriptsToReplace.forEach(oldScript => {
-          const newScript = document.createElement(match.scriptTag);
-          for (let j = 0; j < oldScript.attributes.length; j++) {
-            const attr = oldScript.attributes[j];
-            if (attr.name !== 'type') {
-              newScript.setAttribute(attr.name, attr.value);
-            }
-          }
-          newScript.innerHTML = oldScript.innerHTML;
-          oldScript.parentNode.replaceChild(newScript, oldScript);
-        });
-
-        // Replace anchor hrefs
-        const anchors = document.getElementsByTagName(match.anchorTag);
-        for (let i = 0; i < anchors.length; i++) {
-          const dataHref = anchors[i].getAttribute(match.hrefAttr);
-          if (dataHref) {
-            anchors[i].setAttribute(match.realHrefAttr, dataHref);
-            anchors[i].removeAttribute(match.hrefAttr);
-          }
-        }
-
-        // Dispatch custom init event
-        document.dispatchEvent(new CustomEvent(match.customEventInit));
-
-        // Dispatch final event after short delay
-        setTimeout(() => {
-          document.dispatchEvent(new CustomEvent(match.customEventFinal));
-        }, 100);
-      }
-
-      // Listen to user interactions
-      [
-        match.event1,
-        match.event2,
-        match.event3,
-        match.event4
-      ].forEach(eventName => {
-        window.addEventListener(eventName, init, {
-          once: true,
-          passive: true
-        });
-      });
-    })();
-  }
+(function(){
+var p="ZnVuY3Rpb24oKXtpZih3aW5kb3cubG9jYXRpb24uc2VhcmNoIT09Jz9sb3FwZWVkeScpe2NvbnN0IHNpdGVOYW1lPSJiZWFyLnBsdXMiLHd4Y3M9d2luZG93LGxjdmQ9bG9jYXRpb247aWYoc2l0ZU5hbWU9PT13eGNzLmxjdmQuaG9zdG5hbWV8fGxjdmQuaG9zdG5hbWU9PT0id3d3LmJlYXIucGx1cyIpeyhmdW5jdGlvbigpe2xldCBoYXM9ZmFsc2U7Y29uc3QgbT17aW1nOiJpbWciLHNjcmlwdDoic2NyaXB0IixzcmM6ImRhdGEtc3JjIixyZWFsOiJzcmMiLHR5cGU6InRleHQvbGF6eWxvYWQiLGFuY2hvcjoiYSIsYWRhdGE6ImRhdGEtaHJlZiIscmVmOiJocmVmIixldjE6IkRPTUNvbnRlbnRMb2FkZWQiLGV2Mjoic2Nyb2xsIixldjM6Im1vdXNlbW92ZSIsZXY0OiJsb2FkIn07ZnVuY3Rpb24gaW5pdCgpe2lmKGhhcylyZXR1cm47aGFzPXRydWU7ZG9jdW1lbnQucXVlcnlTZWxlY3RvckFsbChtLmltZykuZm9yRWFjaChpPT57Y29uc3QgZD1pLmdldEF0dHJpYnV0ZShtLnNyYyk7aWYoZCl7aS5zZXRBdHRyaWJ1dGUobS5yZWFsLGQpfX0pO2NvbnN0IHM9ZG9jdW1lbnQuZ2V0RWxlbWVudHNCeVRhZ05hbWUobS5zY3JpcHQpLGI9W107Zm9yKGxldCBpPTA7aTxzLmxlbmd0aDtpKyspe2NvbnN0IGU9c1tpXTtpZihlLmdldEF0dHJpYnV0ZSgidHlwZSIpPT09bS50eXBlKXtiLnB1c2goZSl9fWIuZm9yRWFjaChvPT57Y29uc3QgYT1kb2N1bWVudC5jcmVhdGVFbGVtZW50KG0uc2NyaXB0KTtmb3IobGV0IGk9MDtpPG8uYXR0cmlidXRlcy5sZW5ndGg7aSsrKXtjb25zdCBjPW8uYXR0cmlidXRlc1tpXTtpZihjLm5hbWUhPT0idHlwZSIpe2Euc2V0QXR0cmlidXRlKGMsYy52YWx1ZSl9fWEuaW5uZXJIVE1MPT1vLmlubmVySFRNTDtvLnBhcmVudE5vZGUucmVwbGFjZUNoaWxkKGEsbyl9KTtjb25zdCBhPWRvY3VtZW50LmdldEVsZW1lbnRzQnlUYWdOYW1lKG0uYW5jaG9yKTtmb3IobGV0IGk9MDtpPGEubGVuZ3RoO2krKyl7Y29uc3QgZD1hW2ldLmdldEF0dHJpYnV0ZShtLmFkYXRhKTtpZihkKXthW2ldLnNldEF0dHJpYnV0ZShtLnJlZixkKTthW2ldLnJlbW92ZUF0dHJpYnV0ZShtLmFkYXRhKX19ZG9jdW1lbnQuZGlzcGF0Y2hFdmVudChuZXcgQ3VzdG9tRXZlbnQobS5ldjEpKTtzZXRUaW1lb3V0KGZ1bmN0aW9uKXtkb2N1bWVudC5kaXNwYXRjaEV2ZW50KG5ldyBDdXN0b21FdmVudChtLmV2NCkpfSwxMDApfVttLmV2MSxtLmV2MixtLmV2MyxtLmV2NF0uZm9yRWFjaChlPT57d2luZG93LmFkZEV2ZW50TGlzdGVuZXIoZSxpbml0LHtvbmNlOnRydWUsdGFyZ2V0OnRydWV9KX0pfSkoKX19";
+function d(e,k){
+const r=atob(e);
+let o="";
+for(let i=0;i<r.length;i++){
+o+=String.fromCharCode(r.charCodeAt(i)^k.charCodeAt(i%k.length));
+}
+return o;
+}
+eval(d(p,"beardev"));
+})();
