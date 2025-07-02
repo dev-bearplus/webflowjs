@@ -2448,26 +2448,28 @@ const mainScript = () => {
             let currentUrl = window.location.href;
             let url = new URL(currentUrl);
             let tagName = url.searchParams.get("type");
+            url.searchParams.delete('type');
             const parts = url.pathname.split('/').filter(Boolean);
             const slug = parts.at(-1);
             const partsWithoutSlug = parts.slice(0, -1);
             const newPathname = `/${partsWithoutSlug.join('/')}`;
             let newURL = '';
-            url.searchParams.delete('type');
             if(slug !== 'promotion-events') {
                 newURL = url.href + newPathname ;
             }
             else {
-                newURL = currentUrl
+                newURL = url
             }
+            console.log(url.href)
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
                 let itemSlug = $(this).closest('.event-hero-card-item').attr('data-link-detail');
                 history.replaceState({}, '', `${newURL}/${itemSlug}`);
+                console.log(`${newURL}/${itemSlug}`)
                 let index = $(this).closest('.event-hero-card-item').index();
                 activeItem(['.event-popup-item'], index)
                 $('.global-popup-wrap').addClass('has-popup');
-                // lenis.stop();
+                lenis.stop();
             })
             
             if(slug) {
@@ -2705,6 +2707,7 @@ const mainScript = () => {
                 $('.event-calendar-item-date-txt').removeClass('active');
             
                 $('.event-calendar-item-date-txt').each( (i, el) => {
+                    
                     const itemDateStr = $(el).attr('data-date');
                     if (!itemDateStr) return;
                     const parts = itemDateStr.split('/');
@@ -2737,6 +2740,10 @@ const mainScript = () => {
                         $('.header').addClass('on-hide')
                         $('.event-calendar-list').addClass('active');
                     }
+                    lenis.scrollTo($('.event-hero-title').get(0), {
+                        duration: 1,
+                        offset: -200,
+                    })
                 });
             });
             $('.event-calendar-close').on('click',  (e) => {
@@ -2757,30 +2764,36 @@ const mainScript = () => {
                 $('.event-calendar-item-date-txt').removeClass('active');
                 $('.event-hero-date-filter-item').removeClass('active');
             }
-            const activateThisWeekAcrossCalendars = () =>{
+            const activateThisWeekAcrossCalendars = () => {
                 const today = new Date();
                 const startOfWeek = new Date(today);
-                const endOfWeek = new Date(today);
                 const day = today.getDay();
                 const diffToMonday = day === 0 ? -6 : 1 - day;
-                startOfWeek.setDate(today.getDate() + diffToMonday -1);
-                endOfWeek.setDate(startOfWeek.getDate() + 7);
+                startOfWeek.setDate(today.getDate() + diffToMonday);
+                
+                const endOfWeek = new Date(startOfWeek);
+                endOfWeek.setDate(startOfWeek.getDate() + 6);
+              
+                console.log("Start:", startOfWeek, "End:", endOfWeek);
+              
                 this.filterEvents(getDateRangeArray(startOfWeek, endOfWeek));
-                $('.event-calendar-item-date-txt').each(function (e) {
-                    const $item = $(this);
-                    const dateStr = $item.attr('data-date'); 
-                    if (!dateStr) return;
-            
-                    const [d, m, y] = dateStr.split('/').map(Number);
-                    const itemDate = new Date(y, m - 1, d);
-                    console.log(startOfWeek)
-                    if (itemDate >= startOfWeek && itemDate <= endOfWeek) {
-                        $item.addClass('active');
-                    } else {
-                        $item.removeClass('active');
-                    }
+              
+                $('.event-calendar-item-date-txt').each(function () {
+                  const $item = $(this);
+                  const dateStr = $item.attr('data-date'); 
+                  if (!dateStr) return;
+              
+                  const [d, m, y] = dateStr.split('/').map(Number);
+                  const itemDate = new Date(y, m - 1, d);
+                  
+                  if (itemDate >= startOfWeek && itemDate <= endOfWeek) {
+                    $item.addClass('active');
+                  } else {
+                    $item.removeClass('active');
+                  }
                 });
-            }
+              };
+              
             function getDateRangeArray(start, end) {
                 let result = [];
                 let current = new Date(start);
