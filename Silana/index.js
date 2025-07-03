@@ -566,21 +566,31 @@ const script = () => {
             this.tlTrigger;
         }
         setTrigger(triggerEl, setup) {
-            // console.log(triggerEl)
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        console.log("enter")
-                        console.log(entry)
-                        setup();
-                        observer.unobserve(entry.target); // Only trigger once
-                    }
+            if (viewport.w > 767) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            setup();
+                            observer.unobserve(entry.target); // Only trigger once
+                        }
+                    });
+                }, {
+                    threshold: 0,
+                    rootMargin: `-${window.innerHeight * 1.5}px 0px 0px 0px`
                 });
-            }, {
-                threshold: 0,
-                rootMargin: `-${window.innerHeight * 1.5}px 0px 0px 0px`
-            });
-            observer.observe(triggerEl);
+                observer.observe(triggerEl);
+            }
+            else {
+                this.tlTrigger = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: triggerEl,
+                        start: 'top bottom+=50%',
+                        end: 'bottom top',
+                        once: true,
+                        onEnter: () => setup(),
+                    }
+                })
+            }
         }
     }
     // p-home
