@@ -322,7 +322,7 @@ const script = () => {
             this.list = list;
             this.duration = duration;
         }
-        setup({ isReverse = false }) {
+        setup(isReverse) {
             const cloneAmount = Math.ceil(viewport.w / this.list.width()) + 1;
             let itemClone = this.list.find('[data-marquee="item"]').clone();
             let itemWidth = this.list.find('[data-marquee="item"]').width();
@@ -1256,7 +1256,7 @@ const script = () => {
                 else return;
                 console.log("run")
                 $(this.el).find('.prod-hero-main-marquee').each(function () {
-                    new Marquee($(this).find('[data-marquee="list"]'), 40).setup({ isReverse: true });
+                    new Marquee($(this).find('[data-marquee="list"]'), 40).setup(true);
                 })
             }
             setupOnce(data) {
