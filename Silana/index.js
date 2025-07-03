@@ -620,18 +620,6 @@ const script = () => {
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
 
-                new MasterTimeline({
-                    timeline: this.tlEnter,
-                    allowMobile: true,
-                    tweenArr: [
-                        new FadeSplitText({ el: $(this.el).find('.home-hero-title').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-hero-desc-txt').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-hero-cta').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.home-hero-main-gif').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.home-hero-client').get(0), delay: "<=.3" }),
-                    ]
-                });
-
                 if (!isInViewport(this.el)) {
                     this.tlTriggerEnter = gsap.timeline({
                         scrollTrigger: {
@@ -644,6 +632,18 @@ const script = () => {
                         }
                     })
                 }
+
+                new MasterTimeline({
+                    timeline: this.tlEnter,
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.home-hero-title').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-hero-desc-txt').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-hero-cta').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.home-hero-main-gif').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.home-hero-client').get(0), delay: "<=.3" }),
+                    ]
+                });
             }
             playOnce() {
                 this.tlOnce.play();
@@ -1221,6 +1221,86 @@ const script = () => {
             }
         }
     }
+    //p-product
+    const ProductPage = {
+        Hero: class {
+            constructor() {
+                this.el = null;
+                this.tlOnce = null;
+                this.tlEnter = null;
+                this.tlTriggerEnter = null;
+            }
+            setup(data, mode) {
+                this.el = data.next.container.querySelector('.prod-hero-wrap');
+                if (mode === 'once') {
+                    this.setupOnce(data);
+                } else if (mode === 'enter') {
+                    this.setupEnter(data);
+                }
+                else return;
+                console.log("run")
+                $(this.el).find('.prod-hero-main-marquee').each(function () {
+                    new Marquee($(this).find('[data-marquee="list"]'), 40).setup();
+                })
+            }
+            setupOnce(data) {
+                this.tlOnce = gsap.timeline({
+                    paused: true,
+                    onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                })
+
+                // new MasterTimeline({
+                //     timeline: this.tlOnce,
+                //     allowMobile: true,
+                //     tweenArr: [
+                //         new FadeSplitText({ el: $(this.el).find('.home-hero-title').get(0) }),
+                //         new FadeSplitText({ el: $(this.el).find('.home-hero-desc-txt').get(0) }),
+                //         new FadeSplitText({ el: $(this.el).find('.home-hero-cta').get(0) }),
+                //         new FadeIn({ el: $(this.el).find('.home-hero-main-gif').get(0) }),
+                //         new FadeIn({ el: $(this.el).find('.home-hero-client').get(0), delay: "<=.3" }),
+                //     ]
+                // });
+            }
+            setupEnter(data) {
+                this.tlEnter = gsap.timeline({
+                    paused: true,
+                    onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                })
+
+                if (!isInViewport(this.el)) {
+                    this.tlTriggerEnter = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: this.el,
+                            start: 'top bottom+=50%',
+                            end: 'bottom top',
+                            once: true,
+                            onEnter: () => this.tlEnter.play(),
+                            onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                        }
+                    })
+                }
+            }
+            playOnce() {
+                this.tlOnce.play();
+            }
+            playEnter() {
+                if (isInViewport(this.el)) {
+                    this.tlEnter.play();
+                }
+            }
+            destroy() {
+                if (this.tlOnce) {
+                    this.tlOnce.kill();
+                }
+                if (this.tlEnter) {
+                    this.tlEnter.kill();
+                }
+                if (this.tlTriggerEnter) {
+                    this.tlTriggerEnter.kill();
+                }
+            }
+        },
+    }
     // p-about
     const AboutPage = {
         Team: class extends TriggerSetup {
@@ -1700,6 +1780,9 @@ const script = () => {
     class HomePageManager extends PageManager {
         constructor(page) { super(page); }
     }
+    class ProductPageManager extends PageManager {
+        constructor(page) { super(page); }
+    }
     class AboutPageManager extends PageManager {
         constructor(page) { super(page); }
     }
@@ -1709,7 +1792,8 @@ const script = () => {
 
     const PageManagerRegistry = {
         home: new HomePageManager(HomePage),
-        about:  new AboutPageManager(AboutPage),
+        product: new ProductPageManager(ProductPage),
+        about: new AboutPageManager(AboutPage),
         contact: new ContactPageManager(ContactPage)
     };
     const SCRIPT = {
@@ -1720,6 +1804,15 @@ const script = () => {
             },
             beforeLeave(data) {
                 PageManagerRegistry.home.destroy(data);
+            }
+        },
+        product: {
+            namespace: 'product',
+            afterEnter(data) {
+                PageManagerRegistry.product.initEnter(data);
+            },
+            beforeLeave(data) {
+                PageManagerRegistry.product.destroy(data);
             }
         },
         about: {
