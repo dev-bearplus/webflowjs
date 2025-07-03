@@ -566,6 +566,7 @@ const script = () => {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
+                        console.log("enter " triggerEl);
                         setup();
                         observer.unobserve(entry.target); // Only trigger once
                     }
