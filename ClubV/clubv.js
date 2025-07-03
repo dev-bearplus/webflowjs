@@ -1809,8 +1809,9 @@ const mainScript = () => {
                     let distance = currentY - startY;
 
                     if($(this).scrollTop() === 0 && distance > 80) {
+                        history.replaceState({}, '', newURL);
                         // User pulled down while at top
-                        $('.global-popup-wrap').removeClass('has-popup');
+                        $('.service-hero-popup').removeClass('active');
                         lenis.start();
                         cursor.reset();
                     }
@@ -2515,6 +2516,25 @@ const mainScript = () => {
                 let tagNameInit = $('.event-hero-tag-item.active').attr('data-tag');
                 this.initActiveTab(tagNameInit);
             }
+            if(viewport.w < 768) {
+                let startY = 0;
+                $('.event-popup-item').on('touchstart', function(e) {
+                    startY = e.originalEvent.touches[0].clientY;
+                });
+
+                $('.event-popup-item').on('touchmove', function(e) {
+                    let currentY = e.originalEvent.touches[0].clientY;
+                    let distance = currentY - startY;
+
+                    if($(this).scrollTop() === 0 && distance > 80) {
+                        history.replaceState({}, '', newURL);
+                        // User pulled down while at top
+                        $('.global-popup-wrap').removeClass('has-popup');
+                        lenis.start();
+                        cursor.reset();
+                    }
+                });
+            }
         }
         play() {
             this.tl.play();
@@ -2537,24 +2557,7 @@ const mainScript = () => {
                 $('.event-hero-date-reset').addClass('hidden')
                 this.filterReset();
             })
-            if(viewport.w < 768) {
-                let startY = 0;
-                $('.event-popup-item').on('touchstart', function(e) {
-                    startY = e.originalEvent.touches[0].clientY;
-                });
-
-                $('.event-popup-item').on('touchmove', function(e) {
-                    let currentY = e.originalEvent.touches[0].clientY;
-                    let distance = currentY - startY;
-
-                    if($(this).scrollTop() === 0 && distance > 80) {
-                        // User pulled down while at top
-                        $('.global-popup-wrap').removeClass('has-popup');
-                        lenis.start();
-                        cursor.reset();
-                    }
-                });
-            }
+            
             $('.event-popup-item').on('scroll', (e)=> {
                 if(viewport.w < 992) {
                     if($(e.target).scrollTop()  > 40) {
