@@ -563,11 +563,11 @@ const script = () => {
             this.tlTrigger;
         }
         setTrigger(triggerEl, setup) {
-            console.log(triggerEl)
+            // console.log(triggerEl)
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        console.log(`enter ${triggerEl}`);
+                        console.log(entry)
                         setup();
                         observer.unobserve(entry.target); // Only trigger once
                     }
