@@ -745,7 +745,7 @@ const script = () => {
                             },
                         })
                         .to($(this.el).find('.home-about-story-content'), { scale: 0.8, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, 0)
-                        .to($(this.el).find('.home-about-story-item:last-child .home-about-story-item-img'), { scale: 1.3, transformOrigin: 'bottom', autoAlpha: 0.5, duration: 1, ease: 'none'}, 0));
+                        .to($(this.el).find('.home-about-story-list'), { scale: 1.3, transformOrigin: 'bottom', autoAlpha: 0.5, duration: 1, ease: 'none'}, 0));
             }
             changeTextOnScroll() {
                 let wrapTextSlide = $(this.el).find('.home-about-story-content-text .txt-slider-wrap')
@@ -961,10 +961,12 @@ const script = () => {
                         }, 1000)
                     );
                 headingFlipping.setup();
-
                 new MasterTimeline({
                     triggerInit: this.el,
-                    scrollTrigger: { trigger: this.el, start: `top+=${viewport.h - $(this.el).find('.home-solution-label').get(0).offsetTop} top` },
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: viewport.w > 991 ? `top+=${viewport.h - $(this.el).find('.home-solution-label').get(0).offsetTop} top` : `top top+=75%`
+                    },
                     allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $(this.el).find('.home-solution-label').get(0) }),
@@ -979,7 +981,7 @@ const script = () => {
                     triggerInit: this.el,
                     scrollTrigger: {
                         trigger: $(this.el).find('.home-made'),
-                        start: `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.9)} top`
+                        start: viewport.w > 991 ? `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.9)} top` : `top top+=75%`
                     },
                     allowMobile: true,
                     tweenArr: [
@@ -990,7 +992,18 @@ const script = () => {
                     triggerInit: this.el,
                     scrollTrigger: {
                         trigger: $(this.el).find('.home-made'),
-                        start: `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 2.2)} top`,
+                        start: viewport.w > 991 ? `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.7)} top` : `top top+=75%`,
+                    },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeIn({ el: $(this.el).find('.home-made-map').get(0) })
+                    ]
+                })
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: {
+                        trigger: $(this.el).find('.home-made'),
+                        start: viewport.w > 991 ? `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 2.2)} top` : `top top+=50%`,
                         fastScrollEnd: true
                     },
                     allowMobile: true,
@@ -1009,58 +1022,49 @@ const script = () => {
                     ],
                     stagger: .08
                 })
-
-                new MasterTimeline({
-                    triggerInit: this.el,
-                    scrollTrigger: {
-                        trigger: $(this.el).find('.home-made'),
-                        start: `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.7)} top`
-                    },
-                    allowMobile: true,
-                    tweenArr: [
-                        new FadeIn({ el: $(this.el).find('.home-made-map').get(0) })
-                    ]
-                })
             }
             animationScrub() {
-                this.sections = this.el.querySelectorAll('section');
-                this.horizontalLayout(this.sections);
+                if (viewport.w > 991) {
+                    this.sections = this.el.querySelectorAll('section');
+                    this.horizontalLayout(this.sections);
 
-                this.tlStickSol = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this.el).find('.home-solution'),
-                        start: `top+=${viewport.h * .8} top`,
-                        end: `bottom-=${viewport.h * 1.2} bottom`,
-                        scrub: 1,
-                        anticipatePin: 1,
-                    }
-                })
+                    this.tlStickSol = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: $(this.el).find('.home-solution'),
+                            start: `top+=${viewport.h * .8} top`,
+                            end: `bottom-=${viewport.h * 1.2} bottom`,
+                            scrub: 1,
+                            anticipatePin: 1,
+                        }
+                    })
 
-                this.tlStickSol
-                    .fromTo($(this.el).find('.home-solution-main-transform'), { bottom: '100%' }, { bottom: '0%' })
-                    .fromTo($(this.el).find('.home-solution-main-vid-halftone'), { height: '100%' }, { height: '0%' }, "<=0")
+                    this.tlStickSol
+                        .fromTo($(this.el).find('.home-solution-main-transform'), { bottom: '100%' }, { bottom: '0%' })
+                        .fromTo($(this.el).find('.home-solution-main-vid-halftone'), { height: '100%' }, { height: '0%' }, "<=0")
 
-                this.tlStickMade = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this.el).find('.home-made'),
-                        scrub: 1,
-                        start: `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.9)} top`,
-                        end: 'bottom bottom',
-                        anticipatePin: 1
-                    }
-                })
+                    this.tlStickMade = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: $(this.el).find('.home-made'),
+                            scrub: 1,
+                            start: `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.9)} top`,
+                            end: 'bottom bottom',
+                            anticipatePin: 1
+                        }
+                    })
 
-                const space_accord_process = parseInt($(this.el).find('.home-made-body-item-size').css('width'))
-                this.el.querySelectorAll('.home-made-body-item').forEach((item, index) => {
-                    if (($(this.el).find('.home-made-body-item').length - 1) > index) {
-                        this.tlStickMade.to(item, { width: space_accord_process, ease: 'none' })
-                        this.tlStickMade.to($(item).find('.home-made-body-item-desc'), {autoAlpha:0,ease:'none'}, '<')
-                    }
-                    else {
-                        let space_accord_remaining = viewport.w - (space_accord_process * (this.el.querySelectorAll('.home-made-body-item').length - 1))
-                        this.tlStickMade.to(item, { width: space_accord_remaining, ease: 'none' }, 0)
-                    }
-                })
+                    const space_accord_process = parseInt($(this.el).find('.home-made-body-item-size').css('width'))
+                    this.el.querySelectorAll('.home-made-body-item').forEach((item, index) => {
+                        if (($(this.el).find('.home-made-body-item').length - 1) > index) {
+                            this.tlStickMade.to(item, { width: space_accord_process, ease: 'none' })
+                            this.tlStickMade.to($(item).find('.home-made-body-item-desc'), {autoAlpha:0,ease:'none'}, '<')
+                        }
+                        else {
+                            let space_accord_remaining = viewport.w - (space_accord_process * (this.el.querySelectorAll('.home-made-body-item').length - 1))
+                            this.tlStickMade.to(item, { width: space_accord_remaining, ease: 'none' }, 0)
+                        }
+                    })
+                }
+
                 this.tlOverlap = gsap.timeline({
                     scrollTrigger: {
                         trigger: this.el,
