@@ -322,7 +322,7 @@ const script = () => {
             this.list = list;
             this.duration = duration;
         }
-        setup() {
+        setup({ isReverse = false }) {
             const cloneAmount = Math.ceil(viewport.w / this.list.width()) + 1;
             let itemClone = this.list.find('[data-marquee="item"]').clone();
             let itemWidth = this.list.find('[data-marquee="item"]').width();
@@ -330,6 +330,9 @@ const script = () => {
             new Array(cloneAmount).fill().forEach(() => {
                 let html = itemClone.clone()
                 html.css('animation-duration', `${Math.ceil(itemWidth / this.duration)}s`);
+                if (isReverse) {
+                    html.css('animation-direction', 'reverse');
+                }
                 html.addClass('anim-marquee');
                 this.list.append(html);
             });
@@ -567,6 +570,7 @@ const script = () => {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
+                        console.log("enter")
                         console.log(entry)
                         setup();
                         observer.unobserve(entry.target); // Only trigger once
@@ -1242,7 +1246,7 @@ const script = () => {
                 else return;
                 console.log("run")
                 $(this.el).find('.prod-hero-main-marquee').each(function () {
-                    new Marquee($(this).find('[data-marquee="list"]'), 40).setup();
+                    new Marquee($(this).find('[data-marquee="list"]'), 40).setup({ isReverse: true });
                 })
             }
             setupOnce(data) {
