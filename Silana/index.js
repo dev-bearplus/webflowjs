@@ -516,7 +516,7 @@ const script = () => {
         }
         enterAnim(data) {
             this.tlEnter = gsap.timeline({
-                delay: .4,
+                delay: .5,
                 onStart: () => {
                     this.enterSetup(data);
                     setTimeout(() => {
@@ -552,6 +552,7 @@ const script = () => {
         updateAfterTrans(data) {
             smoothScroll.reInit(data)
             globalChange.update(data)
+            scrollTop();
             smoothScroll.start();
             reinitializeWebflow();
             if (data.current.container) {
