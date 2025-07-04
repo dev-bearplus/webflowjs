@@ -353,16 +353,16 @@ class ScaleLine {
     }
 }
 class ScaleInset {
-    constructor({el, elInner, delay, duration }) {
+    constructor({el, elInner, delay, duration, isDisableRevert }) {
         this.DOM = { el: el, elInner: elInner || el?.querySelector('img') };
         this.delay = delay;
         this.borderRad = gsap.getProperty(this.DOM.el, 'border-radius');
         this.animation = gsap
             .timeline()
             .to(this.DOM.el,
-                { clipPath: `inset(0% round ${this.borderRad}px)`, duration: 2, ease: 'expo.out', clearProps: 'all'})
+                { clipPath: `inset(0% round ${this.borderRad}px)`, duration: 2, ease: 'expo.out', clearProps: isDisableRevert ? '' : 'all' })
             .to(this.DOM.elInner,
-                { scale: 1, duration: 2, autoAlpha: 1, ease: 'expo.out', clearProps: 'all' }, "<=0")
+                { scale: 1, duration: 2, autoAlpha: 1, ease: 'expo.out', clearProps: isDisableRevert ? '' : 'all' }, "<=0")
     }
     init() {
         if (!this.DOM.el) return;

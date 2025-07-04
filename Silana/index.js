@@ -634,7 +634,6 @@ const script = () => {
             this.tlTrigger;
         }
         setTrigger(triggerEl, setup) {
-
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -1392,6 +1391,130 @@ const script = () => {
     }
     // p-about
     const AboutPage = {
+        Hero: class {
+            constructor() {
+                this.el = null;
+                this.tlOnce = null;
+                this.tlEnter = null;
+                this.tlTriggerEnter = null;
+            }
+            setup(data, mode) {
+                this.el = data.next.container.querySelector('.about-hero-wrap');
+                if (mode === 'once') {
+                    this.setupOnce(data);
+                } else if (mode === 'enter') {
+                    this.setupEnter(data);
+                }
+                else return;
+            }
+            setupOnce(data) {
+                this.tlOnce = gsap.timeline({
+                    paused: true,
+                    onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                })
+
+                new MasterTimeline({
+                    timeline: this.tlOnce,
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeIn({ el: $(this.el).find('.about-hero-circ-1').get(0), type: 'top' }),
+                        new FadeIn({ el: $(this.el).find('.about-hero-circ-2').get(0),type: 'top', onComplete: () => $(this.el).find('.about-hero-circ-2').addClass('anim-rotation') }),
+                        new FadeIn({ el: $(this.el).find('.about-hero-circ-3').get(0), type: 'top' }),
+                        new ScaleInset({ el: $(this.el).find('.about-hero-main-logo').get(0), elInner: $(this.el).find('.about-hero-main-logo .logo').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-hero-title').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-hero-desc').get(0) })
+                    ]
+                });
+            }
+            setupEnter(data) {
+                this.tlEnter = gsap.timeline({
+                    paused: true,
+                    onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                })
+
+                if (!isInViewport(this.el)) {
+                    this.tlTriggerEnter = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: this.el,
+                            start: 'top bottom+=50%',
+                            end: 'bottom top',
+                            once: true,
+                            onEnter: () => this.tlEnter.play(),
+                            onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                        }
+                    })
+                }
+                new MasterTimeline({
+                    timeline: this.tlEnter,
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeIn({ el: $(this.el).find('.about-hero-circ-1').get(0), type: 'top' }),
+                        new FadeIn({ el: $(this.el).find('.about-hero-circ-2').get(0),type: 'top', onComplete: () => $(this.el).find('.about-hero-circ-2').addClass('anim-rotation') }),
+                        new FadeIn({ el: $(this.el).find('.about-hero-circ-3').get(0), type: 'top' }),
+                        new ScaleInset({ el: $(this.el).find('.about-hero-main-logo').get(0), elInner: $(this.el).find('.about-hero-main-logo .logo').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-hero-title').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-hero-desc').get(0) })
+                    ]
+                });
+            }
+
+            playOnce() {
+                this.tlOnce.play();
+            }
+            playEnter() {
+                if (isInViewport(this.el)) {
+                    this.tlEnter.play();
+                }
+            }
+            destroy() {
+                if (this.tlOnce) {
+                    this.tlOnce.kill();
+                }
+                if (this.tlEnter) {
+                    this.tlEnter.kill();
+                }
+                if (this.tlTriggerEnter) {
+                    this.tlTriggerEnter.kill();
+                }
+            }
+        },
+        Story: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.about-story-wrap');
+                super.setTrigger(this.el, this.setup.bind(this));
+            }
+            setup() {
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.about-story-text') },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeIn({ el: $(this.el).find('.about-story-ruler').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-story-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-story-title').get(0) })
+                    ]
+                })
+                $(this.el).find('.about-story-item').each((idx, el) => {
+                    console.log(
+                        $(el).find('img')
+                    )
+
+                    new MasterTimeline({
+                        triggerInit: this.el,
+                        scrollTrigger: { trigger: $(el), start: 'top 60%' },
+                        allowMobile: true,
+                        tweenArr: [
+                            new ScaleInset({ el: $(el).find('.about-story-item-img-inner').get(0), onComplete: () => new ParallaxImage({ el: $(el).find('img').get(0) }) }),
+                            new FadeSplitText({ el: $(el).find('.about-story-item-content').get(0) })
+                        ]
+                    })
+                })
+            }
+        },
         Team: class extends TriggerSetup {
             constructor() {
                 super();
