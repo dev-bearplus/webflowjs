@@ -634,35 +634,15 @@ const script = () => {
             this.tlTrigger;
         }
         setTrigger(triggerEl, setup) {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        setup();
-                        observer.unobserve(entry.target); // Only trigger once
-                    }
-                });
-            }, {
-                threshold: 0,
-                rootMargin: `-${window.innerHeight * 1.5}px 0px 0px 0px`,
-                root: document.body
-            });
-            observer.observe(triggerEl);
-            // if (viewport.w > 767) {
-            // }
-            // else {
-                 // this.tlTrigger = gsap.timeline({
-                //     scrollTrigger: {
-                //         trigger: triggerEl,
-                //         start: 'top bottom+=50%',
-                //         end: 'bottom top',
-                //         once: true,
-                //         onEnter: () => {
-                //             getAllScrollTrigger("refresh");
-                //             setup();
-                //         },
-                //     }
-                // })
-            // }
+            this.tlTrigger = gsap.timeline({
+                scrollTrigger: {
+                    trigger: triggerEl,
+                    start: 'top bottom+=50%',
+                    end: 'bottom top',
+                    once: true,
+                    onEnter: () => setup(),
+                }
+            })
         }
     }
     // p-home
@@ -690,17 +670,7 @@ const script = () => {
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
 
-                new MasterTimeline({
-                    timeline: this.tlOnce,
-                    allowMobile: true,
-                    tweenArr: [
-                        new FadeSplitText({ el: $(this.el).find('.home-hero-title').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-hero-desc-txt').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-hero-cta').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.home-hero-main-gif').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.home-hero-client').get(0), delay: "<=.3" }),
-                    ]
-                });
+                this.animationReveal(this.tlOnce);
             }
             setupEnter(data) {
                 this.tlEnter = gsap.timeline({
@@ -721,8 +691,19 @@ const script = () => {
                     })
                 }
 
+                this.animationReveal(this.tlEnter);
+            }
+            playOnce() {
+                this.tlOnce.play();
+            }
+            playEnter() {
+                if (isInViewport(this.el)) {
+                    this.tlEnter.play();
+                }
+            }
+            animationReveal(timeline) {
                 new MasterTimeline({
-                    timeline: this.tlEnter,
+                    timeline,
                     allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $(this.el).find('.home-hero-title').get(0) }),
@@ -732,14 +713,6 @@ const script = () => {
                         new FadeIn({ el: $(this.el).find('.home-hero-client').get(0), delay: "<=.3" }),
                     ]
                 });
-            }
-            playOnce() {
-                this.tlOnce.play();
-            }
-            playEnter() {
-                if (isInViewport(this.el)) {
-                    this.tlEnter.play();
-                }
             }
             destroy() {
                 if (this.tlOnce) {
@@ -875,7 +848,7 @@ const script = () => {
                         }
                     }
                 });
-                this.tlChangeText.to('.home-about-story-content-item', { autoAlpha: 1 });
+                this.tlChangeText.to($(this.el).find('.home-about-story-content-item'), { autoAlpha: 1 });
             }
             getProgressIndex({ progress, N, rootMargin = 0}) {
                 const headSegment = 0.5 / (N - 1);
@@ -1170,6 +1143,12 @@ const script = () => {
                 let sizeScroller = $(this.el).find('.solution-scroller').height();
                 gsap.set(this.el.querySelector('.home-solution-inner'), { display: 'flex' })
 
+                ScrollTrigger.getAll().forEach(trigger => {
+                    if (trigger.progress === 0) {
+                        trigger.refresh();
+                    }
+                });
+
                 this.tlHorizontal = gsap.timeline({
                     scrollTrigger: {
                         trigger: $(this.el).find('.solution-scroller'),
@@ -1413,18 +1392,7 @@ const script = () => {
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
 
-                new MasterTimeline({
-                    timeline: this.tlOnce,
-                    allowMobile: true,
-                    tweenArr: [
-                        new FadeIn({ el: $(this.el).find('.about-hero-circ-1').get(0), type: 'top' }),
-                        new FadeIn({ el: $(this.el).find('.about-hero-circ-2').get(0),type: 'top', onComplete: () => $(this.el).find('.about-hero-circ-2').addClass('anim-rotation') }),
-                        new FadeIn({ el: $(this.el).find('.about-hero-circ-3').get(0), type: 'top' }),
-                        new ScaleInset({ el: $(this.el).find('.about-hero-main-logo').get(0), elInner: $(this.el).find('.about-hero-main-logo .logo').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.about-hero-title').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.about-hero-desc').get(0) })
-                    ]
-                });
+                this.animationReveal(this.tlOnce);
             }
             setupEnter(data) {
                 this.tlEnter = gsap.timeline({
@@ -1444,8 +1412,19 @@ const script = () => {
                         }
                     })
                 }
+                this.animationReveal(this.tlEnter);
+            }
+            playOnce() {
+                this.tlOnce.play();
+            }
+            playEnter() {
+                if (isInViewport(this.el)) {
+                    this.tlEnter.play();
+                }
+            }
+            animationReveal(timeline) {
                 new MasterTimeline({
-                    timeline: this.tlEnter,
+                    timeline,
                     allowMobile: true,
                     tweenArr: [
                         new FadeIn({ el: $(this.el).find('.about-hero-circ-1').get(0), type: 'top' }),
@@ -1456,15 +1435,6 @@ const script = () => {
                         new FadeSplitText({ el: $(this.el).find('.about-hero-desc').get(0) })
                     ]
                 });
-            }
-
-            playOnce() {
-                this.tlOnce.play();
-            }
-            playEnter() {
-                if (isInViewport(this.el)) {
-                    this.tlEnter.play();
-                }
             }
             destroy() {
                 if (this.tlOnce) {
@@ -1488,6 +1458,9 @@ const script = () => {
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
+                this.animationReveal();
+            }
+            animationReveal() {
                 new MasterTimeline({
                     triggerInit: this.el,
                     scrollTrigger: { trigger: $(this.el).find('.about-story-text') },
@@ -1512,6 +1485,41 @@ const script = () => {
                 })
             }
         },
+        Vision: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.about-vision-wrap');
+                super.setTrigger(this.el, this.setup.bind(this));
+            }
+            setup(data) {
+                this.animationReveal();
+            }
+            animationReveal() {
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.about-vision-text') },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.about-vision-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-vision-title').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-vision-desc').get(0) })
+                    ]
+                })
+
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.about-vision-thumb-logo') },
+                    allowMobile: true,
+                    tweenArr: [
+                        new ScaleInset({ el: $(this.el).find('.about-vision-thumb-logo').get(0), elInner: $(this.el).find('.about-vision-thumb-logo .logo').get(0) }),
+                        new ScaleInset({ el: $(this.el).find('.about-vision-thumb-inner').get(0) })
+                    ]
+                })
+            }
+        },
         Team: class extends TriggerSetup {
             constructor() {
                 super();
@@ -1523,6 +1531,52 @@ const script = () => {
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
+                this.interact();
+                this.animationReveal();
+            }
+            animationReveal() {
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.about-team-text')  },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.about-team-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-team-title').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-team-desc').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.about-team-btn').get(0) })
+                    ]
+                })
+
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.about-team-main') },
+                    allowMobile: true,
+                    tweenArr: [
+                        new ScaleInset({ el: $(this.el).find('.about-team-avt-item-inner').eq(0).get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-team-info-item.active .about-team-info-name').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-team-info-item.active .about-team-info-role').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-team-info-item.active .about-team-info-desc').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.about-team-info-item.active .about-team-info-linkedin').get(0) }),
+                        new ScaleLine({ el: $(this.el).find('.about-team-info-item.active .about-team-info-head .about-team-info-item-line').get(0) }),
+                        ...Array.from($(this.el).find('.about-team-info-body')).flatMap((item, idx) => [
+                            new FadeSplitText({ el: $(item).find('.about-team-info-body-label').get(0) }),
+                            new FadeSplitText({ el: $(item).find('.about-team-info-body-richtext').get(0), isDisableRevert: true }),
+                            ...Array.from($(item).find('li')).map((li, idx) => new FadeIn({ el: $(li).get(0) })),
+                            new ScaleLine({ el: $(item).find('.about-team-info-item-line').get(0) })
+                        ])
+                    ]
+                })
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.about-team-info-avt'), start: 'top 80%' },
+                    allowMobile: true,
+                    tweenArr: [
+                        ...Array.from($(this.el).find('.about-team-info-avt-item')).flatMap((item, idx) => new FadeIn({ el: $(item).get(0) })),
+                        new FadeIn({ el: $(this.el).find('.about-team-info-avt-active-wrap').get(0) })
+                    ]
+                })
+            }
+            interact() {
                 let itemLength = $(this.el).find('.about-team-info-avt-item').length;
                 const activeIndex = (index) => {
                     $(this.el).find('.about-team-avt-item').eq(index).addClass('active').siblings().removeClass('active');
@@ -1552,6 +1606,24 @@ const script = () => {
                 super.setTrigger(this.el, this.setup.bind(this));
             }
             setup() {
+                this.interact();
+                this.animationReveal();
+                this.animationScrub();
+            }
+            animationReveal() {
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.home-job-main-text') },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.about-job-main-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-job-main-title').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.home-job-main-control').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.home-job-main-cms').get(0) })
+                    ]
+                })
+            }
+            animationScrub() {
                 new ParallaxImage({ el: this.el.querySelector('.home-job-thumb img') });
                 this.tlOverlap = gsap.timeline({
                     scrollTrigger: {
@@ -1564,6 +1636,8 @@ const script = () => {
                 })
                 .to($(this.el).find('.home-job-thumb-inner'), { scale: .9, autoAlpha: 0.5, duration: 1, ease: 'power2.in' })
 
+            }
+            interact() {
                 $(this.el).find(".home-job-main-list").addClass('keen-slider');
                 $(this.el).find(".home-job-main-list").css('grid-column-gap', 0);
                 $(this.el).find(".home-job-main-item").addClass('keen-slider__slide');
@@ -1982,6 +2056,7 @@ const script = () => {
         constructor() {
             this.el = null;
             this.tlEnter = [];
+            this.tlTrigger = null;
         }
         setup(data, mode) {
             this.el = document.querySelector('.footer');
@@ -2021,19 +2096,17 @@ const script = () => {
             this.setupEnter();
         }
         setupEnter() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
+            this.tlTrigger = gsap.timeline({
+                scrollTrigger: {
+                    trigger: this.el,
+                    start: 'top bottom+=50%',
+                    end: 'bottom top',
+                    once: true,
+                    onEnter: () => {
                         this.animationReveal();
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, {
-                threshold: 0,
-                rootMargin: `-${window.innerHeight * 1.5}px 0px 0px 0px`,
-                root: document.body,
-            });
-            observer.observe(this.el);
+                    },
+                }
+            })
         }
         animationReveal() {
             let tl1 = gsap.timeline({
@@ -2097,6 +2170,9 @@ const script = () => {
         destroy() {
             if (this.tlEnter.length > 0) {
                 this.tlEnter.forEach(tl => tl.kill());
+            }
+            if (this.tlTrigger) {
+                this.tlTrigger.kill();
             }
         }
     }
