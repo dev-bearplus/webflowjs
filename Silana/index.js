@@ -1,4 +1,7 @@
 const script = () => {
+    $.easing.exponentialEaseOut = function (t) {
+        return Math.min(1, 1.001 - Math.pow(2, -10 * t));
+    };
     barba.use(barbaPrefetch);
     if (history.scrollRestoration) {
         history.scrollRestoration = 'manual';
@@ -121,6 +124,37 @@ const script = () => {
             init
         }
     })();
+
+    function resetScroll(data) {
+        if (window.location.hash !== '') {
+            if ($(window.location.hash).length >= 1) {
+                $("html").animate({ scrollTop: $(window.location.hash).offset().top - 100 }, 1200);
+
+                setTimeout(() => {
+                    $("html").animate({ scrollTop: $(window.location.hash).offset().top - 100 }, 1200);
+                }, 300);
+            } else {
+                scrollTop()
+            }
+        } else if (window.location.search !== '') {
+            let searchObj = JSON.parse('{"' + decodeURI(location.search.substring(1)).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}')
+            if (searchObj.sc) {
+                if ($(`#${searchObj.sc}`).length >= 1) {
+                    let target = `#${searchObj.sc}`;
+                    setTimeout(() => {
+                        smoothScroll.lenis.scrollTo(`#${searchObj.sc}`, {
+                            offset: -100
+                        })
+                    }, 500);
+                    barba.history.add(`${window.location.pathname + target}`, 'barba', 'replace');
+                } else {
+                    scrollTop()
+                }
+            }
+        } else {
+            scrollTop()
+        }
+    }
 
     function scrollTop(onComplete) {
         if ('scrollRestoration' in history) {
@@ -447,10 +481,41 @@ const script = () => {
             this.updateLink(data);
         }
         updateLink(data) {
-            document.querySelectorAll('a').forEach((el) => {
-                const href = el.getAttribute('href');
-                const currentPath = `${window.location.pathname}${window.location.hash}`;
-                el.classList.toggle('w--current', href === currentPath);
+            $("a").each(function (index, link) {
+                if ($(this).attr('data-sub-link') && (!$(this).attr('href').includes('#')) && (!$(this).attr('href').includes('sc'))) {
+                    $(this).attr('href', `${$(this).attr('href')}#${$(this).attr('data-sub-link')}`);
+                    $(this).attr('data-barba-history', 'replace');
+                }
+
+                const [urlPath, anchor] = $(this).attr('href').includes('#') ? $(this).attr('href').split('#') : $(this).attr('href').includes('sc') ? $(this).attr('href').split('?sc=') : [$(this).attr('href'), ''];
+
+                $(this).toggleClass("w--current", $(this).attr("href") == `${window.location.pathname}${window.location.hash}`);
+                if (!anchor) {
+                    return;
+                }
+                else {
+                    if (urlPath === `${window.location.pathname}` || urlPath === '') {
+                        $(this).attr('href', `${window.location.pathname}#${anchor}`);
+                    }
+                    else {
+                        $(this).attr('href', `${urlPath}?sc=${anchor}`);
+                    }
+                }
+            });
+            $('a').on('click', function (e) {
+                if ($(this).attr('data-sub-link')) {
+                    barba.history.add(`${window.location.pathname + `#${$(this).attr('data-sub-link')}`}`, 'barba', 'replace');
+
+                    requestAnimationFrame(() => {
+                        setTimeout(() => {
+                            $(`#${$(this).attr('data-sub-link')}`).trigger('click');
+                        }, $(this).hasClass('w--current') ? 0 : 1000);
+
+                        $("a").each(function (index, link) {
+                            $(link).toggleClass("w--current", $(link).attr('href') == `${window.location.pathname}${window.location.hash}`);
+                        });
+                    })
+                }
             })
         }
         refreshOnBreakpoint() {
@@ -545,6 +610,7 @@ const script = () => {
             gsap.set(data.next.container, { opacity: 0, 'pointer-events': 'none', zIndex: 1 })
             smoothScroll.stop();
             smoothScroll.destroy();
+            footer.destroy();
             if (data.current.container) {
                 $(data.current.container).css('z-index', 2);
             }
@@ -553,6 +619,7 @@ const script = () => {
             smoothScroll.reInit(data)
             globalChange.update(data)
             scrollTop();
+            resetScroll();
             smoothScroll.start();
             reinitializeWebflow();
             if (data.current.container) {
@@ -1576,6 +1643,180 @@ const script = () => {
             }
         }
     }
+    //p-privacy
+    const PrivacyPage = {
+        Hero: class {
+            constructor() {
+                this.el = null;
+                this.tlOnce = null;
+                this.tlEnter = null;
+                this.tlTriggerEnter = null;
+            }
+            setup(data, mode) {
+                this.el = data.next.container.querySelector('.sub-hero');
+                if (mode === 'once') {
+                    this.setupOnce(data);
+                } else if (mode === 'enter') {
+                    this.setupEnter(data);
+                }
+                else return;
+            }
+            setupOnce(data) {
+                this.tlOnce = gsap.timeline({
+                    paused: true,
+                    onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                })
+
+                // new MasterTimeline({
+                //     timeline: this.tlOnce,
+                //     allowMobile: true,
+                //     tweenArr: [
+                //         new FadeSplitText({ el: $(this.el).find('.home-hero-title').get(0) }),
+                //         new FadeSplitText({ el: $(this.el).find('.home-hero-desc-txt').get(0) }),
+                //         new FadeSplitText({ el: $(this.el).find('.home-hero-cta').get(0) }),
+                //         new FadeIn({ el: $(this.el).find('.home-hero-main-gif').get(0) }),
+                //         new FadeIn({ el: $(this.el).find('.home-hero-client').get(0), delay: "<=.3" }),
+                //     ]
+                // });
+            }
+            setupEnter(data) {
+                this.tlEnter = gsap.timeline({
+                    paused: true,
+                    onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                })
+
+                if (!isInViewport(this.el)) {
+                    this.tlTriggerEnter = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: this.el,
+                            start: 'top bottom+=50%',
+                            end: 'bottom top',
+                            once: true,
+                            onEnter: () => this.tlEnter.play(),
+                            onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                        }
+                    })
+                }
+            }
+            playOnce() {
+                this.tlOnce.play();
+            }
+            playEnter() {
+                if (isInViewport(this.el)) {
+                    this.tlEnter.play();
+                }
+            }
+            destroy() {
+                if (this.tlOnce) {
+                    this.tlOnce.kill();
+                }
+                if (this.tlEnter) {
+                    this.tlEnter.kill();
+                }
+                if (this.tlTriggerEnter) {
+                    this.tlTriggerEnter.kill();
+                }
+            }
+        },
+        Content: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+                this.tlOverlap = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.sub-inner');
+                super.setTrigger(this.el, this.setup.bind(this));
+            }
+            setup() {
+                this.animationReveal();
+                this.animationScrub();
+                this.createTOC();
+            }
+            animationReveal() {
+
+            }
+            animationScrub() {
+                this.tlOverlap = gsap
+                    .timeline({
+                        scrollTrigger: {
+                            trigger: this.el,
+                            start: `top top`,
+                            end: `bottom top`,
+                            endTrigger: $(this.el).find('.sub-hero'),
+                            scrub: 1
+                        },
+                    })
+
+                gsap.set($(this.el).find('.sub-hero'), { filter: 'brightness(1)' })
+                this.tlOverlap
+                    .to($(this.el).find('.sub-hero'), { filter: 'brightness(0)', duration: 1, ease: 'power2.in' }, 0)
+                    .to($(this.el).find('.sub-hero-title'), { scale: 0.8, autoAlpha: 0, transformOrigin: 'top', duration: 1, ease: 'power2.in' }, 0)
+            }
+            createTOC() {
+                let headings = $(this.el).find('.sub-content-main h2');
+                let tocWrap = $(this.el).find('.sub-content-toc-list-inner');
+
+                let tocClone = $(this.el).find('.sub-content-toc-item').clone();
+                tocWrap.html('');
+                headings.each(function (idx, heading) {
+                    let text = $(heading).text().replace(/^\d+\.\s*/, '').replace(/\s*\([^)]*\)/g, '');
+                    let id = text.toLowerCase().trim().replace(/[\s\W-]+/g, '-').replace(/^-+|-+$/g, '');
+                    let link = tocClone.clone();
+
+                    $(heading).attr('id', id);
+                    link.attr('href', `#${id}`);
+                    link.find('.sub-content-toc-item-txt .txt').text(text);
+                    link.find('.sub-content-toc-item-num .txt').text((idx + 1).toString().padStart(2, "0"));
+                    tocWrap.append(link);
+                })
+
+                smoothScroll.lenis.on('scroll', function (e) {
+                    let currScroll = e.scroll;
+                    const updateHeadings = debounce(() => {
+                        headings.each(function (idx, heading) {
+                            let top = $(this).get(0).getBoundingClientRect().top;
+                            let id = $(this).attr('id');
+                            if (top > 0 && top < (viewport.h / 5)) {
+                                $(`.sub-content-toc-item[href="#${id}"]`).addClass('active');
+                                $('.sub-content-toc-item').not(`[href="#${id}"]`).removeClass('active');
+                            }
+                        });
+                    }, 600);
+
+                    updateHeadings();
+                });
+
+                $(this.el).find('.sub-content-toc-item').on('click', function (e) {
+                    e.preventDefault();
+                    let target = $(this).attr('href');
+
+                    if ($("html").hasClass("lenis-smooth")) {
+                        smoothScroll.lenis.scrollTo(target, {
+                            offset: -100,
+                        })
+                    } else {
+                        let targetTop = $(target).offset().top - 100;
+                        $("html, body").animate({ scrollTop: targetTop }, 1200, 'exponentialEaseOut');
+                    }
+
+                    barba.history.add(`${window.location.pathname + target}`, 'barba', 'replace');
+                    return false;
+                })
+
+                const currToc = window.location.hash;
+                if ($(this.el).find(currToc).length) {
+                    setTimeout(() => {
+                        resetScroll();
+                    }, 10)
+                }
+                else {
+                    barba.history.add(`${window.location.pathname}`, 'barba', 'replace');
+                }
+                $('.sub-content-toc').height() >= viewport.h && $('.sub-content-toc-list-inner').attr('data-lenis-prevent', '');
+            }
+        }
+    }
 
     class Header {
         constructor() {
@@ -1615,6 +1856,7 @@ const script = () => {
     class Footer {
         constructor() {
             this.el = null;
+            this.tlEnter = [];
         }
         setup(data, mode) {
             this.el = document.querySelector('.footer');
@@ -1668,9 +1910,12 @@ const script = () => {
             observer.observe(this.el);
         }
         animationReveal() {
+            let tl1 = gsap.timeline({
+                scrollTrigger: { trigger: $(this.el).find('.footer-cta-content'), start: 'top top+=70%' }
+            })
             new MasterTimeline({
                 triggerInit: this.el,
-                scrollTrigger: { trigger: $(this.el).find('.footer-cta-content') },
+                timeline: tl1,
                 allowMobile: true,
                 tweenArr: [
                     new FadeSplitText({ el: $(this.el).find('.footer-cta-title').get(0) }),
@@ -1679,17 +1924,23 @@ const script = () => {
                     new ScaleLine({ el: $(this.el).find('.footer-cta-line').get(0) })
                 ]
             })
+            let tl2 = gsap.timeline({
+                scrollTrigger: { trigger: $(this.el).find('.footer-main-menu'), start: 'top top+=70%' }
+            })
             new MasterTimeline({
                 triggerInit: this.el,
-                scrollTrigger: { trigger: $(this.el).find('.footer-main-menu') },
+                timeline: tl2,
                 allowMobile: true,
                 tweenArr: [
                     ...Array.from($(this.el).find('.footer-main-link')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0) }))
                 ]
             })
+            let tl3 = gsap.timeline({
+                scrollTrigger: { trigger: $(this.el).find('.footer-main-info'), start: 'top top+=70%' }
+            })
             new MasterTimeline({
                 triggerInit: this.el,
-                scrollTrigger: { trigger: $(this.el).find('.footer-main-info') },
+                timeline: tl3,
                 allowMobile: true,
                 tweenArr: [
                     ...Array.from($(this.el).find('.footer-main-info-col')).flatMap((el, idx) => ([
@@ -1700,9 +1951,12 @@ const script = () => {
                     new FadeIn({ el: $(this.el).find('.footer-main-logo').get(0) })
                 ]
             })
+            let tl4 = gsap.timeline({
+                scrollTrigger: { trigger: $(this.el).find('.footer-main-wrap'), start: 'bottom top+=80%' }
+            })
             new MasterTimeline({
                 triggerInit: this.el,
-                scrollTrigger: { trigger: $(this.el).find('.footer-main-wrap'), start: 'bottom top+=80%' },
+                timeline: tl4,
                 allowMobile: true,
                 tweenArr: [
                     new FadeIn({ el: $(this.el).find('.footer-bot-text').get(0) }),
@@ -1712,9 +1966,12 @@ const script = () => {
                     new ScaleLine({ el: $(this.el).find('.footer-main-line').get(0) })
                 ]
             })
+            this.tlEnter.push(tl1, tl2, tl3, tl4);
         }
         destroy() {
-
+            if (this.tlEnter.length > 0) {
+                this.tlEnter.forEach(tl => tl.kill());
+            }
         }
     }
     const footer = new Footer();
@@ -1805,12 +2062,16 @@ const script = () => {
     class ContactPageManager extends PageManager {
         constructor(page) { super(page); }
     }
+    class PrivacyPageManager extends PageManager {
+        constructor(page) { super(page); }
+    }
 
     const PageManagerRegistry = {
         home: new HomePageManager(HomePage),
         product: new ProductPageManager(ProductPage),
         about: new AboutPageManager(AboutPage),
-        contact: new ContactPageManager(ContactPage)
+        contact: new ContactPageManager(ContactPage),
+        privacy: new PrivacyPageManager(PrivacyPage)
     };
     const SCRIPT = {
         home: {
@@ -1849,6 +2110,15 @@ const script = () => {
                 PageManagerRegistry.contact.destroy(data);
             }
         },
+        privacy: {
+            namespace: 'privacy',
+            afterEnter(data) {
+                PageManagerRegistry.privacy.initEnter(data);
+            },
+            beforeLeave(data) {
+                PageManagerRegistry.privacy.destroy(data);
+            }
+        }
     }
     const VIEWS = Object.values(SCRIPT);
 
@@ -1868,6 +2138,7 @@ const script = () => {
                 loader.init(data);
                 loader.play(data);
                 scrollTop(PageManagerRegistry[namespace]?.initOnce?.(data));
+                resetScroll();
                 header.init(data);
                 footer.setup(data, 'once');
             },
