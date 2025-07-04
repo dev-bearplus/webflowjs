@@ -793,7 +793,7 @@ const script = () => {
                     triggerInit: this.el,
                     scrollTrigger: {
                         trigger: $(this.el).find('.home-about-main'),
-                        start: `bottom top+=${viewport.h * 0.5 - $('.home-about-story-content-item').height()}`
+                        start: `bottom top+=${viewport.h * 0.5 - $(this.el).find('.home-about-story-content-item').height()}`
                     },
                     allowMobile: true,
                     tweenArr: [
@@ -1905,7 +1905,8 @@ const script = () => {
                 });
             }, {
                 threshold: 0,
-                rootMargin: `-${window.innerHeight * 1.5}px 0px 0px 0px`
+                rootMargin: `-${window.innerHeight * 1.5}px 0px 0px 0px`,
+                root: document.body,
             });
             observer.observe(this.el);
         }
