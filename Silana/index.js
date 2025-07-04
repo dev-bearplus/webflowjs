@@ -634,32 +634,36 @@ const script = () => {
             this.tlTrigger;
         }
         setTrigger(triggerEl, setup) {
-            if (viewport.w > 767) {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            setup();
-                            observer.unobserve(entry.target); // Only trigger once
-                        }
-                    });
-                }, {
-                    threshold: 0,
-                    rootMargin: `-${window.innerHeight * 1.5}px 0px 0px 0px`,
-                    root: document.body
-                });
-                observer.observe(triggerEl);
-            }
-            else {
-                this.tlTrigger = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: triggerEl,
-                        start: 'top bottom+=50%',
-                        end: 'bottom top',
-                        once: true,
-                        onEnter: () => setup(),
+            // this.tlTrigger = gsap.timeline({
+            //     scrollTrigger: {
+            //         trigger: triggerEl,
+            //         start: 'top bottom+=50%',
+            //         end: 'bottom top',
+            //         once: true,
+            //         onEnter: () => {
+            //             getAllScrollTrigger("refresh");
+            //             setup();
+            //         },
+            //     }
+            // })
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        setup();
+                        observer.unobserve(entry.target); // Only trigger once
                     }
-                })
-            }
+                });
+            }, {
+                threshold: 0,
+                rootMargin: `-${window.innerHeight * 1.5}px 0px 0px 0px`,
+                root: document.body
+            });
+            observer.observe(triggerEl);
+            // if (viewport.w > 767) {
+            // }
+            // else {
+
+            // }
         }
     }
     // p-home
