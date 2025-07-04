@@ -1697,8 +1697,7 @@ const script = () => {
                         ...Array.from($(el).find('.footer-main-info-val-item')).flatMap((item, idx) => new FadeSplitText({ el: $(item).get(0) })),
                     ])),
                     new ScaleLine({ el: $(this.el).find('.footer-main-logo-line').get(0) }),
-                    new FadeIn({ el: $(this.el).find('.footer-main-logo-inner').get(0) }),
-                    new FadeIn({ el: $(this.el).find('.footer-main-decor').get(0) })
+                    new FadeIn({ el: $(this.el).find('.footer-main-logo').get(0) })
                 ]
             })
             new MasterTimeline({
