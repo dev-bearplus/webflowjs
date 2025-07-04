@@ -634,18 +634,7 @@ const script = () => {
             this.tlTrigger;
         }
         setTrigger(triggerEl, setup) {
-            // this.tlTrigger = gsap.timeline({
-            //     scrollTrigger: {
-            //         trigger: triggerEl,
-            //         start: 'top bottom+=50%',
-            //         end: 'bottom top',
-            //         once: true,
-            //         onEnter: () => {
-            //             getAllScrollTrigger("refresh");
-            //             setup();
-            //         },
-            //     }
-            // })
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -662,7 +651,18 @@ const script = () => {
             // if (viewport.w > 767) {
             // }
             // else {
-
+                 // this.tlTrigger = gsap.timeline({
+                //     scrollTrigger: {
+                //         trigger: triggerEl,
+                //         start: 'top bottom+=50%',
+                //         end: 'bottom top',
+                //         once: true,
+                //         onEnter: () => {
+                //             getAllScrollTrigger("refresh");
+                //             setup();
+                //         },
+                //     }
+                // })
             // }
         }
     }
