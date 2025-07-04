@@ -644,7 +644,8 @@ const script = () => {
                     });
                 }, {
                     threshold: 0,
-                    rootMargin: `-${window.innerHeight * 1.5}px 0px 0px 0px`
+                    rootMargin: `-${window.innerHeight * 1.5}px 0px 0px 0px`,
+                    root: document.body
                 });
                 observer.observe(triggerEl);
             }
