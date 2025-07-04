@@ -1499,16 +1499,13 @@ const script = () => {
                     ]
                 })
                 $(this.el).find('.about-story-item').each((idx, el) => {
-                    console.log(
-                        $(el).find('img')
-                    )
-
+                    new ParallaxImage({ el: $(el).find('img').get(0) })
                     new MasterTimeline({
                         triggerInit: this.el,
                         scrollTrigger: { trigger: $(el), start: 'top 60%' },
                         allowMobile: true,
                         tweenArr: [
-                            new ScaleInset({ el: $(el).find('.about-story-item-img-inner').get(0), onComplete: () => new ParallaxImage({ el: $(el).find('img').get(0) }) }),
+                            new ScaleInset({ el: $(el).find('.about-story-item-img-inner').get(0) }),
                             new FadeSplitText({ el: $(el).find('.about-story-item-content').get(0) })
                         ]
                     })

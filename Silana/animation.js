@@ -362,7 +362,7 @@ class ScaleInset {
             .to(this.DOM.el,
                 { clipPath: `inset(0% round ${this.borderRad}px)`, duration: 2, ease: 'expo.out', clearProps: isDisableRevert ? '' : 'all' })
             .to(this.DOM.elInner,
-                { scale: 1, duration: 2, autoAlpha: 1, ease: 'expo.out', clearProps: isDisableRevert ? '' : 'all' }, "<=0")
+                { scale: 1, duration: 2, autoAlpha: 1, ease: 'expo.out', clearProps: isDisableRevert ? '' : 'all', overwrite: true }, "<=0")
     }
     init() {
         if (!this.DOM.el) return;
