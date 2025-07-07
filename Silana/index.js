@@ -630,17 +630,26 @@ const script = () => {
     class TriggerSetup {
         constructor() {
             this.tlTrigger;
+            this.isPlayed = false;
         }
-        setTrigger(triggerEl, setup) {
+        setTrigger(triggerEl, onTrigger) {
             this.tlTrigger = gsap.timeline({
                 scrollTrigger: {
                     trigger: triggerEl,
-                    start: 'top bottom+=50%',
-                    end: 'bottom top',
+                    start: 'clamp(top bottom+=50%)',
+                    end: 'clamp(bottom top)',
                     once: true,
-                    onEnter: () => setup(),
+                    onEnter: () => {
+                        if (this.isPlayed) {
+                            this.onTrigger();
+                        }
+                    }
                 }
             })
+        }
+        playTrigger() {
+            this.isPlayed = true;
+            if (window.scrollY === 0) window.scrollTo(0, 1)
         }
     }
 
@@ -686,9 +695,9 @@ const script = () => {
         }
         trigger(data) {
             this.el = data.next.container.querySelector('.footer');
-            super.setTrigger(this.el, this.setup.bind(this));
+            super.setTrigger(this.el, this.onTrigger.bind(this));
         }
-        setup() {
+        onTrigger() {
             new Marquee($(this.el).find('.footer-bot-text [data-marquee="list"]'), 40).setup();
             new Marquee($(this.el).find('.footer-bot-ruler [data-marquee="list"]'), 10).setup();
             $(this.el).find('.footer-cta-submit input[type="submit"]').on('click', function(e) {
@@ -772,9 +781,9 @@ const script = () => {
         }
         trigger(data) {
             this.el = data.next.container.querySelector('.main-cta-wrap');
-            super.setTrigger(this.el, this.setup.bind(this));
+            super.setTrigger(this.el, this.onTrigger.bind(this));
         }
-        setup() {
+        onTrigger() {
             this.animationReveal();
         }
         animationReveal() {
@@ -888,9 +897,9 @@ const script = () => {
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-about-wrap');
                 this.tlOverlap = [];
-                super.setTrigger(this.el, this.setup.bind(this));
+                super.setTrigger(this.el, this.onTrigger.bind(this));
             }
-            setup() {
+            onTrigger() {
                 this.animationReveal();
                 this.animationScrub();
             }
@@ -1041,9 +1050,9 @@ const script = () => {
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-challenge-wrap');
                 this.tlParallax = [];
-                super.setTrigger(this.el, this.setup.bind(this));
+                super.setTrigger(this.el, this.onTrigger.bind(this));
             }
-            setup() {
+            onTrigger() {
                 if (viewport.w > 767) {
                     this.animationScrub();
                 }
@@ -1158,9 +1167,9 @@ const script = () => {
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-solution-wrap');
-                super.setTrigger(this.el, this.setup.bind(this));
+                super.setTrigger(this.el, this.onTrigger.bind(this));
             }
-            setup() {
+            onTrigger() {
                 if(viewport.w > 767)  {
                     this.animationScrub();
                 }
@@ -1339,9 +1348,9 @@ const script = () => {
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-benefit-wrap');
-                super.setTrigger(this.el, this.setup.bind(this));
+                super.setTrigger(this.el, this.onTrigger.bind(this));
             }
-            setup() {
+            onTrigger() {
                 this.animationReveal();
             }
             animationReveal() {
@@ -1384,9 +1393,9 @@ const script = () => {
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-news-wrap');
-                super.setTrigger(this.el, this.setup.bind(this));
+                super.setTrigger(this.el, this.onTrigger.bind(this));
             }
-            setup() {
+            onTrigger() {
                 this.animationScrub();
                 this.animationReveal();
             }
@@ -1607,9 +1616,9 @@ const script = () => {
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.about-story-wrap');
-                super.setTrigger(this.el, this.setup.bind(this));
+                super.setTrigger(this.el, this.onTrigger.bind(this));
             }
-            setup() {
+            onTrigger() {
                 this.animationReveal();
             }
             animationReveal() {
@@ -1627,7 +1636,7 @@ const script = () => {
                     new ParallaxImage({ el: $(el).find('img').get(0) })
                     new MasterTimeline({
                         triggerInit: this.el,
-                        scrollTrigger: { trigger: $(el), start: 'top 60%' },
+                        scrollTrigger: { trigger: $(el) },
                         allowMobile: true,
                         tweenArr: [
                             new ScaleInset({ el: $(el).find('.about-story-item-img-inner').get(0) }),
@@ -1644,9 +1653,9 @@ const script = () => {
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.about-vision-wrap');
-                super.setTrigger(this.el, this.setup.bind(this));
+                super.setTrigger(this.el, this.onTrigger.bind(this));
             }
-            setup(data) {
+            onTrigger(data) {
                 this.animationReveal();
             }
             animationReveal() {
@@ -1680,9 +1689,9 @@ const script = () => {
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.about-team-wrap');
-                super.setTrigger(this.el, this.setup.bind(this));
+                super.setTrigger(this.el, this.onTrigger.bind(this));
             }
-            setup() {
+            onTrigger() {
                 this.interact();
                 this.animationReveal();
             }
@@ -1738,7 +1747,7 @@ const script = () => {
                     gsap.to($(this.el).find('.about-team-info-avt-active-ic'), { filter: 'contrast(0.3)', duration: .4, clearProps: 'all' });
                     $(this.el).find('.about-team-info-avt-item').eq(index).addClass('active').siblings().removeClass('active');
                     setTimeout(() => {
-                        $(this.el).find('.about-team-info-avt-active').css('grid-template-columns', `${index}fr 1fr ${itemLength - index - 1}fr`)
+                        $(this.el).find('.about-team-info-avt-active').css(`grid-template-${viewport.w > 991 ? 'columns' : 'rows'}`, `${index}fr 1fr ${itemLength - index - 1}fr`)
                     }, 100);
                 }
                 activeIndex(0);
@@ -1755,9 +1764,9 @@ const script = () => {
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-job-wrap');
-                super.setTrigger(this.el, this.setup.bind(this));
+                super.setTrigger(this.el, this.onTrigger.bind(this));
             }
-            setup() {
+            onTrigger() {
                 this.interact();
                 this.animationReveal();
                 this.animationScrub();
@@ -1795,27 +1804,36 @@ const script = () => {
                 $(this.el).find(".home-job-main-item").addClass('keen-slider__slide');
                 let slider = new KeenSlider(".home-job-main-list", {
                     slides: {
-                        perView: 4,
-                        spacing: parseRem(32),
+                        perView: 1.2,
+                        spacing: parseRem(20),
                     },
                     defaultAnimation: {
                         duration: 1000
                     },
                     dragSpeed: 1.2,
                     rubberband: false,
-                    // breakpoints: {
-                    //     "(min-width: 768px)": {
-                    //         slides: { perView: 2, spacing: parseRem(32) },
-                    //     },
-                    // },
+                    breakpoints: {
+                        "(min-width: 768px)": {
+                            slides: { perView: 3, spacing: parseRem(20)  },
+                        },
+                        "(min-width: 992px)": {
+                            slides: { perView: 4, spacing: parseRem(32) },
+                        },
+                    },
                     dragStarted: () => {
                         $('.home-job-main-item').css('pointer-events', 'none');
                     },
                     dragEnded: () => {
-                        // Add delay before re-enabling pointer events
                         setTimeout(() => {
                             $('.home-job-main-item').css('pointer-events', '');
                         }, 250);
+                    },
+                    created: (slider) => {
+                        const totalSlides = slider.track.details.slides.length;
+                        const perView = slider.options.slides.perView;
+                        if (totalSlides <= perView) {
+                            $(this.el).find('.home-job-main-control').hide();
+                        }
                     },
                 })
                 $(this.el).find('.slide-control.next').on('click', slider.next);
@@ -2086,9 +2104,9 @@ const script = () => {
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.sub-inner');
-                super.setTrigger(this.el, this.setup.bind(this));
+                super.setTrigger(this.el, this.onTrigger.bind(this));
             }
-            setup() {
+            onTrigger() {
                 this.animationReveal();
                 this.animationScrub();
                 this.createTOC();
@@ -2208,6 +2226,9 @@ const script = () => {
                 if (section.playOnce) {
                     section.playOnce(event.detail);
                 }
+                if (section.playTrigger) {
+                    section.playTrigger();
+                }
             });
         }
 
@@ -2215,6 +2236,17 @@ const script = () => {
             this.sections.forEach(section => {
                 if (section.playEnter) {
                     section.playEnter(event.detail);
+                }
+                if (section.playTrigger) {
+                    section.playTrigger();
+                }
+            });
+        }
+
+        destroyHandler(data) {
+            this.sections.forEach(section => {
+                if (section.destroy) {
+                    section.destroy();
                 }
             });
         }
@@ -2235,10 +2267,8 @@ const script = () => {
                 if (section.trigger) {
                     section.trigger(data);
                 }
-                else {
-                    if (section.setup) {
-                        section.setup(data, mode);
-                    }
+                if (section.setup) {
+                    section.setup(data, mode);
                 }
             });
         }
