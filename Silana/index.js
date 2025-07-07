@@ -1459,7 +1459,6 @@ const script = () => {
                     this.setupEnter(data);
                 }
                 else return;
-                console.log("run")
                 $(this.el).find('.prod-hero-main-marquee').each(function () {
                     new Marquee($(this).find('[data-marquee="list"]'), 40).setup(true);
                 })
@@ -1519,6 +1518,61 @@ const script = () => {
                 if (this.tlTriggerEnter) {
                     this.tlTriggerEnter.kill();
                 }
+            }
+        },
+        HIW: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+                this.tlOverlap = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.prod-hiw-wrap');
+                super.setTrigger(this.el, this.onTrigger.bind(this));
+            }
+            onTrigger() {
+                this.interact();
+            }
+            interact() {
+                this.cardSlide();
+            }
+            cardSlide() {
+                const activeIndex = (idx) => {
+                    $(this.el).find('.prod-hiw-main-item').removeClass('active');
+                    $(this.el).find('.prod-hiw-main-item').eq(idx).addClass('active');
+                }
+                $(this.el).find(".prod-hiw-main-list").addClass('keen-slider');
+                $(this.el).find(".prod-hiw-main-list").css('grid-column-gap', 0);
+                $(this.el).find(".prod-hiw-main-item").addClass('keen-slider__slide');
+                let slider = new KeenSlider($(this.el).find(".prod-hiw-main-list").get(0), {
+                    slides: {
+                        perView: 3,
+                        spacing: parseRem(215),
+                        origin: "center"
+                    },
+                    defaultAnimation: {
+                        duration: 1200,
+                    },
+                    dragSpeed: 1.5,
+                    rubberband: false,
+                    detailsChanged: (slider) => {
+                        const details = slider.track.details;
+                        const current = details.rel;
+                        activeIndex(details.rel);
+                    },
+                    dragStarted: (slider) => {
+                        gsap.to($(this.el).find('.prod-hiw-main-active'), { scale: .95, duration: 1.5, filter: 'blur(2px)', ease: 'power3.out' });
+                        gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(0.3)', ease: 'power3.out' });
+                    },
+                    dragEnded: (slider) => {
+                        gsap.to($(this.el).find('.prod-hiw-main-active'), { scale: 1, duration: 1.5, filter: 'blur(0px)', ease: 'power3.out' });
+                        gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(1)', ease: 'power3.out' });
+                    }
+                })
+
+                $(this.el).find('.prod-hiw-main-item').on('click', function () {
+                    slider.moveToIdx($(this).index());
+                })
             }
         },
         CTA: class extends CTA {
