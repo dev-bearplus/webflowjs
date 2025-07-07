@@ -1138,12 +1138,11 @@ const script = () => {
                 [slider => {
                     slider.on("detailsChanged", () => {
                         const details = slider.track.details;
-                        const current = details.rel + 1; // chỉ số slide hiện tại (0-based)
+                        const current = details.rel + 1;
                         const total = details.slides.length;
                         const progress = current / (total );
 
-                        // Cập nhật thanh tiến trình tổng
-                        $(".home-challenge-progress-inner").css('width', `${progress * 100}%`);
+                        $(this.el).find(".home-challenge-progress-inner").css('width', `${progress * 100}%`);
                     });
                 }])
             }
@@ -1619,6 +1618,7 @@ const script = () => {
                 super.setTrigger(this.el, this.onTrigger.bind(this));
             }
             onTrigger() {
+                this.interact();
                 this.animationReveal();
             }
             animationReveal() {
@@ -1633,7 +1633,8 @@ const script = () => {
                     ]
                 })
                 $(this.el).find('.about-story-item').each((idx, el) => {
-                    new ParallaxImage({ el: $(el).find('img').get(0) })
+                    (viewport.w > 767) && new ParallaxImage({ el: $(el).find('img').get(0) })
+
                     new MasterTimeline({
                         triggerInit: this.el,
                         scrollTrigger: { trigger: $(el) },
@@ -1644,6 +1645,36 @@ const script = () => {
                         ]
                     })
                 })
+            }
+            interact() {
+                if (viewport.w <= 767) {
+                    this.slideCard();
+                }
+            }
+            slideCard() {
+                $(this.el).find('.about-story-list').addClass('keen-slider');
+                $(this.el).find('.about-story-item').addClass('keen-slider__slide');
+
+                new KeenSlider($(this.el).find(".about-story-list").get(0), {
+                    slides: {
+                        perView: 'auto',
+                        spacing: parseRem(20),
+                    },
+                    defaultAnimation: {
+                        duration: 1000
+                    },
+                    dragSpeed: 1.2,
+                },
+                [slider => {
+                    slider.on("detailsChanged", () => {
+                        const details = slider.track.details;
+                        const current = details.rel + 1;
+                        const total = details.slides.length;
+                        const progress = current / (total );
+
+                        $(this.el).find(".about-story-progress-inner").css('width', `${progress * 100}%`);
+                    });
+                }])
             }
         },
         Vision: class extends TriggerSetup {
@@ -1707,26 +1738,6 @@ const script = () => {
                         new FadeIn({ el: $(this.el).find('.about-team-btn').get(0) })
                     ]
                 })
-
-                new MasterTimeline({
-                    triggerInit: this.el,
-                    scrollTrigger: { trigger: $(this.el).find('.about-team-main') },
-                    allowMobile: true,
-                    tweenArr: [
-                        new ScaleInset({ el: $(this.el).find('.about-team-avt-item-inner').eq(0).get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.about-team-info-item.active .about-team-info-name').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.about-team-info-item.active .about-team-info-role').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.about-team-info-item.active .about-team-info-desc').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.about-team-info-item.active .about-team-info-linkedin').get(0) }),
-                        new ScaleLine({ el: $(this.el).find('.about-team-info-item.active .about-team-info-head .about-team-info-item-line').get(0) }),
-                        ...Array.from($(this.el).find('.about-team-info-body')).flatMap((item, idx) => [
-                            new FadeSplitText({ el: $(item).find('.about-team-info-body-label').get(0) }),
-                            new FadeSplitText({ el: $(item).find('.about-team-info-body-richtext').get(0), isDisableRevert: true }),
-                            ...Array.from($(item).find('li')).map((li, idx) => new FadeIn({ el: $(li).get(0) })),
-                            new ScaleLine({ el: $(item).find('.about-team-info-item-line').get(0) })
-                        ])
-                    ]
-                })
                 new MasterTimeline({
                     triggerInit: this.el,
                     scrollTrigger: { trigger: $(this.el).find('.about-team-info-avt'), start: 'top 80%' },
@@ -1736,6 +1747,45 @@ const script = () => {
                         new FadeIn({ el: $(this.el).find('.about-team-info-avt-active-wrap').get(0) })
                     ]
                 })
+
+                if (viewport.w > 767) {
+                    new MasterTimeline({
+                        triggerInit: this.el,
+                        scrollTrigger: { trigger: $(this.el).find('.about-team-main') },
+                        allowMobile: true,
+                        tweenArr: [
+                            new ScaleInset({ el: $(this.el).find('.about-team-avt-item-inner').eq(0).get(0) }),
+                            new FadeSplitText({ el: $(this.el).find('.about-team-info-item.active .about-team-info-name').get(0) }),
+                            new FadeSplitText({ el: $(this.el).find('.about-team-info-item.active .about-team-info-role').get(0) }),
+                            new FadeSplitText({ el: $(this.el).find('.about-team-info-item.active .about-team-info-desc').get(0) }),
+                            new FadeIn({ el: $(this.el).find('.about-team-info-item.active .about-team-info-linkedin').get(0) }),
+                            new ScaleLine({ el: $(this.el).find('.about-team-info-item.active .about-team-info-head .about-team-info-item-line').get(0) }),
+                            ...Array.from($(this.el).find('.about-team-info-body')).flatMap((item, idx) => [
+                                new FadeSplitText({ el: $(item).find('.about-team-info-body-label').get(0) }),
+                                new FadeSplitText({ el: $(item).find('.about-team-info-body-richtext').get(0), isDisableRevert: true }),
+                                ...Array.from($(item).find('li')).map((li, idx) => new FadeIn({ el: $(li).get(0) })),
+                                new ScaleLine({ el: $(item).find('.about-team-info-item-line').get(0) })
+                            ])
+                        ]
+                    })
+                }
+                else {
+                    $(this.el).find('.about-team-info-item').each((idx, el) => (
+                        new MasterTimeline({
+                            triggerInit: this.el,
+                            scrollTrigger: { trigger: $(el) },
+                            allowMobile: true,
+                            tweenArr: [
+                                new ScaleInset({ el: $(el).find('.about-team-info-avt-inner').get(0) }),
+                                new FadeSplitText({ el: $(el).find('.about-team-info-name').get(0) }),
+                                new FadeSplitText({ el: $(el).find('.about-team-info-role').get(0) }),
+                                new FadeSplitText({ el: $(el).find('.about-team-info-desc').get(0) }),
+                                new FadeIn({ el: $(el).find('.about-team-info-linkedin').get(0) }),
+                                new ScaleLine({ el: $(el).find('.about-team-info-head .about-team-info-item-line').get(0) }),
+                            ]
+                        })
+                    ))
+                }
             }
             interact() {
                 let itemLength = $(this.el).find('.about-team-info-avt-item').length;
@@ -1763,7 +1813,7 @@ const script = () => {
                 this.tlOverlap = null;
             }
             trigger(data) {
-                this.el = data.next.container.querySelector('.home-job-wrap');
+                this.el = data.next.container.querySelector('.about-job-wrap');
                 super.setTrigger(this.el, this.onTrigger.bind(this));
             }
             onTrigger() {
@@ -1774,37 +1824,40 @@ const script = () => {
             animationReveal() {
                 new MasterTimeline({
                     triggerInit: this.el,
-                    scrollTrigger: { trigger: $(this.el).find('.home-job-main-text') },
+                    scrollTrigger: { trigger: $(this.el).find('.about-job-main-text') },
                     allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $(this.el).find('.about-job-main-label').get(0) }),
                         new FadeSplitText({ el: $(this.el).find('.about-job-main-title').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.home-job-main-control').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.home-job-main-cms').get(0) })
+                        new FadeIn({ el: $(this.el).find('.about-job-main-control').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.about-job-main-cms').get(0) })
                     ]
                 })
             }
             animationScrub() {
-                new ParallaxImage({ el: this.el.querySelector('.home-job-thumb img') });
+                new ParallaxImage({ el: this.el.querySelector('.about-job-thumb img') });
                 this.tlOverlap = gsap.timeline({
                     scrollTrigger: {
-                        trigger: this.el.querySelector('.home-job-thumb'),
+                        trigger: this.el.querySelector('.about-job-thumb'),
                         start: `top 10%`,
                         end: `bottom bottom`,
                         endTrigger: this.el,
                         scrub: 1
                     },
                 })
-                .to($(this.el).find('.home-job-thumb-inner'), { scale: .9, autoAlpha: 0.5, duration: 1, ease: 'power2.in' })
+                .to($(this.el).find('.about-job-thumb-inner'), { scale: .9, autoAlpha: 0.5, duration: 1, ease: 'power2.in' })
 
             }
             interact() {
-                $(this.el).find(".home-job-main-list").addClass('keen-slider');
-                $(this.el).find(".home-job-main-list").css('grid-column-gap', 0);
-                $(this.el).find(".home-job-main-item").addClass('keen-slider__slide');
-                let slider = new KeenSlider(".home-job-main-list", {
+                this.cardSlide();
+            }
+            cardSlide() {
+                $(this.el).find(".about-job-main-list").addClass('keen-slider');
+                $(this.el).find(".about-job-main-list").css('grid-column-gap', 0);
+                $(this.el).find(".about-job-main-item").addClass('keen-slider__slide');
+                let slider = new KeenSlider(".about-job-main-list", {
                     slides: {
-                        perView: 1.2,
+                        perView: 'auto',
                         spacing: parseRem(20),
                     },
                     defaultAnimation: {
@@ -1821,21 +1874,31 @@ const script = () => {
                         },
                     },
                     dragStarted: () => {
-                        $('.home-job-main-item').css('pointer-events', 'none');
+                        $(this.el).find('.about-job-main-item').css('pointer-events', 'none');
                     },
                     dragEnded: () => {
                         setTimeout(() => {
-                            $('.home-job-main-item').css('pointer-events', '');
+                            $(this.el).find('.about-job-main-item').css('pointer-events', '');
                         }, 250);
                     },
                     created: (slider) => {
                         const totalSlides = slider.track.details.slides.length;
                         const perView = slider.options.slides.perView;
                         if (totalSlides <= perView) {
-                            $(this.el).find('.home-job-main-control').hide();
+                            $(this.el).find('.about-job-main-control').hide();
                         }
                     },
-                })
+                },
+                [slider => {
+                    slider.on("detailsChanged", () => {
+                        const details = slider.track.details;
+                        const current = details.rel + 1;
+                        const total = details.slides.length;
+                        const progress = current / (total );
+
+                        $(this.el).find(".about-job-progress-inner").css('width', `${progress * 100}%`);
+                    });
+                }])
                 $(this.el).find('.slide-control.next').on('click', slider.next);
                 $(this.el).find('.slide-control.prev').on('click', slider.prev);
             }
