@@ -1544,6 +1544,9 @@ const script = () => {
                 $(this.el).find(".prod-hiw-main-list").addClass('keen-slider');
                 $(this.el).find(".prod-hiw-main-list").css('grid-column-gap', 0);
                 $(this.el).find(".prod-hiw-main-item").addClass('keen-slider__slide');
+                $(this.el).find('.prod-hiw-main-ruler-inner').width($(this.el).find('.prod-hiw-main-ruler-inner').width() + $(this.el).find(".prod-hiw-main-list").width() - parseRem(80));
+                gsap.set($(this.el).find('.prod-hiw-main-ruler-inner'), { '--progress': 0 });
+
                 let slider = new KeenSlider($(this.el).find(".prod-hiw-main-list").get(0), {
                     slides: {
                         perView: 3,
@@ -1559,14 +1562,21 @@ const script = () => {
                         const details = slider.track.details;
                         const current = details.rel;
                         activeIndex(details.rel);
+                        let progress = slider.track.details.progress;
+                        gsap.set('.prod-hiw-main-ruler-inner', {
+                            '--progress': `${progress * -50}%`,
+                        });
                     },
                     dragStarted: (slider) => {
                         gsap.to($(this.el).find('.prod-hiw-main-active'), { scale: .95, duration: 1.5, filter: 'blur(2px)', ease: 'power3.out' });
                         gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(0.3)', ease: 'power3.out' });
+                        gsap.to($(this.el).find('.prod-hiw-main-ruler-prog'), { scaleY: .9, duration: 1.5, ease: 'power3.out', opacity: .5 });
+
                     },
                     dragEnded: (slider) => {
                         gsap.to($(this.el).find('.prod-hiw-main-active'), { scale: 1, duration: 1.5, filter: 'blur(0px)', ease: 'power3.out' });
                         gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(1)', ease: 'power3.out' });
+                        gsap.to($(this.el).find('.prod-hiw-main-ruler-prog'), { scaleY: 1, duration: 1.5, ease: 'power3.out', opacity: 1 });
                     }
                 })
 
