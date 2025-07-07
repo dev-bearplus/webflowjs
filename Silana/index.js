@@ -601,7 +601,6 @@ const script = () => {
         }
         enterSetup(data) {
             globalHooks.triggerEnterSetup(data);
-            footer.setup(data, 'enter');
         }
         enterPlay(data) {
             globalHooks.triggerEnterPlay(data);
@@ -610,7 +609,6 @@ const script = () => {
             gsap.set(data.next.container, { opacity: 0, 'pointer-events': 'none', zIndex: 1 })
             smoothScroll.stop();
             smoothScroll.destroy();
-            footer.destroy();
             if (data.current.container) {
                 $(data.current.container).css('z-index', 2);
             }
@@ -643,6 +641,160 @@ const script = () => {
                     onEnter: () => setup(),
                 }
             })
+        }
+    }
+
+    class Header {
+        constructor() {
+            this.el = null;
+        }
+        init(data) {
+            this.el = document.querySelector('.header');
+        }
+        updateOnScroll(inst) {
+            this.toggleHide(inst);
+            this.toggleScroll(inst);
+        }
+        toggleScroll(inst) {
+            if (inst.scroll > $(this.el).height() * 2) $(this.el).addClass("on-scroll");
+            else $(this.el).removeClass("on-scroll");
+        }
+        toggleHide(inst) {
+            if (inst.direction == 1) {
+                if (inst.scroll > ($(this.el).height() * 3)) {
+                    $(this.el).addClass('on-hide');
+                }
+            } else if (inst.direction == -1) {
+                if (inst.scroll > ($(this.el).height() * 3)) {
+                    $(this.el).addClass("on-hide");
+                    $(this.el).removeClass("on-hide");
+                }
+            }
+            else {
+                $(this.el).removeClass("on-hide");
+            }
+        }
+        isOpen() {
+            return this.el.classList.contains('on-open-nav');
+        }
+    }
+    const header = new Header();
+    class Footer extends TriggerSetup {
+        constructor() {
+            super();
+            this.el = null;
+        }
+        trigger(data) {
+            this.el = data.next.container.querySelector('.footer');
+            super.setTrigger(this.el, this.setup.bind(this));
+        }
+        setup() {
+            new Marquee($(this.el).find('.footer-bot-text [data-marquee="list"]'), 40).setup();
+            new Marquee($(this.el).find('.footer-bot-ruler [data-marquee="list"]'), 10).setup();
+            $(this.el).find('.footer-cta-submit input[type="submit"]').on('click', function(e) {
+                let email = $(this.el).find('.footer-cta-input[name="email"]');
+                let flag = false;
+                if(email.val() === ''){
+                    email.closest('.footer-cta-input-wrap').addClass('valid-null');
+                    flag = true;
+                }
+                else if(!validateEmail(email.val())){
+                    email.closest('.footer-cta-input-wrap').removeClass('valid-null');
+                    email.closest('.footer-cta-input-wrap').addClass('valid-format');
+                    flag = true;
+                }
+                else {
+                    email.closest('.footer-cta-input-wrap').removeClass('valid-null');
+                    email.closest('.footer-cta-input-wrap').removeClass('valid-format');
+                }
+                if(flag){
+                    e.preventDefault();
+                    return;
+                }
+            })
+            this.animationReveal();
+        }
+        animationReveal() {
+            new MasterTimeline({
+                triggerInit: this.el,
+                scrollTrigger: { trigger: $(this.el).find('.footer-cta-content'), start: 'top top+=70%' },
+                allowMobile: true,
+                tweenArr: [
+                    new FadeSplitText({ el: $(this.el).find('.footer-cta-title').get(0) }),
+                    new FadeSplitText({ el: $(this.el).find('.footer-cta-desc').get(0) }),
+                    new FadeIn({ el: $(this.el).find('.footer-cta-main').get(0) }),
+                    new ScaleLine({ el: $(this.el).find('.footer-cta-line').get(0) })
+                ]
+            })
+            new MasterTimeline({
+                triggerInit: this.el,
+                scrollTrigger: { trigger: $(this.el).find('.footer-main-menu'), start: 'top top+=70%' },
+                allowMobile: true,
+                tweenArr: [
+                    ...Array.from($(this.el).find('.footer-main-link')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0) }))
+                ]
+            })
+            new MasterTimeline({
+                triggerInit: this.el,
+                scrollTrigger: { trigger: $(this.el).find('.footer-main-info'), start: 'top top+=70%' },
+                allowMobile: true,
+                tweenArr: [
+                    ...Array.from($(this.el).find('.footer-main-info-col')).flatMap((el, idx) => ([
+                        new FadeSplitText({ el: $(el).find('.footer-main-info-label').get(0) }),
+                        ...Array.from($(el).find('.footer-main-info-val-item')).flatMap((item, idx) => new FadeSplitText({ el: $(item).get(0) })),
+                    ])),
+                    new ScaleLine({ el: $(this.el).find('.footer-main-logo-line').get(0) }),
+                    new FadeIn({ el: $(this.el).find('.footer-main-logo').get(0) })
+                ]
+            })
+            new MasterTimeline({
+                triggerInit: this.el,
+                scrollTrigger: { trigger: $(this.el).find('.footer-main-wrap'), start: 'bottom top+=80%' },
+                allowMobile: true,
+                tweenArr: [
+                    new FadeIn({ el: $(this.el).find('.footer-bot-text').get(0) }),
+                    new FadeIn({ el: $(this.el).find('.footer-bot-ruler').get(0) }),
+                    ...Array.from($(this.el).find('.footer-bot-link')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0) })),
+                    new FadeSplitText({ el: $(this.el).find('.footer-copyright-main').get(0) }),
+                    new ScaleLine({ el: $(this.el).find('.footer-main-line').get(0) })
+                ]
+            })
+        }
+        destroy() {
+        }
+    }
+    const footer = new Footer();
+    class CTA extends TriggerSetup {
+        constructor() {
+            super();
+            this.el = null;
+            this.tlOverlap = null;
+        }
+        trigger(data) {
+            this.el = data.next.container.querySelector('.main-cta-wrap');
+            super.setTrigger(this.el, this.setup.bind(this));
+        }
+        setup() {
+            this.animationReveal();
+        }
+        animationReveal() {
+            new MasterTimeline({
+                triggerInit: this.el,
+                scrollTrigger: { trigger: $(this.el).find('.main-cta-inner') },
+                allowMobile: true,
+                tweenArr: [
+                    new FadeIn({ el: $(this.el).find('.main-cta-bg').get(0) }),
+                    new FadeSplitText({ el: $(this.el).find('.main-cta-title').get(0) }),
+                    new FadeSplitText({ el: $(this.el).find('.main-cta-desc').get(0) }),
+                    new FadeIn({ el: $(this.el).find('.main-cta-btn').get(0) }),
+                    new FadeIn({ el: $(this.el).find('.main-cta-decor').get(0) })
+                ]
+            })
+        }
+        destroy(data) {
+            if (this.tlOverlap) {
+                this.tlOverlap.kill();
+            }
         }
     }
     // p-home
@@ -1255,18 +1407,6 @@ const script = () => {
                         ])
                     ]
                 })
-                new MasterTimeline({
-                    triggerInit: this.el,
-                    scrollTrigger: { trigger: $(this.el).find('.main-cta-inner'), start: 'top top+=50%' },
-                    allowMobile: true,
-                    tweenArr: [
-                        new FadeIn({ el: $(this.el).find('.main-cta-bg').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.main-cta-title').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.main-cta-desc').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.main-cta-btn').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.main-cta-decor').get(0) })
-                    ]
-                })
             }
             animationScrub() {
                 new ParallaxImage({ el: this.el.querySelector('.home-news-thumb img') });
@@ -1286,6 +1426,12 @@ const script = () => {
                     this.tlOverlap.kill();
                 }
             }
+        },
+        CTA: class extends CTA {
+            constructor() { super(); }
+        },
+        Footer: class extends Footer {
+            constructor() { super(); }
         }
     }
     //p-product
@@ -1367,6 +1513,12 @@ const script = () => {
                 }
             }
         },
+        CTA: class extends CTA {
+            constructor() { super(); }
+        },
+        Footer: class extends Footer {
+            constructor() { super(); }
+        }
     }
     // p-about
     const AboutPage = {
@@ -1674,6 +1826,12 @@ const script = () => {
                     this.tlOverlap.kill();
                 }
             }
+        },
+        CTA: class extends CTA {
+            constructor() { super(); }
+        },
+        Footer: class extends Footer {
+            constructor() { super(); }
         }
     }
     // p-contact
@@ -1840,6 +1998,9 @@ const script = () => {
                     this.tlTriggerEnter.kill();
                 }
             }
+        },
+        Footer: class extends Footer {
+            constructor() { super(); }
         }
     }
     //p-privacy
@@ -2016,167 +2177,6 @@ const script = () => {
             }
         }
     }
-
-    class Header {
-        constructor() {
-            this.el = null;
-        }
-        init(data) {
-            this.el = document.querySelector('.header');
-        }
-        updateOnScroll(inst) {
-            this.toggleHide(inst);
-            this.toggleScroll(inst);
-        }
-        toggleScroll(inst) {
-            if (inst.scroll > $(this.el).height() * 2) $(this.el).addClass("on-scroll");
-            else $(this.el).removeClass("on-scroll");
-        }
-        toggleHide(inst) {
-            if (inst.direction == 1) {
-                if (inst.scroll > ($(this.el).height() * 3)) {
-                    $(this.el).addClass('on-hide');
-                }
-            } else if (inst.direction == -1) {
-                if (inst.scroll > ($(this.el).height() * 3)) {
-                    $(this.el).addClass("on-hide");
-                    $(this.el).removeClass("on-hide");
-                }
-            }
-            else {
-                $(this.el).removeClass("on-hide");
-            }
-        }
-        isOpen() {
-            return this.el.classList.contains('on-open-nav');
-        }
-    }
-    const header = new Header();
-    class Footer {
-        constructor() {
-            this.el = null;
-            this.tlEnter = [];
-            this.tlTrigger = null;
-        }
-        setup(data, mode) {
-            this.el = document.querySelector('.footer');
-            if (mode === 'once') {
-                this.setupOnce(data);
-            } else if (mode === 'enter') {
-                this.setupEnter(data);
-            }
-            else return;
-        }
-        setupOnce() {
-            new Marquee($(this.el).find('.footer-bot-text [data-marquee="list"]'), 40).setup();
-            new Marquee($(this.el).find('.footer-bot-ruler [data-marquee="list"]'), 10).setup();
-
-            $('.footer-cta-submit input[type="submit"]').on('click', function(e) {
-                let email = $('.footer-cta-input[name="email"]');
-                let flag = false;
-                if(email.val() === ''){
-                    email.closest('.footer-cta-input-wrap').addClass('valid-null');
-                    flag = true;
-                }
-                else if(!validateEmail(email.val())){
-                    email.closest('.footer-cta-input-wrap').removeClass('valid-null');
-                    email.closest('.footer-cta-input-wrap').addClass('valid-format');
-                    flag = true;
-                }
-                else {
-                    email.closest('.footer-cta-input-wrap').removeClass('valid-null');
-                    email.closest('.footer-cta-input-wrap').removeClass('valid-format');
-                }
-                if(flag){
-                    e.preventDefault();
-                    return;
-                }
-            })
-
-            this.setupEnter();
-        }
-        setupEnter() {
-            this.tlTrigger = gsap.timeline({
-                scrollTrigger: {
-                    trigger: this.el,
-                    start: 'top bottom+=50%',
-                    end: 'bottom top',
-                    once: true,
-                    onEnter: () => {
-                        this.animationReveal();
-                    },
-                }
-            })
-        }
-        animationReveal() {
-            let tl1 = gsap.timeline({
-                scrollTrigger: { trigger: $(this.el).find('.footer-cta-content'), start: 'top top+=70%' }
-            })
-            new MasterTimeline({
-                triggerInit: this.el,
-                timeline: tl1,
-                allowMobile: true,
-                tweenArr: [
-                    new FadeSplitText({ el: $(this.el).find('.footer-cta-title').get(0) }),
-                    new FadeSplitText({ el: $(this.el).find('.footer-cta-desc').get(0) }),
-                    new FadeIn({ el: $(this.el).find('.footer-cta-main').get(0) }),
-                    new ScaleLine({ el: $(this.el).find('.footer-cta-line').get(0) })
-                ]
-            })
-            let tl2 = gsap.timeline({
-                scrollTrigger: { trigger: $(this.el).find('.footer-main-menu'), start: 'top top+=70%' }
-            })
-            new MasterTimeline({
-                triggerInit: this.el,
-                timeline: tl2,
-                allowMobile: true,
-                tweenArr: [
-                    ...Array.from($(this.el).find('.footer-main-link')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0) }))
-                ]
-            })
-            let tl3 = gsap.timeline({
-                scrollTrigger: { trigger: $(this.el).find('.footer-main-info'), start: 'top top+=70%' }
-            })
-            new MasterTimeline({
-                triggerInit: this.el,
-                timeline: tl3,
-                allowMobile: true,
-                tweenArr: [
-                    ...Array.from($(this.el).find('.footer-main-info-col')).flatMap((el, idx) => ([
-                        new FadeSplitText({ el: $(el).find('.footer-main-info-label').get(0) }),
-                        ...Array.from($(el).find('.footer-main-info-val-item')).flatMap((item, idx) => new FadeSplitText({ el: $(item).get(0) })),
-                    ])),
-                    new ScaleLine({ el: $(this.el).find('.footer-main-logo-line').get(0) }),
-                    new FadeIn({ el: $(this.el).find('.footer-main-logo').get(0) })
-                ]
-            })
-            let tl4 = gsap.timeline({
-                scrollTrigger: { trigger: $(this.el).find('.footer-main-wrap'), start: 'bottom top+=80%' }
-            })
-            new MasterTimeline({
-                triggerInit: this.el,
-                timeline: tl4,
-                allowMobile: true,
-                tweenArr: [
-                    new FadeIn({ el: $(this.el).find('.footer-bot-text').get(0) }),
-                    new FadeIn({ el: $(this.el).find('.footer-bot-ruler').get(0) }),
-                    ...Array.from($(this.el).find('.footer-bot-link')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0) })),
-                    new FadeSplitText({ el: $(this.el).find('.footer-copyright-main').get(0) }),
-                    new ScaleLine({ el: $(this.el).find('.footer-main-line').get(0) })
-                ]
-            })
-            this.tlEnter.push(tl1, tl2, tl3, tl4);
-        }
-        destroy() {
-            if (this.tlEnter.length > 0) {
-                this.tlEnter.forEach(tl => tl.kill());
-            }
-            if (this.tlTrigger) {
-                this.tlTrigger.kill();
-            }
-        }
-    }
-    const footer = new Footer();
     class PageManager {
         constructor(page) {
             this.sections = Object.values(page).map(section => new section());
@@ -2342,7 +2342,6 @@ const script = () => {
                 scrollTop(PageManagerRegistry[namespace]?.initOnce?.(data));
                 resetScroll();
                 header.init(data);
-                footer.setup(data, 'once');
             },
             async leave(data) {
                 await pageTrans.play(data);
