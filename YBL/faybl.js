@@ -7,11 +7,19 @@ const mainScript = () => {
         if (parts.length === 2) return parts.pop().split(';').shift();
         return null;
     };
+    function isStagging() {
+        let currentUrl = window.location.href;
+        return currentUrl.includes('webflow.io')
+    }
     const isLogin = getCookie('is_login')
     const pathname = window.location.pathname
     const isPathNotRedirect = pathname.includes('privacy-policy') || pathname.includes('terms-of-use')
     console.log('isLogin', isLogin)
-
+    function validateEmail(email) {
+        if (typeof email !== 'string') return false;
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailPattern.test(email.trim());
+    }
     if (isLogin && !isPathNotRedirect) {
         window.location.href = 'https://app.faybl.com/'
     }
@@ -320,6 +328,7 @@ const mainScript = () => {
             super.init(this.play.bind(this));
         }
         setup() {
+            setupMarquee($('.home-hero-marquee'));
             this.tl = gsap.timeline({
                 onStart: () => {
                     console.log("start")
@@ -332,10 +341,13 @@ const mainScript = () => {
                 allowMobile: true,
                 tweenArr: [
                     new FadeSplitText({ el: $('.home-hero-title').get(0), onMask: true, headingType: true }),
-                    new FadeSplitText({ el: $('.home-hero-sub').get(0), onMask: true, delay: '<=.4' }),
+                    new ScaleInset({ el: $('.home-hero-video').get(0) }),
+                    new FadeSplitText({ el: $('.home-hero-sub').get(0), onMask: true, delay: '<=.2' }),
                     new FadeIn({ el: $('.home-hero-act-request').get(0), delay: "<=0" }),
                     new FadeIn({ el: $('.home-hero-act-key').get(0) }),
-                    new ScaleInset({ el: $('.home-hero-video').get(0) }),
+                    new FadeSplitText({ el: $('.home-hero-marquee-txt').get(0), onMask: true }),
+                    new ScaleLine({ el: $('.home-hero-marquee-line').get(1), delay: '1'}),
+                    new FadeIn({ el: $('.home-hero-marquee').get(0) }),
                 ]
             });
         }
@@ -364,6 +376,9 @@ const mainScript = () => {
                     new FadeSplitText({ el: $('.home-user-content-sub').get(0), onMask: true }),
                     new FadeSplitText({ el: $('.home-user-content-name').get(0), onMask: true, breakType: 'words', delay: "<=.6" }),
                     new FadeSplitText({ el: $('.home-user-content-position').get(0), onMask: true, breakType: 'words' }),
+                    new FadeIn({ el: $('.home-user-cta').get(0), delay: '<=-.2' }),
+                    new FadeSplitText({ el: $('.home-user-cta-title').get(0), onMask: true }),
+                    new FadeIn({ el: $('.home-user-cta-btn').get(0)}),
                 ]
             })
         }
@@ -448,6 +463,86 @@ const mainScript = () => {
             super.setTrigger(this.setup.bind(this));
         }
         setup() {
+            if(isStagging()) {
+                if(viewport.w < 992) {
+                    let swiper = new Swiper('.home-why-cms', {
+                        slidesPerView: 1,
+                        spaceBetween: parseRem(10),
+                        pagination: {
+                            el: '.home-why-pagi',
+                            bulletClass: 'home-why-pagi-item',
+                            bulletActiveClass: 'active',
+                            clickable: true,
+                        },
+                        on: {
+                            init: function () {
+                                let realIndex = this.realIndex;
+                                toggleControl(realIndex);
+                            },
+                            slideChange: function () {
+                                let realIndex = this.realIndex;
+                                console.log(realIndex);
+                                toggleControl(realIndex);
+                            }
+                        },
+                        breakpoints: {
+                            768: {
+                                slidesPerView: 2,
+                                spaceBetween: parseRem(10),
+                            },
+                            991: {
+                                slidesPerView: 'auto',
+                                slidesPerGroup: 4,
+                                spaceBetween: parseRem(20),
+                            }
+                        }
+                    });
+                }
+            }
+            else {
+                let swiper = new Swiper('.home-why-cms', {
+                    slidesPerView: 1,
+                    spaceBetween: parseRem(10),
+                    pagination: {
+                        el: '.home-why-pagi',
+                        bulletClass: 'home-why-pagi-item',
+                        bulletActiveClass: 'active',
+                        clickable: true,
+                    },
+                    on: {
+                        init: function () {
+                            let realIndex = this.realIndex;
+                            toggleControl(realIndex);
+                        },
+                        slideChange: function () {
+                            let realIndex = this.realIndex;
+                            console.log(realIndex);
+                            toggleControl(realIndex);
+                        }
+                    },
+                    breakpoints: {
+                        768: {
+                            slidesPerView: 2,
+                            spaceBetween: parseRem(10),
+                        },
+                        991: {
+                            slidesPerView: 'auto',
+                            slidesPerGroup: 4,
+                            spaceBetween: parseRem(20),
+                        }
+                    }
+                });
+                $('.home-why-control-btn').on('click', function () {
+                    let realIndex = swiper.realIndex;
+                    let target = $(this).attr('target');
+                    console.log(target)
+                    if (target === 'next') {
+                        swiper.slideNext();
+                    } else {
+                        swiper.slidePrev();
+                    }
+                })
+            }
             new MasterTimeline({
                 triggerInit: this.triggerEl,
                 scrollTrigger: { trigger: '.home-why-title-wrap' },
@@ -457,7 +552,6 @@ const mainScript = () => {
                     ...$('.home-why-control-btn').map((idx, el) => new FadeIn({ el })),
                 ]
             })
-
             new MasterTimeline({
                 triggerInit: this.triggerEl,
                 scrollTrigger: { trigger: '.home-why-cms-wrap', from: 'top 70%' },
@@ -474,38 +568,7 @@ const mainScript = () => {
                 ]
             })
 
-            let swiper = new Swiper('.home-why-cms', {
-                slidesPerView: 1,
-                spaceBetween: parseRem(10),
-                pagination: {
-                    el: '.home-why-pagi',
-                    bulletClass: 'home-why-pagi-item',
-                    bulletActiveClass: 'active',
-                    clickable: true,
-                },
-                on: {
-                    init: function () {
-                        let realIndex = this.realIndex;
-                        toggleControl(realIndex);
-                    },
-                    slideChange: function () {
-                        let realIndex = this.realIndex;
-                        console.log(realIndex);
-                        toggleControl(realIndex);
-                    }
-                },
-                breakpoints: {
-                    768: {
-                        slidesPerView: 2,
-                        spaceBetween: parseRem(10),
-                    },
-                    991: {
-                        slidesPerView: 'auto',
-                        slidesPerGroup: 4,
-                        spaceBetween: parseRem(20),
-                    }
-                }
-            });
+            
             function toggleControl(realIndex) {
                 $('.home-why-control-btn').addClass('active');
                 let totalSlide;
@@ -523,16 +586,7 @@ const mainScript = () => {
                     $('.home-why-control-btn[target = prev]').removeClass('active');
                 }
             }
-            $('.home-why-control-btn').on('click', function () {
-                let realIndex = swiper.realIndex;
-                let target = $(this).attr('target');
-                console.log(target)
-                if (target === 'next') {
-                    swiper.slideNext();
-                } else {
-                    swiper.slidePrev();
-                }
-            })
+            
         }
     }
     const homeWhy = new HomeWhy('.home-why-wrap');
@@ -1159,6 +1213,131 @@ const mainScript = () => {
         }
     }
     let termHero = new TermHero();
+    class ScheduleHero extends TriggerSetupHero {
+        constructor() {
+            super();
+            this.tl = null;
+        }
+        trigger() {
+            this.setup();
+            super.init(this.play.bind(this));
+            this.interact();
+        }
+        setup() {
+            
+             this.tl = gsap.timeline({
+                onStart: () => {
+                    $('[data-init-df]').removeAttr('data-init-df');
+                },
+                paused: true
+            });
+            new MasterTimeline({
+                timeline: this.tl,
+                allowMobile: true,
+                tweenArr: [
+                    new FadeSplitText({ el: $('.schedule-hero-title').get(0), onMask: true}),
+                    ...Array.from($('.schedule-hero-form-input-wrap')).flatMap((el, idx) => new FadeIn({ el:el, delay: "<=.1" })),
+                    new FadeIn({el: $('.schedule-hero-form-submit').get(0)}),
+                    new FadeSplitText({ el: $('.schedule-hero-form-info-label').get(0), onMask: true, }),
+                    new FadeSplitText({ el: $('.schedule-hero-form-info-title .txt').get(0), onMask: true }),
+                ]
+            })
+        }
+        interact() {
+            $('.schedule-hero-form-success-link').on('click', function(e) {
+                e.preventDefault();
+                $('.schedule-hero-form-inner').addClass('active');
+                $('.schedule-hero-form-success').removeClass('active');
+            })
+            $('.schedule-hero-form-submit').on('click', function(e) {
+                e.preventDefault();
+                let originText = $('.schedule-hero-form-submit').val();
+                let email = $('.schedule-hero-form-input[name="email"]');
+                let firstName = $('.schedule-hero-form-input[name="First-name"]');
+                let lastName = $('.schedule-hero-form-input[name="Last-name"]');
+                let meassage = $('.schedule-hero-form-input[name="message"]');
+                let flag = false;
+                if(firstName.val() == '') {
+                    firstName.closest('.schedule-hero-form-input-wrap').addClass('error');
+                    flag = true;
+                }
+                else {
+                    firstName.closest('.schedule-hero-form-input-wrap').removeClass('error');
+                }
+                if(lastName.val() == '') {
+                    lastName.closest('.schedule-hero-form-input-wrap').addClass('error');
+                    flag = true;
+                }
+                else {
+                    lastName.closest('.schedule-hero-form-input-wrap').removeClass('error');
+                }
+                if(email.val() == '') {
+                    email.closest('.schedule-hero-form-input-wrap').removeClass('error-format').addClass('error-null');
+                    flag = true;
+                }
+                else if( !validateEmail(email.val())) {
+                    email.closest('.schedule-hero-form-input-wrap').removeClass('error-null').addClass('error-format');
+                    flag = true;
+                }
+                else {
+                    email.closest('.schedule-hero-form-input-wrap').removeClass('error-format, error-null');
+                }
+                if(!flag) {
+                    $('.schedule-hero-form-submit').val(`${originText}...`);
+                    var formData = {
+                        fields: [
+                        {
+                            name: "email",
+                            value: email.val()
+                        },
+                        {
+                            name: "firstname",
+                            value: firstName.val()
+                        },
+                        {
+                            name: "lastname",
+                            value: lastName.val()
+                        },
+                        {
+                            name: "message",
+                            value: meassage.val()
+                        },
+                        ],
+                        context: {
+                        // Thông tin tracking (tùy chọn)
+                        pageUri: window.location.href,
+                        pageName: document.title
+                        }
+                    };
+                    console.log(formData)
+                     $.ajax({
+                        url: "https://api.hsforms.com/submissions/v3/integration/submit/40167303/0ff7eeb5-33c6-41cb-9434-91d0496156de",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify(formData),
+                        success: function(response) {
+                            lenis.scrollTo('.schedule-hero');
+                            $('.schedule-hero-form-inner').removeClass('active');
+                            $('.schedule-hero-form-success').addClass('active');
+                            $('.schedule-hero-form-submit').val(originText);
+                            email.val('');
+                            firstName.val('');
+                            lastName.val('');
+                            meassage.val('');
+                        },
+                        error: function(xhr, status, error) {
+                            $('.schedule-hero-form-submit').text(originText);
+                            console.error("Form submission error:", error);
+                        }
+                    });
+                }
+            })
+        }
+        play() {
+            this.tl.play();
+        }
+    }
+    let scheduleHero = new ScheduleHero();
     class CTA extends TriggerSetup {
         constructor(triggerEl) {
             super(triggerEl);
@@ -1189,6 +1368,7 @@ const mainScript = () => {
         }
         trigger() {
             super.setTrigger(this.setup.bind(this));
+            this.interact();
         }
         setup() {
             let tlLeft = new gsap.timeline({
@@ -1206,6 +1386,20 @@ const mainScript = () => {
                     new FadeIn({ el: $('.footer-left-contact-title ').get(0) }),
                     new FadeSplitText({ el: $('.footer-left-social-label').get(0) }),
                     ...Array.from($('.footer-left-social-item')).flatMap((el, idx) => new FadeIn({ el })),
+                ]
+            })
+            let tlForm = new gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.footer-form-wrap',
+                    start: 'top top+=65%',
+                }
+            })
+            new MasterTimeline({
+                timeline: tlForm,
+                tweenArr: [
+                    new FadeSplitText({ el: $('.footer-form-title').get(0), onMask: true }),
+                    new FadeIn({ el: $('.footer-form-input-wrap').get(0) }),
+                    new FadeSplitText({ el: $('.footer-form-sub').get(0), onMask: true }),
                 ]
             })
             let tlRightMenu = new gsap.timeline({
@@ -1241,6 +1435,65 @@ const mainScript = () => {
                 ]
             })
         }
+        interact() {
+            $('.footer-form-submit-real').on('click', function(e) {
+                let originText = $('.footer-form-submit-txt').text();
+                e.preventDefault();
+                let email = $('.footer-form-input[name="email"]');
+                console.log(email.val())
+                let flag = false;
+                if (email.val() === '') {
+                    $('.footer-form-message-error.error-null').slideDown();
+                    $('.footer-form-message-error.error-format').slideUp();
+                    flag = true;
+                }
+                 else if (!validateEmail(email.val())) {
+                    $('.footer-form-message-error.error-null').slideUp();
+                    $('.footer-form-message-error.error-format').slideDown();
+                    flag = true;
+                }
+                else {
+                    $('.footer-form-message-error.error-null').slideUp();
+                    $('.footer-form-message-error.error-format').slideUp();
+                }
+                if (!flag){
+                    $('.footer-form-submit').addClass('disable');
+                    $('.footer-form-submit-txt').text('Sending...');
+                    var formData = {
+                        fields: [
+                        {
+                            name: "email",
+                            value: email.val()
+                        }
+                        ],
+                        context: {
+                        // Thông tin tracking (tùy chọn)
+                        pageUri: window.location.href,
+                        pageName: document.title
+                        }
+                    };
+                    console.log(formData)
+                     $.ajax({
+                        url: "https://api.hsforms.com/submissions/v3/integration/submit/40167303/98fbf937-3b28-4e46-85ea-62eb4f1ac741",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify(formData),
+                        success: function(response) {
+                        $('.footer-form-message-success').slideDown();
+                        $('.footer-form-submit-txt').text(originText);
+                        setTimeout(function() {
+                            $('.footer-form-message-success').slideUp();
+                            email.val('');
+                        }, 5000)
+                        },
+                        error: function(xhr, status, error) {
+                            $('.footer-form-submit-txt').text(originText);
+                            console.error("Form submission error:", error);
+                        }
+                    });
+                }
+            })
+        }
     }
     const footer = new Footer('.footer-wrap');
     const SCRIPT = {
@@ -1270,6 +1523,9 @@ const mainScript = () => {
         },
         termScript: () => {
             termHero.trigger();
+        },
+        scheduleScript: () => {
+            scheduleHero.trigger();
         },
     };
 
