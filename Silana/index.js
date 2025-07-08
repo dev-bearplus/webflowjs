@@ -1676,6 +1676,7 @@ const script = () => {
                     scrollTrigger: { trigger: $(this.el).find('.prod-hiw-main') },
                     allowMobile: true,
                     tweenArr: [
+                        new FadeIn({ el: $(this.el).find('.prod-hiw-main-control').get(0) }),
                         new FadeIn({ el: $(this.el).find('.prod-hiw-main-active').get(0) }),
                         new FadeIn({ el: $(this.el).find('.home-hiw-main-decor').get(0) }),
                         ...Array.from($(this.el).find('.prod-hiw-main-item')).flatMap((el, idx) => ([
@@ -1725,12 +1726,16 @@ const script = () => {
                     },
                     detailsChanged: (slider) => {
                         const details = slider.track.details;
-                        const current = details.rel;
-                        activeIndex(details.rel);
+                        const current = details.abs;
                         let progress = slider.track.details.progress;
+
+                        activeIndex(current);
                         let progressX = ((progress * -50) * rulerW / 100) + (progress * parseRem(58));
                         let currentX = gsap.getProperty($(this.el).find('.prod-hiw-main-ruler-inner').get(0), 'x')
-                        gsap.quickSetter($(this.el).find('.prod-hiw-main-ruler-inner'), 'x', 'px')(lerp(currentX, progressX, 0.25))
+                        gsap.quickSetter($(this.el).find('.prod-hiw-main-ruler-inner'), 'x', 'px')(lerp(currentX, progressX, 0.25));
+
+                        $(this.el).find('.slide-control.next').toggleClass('disable', current === details.maxIdx);
+                        $(this.el).find('.slide-control.prev').toggleClass('disable', current === details.minIdx);
                     },
                     dragStarted: (slider) => {
                         gsap.to($(this.el).find('.prod-hiw-main-active'), { duration: .5, opacity: 0, filter: 'blur(2px)', scale: .98 });
@@ -1752,6 +1757,8 @@ const script = () => {
                 $(this.el).find('.prod-hiw-main-item').on('click', function () {
                     slider.moveToIdx($(this).index());
                 })
+                $(this.el).find('.slide-control.next').on('click', slider.next);
+                $(this.el).find('.slide-control.prev').on('click', slider.prev);
             }
         },
         Compare: class extends TriggerSetup {
@@ -2172,17 +2179,18 @@ const script = () => {
                             $(this.el).find('.about-job-main-control').hide();
                         }
                     },
-                },
-                [slider => {
-                    slider.on("detailsChanged", () => {
+                    detailsChanged: (slider) => {
                         const details = slider.track.details;
-                        const current = details.rel + 1;
+                        const current = details.rel;
                         const total = details.slides.length;
-                        const progress = current / (total );
+                        const progress = (current + 1) / (total);
 
                         $(this.el).find(".about-job-progress-inner").css('width', `${progress * 100}%`);
-                    });
-                }])
+
+                        $(this.el).find('.slide-control.next').toggleClass('disable', current === details.maxIdx);
+                        $(this.el).find('.slide-control.prev').toggleClass('disable', current === details.minIdx);
+                    }
+                })
                 $(this.el).find('.slide-control.next').on('click', slider.next);
                 $(this.el).find('.slide-control.prev').on('click', slider.prev);
             }
