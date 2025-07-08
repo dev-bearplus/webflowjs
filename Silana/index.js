@@ -9,6 +9,7 @@ const script = () => {
     gsap.registerPlugin(ScrollTrigger, SplitText);
     ScrollTrigger.defaults({
         invalidateOnRefresh: true,
+        fastScrollEnd: true
     });
     const parseRem = (input) => {
         return input / 10 * parseFloat($('html').css('font-size'))
@@ -631,6 +632,7 @@ const script = () => {
         constructor() {
             this.tlTrigger;
             this.isPlayed = false;
+            this.once = true;
         }
         setTrigger(triggerEl, onTrigger) {
             this.tlTrigger = gsap.timeline({
@@ -638,9 +640,9 @@ const script = () => {
                     trigger: triggerEl,
                     start: 'clamp(top bottom+=50%)',
                     end: 'clamp(bottom top)',
-                    once: true,
                     onEnter: () => {
-                        if (this.isPlayed) {
+                        if (this.isPlayed && this.once) {
+                            this.once = false;
                             this.onTrigger();
                         }
                     }
@@ -1450,6 +1452,7 @@ const script = () => {
                 this.tlOnce = null;
                 this.tlEnter = null;
                 this.tlTriggerEnter = null;
+                this.rafID = null;
             }
             setup(data, mode) {
                 this.el = data.next.container.querySelector('.prod-hero-wrap');
@@ -1470,17 +1473,7 @@ const script = () => {
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
 
-                // new MasterTimeline({
-                //     timeline: this.tlOnce,
-                //     allowMobile: true,
-                //     tweenArr: [
-                //         new FadeSplitText({ el: $(this.el).find('.home-hero-title').get(0) }),
-                //         new FadeSplitText({ el: $(this.el).find('.home-hero-desc-txt').get(0) }),
-                //         new FadeSplitText({ el: $(this.el).find('.home-hero-cta').get(0) }),
-                //         new FadeIn({ el: $(this.el).find('.home-hero-main-gif').get(0) }),
-                //         new FadeIn({ el: $(this.el).find('.home-hero-client').get(0), delay: "<=.3" }),
-                //     ]
-                // });
+                this.animationReveal(this.tlOnce);
             }
             setupEnter(data) {
                 this.tlEnter = gsap.timeline({
@@ -1500,6 +1493,7 @@ const script = () => {
                         }
                     })
                 }
+                this.animationReveal(this.tlEnter);
             }
             playOnce() {
                 this.tlOnce.play();
@@ -1525,6 +1519,8 @@ const script = () => {
                 let isDragging = false;
                 let targetPercentage = -50;
                 let currentPercentage = -50;
+                const MOVEMENT_THRESHOLD = 2;
+                let hasMoved = false;
 
                 const handleOnDown = (e) => {
                     if (!$(this.el).find('.prod-hero-decor-scan-drag:hover').length) return;
@@ -1556,7 +1552,7 @@ const script = () => {
                     gsap.set([track, maskItemBefore, maskItemAfter], { '--hidden-mask': `${currentPercentage * -1}%` });
                     gsap.set(blur, { left: `${currentPercentage * -1}%` });
 
-                    requestAnimationFrame(animate);
+                    this.rafID = requestAnimationFrame(animate);
                 };
 
                 const handleOnMove = (e) => {
@@ -1564,6 +1560,12 @@ const script = () => {
 
                     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                     track.dataset.currentX = clientX - scanInner.getBoundingClientRect().left;
+
+                    const movement = Math.abs(parseFloat(track.dataset.currentX) - parseFloat(track.dataset.initialX));
+                    if (movement > MOVEMENT_THRESHOLD) {
+                        hasMoved = true;
+                        track.dataset.mouseDownAt = track.dataset.currentX;
+                    }
                 };
 
                 window.onmousedown = (e) => handleOnDown(e);
@@ -1575,7 +1577,23 @@ const script = () => {
                 window.onmousemove = (e) => handleOnMove(e);
                 window.ontouchmove = (e) => handleOnMove(e);
 
-                requestAnimationFrame(animate);
+                this.rafID = requestAnimationFrame(animate);
+            }
+            animationReveal(timeline) {
+                new MasterTimeline({
+                    timeline,
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeIn({ el: $(this.el).find('.prod-hero-main.before').get(0), type: 'right' }),
+                        new FadeIn({ el: $(this.el).find('.prod-hero-main.after').get(0), type: 'right', delay: "<=0" }),
+                        new FadeIn({ el: $(this.el).find('.prod-hero-decor-scan').get(0), type: 'right' }),
+                        new FadeIn({ el: $(this.el).find('.prod-hero-decor-shape-inner').get(0), type: 'right' }),
+                        new FadeIn({ el: $(this.el).find('.prod-hero-decor-inner').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.prod-hero-title').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.prod-hero-desc').get(0) }),
+                        new ScaleLine({ el: $(this.el).find('.prod-hero-line').get(0) })
+                    ]
+                });
             }
             destroy() {
                 if (this.tlOnce) {
@@ -1587,23 +1605,95 @@ const script = () => {
                 if (this.tlTriggerEnter) {
                     this.tlTriggerEnter.kill();
                 }
+                cancelAnimationFrame(this.rafID);
+                this.rafID = null;
+            }
+        },
+        Solution: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.prod-solution-wrap');
+                super.setTrigger(this.el, this.onTrigger.bind(this));
+            }
+            onTrigger() {
+                this.animationReveal();
+            }
+            animationReveal() {
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: this.el },
+                    allowMobile: true,
+                    tweenArr: [
+                        new ScaleInset({ el: $(this.el).find('.prod-solution-thumb-inner').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.prod-solution-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.prod-solution-title').get(0) })
+                    ]
+                })
+
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.prod-solution-desc'), start: 'top top+=90%' },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.prod-solution-desc-txt').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.prod-solution-btn').get(0), delay: "<=.3" })
+                    ]
+                })
             }
         },
         HIW: class extends TriggerSetup {
             constructor() {
                 super();
                 this.el = null;
-                this.tlOverlap = null;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.prod-hiw-wrap');
                 super.setTrigger(this.el, this.onTrigger.bind(this));
             }
             onTrigger() {
+                this.animationReveal();
                 this.interact();
             }
             interact() {
                 this.cardSlide();
+            }
+            animationReveal() {
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.prod-hiw-text') },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.prod-hiw-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.prod-hiw-title').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.prod-hiw-desc').get(0) })
+                    ]
+                })
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.prod-hiw-main') },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeIn({ el: $(this.el).find('.prod-hiw-main-active').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.home-hiw-main-decor').get(0) }),
+                        ...Array.from($(this.el).find('.prod-hiw-main-item')).flatMap((el, idx) => ([
+                            new FadeIn({ el: $(el).find('.prod-hiw-main-item-graphic') }),
+                            new FadeSplitText({ el: $(el).find('.prod-hiw-main-item-title').get(0) }),
+                        ]))
+                    ]
+                })
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.prod-hiw-main-ruler'), start: 'top 85%' },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeIn({ el: $(this.el).find('.prod-hiw-main-ruler').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-title').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-desc').get(0) }),
+                    ]
+                })
             }
             cardSlide() {
                 const activeIndex = (idx) => {
@@ -1613,13 +1703,12 @@ const script = () => {
                     $(this.el).find('.prod-hiw-main-content-item').removeClass('active');
                     $(this.el).find('.prod-hiw-main-content-item').eq(idx).addClass('active');
                 }
-                activeIndex(0);
                 $(this.el).find(".prod-hiw-main-list").addClass('keen-slider');
-                $(this.el).find(".prod-hiw-main-list").css('grid-column-gap', 0);
                 $(this.el).find(".prod-hiw-main-item").addClass('keen-slider__slide');
                 gsap.set($(this.el).find('.prod-hiw-main-ruler-inner'), { '--progress': 0 });
                 $(this.el).find('.prod-hiw-main-ruler-inner').width($(this.el).find('.prod-hiw-main-ruler-inner').width() + $(this.el).find(".prod-hiw-main-list").width() - parseRem(80));
                 let rulerW = $(this.el).find('.prod-hiw-main-ruler-inner').width();
+
                 let slider = new KeenSlider($(this.el).find(".prod-hiw-main-list").get(0), {
                     slides: {
                         perView: 3,
@@ -1630,6 +1719,10 @@ const script = () => {
                         duration: 1200,
                     },
                     rubberband: false,
+                    created: () => {
+                        $(this.el).find(".prod-hiw-main-list").css('grid-column-gap', 0);
+                        activeIndex(0);
+                    },
                     detailsChanged: (slider) => {
                         const details = slider.track.details;
                         const current = details.rel;
@@ -1658,6 +1751,57 @@ const script = () => {
 
                 $(this.el).find('.prod-hiw-main-item').on('click', function () {
                     slider.moveToIdx($(this).index());
+                })
+            }
+        },
+        Compare: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.prod-compare-wrap');
+                super.setTrigger(this.el, this.onTrigger.bind(this));
+            }
+            onTrigger() {
+                this.animationReveal();
+            }
+            animationReveal() {
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.prod-compare-text') },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.prod-compare-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.prod-compare-title').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.prod-compare-desc').get(0) }),
+                    ]
+                })
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.prod-compare-table-head') },
+                    allowMobile: true,
+                    tweenArr: [
+                        new ScaleLine({ el: $(this.el).find('.prod-compare-table-head .prod-compare-table-line').get(0) }),
+                        ...Array.from($(this.el).find('.prod-compare-table-title')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0) }))
+                    ]
+                })
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.prod-compare-table-body') },
+                    allowMobile: true,
+                    tweenArr: [
+                        ...Array.from($(this.el).find('.prod-compare-table-item')).flatMap((el, idx) => ([
+                            new ScaleLine({ el: $(el).find('.prod-compare-table-line').get(0) }),
+                            new FadeIn({ el: $(el).find('.prod-compare-table-item-ic').get(0) }),
+                            new FadeSplitText({ el: $(el).find('.prod-compare-table-item-label-txt').get(0) }),
+                            ...Array.from($(el).find('.prod-compare-table-item-content')).flatMap((item, idx) => ([
+                                new FadeIn({ el: $(item).find('.prod-compare-table-item-content-ic').get(0) }),
+                                new FadeSplitText({ el: $(item).find('.prod-compare-table-item-content-txt').get(0) })
+                            ]))
+                        ]))
+                    ],
+                    stagger: 0.05
                 })
             }
         },
@@ -2431,6 +2575,7 @@ const script = () => {
                 }
                 if (section.playTrigger) {
                     section.playTrigger();
+                    ScrollTrigger.refresh();
                 }
             });
         }
@@ -2442,6 +2587,7 @@ const script = () => {
                 }
                 if (section.playTrigger) {
                     section.playTrigger();
+                    ScrollTrigger.refresh();
                 }
             });
         }
