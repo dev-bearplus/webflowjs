@@ -1522,40 +1522,60 @@ const script = () => {
                     'data-prev-percentage': -50
                 });
 
+                let isDragging = false;
+                let targetPercentage = -50;
+                let currentPercentage = -50;
+
                 const handleOnDown = (e) => {
-                    track.dataset.mouseDownAt = e.clientX - scanInner.getBoundingClientRect().left;
+                    if (!$(this.el).find('.prod-hero-decor-scan-drag:hover').length) return;
+
+                    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                    track.dataset.mouseDownAt = clientX - scanInner.getBoundingClientRect().left;
                     track.dataset.prevPercentage = track.dataset.percentage || -50;
+                    isDragging = true;
                 };
+
                 const handleOnUp = () => {
                     track.dataset.mouseDownAt = "0";
-                    track.dataset.prevPercentage = track.dataset.percentage;
-                    const handleOnMove = (e) => {
-                        if (!$(this.el).find('.prod-hero-decor-scan-drag:hover').length) return;
-                        if (track.dataset.mouseDownAt === "0") return;
-
-                        const mouseDelta = parseFloat(track.dataset.mouseDownAt) - (e.clientX - scanInner.getBoundingClientRect().left);
-                        const maxDelta = scanInner.getBoundingClientRect().width;
-
-                        const percentage = (mouseDelta / maxDelta) * -100;
-                        const nextPercentageUnconstrained = parseFloat(track.dataset.prevPercentage) - percentage;
-                        const nextPercentage = Math.max(Math.min(nextPercentageUnconstrained, 0), -100);
-                        console.log(parseFloat(track.dataset.prevPercentage))
-                        track.dataset.percentage = nextPercentage;
-
-                        gsap.set([track, maskItemBefore, maskItemAfter], { '--hidden-mask': `${nextPercentage * -1}%` });
-                        gsap.set(blur, { left: `${nextPercentage * -1}%` });
-                    };
-
-                    window.onmousemove = (e) => handleOnMove(e);
-                    window.ontouchmove = (e) => handleOnMove(e.touches[0]);
+                    track.dataset.prevPercentage = currentPercentage;
+                    isDragging = false;
                 };
 
+                const animate = () => {
+                    if (isDragging && track.dataset.mouseDownAt !== "0") {
+                        const mouseDelta = parseFloat(track.dataset.mouseDownAt) - (track.dataset.currentX || 0);
+                        const maxDelta = scanInner.getBoundingClientRect().width;
+                        const percentage = (mouseDelta / maxDelta) * -100;
+                        const nextPercentageUnconstrained = parseFloat(track.dataset.prevPercentage) - percentage;
+                        targetPercentage = Math.max(Math.min(nextPercentageUnconstrained, 0), -100);
+                    }
+
+                    currentPercentage = lerp(currentPercentage, targetPercentage, 0.1);
+                    track.dataset.percentage = currentPercentage;
+
+                    gsap.set([track, maskItemBefore, maskItemAfter], { '--hidden-mask': `${currentPercentage * -1}%` });
+                    gsap.set(blur, { left: `${currentPercentage * -1}%` });
+
+                    requestAnimationFrame(animate);
+                };
+
+                const handleOnMove = (e) => {
+                    if (!isDragging) return;
+
+                    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                    track.dataset.currentX = clientX - scanInner.getBoundingClientRect().left;
+                };
 
                 window.onmousedown = (e) => handleOnDown(e);
-                window.ontouchstart = (e) => handleOnDown(e.touches[0]);
+                window.ontouchstart = (e) => handleOnDown(e);
 
-                window.onmouseup = (e) => handleOnUp(e);
-                window.ontouchend = (e) => handleOnUp(e.touches[0]);
+                window.onmouseup = () => handleOnUp();
+                window.ontouchend = () => handleOnUp();
+
+                window.onmousemove = (e) => handleOnMove(e);
+                window.ontouchmove = (e) => handleOnMove(e);
+
+                requestAnimationFrame(animate);
             }
             destroy() {
                 if (this.tlOnce) {
@@ -1589,7 +1609,11 @@ const script = () => {
                 const activeIndex = (idx) => {
                     $(this.el).find('.prod-hiw-main-item').removeClass('active');
                     $(this.el).find('.prod-hiw-main-item').eq(idx).addClass('active');
+
+                    $(this.el).find('.prod-hiw-main-content-item').removeClass('active');
+                    $(this.el).find('.prod-hiw-main-content-item').eq(idx).addClass('active');
                 }
+                activeIndex(0);
                 $(this.el).find(".prod-hiw-main-list").addClass('keen-slider');
                 $(this.el).find(".prod-hiw-main-list").css('grid-column-gap', 0);
                 $(this.el).find(".prod-hiw-main-item").addClass('keen-slider__slide');
@@ -1614,7 +1638,6 @@ const script = () => {
                         let progressX = ((progress * -50) * rulerW / 100) + (progress * parseRem(58));
                         let currentX = gsap.getProperty($(this.el).find('.prod-hiw-main-ruler-inner').get(0), 'x')
                         gsap.quickSetter($(this.el).find('.prod-hiw-main-ruler-inner'), 'x', 'px')(lerp(currentX, progressX, 0.25))
-
                     },
                     dragStarted: (slider) => {
                         gsap.to($(this.el).find('.prod-hiw-main-active'), { duration: .5, opacity: 0, filter: 'blur(2px)', scale: .98 });
