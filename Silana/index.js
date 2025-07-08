@@ -1462,6 +1462,7 @@ const script = () => {
                 $(this.el).find('.prod-hero-main-marquee').each(function () {
                     new Marquee($(this).find('[data-marquee="list"]'), 40).setup(true);
                 })
+                this.dragTransform();
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
@@ -1508,6 +1509,54 @@ const script = () => {
                     this.tlEnter.play();
                 }
             }
+            dragTransform() {
+                const scanInner = $(this.el).find('.prod-hero-decor-scan').get(0);
+                const track = $(this.el).find('.prod-hero-decor-scan-inner').get(0);
+                const maskItemBefore = $(this.el).find('.prod-hero-main-marquee.before').get(0);
+                const maskItemAfter = $(this.el).find('.prod-hero-main-marquee.after').get(0);
+                const blur = $(this.el).find('.prod-hero-decor-shape-inner').get(0)
+
+                $(this.el).find('.prod-hero-decor-scan-inner').attr({
+                    'data-mouse-down-at': scanInner.getBoundingClientRect().width / 2,
+                    'data-percentage': -50,
+                    'data-prev-percentage': -50
+                });
+
+                const handleOnDown = (e) => {
+                    track.dataset.mouseDownAt = e.clientX - scanInner.getBoundingClientRect().left;
+                    track.dataset.prevPercentage = track.dataset.percentage || -50;
+                };
+                const handleOnUp = () => {
+                    track.dataset.mouseDownAt = "0";
+                    track.dataset.prevPercentage = track.dataset.percentage;
+                    const handleOnMove = (e) => {
+                        if (!$(this.el).find('.prod-hero-decor-scan-drag:hover').length) return;
+                        if (track.dataset.mouseDownAt === "0") return;
+
+                        const mouseDelta = parseFloat(track.dataset.mouseDownAt) - (e.clientX - scanInner.getBoundingClientRect().left);
+                        const maxDelta = scanInner.getBoundingClientRect().width;
+
+                        const percentage = (mouseDelta / maxDelta) * -100;
+                        const nextPercentageUnconstrained = parseFloat(track.dataset.prevPercentage) - percentage;
+                        const nextPercentage = Math.max(Math.min(nextPercentageUnconstrained, 0), -100);
+                        console.log(parseFloat(track.dataset.prevPercentage))
+                        track.dataset.percentage = nextPercentage;
+
+                        gsap.set([track, maskItemBefore, maskItemAfter], { '--hidden-mask': `${nextPercentage * -1}%` });
+                        gsap.set(blur, { left: `${nextPercentage * -1}%` });
+                    };
+
+                    window.onmousemove = (e) => handleOnMove(e);
+                    window.ontouchmove = (e) => handleOnMove(e.touches[0]);
+                };
+
+
+                window.onmousedown = (e) => handleOnDown(e);
+                window.ontouchstart = (e) => handleOnDown(e.touches[0]);
+
+                window.onmouseup = (e) => handleOnUp(e);
+                window.ontouchend = (e) => handleOnUp(e.touches[0]);
+            }
             destroy() {
                 if (this.tlOnce) {
                     this.tlOnce.kill();
@@ -1544,9 +1593,9 @@ const script = () => {
                 $(this.el).find(".prod-hiw-main-list").addClass('keen-slider');
                 $(this.el).find(".prod-hiw-main-list").css('grid-column-gap', 0);
                 $(this.el).find(".prod-hiw-main-item").addClass('keen-slider__slide');
-                $(this.el).find('.prod-hiw-main-ruler-inner').width($(this.el).find('.prod-hiw-main-ruler-inner').width() + $(this.el).find(".prod-hiw-main-list").width() - parseRem(80));
                 gsap.set($(this.el).find('.prod-hiw-main-ruler-inner'), { '--progress': 0 });
-
+                $(this.el).find('.prod-hiw-main-ruler-inner').width($(this.el).find('.prod-hiw-main-ruler-inner').width() + $(this.el).find(".prod-hiw-main-list").width() - parseRem(80));
+                let rulerW = $(this.el).find('.prod-hiw-main-ruler-inner').width();
                 let slider = new KeenSlider($(this.el).find(".prod-hiw-main-list").get(0), {
                     slides: {
                         perView: 3,
@@ -1556,27 +1605,31 @@ const script = () => {
                     defaultAnimation: {
                         duration: 1200,
                     },
-                    dragSpeed: 1.5,
                     rubberband: false,
                     detailsChanged: (slider) => {
                         const details = slider.track.details;
                         const current = details.rel;
                         activeIndex(details.rel);
                         let progress = slider.track.details.progress;
-                        gsap.set('.prod-hiw-main-ruler-inner', {
-                            '--progress': `${progress * -50}%`,
-                        });
+                        let progressX = ((progress * -50) * rulerW / 100) + (progress * parseRem(58));
+                        let currentX = gsap.getProperty($(this.el).find('.prod-hiw-main-ruler-inner').get(0), 'x')
+                        gsap.quickSetter($(this.el).find('.prod-hiw-main-ruler-inner'), 'x', 'px')(lerp(currentX, progressX, 0.25))
+
                     },
                     dragStarted: (slider) => {
-                        gsap.to($(this.el).find('.prod-hiw-main-active'), { scale: .95, duration: 1.5, filter: 'blur(2px)', ease: 'power3.out' });
-                        gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(0.3)', ease: 'power3.out' });
-                        gsap.to($(this.el).find('.prod-hiw-main-ruler-prog'), { scaleY: .9, duration: 1.5, ease: 'power3.out', opacity: .5 });
+                        gsap.to($(this.el).find('.prod-hiw-main-active'), { duration: .5, opacity: 0, filter: 'blur(2px)', scale: .98 });
+                        gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(0.3)' });
+                        gsap.to($(this.el).find('.prod-hiw-main-ruler-prog'), { scaleY: .9, duration: 1.5, opacity: .5 });
+                        gsap.to($(this.el).find('.prod-hiw-main-ruler-inner'), { duration: 1.5, filter: 'blur(2px)' });
+                        $(this.el).find('.prod-hiw-main-slide').addClass('on-grabbing');
 
                     },
                     dragEnded: (slider) => {
-                        gsap.to($(this.el).find('.prod-hiw-main-active'), { scale: 1, duration: 1.5, filter: 'blur(0px)', ease: 'power3.out' });
-                        gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(1)', ease: 'power3.out' });
-                        gsap.to($(this.el).find('.prod-hiw-main-ruler-prog'), { scaleY: 1, duration: 1.5, ease: 'power3.out', opacity: 1 });
+                        gsap.to($(this.el).find('.prod-hiw-main-active'), { duration: .5, opacity: 1, filter: 'blur(0px)', scale: 1, overwrite: true, clearProps: 'all' });
+                        gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(1.5)',overwrite: true, clearProps: 'all'  });
+                        gsap.to($(this.el).find('.prod-hiw-main-ruler-prog'), { scaleY: 1, duration: 1, opacity: 1, overwrite: true, clearProps: 'all'  });
+                        gsap.to($(this.el).find('.prod-hiw-main-ruler-inner'), { duration: 1, filter: 'blur(0px)', overwrite: true });
+                        $(this.el).find('.prod-hiw-main-slide').removeClass('on-grabbing');
                     }
                 })
 
