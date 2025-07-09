@@ -45,6 +45,14 @@ const mainScript = () => {
     const lerp = (a, b, t = 0.08) => {
         return a + (b - a) * t;
     };
+    function resetScrollPopup() {
+                
+        setTimeout(() => {
+            $('[data-popup="popup-item"]').animate({
+                scrollTop: 0
+            }, 0);
+        }, 500);
+    }
     function setupIframe() {
         let iframes = $("iframe");
         iframes.each(function (idx, item) {
@@ -94,12 +102,15 @@ const mainScript = () => {
         var historyTraversal = event.persisted ||
             (typeof window.performance != "undefined" &&
                 window.performance.navigation.type === 2);
-                console.log(historyTraversal)
         if (historyTraversal) {
             $('.header-menu-inner').removeAttr('style');
-            $('.header-menu-inner').removeClass('active');
+            $('.header-menu-inner').removeClass('active'); 
         }
     })
+    window.addEventListener('popstate', function(event) {
+        location.reload();
+    });
+      
     if (!isTouchDevice()) {
         $("html").attr("data-has-cursor", "true");
         window.addEventListener("pointermove", function (e) {
@@ -694,7 +705,7 @@ const mainScript = () => {
                     });
                 }
                 $('.home-popup-item').on('scroll', function(e){
-                    if(viewport.w < 768) {
+                    if(viewport.w < 992) {
                         if($(this).scrollTop()  > 40) {
                             $('[data-popup = "close"]').addClass('hidden');
                         }
@@ -786,24 +797,21 @@ const mainScript = () => {
             })
             $('.home-featured-right-item').each((idx, el) => {
                 let linkInner = $(el).find('.home-featured-right-item-inner')
-                let dataLinkDetail = linkInner.attr('data-link-detail');
                 let dataLinkType = linkInner.attr('data-link-type');
                 let linkCurrent = linkInner.attr('href');
-                linkInner.attr('href', `${linkCurrent}?detail=${dataLinkDetail}&type=${dataLinkType}`);
+                linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
             })
             $('.home-featured-left-inner').each((idx, el) => {
                 let linkInner = $(el).find('.home-featured-left-inner-link')
-                let dataLinkDetail = linkInner.attr('data-link-detail');
                 let dataLinkType = linkInner.attr('data-link-type');
                 let linkCurrent = linkInner.attr('href');
-                linkInner.attr('href', `${linkCurrent}?detail=${dataLinkDetail}&type=${dataLinkType}`);
+                linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
             })
             $('.home-featured-img-item').each((idx, el) => {
                 let linkInner = $(el).find('.home-featured-img-item-inner')
-                let dataLinkDetail = linkInner.attr('data-link-detail');
                 let dataLinkType = linkInner.attr('data-link-type');
                 let linkCurrent = linkInner.attr('href');
-                linkInner.attr('href', `${linkCurrent}?detail=${dataLinkDetail}&type=${dataLinkType}`);
+                linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
             })
             $('.home-featured-img-item').each((idx, el) => {
                 let tlItem = gsap.timeline({
@@ -1087,10 +1095,6 @@ const mainScript = () => {
             })
 
             $('.home-service-item').each((idx, el) => {
-                let linkItem = $(el).find('.home-service-item-inner');
-                let linkItemHref = linkItem.attr('href');
-                let dataLinkItem = linkItem.attr('data-link-item');
-                linkItem.attr('href', `${linkItemHref}?detail=${dataLinkItem}`);
                 let number = idx <=9 ? `0${idx+1}` : idx+1;
                 $(el).find('.home-service-item-number').text(`(${number})`);
                 let tlItem = gsap.timeline({
@@ -1313,10 +1317,9 @@ const mainScript = () => {
              
             $('.home-article-item').each((idx, el) => {
                 let linkInner = $(el).find('.home-article-item-inner')
-                let dataLinkDetail = linkInner.attr('data-link-detail');
                 let dataLinkType = linkInner.attr('data-link-type');
                 let linkCurrent = linkInner.attr('href');
-                linkInner.attr('href', `${linkCurrent}?detail=${dataLinkDetail}&type=${dataLinkType}`);
+                linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
             })
             if(viewport.w < 991) {
                 $('.home-article-cms').addClass('swiper')
@@ -1745,40 +1748,56 @@ const mainScript = () => {
                 })
             })
             this.initContentPopup();
-            let currentUrl = window.location.href;
-            let url = new URL(currentUrl);
-            let itemDetail = url.searchParams.get("detail");
-            if(itemDetail) {
-                $('.service-hero-popup-inner').removeClass('active');
-                $(`.service-hero-popup-inner[data-link-item="${itemDetail}"]`).addClass('active');
-                $('.service-hero-popup').addClass('active');
-                lenis.stop();
-            }
+            
         }
         play() {
             this.tl.play();
         }
         interact() {
+            let currentUrl = window.location.href;
+            let url = new URL(currentUrl);
+            const parts = url.pathname.split('/').filter(Boolean);
+            const slug = parts.at(-1);
+            const partsWithoutSlug = parts.slice(0, -1);
+            const newPathname = `/${partsWithoutSlug.join('/')}`;
+            let newURL = '';
+            if(slug !== 'service') {
+                newURL = url.origin + newPathname + url.search + url.hash;
+            }
+            else {
+                newURL = currentUrl
+            }  
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
+                let itemSlug = $(this).closest('.service-hero-content-item').attr('data-link-detail');
+                history.pushState({}, '', `${newURL}/${itemSlug}`);
                 let index = $(this).closest('.service-hero-content-item').index();
                 activeItem(['.service-hero-popup-inner'], index)
                 $('.service-hero-popup').addClass('active');
                 lenis.stop();
             })
+            
             $('.service-hero-popup-close').on('click', function(e) {
                 e.preventDefault();
+                history.replaceState({}, '', newURL);
                 $('.service-hero-popup').removeClass('active');
                 lenis.start();
                 resetScrollPopup();
             })
             $('.service-hero-popup').on('click', function(e) {
                 if($(e.target).closest('.service-hero-popup-inner').length == 0) {
+                    history.replaceState({}, '', newURL);
                     $(this).removeClass('active');
                     lenis.start();
                     resetScrollPopup();
                 }
             })
+            
+            if(slug) {
+                if($(`.service-hero-content-item[data-link-detail=${slug}] [data-link= "open-popup"]`).length > 0) {
+                    $(`.service-hero-content-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
+                }
+            }
             if(viewport.w < 768) {
                 let startY = 0;
                 $('.service-hero-popup-inner').on('touchstart', function(e) {
@@ -1790,8 +1809,9 @@ const mainScript = () => {
                     let distance = currentY - startY;
 
                     if($(this).scrollTop() === 0 && distance > 80) {
+                        history.replaceState({}, '', newURL);
                         // User pulled down while at top
-                        $('.global-popup-wrap').removeClass('has-popup');
+                        $('.service-hero-popup').removeClass('active');
                         lenis.start();
                         cursor.reset();
                     }
@@ -1799,7 +1819,7 @@ const mainScript = () => {
             }
             $('.service-hero-popup-inner').on('scroll', (e)=> {
                 this.ItemContentActiveCheck('.service-hero-popup-inner.active h6');
-                if(viewport.w < 768) {
+                if(viewport.w < 992) {
                     if($(e.target).scrollTop()  > 40) {
                         $('[data-popup = "close"]').addClass('hidden');
                     }
@@ -1808,14 +1828,7 @@ const mainScript = () => {
                     }
                 }
             })
-            function resetScrollPopup() {
-                
-                setTimeout(() => {
-                    $('.service-hero-popup-inner').animate({
-                        scrollTop: 0
-                    }, 0);
-                }, 500);
-            }
+            
             $('.service-hero-popup-menu-inner').on('click', '.service-hero-popup-menu-item', function(e) {
                 e.preventDefault();
                 $('.service-hero-popup-menu-item').removeClass('active');
@@ -1857,6 +1870,75 @@ const mainScript = () => {
         }
     }
     let serviceHero = new ServiceHero();
+    class TemplateHero extends TriggerSetupHero {
+        constructor() {
+            super();
+            this.tl = null;
+        }
+        trigger() {
+            this.setup();
+            super.init(this.play.bind(this));
+            this.interact();
+        }
+        setup() {
+            this.initContentPopup(); 
+            if($('.tp-hero-opera').length > 0) {
+                new FadeIn({el: '.tp-hero-opera'});
+            }
+            if($('.tp-hero-menu-wrap').length > 0) {
+                new FadeIn({el: '.tp-hero-menu-wrap'});
+            }
+            new FadeIn({el: '.tp-hero-title'})
+            new FadeIn({el: '.tp-hero-thumb'})
+            new FadeIn({el: '.tp-hero-content-wrap'})
+        }
+        play() {
+            this.tl.play();
+        }
+        interact() {
+            $(window).on('scroll', (e)=> {
+                this.ItemContentActiveCheck('.tp-hero-content h6');
+            })
+            $('.tp-hero-menu-inner').on('click', '.tp-hero-menu-item', function(e) {
+                e.preventDefault();
+                $('.tp-hero-menu-item').removeClass('active');
+                $(this).addClass('active');
+                let dataHeader = $(this).attr('data-title');
+                var scrollTop =   $(`.tp-hero-content h6[data-title="${dataHeader}"]`).offset().top  - parseFloat($('.tp-hero-menu-inner').css('top'));
+                console.log(scrollTop )
+                $('html').animate({
+                    scrollTop: scrollTop
+                }, 1000);
+            })
+        }
+        ItemContentActiveCheck(el) {
+            if($('.tp-hero-menu-item').length == 0) return;
+            for (let i = 0; i < $(el).length; i++) {
+                let top = $(el).eq(i).get(0).getBoundingClientRect().top;
+                if (top > 0 && top - $(el).eq(i).height()   < ($(window).height() / 3)) {
+                    $(' .tp-hero-menu-item').removeClass('active');
+                    $(' .tp-hero-menu-item').eq(i).addClass('active');
+                }
+                }
+        }
+        initContentPopup() {
+            if($('.tp-hero-menu-item').length == 0) return;
+            let titleLeft = $('.tp-hero-menu-item').eq(0).clone();
+            $('.tp-hero-menu-item').remove();
+            $('.tp-hero-content h6').each((i, el) => {
+                $(el).attr('data-title', `toch-${i}`);
+                let titleLeftClone = titleLeft.clone();
+                if(i == 0) {
+                    titleLeftClone.addClass('active');
+                }
+                titleLeftClone.find('.tp-hero-menu-item-txt').text($(el).text());
+                titleLeftClone.attr('data-title', `toch-${i}`);
+                $('.tp-hero-menu-inner').append(titleLeftClone);
+            })
+
+        }
+    }
+    let templateHero = new TemplateHero();
     class GameHero extends TriggerSetupHero {
         constructor() {
             super();
@@ -2011,7 +2093,7 @@ const mainScript = () => {
                 });
             }
             $('.work-popup-item').on('scroll', (e)=> {
-                if (viewport.w < 768) {
+                if (viewport.w < 992) {
                     if($(e.target).scrollTop()  > 40) {
                         $('[data-popup = "close"]').addClass('hidden');
                     }
@@ -2031,13 +2113,6 @@ const mainScript = () => {
                     scrollTop: scrollTop
                 }, 1000);
             })
-            function resetScrollPopup() {
-                setTimeout(() => {
-                    $('.service-hero-popup-inner').animate({
-                        scrollTop: 0
-                    }, 0);
-                }, 500);
-            }
         }
         activeTitle(index, direction) {
             activeItem(['.game-hero-machine-title'], index);
@@ -2374,45 +2449,91 @@ const mainScript = () => {
                     ...Array.from($('.event-calendar-item')).flatMap((el, index) => new FadeIn({el: $(el), delay: .2})),
                 ]
             })
-
-            $('.event-calendar-item').each((i, el) => {
-                this.calendar($(el));
-            })
-            this.filterByTab();
+            let currentUrl = window.location.href;
+            let url = new URL(currentUrl);
+            let tagName = url.searchParams.get("type");
+            url.searchParams.delete('type');
+            const parts = url.pathname.split('/').filter(Boolean);
+            const slug = parts.at(-1);
+            const partsWithoutSlug = parts.slice(0, -1);
+            const newPathname = `/${partsWithoutSlug.join('/')}`;
+            let newURL = '';
+            if(slug !== 'promotion-events') {
+                newURL = url.href + newPathname ;
+            }
+            else {
+                newURL = url
+            }
+            console.log(url.href)
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
+                let itemSlug = $(this).closest('.event-hero-card-item').attr('data-link-detail');
+                history.pushState({}, '', `${newURL}/${itemSlug}`);
+                console.log(`${newURL}/${itemSlug}`)
                 let index = $(this).closest('.event-hero-card-item').index();
                 activeItem(['.event-popup-item'], index)
                 $('.global-popup-wrap').addClass('has-popup');
                 lenis.stop();
             })
+            
+            if(slug) {
+                if($(`.event-hero-card-item[data-link-detail=${slug}] [data-link= "open-popup"]`).length > 0) {
+                    $(`.event-hero-card-item[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
+                }
+            }
+            $('.event-calendar-item').each((i, el) => {
+                this.calendar($(el));
+            })
+            this.filterByTab();
+            
             $('.event-popup-close').on('click', function(e) {
                 e.preventDefault();
+                history.replaceState({}, '', newURL);
                 $('.global-popup-wrap').removeClass('has-popup');
                 lenis.start();
+                resetScrollPopup();
             })
             $('.global-popup-wrap').on('click', function(e) {
                 if($(e.target).closest('.event-popup-inner').length == 0) {
+                    history.replaceState({}, '', newURL);
                     $(this).removeClass('has-popup');
                     lenis.start();
+                    resetScrollPopup();
                 }
             })
-            let currentUrl = window.location.href;
-            let url = new URL(currentUrl);
-            let tagName = url.searchParams.get("type");
-            let itemDetail = url.searchParams.get("detail");
-            if(itemDetail) {
-                $(`.event-hero-card-item[data-link-detail=${itemDetail}] [data-link= "open-popup"]`).eq(0).click();
-            }
+            
             if(tagName) {
                 $('.event-hero-tag-item').removeClass('active');
                 $(`.event-hero-tag-item[data-tag="${tagName}"]`).addClass('active');
                 this.initActiveTab(tagName);
+                //remove param type on href
+                let url = new URL(window.location.href);
+                url.searchParams.delete('type');
+                window.history.replaceState({}, '', url.href);
             }
             else {
-                activeItem(['.event-hero-tag-item', '.event-popup-item'], 0)
+                activeItem(['.event-hero-tag-item'], 0)
                 let tagNameInit = $('.event-hero-tag-item.active').attr('data-tag');
                 this.initActiveTab(tagNameInit);
+            }
+            if(viewport.w < 768) {
+                let startY = 0;
+                $('.event-popup-item').on('touchstart', function(e) {
+                    startY = e.originalEvent.touches[0].clientY;
+                });
+
+                $('.event-popup-item').on('touchmove', function(e) {
+                    let currentY = e.originalEvent.touches[0].clientY;
+                    let distance = currentY - startY;
+
+                    if($(this).scrollTop() === 0 && distance > 80) {
+                        history.replaceState({}, '', newURL);
+                        // User pulled down while at top
+                        $('.global-popup-wrap').removeClass('has-popup');
+                        lenis.start();
+                        cursor.reset();
+                    }
+                });
             }
         }
         play() {
@@ -2436,26 +2557,9 @@ const mainScript = () => {
                 $('.event-hero-date-reset').addClass('hidden')
                 this.filterReset();
             })
-            if(viewport.w < 768) {
-                let startY = 0;
-                $('.event-popup-item').on('touchstart', function(e) {
-                    startY = e.originalEvent.touches[0].clientY;
-                });
-
-                $('.event-popup-item').on('touchmove', function(e) {
-                    let currentY = e.originalEvent.touches[0].clientY;
-                    let distance = currentY - startY;
-
-                    if($(this).scrollTop() === 0 && distance > 80) {
-                        // User pulled down while at top
-                        $('.global-popup-wrap').removeClass('has-popup');
-                        lenis.start();
-                        cursor.reset();
-                    }
-                });
-            }
+            
             $('.event-popup-item').on('scroll', (e)=> {
-                if(viewport.w < 768) {
+                if(viewport.w < 992) {
                     if($(e.target).scrollTop()  > 40) {
                         $('[data-popup = "close"]').addClass('hidden');
                     }
@@ -2559,6 +2663,12 @@ const mainScript = () => {
                       $('.event-calendar-list').removeClass('active');
                     }
                     this.filterEvents(arrDateFilter);
+                    setTimeout(() => {
+                        lenis.scrollTo($('.event-hero-title').get(0), {
+                            duration: 1,
+                            offset: -200,
+                        })
+                    }, 20)
                   });
               
                   // Nếu là ngày hôm nay
@@ -2609,6 +2719,7 @@ const mainScript = () => {
                 $('.event-calendar-item-date-txt').removeClass('active');
             
                 $('.event-calendar-item-date-txt').each( (i, el) => {
+                    
                     const itemDateStr = $(el).attr('data-date');
                     if (!itemDateStr) return;
                     const parts = itemDateStr.split('/');
@@ -2641,6 +2752,12 @@ const mainScript = () => {
                         $('.header').addClass('on-hide')
                         $('.event-calendar-list').addClass('active');
                     }
+                    setTimeout(() => {
+                        lenis.scrollTo($('.event-hero-title').get(0), {
+                            duration: 1,
+                            offset: -200,
+                        })
+                    }, 20)
                 });
             });
             $('.event-calendar-close').on('click',  (e) => {
@@ -2661,30 +2778,36 @@ const mainScript = () => {
                 $('.event-calendar-item-date-txt').removeClass('active');
                 $('.event-hero-date-filter-item').removeClass('active');
             }
-            const activateThisWeekAcrossCalendars = () =>{
+            const activateThisWeekAcrossCalendars = () => {
                 const today = new Date();
                 const startOfWeek = new Date(today);
-                const endOfWeek = new Date(today);
                 const day = today.getDay();
                 const diffToMonday = day === 0 ? -6 : 1 - day;
-                startOfWeek.setDate(today.getDate() + diffToMonday -1);
-                endOfWeek.setDate(startOfWeek.getDate() + 7);
+                startOfWeek.setDate(today.getDate() + diffToMonday);
+                
+                const endOfWeek = new Date(startOfWeek);
+                endOfWeek.setDate(startOfWeek.getDate() + 6);
+              
+                console.log("Start:", startOfWeek, "End:", endOfWeek);
+              
                 this.filterEvents(getDateRangeArray(startOfWeek, endOfWeek));
-                $('.event-calendar-item-date-txt').each(function (e) {
-                    const $item = $(this);
-                    const dateStr = $item.attr('data-date'); 
-                    if (!dateStr) return;
-            
-                    const [d, m, y] = dateStr.split('/').map(Number);
-                    const itemDate = new Date(y, m - 1, d);
-                    console.log(startOfWeek)
-                    if (itemDate >= startOfWeek && itemDate <= endOfWeek) {
-                        $item.addClass('active');
-                    } else {
-                        $item.removeClass('active');
-                    }
+              
+                $('.event-calendar-item-date-txt').each(function () {
+                  const $item = $(this);
+                  const dateStr = $item.attr('data-date'); 
+                  if (!dateStr) return;
+              
+                  const [d, m, y] = dateStr.split('/').map(Number);
+                  const itemDate = new Date(y, m - 1, d);
+                  
+                  if (itemDate >= startOfWeek && itemDate <= endOfWeek) {
+                    $item.addClass('active');
+                  } else {
+                    $item.removeClass('active');
+                  }
                 });
-            }
+              };
+              
             function getDateRangeArray(start, end) {
                 let result = [];
                 let current = new Date(start);
@@ -3025,22 +3148,51 @@ const mainScript = () => {
             this.initContentPopup();
         }
         interact() {
+            let currentUrl = window.location.href;
+            let url = new URL(currentUrl);
+            const parts = url.pathname.split('/').filter(Boolean);
+            const slug = parts.at(-1);
+            const partsWithoutSlug = parts.slice(0, -1);
+            const newPathname = `/${partsWithoutSlug.join('/')}`;
+            let newURL = '';
+            if(slug !== 'work-with-us') {
+                newURL = url.origin + newPathname + url.search + url.hash;
+            }
+            else {
+                newURL = currentUrl
+            }
             $('[data-link= "open-popup"]').on('click', function(e) {
                 e.preventDefault();
+                let itemSlug = $(this).closest('.work-job-item-wrap').attr('data-link-detail');
+                history.pushState({}, '', `${newURL}/${itemSlug}`);
                 let index = $(this).closest('.work-job-item-wrap').index();
                 console.log(index)
                 activeItem(['.work-popup-item'], index)
                 $('.global-popup-wrap').addClass('has-popup');
                 lenis.stop();
             })
+            if(slug && slug != 'work-with-us') {
+                console.log(slug)
+                lenis.scrollTo($('.work-job').get(0), {
+                    duration: .0001,
+                    offset: -100,
+                })
+                setTimeout(() => {
+                    if($(`.work-job-item-wrap[data-link-detail=${slug}] [data-link= "open-popup"]`).length > 0) {
+                        $(`.work-job-item-wrap[data-link-detail=${slug}] [data-link= "open-popup"]`).eq(0).click();
+                    }
+                }, 10);
+            }
             $('.work-popup-close').on('click', function(e) {
                 e.preventDefault();
+                history.replaceState({}, '', newURL);
                 $('.global-popup-wrap').removeClass('has-popup');
                 lenis.start();
                 resetScrollPopup();
             })
             $('.global-popup-wrap').on('click', function(e) {
                 if($(e.target).closest('.work-popup-inner').length == 0) {
+                    history.replaceState({}, '', newURL);
                     $(this).removeClass('has-popup');
                     lenis.start();
                     resetScrollPopup();
@@ -3065,7 +3217,7 @@ const mainScript = () => {
                 });
             }
             $('.work-popup-item').on('scroll', (e)=> {
-                if(viewport.w < 768) {
+                if(viewport.w < 992) {
                     if($(e.target).scrollTop()  > 40) {
                         $('[data-popup = "close"]').addClass('hidden');
                     }
@@ -3288,7 +3440,7 @@ const mainScript = () => {
                 if(i == 0) {
                     titleLeftClone.addClass('active');
                 }
-                titleLeftClone.find('.policy-hero-menu-item-number').text(i>9? `(${i+1})` : `(0${i+1})`);
+                titleLeftClone.find('.policy-hero-menu-item-number').text(i>8? `(${i+1})` : `(0${i+1})`);
                 titleLeftClone.find('.policy-hero-menu-item-title').text($(el).text());
                 titleLeftClone.attr('data-title', `toch-${i}`);
                 $('.policy-hero-menu').append(titleLeftClone);
@@ -3404,6 +3556,17 @@ const mainScript = () => {
                         this.activeMenuTablet();
                     }
                 })
+                $('.header-menu-item').on('click', function(e) {
+                    e.preventDefault();
+                    $('.header-menu-inner').removeAttr('style');
+                    gsap.set(".header-menu-title.close .word", { y: "-100%" });
+                    gsap.set(".header-menu-title.open .word", { y: "0%" });
+                    lenis.start();
+                    header.toggleColorMode('white');
+                    $('.header').removeClass('active');
+                    let href = $(this).attr('href');
+                    window.location.href = href;
+                })
             }
             $('.header-lang-title-wrap').on('click', (e) => {
                 e.preventDefault();
@@ -3463,21 +3626,19 @@ const mainScript = () => {
             const scrollTop = document.documentElement.scrollTop || window.scrollY;
             const $header = $('.header');
             const isScrollHeader =
-                scrollTop > $('.header').height() * (viewport.w > 767 ? 4 : 1.5) &&
-                !$header.hasClass('on-show-menu');
-            console.log(isScrollHeader)
+                scrollTop > $('.header').height() * (viewport.w > 767 ? 4 : 1.5) ;
             clearTimeout(this.debounceTimer);
             this.debounceTimer = setTimeout(() => {
                 if (isScrollHeader) {
-                if (inst.direction >= 1) {
-                    if ($('.header-lang').hasClass('active')) {
-                    this.toggleLang();
-                    $('.header-lang').removeClass('active');
+                    if (inst.direction >= 0) {
+                        if ($('.header-lang').hasClass('active')) {
+                            this.toggleLang();
+                            $('.header-lang').removeClass('active');
+                        }
+                        $header.addClass('on-hide');
+                    } else {
+                        $header.removeClass('on-hide');
                     }
-                    $header.addClass('on-hide');
-                } else {
-                    $header.removeClass('on-hide');
-                }
                 } else {
                 $header.removeClass('on-hide');
                 }
@@ -3647,6 +3808,10 @@ const mainScript = () => {
         },
         serviceScript: () => {
             serviceHero.trigger();
+            footer.trigger();
+        },
+        templateScript: () => {
+            templateHero.trigger();
             footer.trigger();
         },
         gameScript: () => {

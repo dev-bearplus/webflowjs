@@ -685,7 +685,6 @@ const mainScript = () => {
         const html = template.clone();
         if (!partner.visibility) html.addClass('hidden');
         let imgurl = partner.image.url.includes('gif') ? partner.image.url.replace('?auto=format,compress', '') : partner.image.url;
-        console.log(imgurl)
         html.find('[data-partner="img"]').attr('src',imgurl);
         html.find('[data-partner="label"]').text(partner.label);
         return html;
@@ -1543,9 +1542,24 @@ const mainScript = () => {
                     allPartner.forEach(({ data }, i) => {
                         if (i < 5) createPartnerHTML(template, data).appendTo($('.home-partner-inner'))
                     })
+                    homePartnerAppendDisclaimer();
                     $('.home-partner-inner').find('.load-ske').addClass('loaded')
                 }
             });
+            function homePartnerAppendDisclaimer() {
+                let columnGap = viewport.w > 767 ? '6rem' : '2.4rem';
+                if(viewport.w < 767 ) {
+                    $('.home-partner-item-img-wrap').css('height', '4.1rem')
+                }
+                $('.home-partner-inner').css('column-gap', columnGap);
+                $('.home-partner').css('height', 'auto');
+                $('.home-partner-item').css('justify-content', 'space-between')
+                let textTemplate = $('.home-partner-inner').find('.home-partner-item').eq(0).clone();
+                textTemplate.find('.home-partner-item-img-wrap').remove();
+                textTemplate.find('.home-partner-item-label').text('Chocolate Finance is not a bank. We’re an asset manager built to target a happier return on your spare cash.');
+                textTemplate.css('max-width', '18.6rem')
+                $('.home-partner-inner').find('.home-partner-item').eq(1).before(textTemplate);
+            }
         }
         getHomePartners()
         function homeHeroHandle() {
@@ -2980,9 +2994,7 @@ const mainScript = () => {
             console.log('update')
             socialShare();
             updateMobileTable();
-            if (isStagging) {
-                updateTabTable();
-            }
+            updateTabTable();
         }
         currentUpdate();
         
@@ -4165,30 +4177,17 @@ const mainScript = () => {
     }
     SCRIPT.thankyouScript = () => {
         function thankHero() {
-            let tlHeart = gsap.timeline({
+            let tl = gsap.timeline({
                 scrollTrigger: {
-                    trigger: '.thank-hero-ic-heart',
-                    start: 'top bottom',
-                    end: 'bottom top',
-                    scrub: 1,
+                  trigger: '.thank-hero',
+                  start: viewport.w > 991 ? 'top+=50% bottom-=50%' : 'top+=70% bottom-=70%',
+                  end: viewport.w > 991 ? 'bottom-=60% top-=60%' : 'bottom-=40% top-=40%',
+                  scrub: 1,
                 }
-            });
-            requestAnimationFrame(() => {
-                tlHeart
-                .fromTo('.thank-hero-ic-heart', { yPercent: -40 }, {yPercent: 40})    
-            })
-            let tlHand = gsap.timeline({
-                scrollTrigger: {
-                    trigger: '.thank-hero-ic-hand',
-                    start: 'top bottom',
-                    end: 'bottom top',
-                    scrub: 1
-                }
-            });
-            requestAnimationFrame(() => {
-                tlHand
-                .fromTo('.thank-hero-ic-hand', { yPercent: -40 }, {yPercent: 40})    
-            })
+              });
+              
+              tl
+                .fromTo('.thank-hero-ic', { yPercent: 0 }, { yPercent: -20 , ease: 'none'}, 0)
         }
         thankHero();
         function thankReview() {
@@ -4326,9 +4325,9 @@ const mainScript = () => {
                 }
             });
             tl
-               .fromTo('.thank-community-fashion-row.item1 .thank-community-fashion-item', { yPercent: -20 }, {yPercent: 20})
-               .fromTo('.thank-community-fashion-row.item2 .thank-community-fashion-item', { yPercent: 20 }, {yPercent: -20}, '<=0')
-               .fromTo('.thank-community-fashion-row.item3 .thank-community-fashion-item', { yPercent: -20 }, {yPercent: 20}, '<=0')
+               .fromTo('.thank-community-fashion-row.item1 .thank-community-fashion-item', { yPercent: -50 }, {yPercent: 50})
+               .fromTo('.thank-community-fashion-row.item2 .thank-community-fashion-item', { yPercent: 30 }, {yPercent: -30}, '<=0')
+               .fromTo('.thank-community-fashion-row.item3 .thank-community-fashion-item', { yPercent: -50 }, {yPercent: 40}, '<=0')
         }
         homeCommunity();
         function thankGetFaq() {
@@ -4363,7 +4362,8 @@ const mainScript = () => {
         thankGetFaq();
     }
     SCRIPT.guaranteeScript = () => {
-        if (!isStagging) return;
+        console.log(!isStagging())
+        if (!isStagging()) return;
         const sgdToUsd = parseFloat($('.sgd-to-usd').text());
         const usdToSgd = (Math.floor((1/sgdToUsd)*100000)/100000).toFixed(5);
         const feeSgdToUsd = 0.1;

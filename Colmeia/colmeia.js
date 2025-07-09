@@ -779,17 +779,11 @@ const mainScript = () => {
             }
         });
     }
-    let pageName = $('[data-barba-namespace]').attr('data-barba-namespace');
-    let subPageName = $('[data-barba-namespace]').attr('data-barba-namespace') === $('[data-utm-source]').attr('data-utm-source') ? '' : $('[data-utm-source]').attr('data-utm-source').toLowerCase().replace(/[\s&/]+/g, '_').replace(/[^a-z0-9_]/g, '');
-    let utm_source = `${pageName}${subPageName.length === 0 ? '' : `_${subPageName}`}`;
+    let pageName = $('[data-page-name]').attr('data-page-name');
+    let subPageName = $('[data-page-name]').attr('data-page-name') === $('[data-gtm-page]').attr('data-gtm-page') ? '' : $('[data-gtm-page]').attr('data-gtm-page');
+    let gtm_page = `${subPageName.length === 0 ? '' : `${subPageName}: `}${pageName}`;
     const updateCurrentNav = () => {
         $("a").each(function (index, link) {
-            let utm_medium = $(this).parents('[data-utm-medium]').length !== 0 ? $(this).parents('[data-utm-medium]').attr('data-utm-medium') : '';
-            let utm_content = $(this).parents('[data-utm-content]').attr('data-utm-content');
-            if (utm_medium) {
-                $(this).attr('href', `${$(this).attr('href')}?utm_source=${utm_source}&utm_content=${utm_content}&utm_medium=${utm_medium}`);
-            }
-
             if ($(this).attr('data-sub-link') && (!$(this).attr('href').includes('#')) && (!$(this).attr('href').includes('sc'))) {
                 $(this).attr('href', `${$(this).attr('href')}#${$(this).attr('data-sub-link')}`);
                 // $(this).attr('data-barba-history', 'replace');
@@ -810,9 +804,6 @@ const mainScript = () => {
                     // $(this).attr('href', `${urlPath}?sc=${anchor}`);
                 }
             }
-            // if ($(this).parent().hasAttr('data-utm-medium')) {
-            //     console.log()
-            // }
         });
 
         $('a').on('click', function (e) {
@@ -838,6 +829,10 @@ const mainScript = () => {
                     }
                 })
             }
+        })
+
+        $('[data-gtm-medium]').each(function (index, el) {
+            $(el).attr('data-gtm-page', gtm_page);
         })
     };
 
@@ -2388,7 +2383,11 @@ const mainScript = () => {
                             });
                         }
                         if ($(el).attr('href').includes('/schedule-demo')) {
-                            $(el).attr('href', `${$(el).attr('href')}?utm_source=${utm_source}&utm_content=content&utm_medium=banner_cta`);
+                            $(el).parent().attr({
+                                'data-gtm-medium': 'image cta',
+                                'data-gtm-section': 'content',
+                                'data-gtm-page': gtm_page
+                            })
                         }
                     });
 
