@@ -318,7 +318,7 @@ const script = () => {
             this.tlLoadMaster = gsap.timeline({
                 paused: true,
                 delay: this.isLoaded ? 0 : 1,
-                duration:1,
+                duration: .5,
                 onStart: () => {
                     this.onceSetup(data);
                 },
@@ -630,7 +630,7 @@ const script = () => {
 
     class TriggerSetup {
         constructor() {
-            this.tlTrigger;
+            this.tlTrigger = null;
             this.isPlayed = false;
             this.once = true;
         }
@@ -652,6 +652,18 @@ const script = () => {
         playTrigger() {
             this.isPlayed = true;
             if (window.scrollY === 0) window.scrollTo(0, 1)
+        }
+        cleanTrigger() {
+            if (this.isPlayed) {
+                this.isPlayed = false;
+            }
+            if (!this.once) {
+                this.once = true;
+            }
+            if (this.tlTrigger) {
+                this.tlTrigger.kill();
+                this.tlTrigger = null;
+            }
         }
     }
 
@@ -1055,10 +1067,7 @@ const script = () => {
                 super.setTrigger(this.el, this.onTrigger.bind(this));
             }
             onTrigger() {
-                if (viewport.w > 767) {
-                    this.animationScrub();
-                }
-                else {
+                if (viewport.w <= 767) {
                     this.slideCard();
                 }
 
@@ -1172,7 +1181,7 @@ const script = () => {
             }
             onTrigger() {
                 if(viewport.w > 767)  {
-                    // this.animationScrub();
+                    this.animationScrub();
                 }
                 this.animationReveal();
             }
@@ -2630,7 +2639,6 @@ const script = () => {
                 }
                 if (section.playTrigger) {
                     section.playTrigger();
-                    ScrollTrigger.refresh();
                 }
             });
         }
@@ -2642,26 +2650,8 @@ const script = () => {
                 }
                 if (section.playTrigger) {
                     section.playTrigger();
-                    ScrollTrigger.refresh();
                 }
             });
-        }
-
-        destroyHandler(data) {
-            this.sections.forEach(section => {
-                if (section.destroy) {
-                    section.destroy();
-                }
-            });
-        }
-
-        destroy(data) {
-            const container = data.next.container;
-            container.removeEventListener("onceSetup", this.boundSetupHandler);
-            container.removeEventListener("oncePlay", this.boundOncePlayHandler);
-            container.removeEventListener("enterSetup", this.boundSetupHandler);
-            container.removeEventListener("enterPlay", this.boundEnterPlayHandler);
-            this.destroyHandler(data);
         }
 
         setupHandler(event) {
@@ -2677,10 +2667,19 @@ const script = () => {
             });
         }
 
-        destroyHandler(data) {
+        destroy(data) {
+            const container = data.next.container;
+            container.removeEventListener("onceSetup", this.boundSetupHandler);
+            container.removeEventListener("oncePlay", this.boundOncePlayHandler);
+            container.removeEventListener("enterSetup", this.boundSetupHandler);
+            container.removeEventListener("enterPlay", this.boundEnterPlayHandler);
+
             this.sections.forEach(section => {
                 if (section.destroy) {
                     section.destroy();
+                }
+                if (section.cleanTrigger) {
+                    section.cleanTrigger();
                 }
             });
         }
