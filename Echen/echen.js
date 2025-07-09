@@ -1,14 +1,7 @@
-import * as THREE from 'https://unpkg.com/three@0.155.0/build/three.module.js';
-import { AsciiEffect } from 'https://unpkg.com/three@0.155.0/examples/jsm/effects/AsciiEffect.js';
-import { TrackballControls } from 'https://unpkg.com/three@0.155.0/examples/jsm/controls/TrackballControls.js';
-import { GLTFLoader } from 'https://unpkg.com/three@0.155.0/examples/jsm/loaders/GLTFLoader.js';
-import { DRACOLoader } from 'https://unpkg.com/three@0.155.0/examples/jsm/loaders/DRACOLoader.js'
-
-
 const start = Date.now()
-console.log('start')
 let camera, controls, scene, renderer, effect;
-export function initEchen() {
+
+const mainScript = () => {
     console.log('initEchen')
     let model;
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
@@ -112,3 +105,5 @@ function animate() {
     effect.render(scene, camera);
 
 }
+
+window.onload = mainScript;  
