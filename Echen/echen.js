@@ -30,10 +30,10 @@ class MainScript {
         this.scene.add(pointLight2);
 
         this.dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
-        const urlLoader = '/surge-logo.glb'
+        const urlLoader = 'https://cdnwf-prod.bear.plus/Echen/surge-logo.glb'
         this.loader.setDRACOLoader(this.dracoLoader);
         this.loader.load(
-            'https://media.bear.plus/surge-logo.glb',
+            urlLoader,
             (gltf) => {
                 this.model = gltf.scene;
                 this.model.position.y = 0;
