@@ -4180,15 +4180,14 @@ const mainScript = () => {
             let tl = gsap.timeline({
                 scrollTrigger: {
                   trigger: '.thank-hero',
-                  start: 'top bottom',
-                  end: 'bottom top',
-                  scrub: 1
+                  start: viewport.w > 991 ? 'top+=50% bottom-=50%' : 'top+=70% bottom-=70%',
+                  end: viewport.w > 991 ? 'bottom-=60% top-=60%' : 'bottom-=40% top-=40%',
+                  scrub: 1,
                 }
               });
               
               tl
-                .fromTo('.thank-hero-ic-heart', { yPercent: 40 }, { yPercent: -40 }, 0)
-                .fromTo('.thank-hero-ic-hand', { yPercent: 40 }, { yPercent: -40 }, 0);  
+                .fromTo('.thank-hero-ic', { yPercent: 0 }, { yPercent: -20 , ease: 'none'}, 0)
         }
         thankHero();
         function thankReview() {
