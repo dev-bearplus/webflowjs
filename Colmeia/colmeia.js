@@ -2536,6 +2536,45 @@ const mainScript = () => {
                 }
                 marqueeLogo();
             }
+        },
+        contact: {
+            namespace: 'contact',
+            afterEnter() {
+                function contactHero() {
+                    let heroTitle = splitTextFadeUpSetup('.contact-form-title');
+                    let heroSub = splitTextFadeUpSetup('.contact-form-sub');
+                    gsap.set('.form-inner', { autoAlpha: 0, y: 60 });
+                    let tl = gsap.timeline({
+                        defaults: { ease: 'power2.out' },
+                        onComplete: () => {
+                            heroTitle.revert();
+                            heroSub.revert();
+                            gsap.set('.contact-form-title, .contact-form-sub', { clearProps: 'all' });
+                            gsap.set('.form-inner', { clearProps: 'all' });
+                        }
+                    })
+
+                    tl
+                        .to(heroTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .025 })
+                        .to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .015 }, "<=.1")
+                        .to('.form-inner', { autoAlpha: 1, y: 0, duration: 1 }, "<=.3")
+                    
+                    let tlItem = gsap.timeline({
+                        defaults: { ease: 'power2.out' },
+                        onComplete: () => {
+                            gsap.set('.contact-form-thumb-label, .contact-form-thumb-val', { clearProps: 'all' });
+                        }
+                    })
+                    $('.contact-form-thumb-info').each((_, item) => {
+                        let labelItem = splitTextFadeUpSetup($(item).find('.contact-form-thumb-label'))
+                        let valItem = splitTextFadeUpSetup($(item).find('.contact-form-thumb-val'))
+                        tlItem
+                            .to(labelItem.words, { yPercent: 0, autoAlpha: 1, duration: .6, stagger: .015 }, '<=.1')
+                            .to(valItem.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .025 }, "<=.2")
+                    })
+                }
+                contactHero();
+            }
         }
     }
     const enterTransition = (data) => {
