@@ -95,6 +95,7 @@ class MainScript {
                 this.camera.position.set(0, -1, 8.5);
             }
         };
+        this._resizeHandler();
         window.addEventListener('resize', this._resizeHandler);
     }
 
