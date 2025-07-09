@@ -1172,7 +1172,7 @@ const script = () => {
             }
             onTrigger() {
                 if(viewport.w > 767)  {
-                    this.animationScrub();
+                    // this.animationScrub();
                 }
                 this.animationReveal();
             }
@@ -2109,11 +2109,61 @@ const script = () => {
                 })
             }
         },
-        Job: class extends TriggerSetup {
+        News: class extends TriggerSetup {
             constructor() {
                 super();
                 this.el = null;
                 this.tlOverlap = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.about-news-wrap');
+                super.setTrigger(this.el, this.onTrigger.bind(this));
+            }
+            onTrigger() {
+                this.animationScrub();
+                this.animationReveal();
+            }
+            animationReveal() {
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: { trigger: $(this.el).find('.about-news-main') },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.about-news-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-news-title').get(0) }),
+                        new ScaleLine({ el: $(this.el).find('.line-ver.about-news-main-line').get(0) }),
+                        new ScaleLine({ el: $(this.el).find('.about-news-main-line').get(0) }),
+                        ...Array.from($(this.el).find('.about-news-main-item')).flatMap((el, idx) => [
+                            new FadeSplitText({ el: $(el).find('.about-news-main-item-label').get(0) }),
+                            new FadeSplitText({ el: $(el).find('.about-news-main-item-title').get(0) }),
+                            new ScaleLine({ el: $(el).find('.about-news-main-item-line').get(0) })
+                        ])
+                    ]
+                })
+            }
+            animationScrub() {
+                new ParallaxImage({ el: this.el.querySelector('.about-news-thumb img') });
+                this.tlOverlap = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el.querySelector('.about-news-thumb'),
+                        start: `top 10%`,
+                        end: `bottom bottom`,
+                        endTrigger: this.el,
+                        scrub: 1
+                    },
+                })
+                .to($(this.el).find('.about-news-thumb-inner'), { scale: .9, autoAlpha: 0.5, duration: 1, ease: 'power2.in' })
+            }
+            destroy() {
+                if (this.tlOverlap) {
+                    this.tlOverlap.kill();
+                }
+            }
+        },
+        Job: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.about-job-wrap');
@@ -2122,7 +2172,6 @@ const script = () => {
             onTrigger() {
                 this.interact();
                 this.animationReveal();
-                this.animationScrub();
             }
             animationReveal() {
                 new MasterTimeline({
@@ -2136,20 +2185,6 @@ const script = () => {
                         new FadeIn({ el: $(this.el).find('.about-job-main-cms').get(0) })
                     ]
                 })
-            }
-            animationScrub() {
-                new ParallaxImage({ el: this.el.querySelector('.about-job-thumb img') });
-                this.tlOverlap = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: this.el.querySelector('.about-job-thumb'),
-                        start: `top 10%`,
-                        end: `bottom bottom`,
-                        endTrigger: this.el,
-                        scrub: 1
-                    },
-                })
-                .to($(this.el).find('.about-job-thumb-inner'), { scale: .9, autoAlpha: 0.5, duration: 1, ease: 'power2.in' })
-
             }
             interact() {
                 this.cardSlide();
@@ -2207,9 +2242,6 @@ const script = () => {
                 $(this.el).find('.slide-control.prev').on('click', slider.prev);
             }
             destroy() {
-                if (this.tlOverlap) {
-                    this.tlOverlap.kill();
-                }
             }
         },
         CTA: class extends CTA {
