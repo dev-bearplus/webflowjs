@@ -1032,7 +1032,7 @@ const script = () => {
         let validateInfo = { status: false, resultForm: {} };
 
         const { errors, isValidated } = validateForm({ formsObj, rules });
-        if (isValidated) {
+    if (isValidated) {
             validateInfo.status = true;
             Object.entries(rules).forEach(([key, { value }]) => {
                 validateInfo.resultForm[key.toLowerCase()] = value;

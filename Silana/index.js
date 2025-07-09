@@ -2229,11 +2229,10 @@ const script = () => {
             }
             initInputValueCheck(selector = 'input') {
                 $(document).on('input', selector, function () {
-                    const $this = $(this);
-                    if ($this.val().trim() !== '') {
-                        $this.addClass('has-value');
+                    if ($(this).val().trim() !== '') {
+                        $(this).addClass('has-value');
                     } else {
-                        $this.removeClass('has-value');
+                        $(this).removeClass('has-value');
                     }
                 });
             }
@@ -2309,6 +2308,10 @@ const script = () => {
                 });
                 $('.contact-hero-form .overlay-bg').on('click', function(){
                     $('.contact-hero-form-success').removeClass('active');
+                })
+                $('.contact-hero-form-input[type="tel"]').bind('change keydown keyup', function (e) {
+                    let inputVal = $(this).val();
+                    $(this).val(inputVal.replace(/\D/g, ''));
                 })
                 const formInner = $('.contact-hero-form-inner');
                 const successBox = $('.contact-hero-form-success');
