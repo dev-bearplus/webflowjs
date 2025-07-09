@@ -1301,7 +1301,7 @@ const mainScript = () => {
                             let itemClone = $('.home-hero-company-list').clone();
                             $('.home-hero-company-cms').append(itemClone);
                         })
-                        $('.home-hero-company-list').addClass('anim-marquee-right')
+                        $('.home-hero-company-list').addClass('animMarquee')
                     }
                     marqueeLogo();
 
