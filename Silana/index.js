@@ -1184,17 +1184,29 @@ const script = () => {
                         }, 1000)
                     );
                 headingFlipping.setup();
+                if (viewport.w < 991) {
+                    new MasterTimeline({
+                        triggerInit: this.el,
+                        scrollTrigger: {
+                            trigger: this.el,
+                            start: `top top+=75%`
+                        },
+                        allowMobile: true,
+                        tweenArr: [
+                            new FadeSplitText({ el: $(this.el).find('.home-solution-label').get(0) }),
+                            new FadeSplitText({ el: $(this.el).find('.home-solution-title').get(0) }),
+                            new FadeSplitText({ el: $(this.el).find('.home-solution-desc').get(0) }),
+                        ]
+                    })
+                }
                 new MasterTimeline({
                     triggerInit: this.el,
                     scrollTrigger: {
                         trigger: this.el,
-                        start: viewport.w > 991 ? `top+=${viewport.h - $(this.el).find('.home-solution-label').get(0).offsetTop} top` : `top top+=75%`
+                        start: viewport.w > 991 ? `top+=${viewport.h - $(this.el).find('.home-solution-title').get(0).offsetTop} top` : `top top+=75%`
                     },
                     allowMobile: true,
                     tweenArr: [
-                        new FadeSplitText({ el: $(this.el).find('.home-solution-label').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-solution-title').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-solution-desc').get(0) }),
                         new FadeIn({ el: $(this.el).find('.home-solution-main-transform').get(0), clearProps: 'transform, opacity' }),
                         new FadeIn({ el: $(this.el).find('.home-solution-main-decor').get(0) }),
                         new FadeIn({ el: $(this.el).find('.home-solution-main-vid').get(0) })
