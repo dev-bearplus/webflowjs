@@ -2038,8 +2038,10 @@ const script = () => {
                 super.setTrigger(this.el, this.onTrigger.bind(this));
             }
             onTrigger() {
-                this.animationScrub();
                 this.animationReveal();
+                if (viewport.w > 767) {
+                    this.animationScrub();
+                }
             }
             animationReveal() {
                 new MasterTimeline({
@@ -2053,15 +2055,6 @@ const script = () => {
                         new FadeIn({ el: $(this.el).find('.about-team-btn').get(0) })
                     ]
                 })
-                new MasterTimeline({
-                    triggerInit: this.el,
-                    scrollTrigger: { trigger: $(this.el).find('.about-team-info-avt'), start: 'top 80%' },
-                    allowMobile: true,
-                    tweenArr: [
-                        ...Array.from($(this.el).find('.about-team-info-avt-item')).flatMap((item, idx) => new FadeIn({ el: $(item).get(0) })),
-                        new FadeIn({ el: $(this.el).find('.about-team-info-avt-active-wrap').get(0) })
-                    ]
-                })
 
                 if (viewport.w > 767) {
                     new MasterTimeline({
@@ -2069,6 +2062,8 @@ const script = () => {
                         scrollTrigger: { trigger: $(this.el).find('.about-team-main') },
                         allowMobile: true,
                         tweenArr: [
+                            ...Array.from($(this.el).find('.about-team-info-avt-item')).flatMap((item, idx) => new FadeIn({ el: $(item).get(0) })),
+                            new FadeIn({ el: $(this.el).find('.about-team-info-avt-active-wrap').get(0) }),
                             new ScaleInset({ el: $(this.el).find('.about-team-avt-item-inner').eq(0).get(0) }),
                             new FadeSplitText({ el: $(this.el).find('.about-team-info-item.active .about-team-info-name').get(0) }),
                             new FadeSplitText({ el: $(this.el).find('.about-team-info-item.active .about-team-info-role').get(0) }),
@@ -2135,7 +2130,7 @@ const script = () => {
                 const scrollTop = window.scrollY || window.pageYOffset;
                 const rectTop = $(this.el).get(0).getBoundingClientRect().top;
                 $(this.el).find('.about-team-info-avt-item').on('click', function () {
-                    smoothScroll.lenis.scrollTo((scrollTop + rectTop) + (viewport.h * $(this).index()));
+                    smoothScroll.lenis.scrollTo((scrollTop + rectTop) + (viewport.h * (viewport > 991 ? 1 : .25) * $(this).index()));
                 })
 
                 const onUpdateProgress = (progress) => {
