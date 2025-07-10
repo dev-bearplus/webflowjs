@@ -1751,7 +1751,7 @@ const script = () => {
                         "(min-width: 992px)": {
                             slides: { perView: 3, spacing: parseRem(215) },
                         },
-                    }
+                    },
                     rubberband: false,
                     created: () => {
                         $(this.el).find(".prod-hiw-main-list").css('grid-column-gap', 0);
