@@ -1737,13 +1737,21 @@ const script = () => {
 
                 let slider = new KeenSlider($(this.el).find(".prod-hiw-main-list").get(0), {
                     slides: {
-                        perView: 3,
-                        spacing: parseRem(215),
+                        perView: 1,
+                        spacing: parseRem(20),
                         origin: "center"
                     },
                     defaultAnimation: {
                         duration: 1200,
                     },
+                    breakpoints: {
+                        "(min-width: 768px)": {
+                            slides: { perView: 3, spacing: parseRem(43)  },
+                        },
+                        "(min-width: 992px)": {
+                            slides: { perView: 3, spacing: parseRem(215) },
+                        },
+                    }
                     rubberband: false,
                     created: () => {
                         $(this.el).find(".prod-hiw-main-list").css('grid-column-gap', 0);
