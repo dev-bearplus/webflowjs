@@ -1083,10 +1083,6 @@ const script = () => {
                 super.setTrigger(this.el, this.onTrigger.bind(this));
             }
             onTrigger() {
-                if (viewport.w <= 767) {
-                    this.slideCard();
-                }
-
                 this.animationReveal();
                 this.handleAccordion();
             }
@@ -1149,29 +1145,6 @@ const script = () => {
                             { autoAlpha: 0, duration: .2 }, "-=.6")
                 })
                 this
-            }
-            slideCard() {
-                $(this.el).find(".home-challenge-list").addClass('keen-slider');
-                $(this.el).find(".home-challenge-list").css('grid-column-gap', 0);
-                $(this.el).find(".home-challenge-item").addClass('keen-slider__slide');
-                let slider = new KeenSlider($(this.el).find(".home-challenge-list").get(0), {
-                    slides: {
-                        perView: 1.1,
-                        spacing: parseRem(16),
-                    },
-                    defaultAnimation: {
-                        duration: 1000
-                    },
-                    dragSpeed: 1.2,
-                    detailsChanged: (slider) => {
-                        const details = slider.track.details;
-                        const current = details.rel + 1;
-                        const total = details.slides.length;
-                        const progress = current / (total );
-
-                        $(this.el).find(".home-challenge-progress-inner").css('width', `${progress * 100}%`);
-                    }
-                })
             }
             handleAccordion() {
                 $(this.el).find('.home-challenge-item').on('click', debounce(function (e) {
@@ -1976,7 +1949,6 @@ const script = () => {
                     ]
                 })
                 $(this.el).find('.about-story-item').each((idx, el) => {
-                    // (viewport.w > 767) && new ParallaxImage({ el: $(el).find('img').get(0) })
                     (viewport.w > 767) && new ParallaxImage({ el: $(el).find('img').get(0) })
 
                     new MasterTimeline({
@@ -1984,9 +1956,7 @@ const script = () => {
                         scrollTrigger: { trigger: $(el) },
                         allowMobile: true,
                         tweenArr: [
-                            new ScaleInset({
-                                el: $(el).find('.about-story-item-img').get(0), elInner: $(el).find('.about-story-item-img-inner').get(0)
-                            }),
+                            new ScaleInset({ el: $(el).find('.about-story-item-img').get(0), elInner: $(el).find('.about-story-item-img-inner').get(0) }),
                             new FadeSplitText({ el: $(el).find('.about-story-item-content').get(0),  })
                         ]
                     })
@@ -2061,13 +2031,14 @@ const script = () => {
                 super();
                 this.el = null;
                 this.tlOverlap = null;
+                this.currentIdx = 0;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.about-team-wrap');
                 super.setTrigger(this.el, this.onTrigger.bind(this));
             }
             onTrigger() {
-                this.interact();
+                this.animationScrub();
                 this.animationReveal();
             }
             animationReveal() {
@@ -2131,8 +2102,23 @@ const script = () => {
                     ))
                 }
             }
-            interact() {
-                let itemLength = $(this.el).find('.about-team-info-avt-item').length;
+            animationScrub() {
+                const itemLength = $(this.el).find('.about-team-info-item').length;
+                const step = 1 / itemLength;
+                const breakPoints = Array.from({ length: itemLength + 1 }, (_, index) => parseFloat((index * step).toPrecision(2)));
+
+                this.tlActive = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el),
+                        start: 'top top',
+                        end: 'bottom bottom',
+                        scrub: 1,
+                        onUpdate: (self) => {
+                            onUpdateProgress(self.progress);
+                        }
+                    }
+                })
+
                 const activeIndex = (index) => {
                     $(this.el).find('.about-team-avt-item').eq(index).addClass('active').siblings().removeClass('active');
                     $(this.el).find('.about-team-info-item').eq(index).addClass('active').siblings().removeClass('active');
@@ -2141,13 +2127,30 @@ const script = () => {
                     gsap.to($(this.el).find('.about-team-info-avt-active-ic'), { filter: 'contrast(0.3)', duration: .4, clearProps: 'all' });
                     $(this.el).find('.about-team-info-avt-item').eq(index).addClass('active').siblings().removeClass('active');
                     setTimeout(() => {
-                        $(this.el).find('.about-team-info-avt-active').css(`grid-template-${viewport.w > 991 ? 'columns' : 'rows'}`, `${index}fr 1fr ${itemLength - index - 1}fr`)
+                        $(this.el).find('.about-team-info-avt-active').css('grid-template-rows', `${index}fr 1fr ${itemLength - index - 1}fr`)
                     }, 100);
                 }
                 activeIndex(0);
+
+                const scrollTop = window.scrollY || window.pageYOffset;
+                const rectTop = $(this.el).get(0).getBoundingClientRect().top;
                 $(this.el).find('.about-team-info-avt-item').on('click', function () {
-                    activeIndex($(this).index());
+                    smoothScroll.lenis.scrollTo((scrollTop + rectTop) + (viewport.h * $(this).index()));
                 })
+
+                const onUpdateProgress = (progress) => {
+                    for (let i = 0; i < breakPoints.length - 1; i++) {
+                        const startPoint = breakPoints[i];
+                        const endPoint = breakPoints[i + 1];
+
+                        if (progress >= startPoint && progress < endPoint) {
+                            if (this.currentIdx !== i) {
+                                this.currentIdx = i;
+                                activeIndex(this.currentIdx);
+                            };
+                        }
+                    }
+                }
             }
         },
         News: class extends TriggerSetup {
