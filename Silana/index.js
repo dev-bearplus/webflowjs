@@ -1110,7 +1110,7 @@ const script = () => {
                                 new ScaleLine({ el: $(el).find('.home-challenge-item-line').get(0) }),
                                 new FadeSplitText({ el: $(el).find('.home-challenge-item-label').get(0) }),
                                 new FadeSplitText({ el: $(el).find('.home-challenge-item-title').get(0) }),
-                                new FadeSplitText({ el: $(el).find('.home-challenge-item-desc').get(0) }),
+                                idx === 0 && new FadeSplitText({ el: $(el).find('.home-challenge-item-desc').get(0) }),
                                 new FadeIn({ el: $(el).find('.home-challenge-item-ic').get(0) })
                             ]
                         ))
@@ -1234,20 +1234,20 @@ const script = () => {
                             new FadeSplitText({ el: $(this.el).find('.home-solution-desc').get(0) }),
                         ]
                     })
+                    new MasterTimeline({
+                        triggerInit: this.el,
+                        scrollTrigger: {
+                            trigger: this.el,
+                            start: `top top+=75%`
+                        },
+                        allowMobile: true,
+                        tweenArr: [
+                            new FadeIn({ el: $(this.el).find('.home-solution-main-transform').get(0), clearProps: 'transform, opacity' }),
+                            new FadeIn({ el: $(this.el).find('.home-solution-main-decor').get(0) }),
+                            new FadeIn({ el: $(this.el).find('.home-solution-main-vid').get(0) })
+                        ]
+                    })
                 }
-                new MasterTimeline({
-                    triggerInit: this.el,
-                    scrollTrigger: {
-                        trigger: this.el,
-                        start: viewport.w > 991 ? `top+=${viewport.h - $(this.el).find('.home-solution-title').get(0).offsetTop} top` : `top top+=75%`
-                    },
-                    allowMobile: true,
-                    tweenArr: [
-                        new FadeIn({ el: $(this.el).find('.home-solution-main-transform').get(0), clearProps: 'transform, opacity' }),
-                        new FadeIn({ el: $(this.el).find('.home-solution-main-decor').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.home-solution-main-vid').get(0) })
-                    ]
-                })
 
                 this.tlFadeHead = gsap.timeline({ paused: true })
                 new MasterTimeline({
