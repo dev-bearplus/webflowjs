@@ -706,6 +706,7 @@ const script = () => {
         constructor() {
             super();
             this.el = null;
+            this.tlOverlap = null;
         }
         trigger(data) {
             this.el = data.next.container.querySelector('.footer');
@@ -736,6 +737,7 @@ const script = () => {
                 }
             })
             this.animationReveal();
+            this.animationScrub();
         }
         animationReveal() {
             new MasterTimeline({
@@ -783,7 +785,22 @@ const script = () => {
                 ]
             })
         }
+        animationScrub() {
+            this.tlOverlap = gsap.timeline({
+                scrollTrigger: {
+                    trigger: $(this.el).find('.footer-main-wrap'),
+                    start: 'bottom bottom',
+                    end: `bottom bottom-=${$(this.el).find('.footer-bot').outerHeight()}`,
+                    scrub: 1
+                }
+            })
+            this.tlOverlap.fromTo($(this.el).find('.footer-bot'), { yPercent: 20 }, { yPercent: 0, ease: 'sine.out' });
+            console.log($(this.el).find('.footer-bot').height())
+        }
         destroy() {
+            if (this.tlOverlap) {
+                this.tlOverlap.kill();
+            }
         }
     }
     const footer = new Footer();
@@ -808,7 +825,6 @@ const script = () => {
                 tweenArr: [
                     new FadeIn({ el: $(this.el).find('.main-cta-bg').get(0) }),
                     new FadeSplitText({ el: $(this.el).find('.main-cta-title').get(0) }),
-                    new FadeSplitText({ el: $(this.el).find('.main-cta-desc').get(0) }),
                     new FadeIn({ el: $(this.el).find('.main-cta-btn').get(0) }),
                     new FadeIn({ el: $(this.el).find('.main-cta-decor').get(0) })
                 ]
@@ -1072,6 +1088,7 @@ const script = () => {
                 }
 
                 this.animationReveal();
+                this.handleAccordion();
             }
             animationReveal() {
                 new MasterTimeline({
@@ -1131,6 +1148,7 @@ const script = () => {
                         .to($(item).find('.home-challenge-item-content-overlay'),
                             { autoAlpha: 0, duration: .2 }, "-=.6")
                 })
+                this
             }
             slideCard() {
                 $(this.el).find(".home-challenge-list").addClass('keen-slider');
@@ -1157,6 +1175,12 @@ const script = () => {
                     });
                 }])
             }
+            handleAccordion() {
+                $(this.el).find('.home-challenge-item').on('click', debounce(function (e) {
+                    let current = $(e.target).closest('.home-challenge-item');
+                    $(current).addClass('active').siblings().removeClass('active');
+                }, 100))
+            }
             destroy() {
                 if (this.tlParallax.length > 0) {
                     this.tlParallax.forEach(tl => tl.kill());
@@ -1174,6 +1198,9 @@ const script = () => {
                 this.tlStickMade = null;
                 this.tlHorizontal = null;
                 this.tlOverlap = null;
+                this.fadeSec = null;
+                this.tlFadeHead = null;
+                this.tlFadeBody = null;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-solution-wrap');
@@ -1221,35 +1248,22 @@ const script = () => {
                         new FadeIn({ el: $(this.el).find('.home-solution-main-vid').get(0) })
                     ]
                 })
+
+                this.tlFadeHead = gsap.timeline({ paused: true })
                 new MasterTimeline({
                     triggerInit: this.el,
-                    scrollTrigger: {
-                        trigger: $(this.el).find('.home-made'),
-                        start: viewport.w > 991 ? `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.9)} top` : `top top+=75%`
-                    },
+                    timeline: this.tlFadeHead,
                     allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $(this.el).find('.home-made-title').get(0), onComplete: () => headingFlipping.play() }),
+                        new FadeIn({ el: $(this.el).find('.home-made-map').get(0) })
                     ],
                 })
+
+                this.tlFadeBody = gsap.timeline({ paused: true })
                 new MasterTimeline({
                     triggerInit: this.el,
-                    scrollTrigger: {
-                        trigger: $(this.el).find('.home-made'),
-                        start: viewport.w > 991 ? `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.7)} top` : `top top+=75%`,
-                    },
-                    allowMobile: true,
-                    tweenArr: [
-                        new FadeIn({ el: $(this.el).find('.home-made-map').get(0) })
-                    ]
-                })
-                new MasterTimeline({
-                    triggerInit: this.el,
-                    scrollTrigger: {
-                        trigger: $(this.el).find('.home-made'),
-                        start: viewport.w > 991 ? `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 2.2)} top` : `top top+=50%`,
-                        fastScrollEnd: true
-                    },
+                    timeline: this.tlFadeBody,
                     allowMobile: true,
                     tweenArr: [
                         new ScaleLine({ el: $(this.el).find('.home-solution-line').get(0) }),
@@ -1272,14 +1286,25 @@ const script = () => {
                     this.sections = this.el.querySelectorAll('section');
                     this.horizontalLayout(this.sections);
 
+                    this.tlFadeShirt = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: $(this.el).find('.home-solution'),
+                            start: `top+=${viewport.h} bottom`,
+                            end: `bottom-=${viewport.h * 2} bottom`,
+                            scrub: 1,
+                            anticipatePin: 1
+                        },
+                    })
+                    this.tlFadeShirt.fromTo($(this.el).find('.home-solution-main-inner'), { autoAlpha: 0 }, { autoAlpha: 1 });
+
                     this.tlStickSol = gsap.timeline({
                         scrollTrigger: {
                             trigger: $(this.el).find('.home-solution'),
                             start: `top+=${viewport.h * .8} top`,
                             end: `bottom-=${viewport.h * 1.2} bottom`,
                             scrub: 1,
-                            anticipatePin: 1,
-                        }
+                            anticipatePin: 1
+                        },
                     })
 
                     this.tlStickSol
@@ -1325,13 +1350,13 @@ const script = () => {
             horizontalLayout(sections) {
                 let sizeScroller = $(this.el).find('.solution-scroller').height();
                 gsap.set(this.el.querySelector('.home-solution-inner'), { display: 'flex' })
-
                 ScrollTrigger.getAll().forEach(trigger => {
                     if (trigger.progress === 0) {
                         trigger.refresh();
                     }
                 });
 
+                let fadeIn = false;
                 this.tlHorizontal = gsap.timeline({
                     scrollTrigger: {
                         trigger: $(this.el).find('.solution-scroller'),
@@ -1339,7 +1364,15 @@ const script = () => {
                         end: `bottom+=${viewport.h * 1.3} bottom`,
                         scrub: 1,
                         anticipatePin: 1,
-                        snap: 1
+                        snap: 1,
+                        onUpdate: (self) => {
+                            console.log(self.progress)
+                            if (self.progress > 0.8 && !fadeIn) {
+                                fadeIn = true;
+                                this.tlFadeHead.play();
+                                this.tlFadeBody.play();
+                            }
+                        }
                     }
                 })
 
