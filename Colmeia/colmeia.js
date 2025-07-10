@@ -138,7 +138,36 @@ const mainScript = () => {
             timer = setTimeout(func, wait, event);
         };
     }
+    function setupUnloadCheckForPlayer(player, video_name) {
+        if (!player || typeof player.getPlayerState !== 'function') {
+            console.warn('Invalid player passed to setupUnloadCheckForPlayer');
+            return;
+        }
+        window.addEventListener('beforeunload', function(e) {
+            const state = player.getPlayerState();
 
+            // Nếu video chưa kết thúc
+            if (state !== YT.PlayerState.ENDED) {
+            let currentTime = 0;
+            try {
+                if (typeof player.getCurrentTime === 'function') {
+                currentTime = player.getCurrentTime();
+                }
+            } catch (err) {
+                console.warn('Error getting current time:', err);
+            }
+
+            const videoData = player.getVideoData ? player.getVideoData() : {};
+            const videoId = videoData.video_id || 'unknown';
+            let data = {
+                event: 'video-youtube-close',
+                video_name : video_name,
+                time_video_play : currentTime
+            }
+            sendGGTag(data)
+            } 
+        });
+    }
     const documentHeightObserver = (() => {
         let previousHeight = document.documentElement.scrollHeight;
         let resizeObserver;
@@ -738,10 +767,10 @@ const mainScript = () => {
     const initAllPopup = () => {
         let demoPlayer;
         let demoPlayerState = null; 
+        const iframeId = $('.demo-vid-inner').attr('data-iframe-id');
+        const nameVideo = $('.demo-vid-inner').attr('data-name-video');
         initPopup('demo', {
             onOpen: () => {
-                const iframeId = $('.demo-vid-inner').attr('data-iframe-id');
-                const nameVideo = $('.demo-vid-inner').attr('data-name-video');
                 if (!demoPlayer) {
                     demoPlayer = new YT.Player($('.demo-vid-inner').get(0), {
                     videoId: iframeId,
@@ -780,7 +809,6 @@ const mainScript = () => {
                 }
             },
             onClose: () => {
-                const nameVideo = $('.demo-vid-inner').attr('data-name-video');
                 if (demoPlayer && demoPlayer.getCurrentTime) {
                     console.log(demoPlayer.getCurrentTime())
                     if (demoPlayerState !== YT.PlayerState.ENDED) {
@@ -1414,12 +1442,12 @@ const mainScript = () => {
                     //     } });
                     // })
                     let homePlayer;
+                    let iframeSrc = new URL($('.home-hero-thumb-vid-inner').attr('data-iframe-src'));
+                    let videoId = iframeSrc.pathname.split('/').pop();
+                    let nameVideo = $('.home-hero-thumb-vid-inner').attr('data-name-video');
+                    let demoPlayerState = null;
                     $('.home-hero-thumb-btn a').on('click', function(e) {
                         e.preventDefault();
-                        let iframeSrc = new URL($('.home-hero-thumb-vid-inner').attr('data-iframe-src'));
-                        let videoId = iframeSrc.pathname.split('/').pop();
-                        let nameVideo = $('.home-hero-thumb-vid-inner').attr('data-name-video');
-                        let demoPlayerState = null;
                         if (!homePlayer) {
                             homePlayer = new YT.Player($('.home-hero-thumb-vid-inner').get(0), {
                             videoId: videoId,
@@ -1430,6 +1458,7 @@ const mainScript = () => {
                             events: {
                                 'onReady': function(event) {
                                     console.log('Video ready');
+                                    setupUnloadCheckForPlayer(homePlayer, nameVideo);
                                     let data = {
                                         event: 'video-youtube-start',
                                         video_name : nameVideo
@@ -1468,7 +1497,7 @@ const mainScript = () => {
                                 }
                             });
                         }
-
+                        
                     });
                 }
                 scHero();
@@ -2247,9 +2276,9 @@ const mainScript = () => {
                     // })
                     let prodPlayer;
                     let demoPlayerState = null;
+                    let nameVideo = $('.prod-hero-thumb-vid-inner').attr('data-name-video');
                     $('.prod-hero-thumb-btn a').on('click', function (e) {
                         e.preventDefault();
-                        let nameVideo = $('.prod-hero-thumb-vid-inner').attr('data-name-video');
                         const iframeId = $('.prod-hero-thumb-vid-inner').attr('data-iframe-id');
                         if (!prodPlayer) {
                             prodPlayer = new YT.Player($('.prod-hero-thumb-vid-inner').get(0), {
@@ -2261,6 +2290,7 @@ const mainScript = () => {
                             events: {
                                 'onReady': function(event) {
                                     console.log('Video ready');
+                                    setupUnloadCheckForPlayer(prodPlayer, nameVideo);
                                     let data = {
                                         event: 'video-youtube-start',
                                         video_name : nameVideo
@@ -2298,6 +2328,7 @@ const mainScript = () => {
                         });
                         }
                     });
+                    
                 }
                 scHero();
 
