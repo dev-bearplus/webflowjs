@@ -740,56 +740,58 @@ const mainScript = () => {
         let demoPlayerState = null; 
         initPopup('demo', {
             onOpen: () => {
-            const iframeId = $('.demo-vid-inner').attr('data-iframe-id');
-            const nameVideo = $('.demo-vid-inner').attr('data-name-video');
-
-            if (!demoPlayer) {
-                demoPlayer = new YT.Player($('.demo-vid-inner').get(0), {
-                videoId: iframeId,
-                playerVars: {
-                    autoplay: 1,
-                    origin: window.location.origin
-                },
-                events: {
-                    'onReady': function(event) {
-                        console.log('Player ready');
-                        event.target.playVideo();
-                        let data = {
-                            event: 'video-youtube-start',
-                            video_name : nameVideo
-                        }
-                        sendGGTag(data);
+                const iframeId = $('.demo-vid-inner').attr('data-iframe-id');
+                const nameVideo = $('.demo-vid-inner').attr('data-name-video');
+                if (!demoPlayer) {
+                    demoPlayer = new YT.Player($('.demo-vid-inner').get(0), {
+                    videoId: iframeId,
+                    playerVars: {
+                        autoplay: 1,
+                        origin: window.location.origin
                     },
-                    'onStateChange': function(event) {
-                        demoPlayerState = event.data;
-                        if (event.data === YT.PlayerState.ENDED) {
-                            console.log('Video ended');
-
+                    events: {
+                        'onReady': function(event) {
+                            console.log('Player ready');
                             let data = {
-                                event: 'video-youtube-complete',
+                                event: 'video-youtube-start',
                                 video_name : nameVideo
                             }
+                            console.log(data)
                             sendGGTag(data);
+                        },
+                        'onStateChange': function(event) {
+                            demoPlayerState = event.data;
+                            if (event.data === YT.PlayerState.ENDED) {
+                                console.log('Video ended');
+
+                                let data = {
+                                    event: 'video-youtube-complete',
+                                    video_name : nameVideo
+                                }
+                                sendGGTag(data);
+                            }
                         }
-                    }
-                },
+                    },
                 
                 });
-            } else {
-                demoPlayer.loadVideoById(iframeId);
-                demoPlayer.playVideo();
-            }
+                } else {
+                    demoPlayer.loadVideoById(iframeId);
+                    demoPlayer.playVideo();
+                }
             },
             onClose: () => {
+                const nameVideo = $('.demo-vid-inner').attr('data-name-video');
                 if (demoPlayer && demoPlayer.getCurrentTime) {
+                    console.log(demoPlayer.getCurrentTime())
                     if (demoPlayerState !== YT.PlayerState.ENDED) {
-                    const seconds = demoPlayer.getCurrentTime();
-                    let data = {
-                        event: 'video-youtube-close',
-                        video_name : nameVideo,
-                        time_video_play : seconds
-                    }
-                    sendGGTag(data);
+                        const seconds = demoPlayer.getCurrentTime();
+                        let data = {
+                            event: 'video-youtube-close',
+                            video_name : nameVideo,
+                            time_video_play : seconds
+                        }
+                        console.log(data)
+                        sendGGTag(data);
                     } else {
                         console.log('Video was complete, not sending current time.');
                     }
@@ -1417,6 +1419,7 @@ const mainScript = () => {
                         let iframeSrc = new URL($('.home-hero-thumb-vid-inner').attr('data-iframe-src'));
                         let videoId = iframeSrc.pathname.split('/').pop();
                         let nameVideo = $('.home-hero-thumb-vid-inner').attr('data-name-video');
+                        let demoPlayerState = null;
                         if (!homePlayer) {
                             homePlayer = new YT.Player($('.home-hero-thumb-vid-inner').get(0), {
                             videoId: videoId,
@@ -1427,7 +1430,6 @@ const mainScript = () => {
                             events: {
                                 'onReady': function(event) {
                                     console.log('Video ready');
-                                    event.target.playVideo();
                                     let data = {
                                         event: 'video-youtube-start',
                                         video_name : nameVideo
@@ -2244,7 +2246,7 @@ const mainScript = () => {
                     //     } });
                     // })
                     let prodPlayer;
-
+                    let demoPlayerState = null;
                     $('.prod-hero-thumb-btn a').on('click', function (e) {
                         e.preventDefault();
                         let nameVideo = $('.prod-hero-thumb-vid-inner').attr('data-name-video');
@@ -2259,7 +2261,6 @@ const mainScript = () => {
                             events: {
                                 'onReady': function(event) {
                                     console.log('Video ready');
-                                    event.target.playVideo();
                                     let data = {
                                         event: 'video-youtube-start',
                                         video_name : nameVideo
