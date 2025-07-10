@@ -1738,19 +1738,11 @@ const script = () => {
                 let slider = new KeenSlider($(this.el).find(".prod-hiw-main-list").get(0), {
                     slides: {
                         perView: 3,
-                        spacing: parseRem(43),
+                        spacing: parseRem(215),
                         origin: "center"
                     },
                     defaultAnimation: {
                         duration: 1200,
-                    },
-                    breakpoints: {
-                        "(min-width: 768px)": {
-                            slides: { spacing: parseRem(43)  },
-                        },
-                        "(min-width: 992px)": {
-                            slides: { spacing: parseRem(215) },
-                        },
                     },
                     rubberband: false,
                     created: () => {
