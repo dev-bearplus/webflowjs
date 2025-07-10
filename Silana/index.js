@@ -716,22 +716,21 @@ const script = () => {
             new Marquee($(this.el).find('.footer-bot-text [data-marquee="list"]'), 40).setup();
             new Marquee($(this.el).find('.footer-bot-ruler [data-marquee="list"]'), 10).setup();
             $(this.el).find('.footer-cta-submit input[type="submit"]').on('click', (e) => {
-                console.log("click")
                 let email = $(this.el).find('.footer-cta-input[name="email"]');
 
                 let flag = false;
                 if(email.val() === ''){
-                    $(this.el).find('.footer-cta-input-wrap').addClass('valid-null');
+                    email.closest('.footer-cta-input-wrap').addClass('valid-null');
                     flag = true;
                 }
                 else if(!validateEmail(email.val())){
-                    $(this.el).find('.footer-cta-input-wrap').removeClass('valid-null');
-                    $(this.el).find('.footer-cta-input-wrap').addClass('valid-format');
+                    email.closest('.footer-cta-input-wrap').removeClass('valid-null');
+                    email.closest('.footer-cta-input-wrap').addClass('valid-format');
                     flag = true;
                 }
                 else {
-                    $(this.el).find('.footer-cta-input-wrap').removeClass('valid-null');
-                    $(this.el).find('.footer-cta-input-wrap').removeClass('valid-format');
+                    email.closest('.footer-cta-input-wrap').removeClass('valid-null');
+                    email.closest('.footer-cta-input-wrap').removeClass('valid-format');
                 }
                 if(flag){
                     e.preventDefault();
@@ -1199,7 +1198,6 @@ const script = () => {
                 this.tlStickMade = null;
                 this.tlHorizontal = null;
                 this.tlOverlap = null;
-                this.fadeSec = null;
                 this.tlFadeHead = null;
                 this.tlFadeBody = null;
             }
@@ -1340,7 +1338,7 @@ const script = () => {
                 this.tlOverlap = gsap.timeline({
                     scrollTrigger: {
                         trigger: this.el,
-                        start: `bottom-=${viewport.h * 1.5} bottom`,
+                        start: `bottom-=${viewport.h * 2} bottom`,
                         end: `bottom bottom`,
                         scrub: 1
                     },
@@ -1348,7 +1346,7 @@ const script = () => {
                 this.tlOverlap
                     .to('.home-made-body', { scale: 0.8, transformOrigin: 'top', autoAlpha: 0.6, duration: 1, ease: 'power2.in' })
                     .to('.home-made-title', { scale: .95, transformOrigin: 'bottom', autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
-                    .to('.home-made-map', { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
+                    .fromTo('.home-made-map', { scale: 1, autoAlpha: 1 }, { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
             }
             horizontalLayout(sections) {
                 let sizeScroller = $(this.el).find('.solution-scroller').height();
@@ -1364,13 +1362,12 @@ const script = () => {
                     scrollTrigger: {
                         trigger: $(this.el).find('.solution-scroller'),
                         start: `top+=${viewport.h * 1.5} top`,
-                        end: `bottom+=${viewport.h * 1.3} bottom`,
+                        end: `bottom+=${viewport.h * 1.5} bottom`,
                         scrub: 1,
                         anticipatePin: 1,
                         snap: 1,
                         onUpdate: (self) => {
-                            console.log(self.progress)
-                            if (self.progress > 0.8 && !fadeIn) {
+                            if (self.progress > 0.7 && !fadeIn) {
                                 fadeIn = true;
                                 this.tlFadeHead.play();
                                 this.tlFadeBody.play();
@@ -1397,50 +1394,6 @@ const script = () => {
                 if (this.tlOverlap) {
                     this.tlOverlap.kill()
                 }
-            }
-        },
-        Benefit: class extends TriggerSetup {
-            constructor() {
-                super();
-                this.el = null;
-            }
-            trigger(data) {
-                this.el = data.next.container.querySelector('.home-benefit-wrap');
-                super.setTrigger(this.el, this.onTrigger.bind(this));
-            }
-            onTrigger() {
-                this.animationReveal();
-            }
-            animationReveal() {
-                new MasterTimeline({
-                    triggerInit: this.el,
-                    scrollTrigger: {
-                        trigger: this.el,
-                        start: `top top+=50%`
-                    },
-                    allowMobile: true,
-                    tweenArr: [
-                        new FadeSplitText({ el: $(this.el).find('.home-benefit-label').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-benefit-title').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.home-benefit-btn').get(0) })
-                    ]
-                })
-                new MasterTimeline({
-                    triggerInit: this.el,
-                    scrollTrigger: {
-                        trigger: this.el,
-                        start: `top top+=50%`
-                    },
-                    allowMobile: true,
-                    tweenArr: [
-                        ...Array.from($(this.el).find('.home-benefit-item')).flatMap((el, idx) => [
-                            new ScaleLine({ el: $(el).find('.line').get(0) }),
-                            new FadeIn({ el: $(el).find('.home-benefit-item-ic').get(0) }),
-                            new FadeSplitText({ el: $(el).find('.home-benefit-item-content').get(0) })
-                        ])
-                    ],
-                    stagger: .08
-                })
             }
         },
         News: class extends TriggerSetup {
@@ -1698,6 +1651,50 @@ const script = () => {
                         new FadeSplitText({ el: $(this.el).find('.prod-solution-desc-txt').get(0) }),
                         new FadeIn({ el: $(this.el).find('.prod-solution-btn').get(0), delay: "<=.3" })
                     ]
+                })
+            }
+        },
+        Benefit: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.about-benefit-wrap');
+                super.setTrigger(this.el, this.onTrigger.bind(this));
+            }
+            onTrigger() {
+                this.animationReveal();
+            }
+            animationReveal() {
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: `top top+=50%`
+                    },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.about-benefit-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-benefit-title').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.about-benefit-btn').get(0) })
+                    ]
+                })
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: `top top+=50%`
+                    },
+                    allowMobile: true,
+                    tweenArr: [
+                        ...Array.from($(this.el).find('.about-benefit-item')).flatMap((el, idx) => [
+                            new ScaleLine({ el: $(el).find('.line').get(0) }),
+                            new FadeIn({ el: $(el).find('.about-benefit-item-ic').get(0) }),
+                            new FadeSplitText({ el: $(el).find('.about-benefit-item-content').get(0) })
+                        ])
+                    ],
+                    stagger: .08
                 })
             }
         },
