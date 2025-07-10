@@ -1620,7 +1620,7 @@ const script = () => {
                     allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $(this.el).find('.prod-solution-desc-txt').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.prod-solution-btn').get(0), delay: "<=.3" })
+                        new FadeIn({ el: $(this.el).find('.prod-solution-btn').get(0), delay: "<=50%" })
                     ]
                 })
             }
@@ -1738,12 +1738,20 @@ const script = () => {
                 let slider = new KeenSlider($(this.el).find(".prod-hiw-main-list").get(0), {
                     slides: {
                         perView: 3,
-                        spacing: parseRem(215),
+                        spacing: parseRem(43),
                         origin: "center"
                     },
                     defaultAnimation: {
                         duration: 1200,
                     },
+                    breakpoints: {
+                        "(min-width: 768px)": {
+                            slides: { spacing: parseRem(43)  },
+                        },
+                        "(min-width: 992px)": {
+                            slides: { spacing: parseRem(215) },
+                        },
+                    }
                     rubberband: false,
                     created: () => {
                         $(this.el).find(".prod-hiw-main-list").css('grid-column-gap', 0);
@@ -2130,7 +2138,7 @@ const script = () => {
                 const scrollTop = window.scrollY || window.pageYOffset;
                 const rectTop = $(this.el).get(0).getBoundingClientRect().top;
                 $(this.el).find('.about-team-info-avt-item').on('click', function () {
-                    smoothScroll.lenis.scrollTo((scrollTop + rectTop) + (viewport.h * (viewport > 991 ? 1 : .25) * $(this).index()));
+                    // smoothScroll.lenis.scrollTo((scrollTop + rectTop) + (viewport.h * (viewport > 991 ? 1 : .25) * $(this).index()));
                 })
 
                 const onUpdateProgress = (progress) => {
