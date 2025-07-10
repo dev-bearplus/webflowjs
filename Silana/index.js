@@ -1154,7 +1154,7 @@ const script = () => {
                 $(this.el).find(".home-challenge-list").addClass('keen-slider');
                 $(this.el).find(".home-challenge-list").css('grid-column-gap', 0);
                 $(this.el).find(".home-challenge-item").addClass('keen-slider__slide');
-                let slider = new KeenSlider(".home-challenge-list", {
+                let slider = new KeenSlider($(this.el).find(".home-challenge-list").get(0), {
                     slides: {
                         perView: 1.1,
                         spacing: parseRem(16),
@@ -1163,17 +1163,15 @@ const script = () => {
                         duration: 1000
                     },
                     dragSpeed: 1.2,
-                },
-                [slider => {
-                    slider.on("detailsChanged", () => {
+                    detailsChanged: (slider) => {
                         const details = slider.track.details;
                         const current = details.rel + 1;
                         const total = details.slides.length;
                         const progress = current / (total );
 
                         $(this.el).find(".home-challenge-progress-inner").css('width', `${progress * 100}%`);
-                    });
-                }])
+                    }
+                })
             }
             handleAccordion() {
                 $(this.el).find('.home-challenge-item').on('click', debounce(function (e) {
@@ -2009,17 +2007,15 @@ const script = () => {
                         duration: 1000
                     },
                     dragSpeed: 1.2,
-                },
-                [slider => {
-                    slider.on("detailsChanged", () => {
+                    detailsChanged: (slider) => {
                         const details = slider.track.details;
                         const current = details.rel + 1;
                         const total = details.slides.length;
                         const progress = current / (total );
 
                         $(this.el).find(".about-story-progress-inner").css('width', `${progress * 100}%`);
-                    });
-                }])
+                    },
+                })
             }
         },
         Vision: class extends TriggerSetup {
@@ -2235,7 +2231,7 @@ const script = () => {
                 $(this.el).find(".about-job-main-list").addClass('keen-slider');
                 $(this.el).find(".about-job-main-list").css('grid-column-gap', 0);
                 $(this.el).find(".about-job-main-item").addClass('keen-slider__slide');
-                let slider = new KeenSlider(".about-job-main-list", {
+                let slider = new KeenSlider($(this.el).find(".about-job-main-list").get(0), {
                     slides: {
                         perView: 'auto',
                         spacing: parseRem(20),
