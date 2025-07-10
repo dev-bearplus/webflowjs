@@ -1311,27 +1311,29 @@ const script = () => {
                         .fromTo($(this.el).find('.home-solution-main-transform'), { bottom: '100%' }, { bottom: '0%' })
                         .fromTo($(this.el).find('.home-solution-main-vid-halftone'), { height: '100%' }, { height: '0%' }, "<=0")
 
-                    this.tlStickMade = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: $(this.el).find('.home-made'),
-                            scrub: 1,
-                            start: `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.9)} top`,
-                            end: 'bottom bottom',
-                            anticipatePin: 1
-                        }
-                    })
+                    //notes: animation overlap card
 
-                    const space_accord_process = parseInt($(this.el).find('.home-made-body-item-size').css('width'))
-                    this.el.querySelectorAll('.home-made-body-item').forEach((item, index) => {
-                        if (($(this.el).find('.home-made-body-item').length - 1) > index) {
-                            this.tlStickMade.to(item, { width: space_accord_process, ease: 'none' })
-                            this.tlStickMade.to($(item).find('.home-made-body-item-desc'), {autoAlpha:0,ease:'none'}, '<')
-                        }
-                        else {
-                            let space_accord_remaining = viewport.w - (space_accord_process * (this.el.querySelectorAll('.home-made-body-item').length - 1))
-                            this.tlStickMade.to(item, { width: space_accord_remaining, ease: 'none' }, 0)
-                        }
-                    })
+                    // this.tlStickMade = gsap.timeline({
+                    //     scrollTrigger: {
+                    //         trigger: $(this.el).find('.home-made'),
+                    //         scrub: 1,
+                    //         start: `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.9)} top`,
+                    //         end: 'bottom bottom',
+                    //         anticipatePin: 1
+                    //     }
+                    // })
+
+                    // const space_accord_process = parseInt($(this.el).find('.home-made-body-item-size').css('width'))
+                    // this.el.querySelectorAll('.home-made-body-item').forEach((item, index) => {
+                    //     if (($(this.el).find('.home-made-body-item').length - 1) > index) {
+                    //         this.tlStickMade.to(item, { width: space_accord_process, ease: 'none' })
+                    //         this.tlStickMade.to($(item).find('.home-made-body-item-desc'), {autoAlpha:0,ease:'none'}, '<')
+                    //     }
+                    //     else {
+                    //         let space_accord_remaining = viewport.w - (space_accord_process * (this.el.querySelectorAll('.home-made-body-item').length - 1))
+                    //         this.tlStickMade.to(item, { width: space_accord_remaining, ease: 'none' }, 0)
+                    //     }
+                    // })
                 }
 
                 this.tlOverlap = gsap.timeline({
@@ -1577,7 +1579,7 @@ const script = () => {
                 let hasMoved = false;
 
                 const handleOnDown = (e) => {
-                    if (!$(this.el).find('.prod-hero-decor-scan-drag:hover').length) return;
+                    if (!$(this.el).find('.prod-hero-decor-scan-drag-inner:hover').length) return;
 
                     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                     track.dataset.mouseDownAt = clientX - scanInner.getBoundingClientRect().left;
