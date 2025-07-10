@@ -1976,15 +1976,18 @@ const script = () => {
                     ]
                 })
                 $(this.el).find('.about-story-item').each((idx, el) => {
-                    (viewport.w > 767) && new ParallaxImage({ el: $(el).find('img').get(0) })
+                    // (viewport.w > 767) && new ParallaxImage({ el: $(el).find('img').get(0) })
 
                     new MasterTimeline({
                         triggerInit: this.el,
                         scrollTrigger: { trigger: $(el) },
                         allowMobile: true,
                         tweenArr: [
-                            new ScaleInset({ el: $(el).find('.about-story-item-img-inner').get(0) }),
-                            new FadeSplitText({ el: $(el).find('.about-story-item-content').get(0) })
+                            new ScaleInset({
+                                el: $(el).find('.about-story-item-img-inner').get(0),
+                                onComplete: () => (viewport.w > 767) && new ParallaxImage({ el: $(el).find('img').get(0) })
+                            }),
+                            new FadeSplitText({ el: $(el).find('.about-story-item-content').get(0),  })
                         ]
                     })
                 })
