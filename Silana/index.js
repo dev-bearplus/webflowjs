@@ -715,21 +715,23 @@ const script = () => {
         onTrigger() {
             new Marquee($(this.el).find('.footer-bot-text [data-marquee="list"]'), 40).setup();
             new Marquee($(this.el).find('.footer-bot-ruler [data-marquee="list"]'), 10).setup();
-            $(this.el).find('.footer-cta-submit input[type="submit"]').on('click', function(e) {
+            $(this.el).find('.footer-cta-submit input[type="submit"]').on('click', (e) => {
+                console.log("click")
                 let email = $(this.el).find('.footer-cta-input[name="email"]');
+
                 let flag = false;
                 if(email.val() === ''){
-                    email.closest('.footer-cta-input-wrap').addClass('valid-null');
+                    $(this.el).find('.footer-cta-input-wrap').addClass('valid-null');
                     flag = true;
                 }
                 else if(!validateEmail(email.val())){
-                    email.closest('.footer-cta-input-wrap').removeClass('valid-null');
-                    email.closest('.footer-cta-input-wrap').addClass('valid-format');
+                    $(this.el).find('.footer-cta-input-wrap').removeClass('valid-null');
+                    $(this.el).find('.footer-cta-input-wrap').addClass('valid-format');
                     flag = true;
                 }
                 else {
-                    email.closest('.footer-cta-input-wrap').removeClass('valid-null');
-                    email.closest('.footer-cta-input-wrap').removeClass('valid-format');
+                    $(this.el).find('.footer-cta-input-wrap').removeClass('valid-null');
+                    $(this.el).find('.footer-cta-input-wrap').removeClass('valid-format');
                 }
                 if(flag){
                     e.preventDefault();
@@ -795,7 +797,6 @@ const script = () => {
                 }
             })
             this.tlOverlap.fromTo($(this.el).find('.footer-bot'), { yPercent: 20 }, { yPercent: 0, ease: 'sine.out' });
-            console.log($(this.el).find('.footer-bot').height())
         }
         destroy() {
             if (this.tlOverlap) {
