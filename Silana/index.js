@@ -1276,7 +1276,7 @@ const script = () => {
                         scrollTrigger: {
                             trigger: $(this.el).find('.home-solution'),
                             start: `top+=${viewport.h * .8} top`,
-                            end: `bottom-=${viewport.h * 1.2} bottom`,
+                            end: `bottom-=${viewport.h * .2} bottom`,
                             scrub: 1,
                             anticipatePin: 1
                         },
@@ -1311,18 +1311,18 @@ const script = () => {
                     // })
                 }
 
-                this.tlOverlap = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: this.el,
-                        start: `bottom-=${viewport.h * 2} bottom`,
-                        end: `bottom bottom`,
-                        scrub: 1
-                    },
-                })
-                this.tlOverlap
-                    .to('.home-made-body', { scale: 0.8, transformOrigin: 'top', autoAlpha: 0.6, duration: 1, ease: 'power2.in' })
-                    .to('.home-made-title', { scale: .95, transformOrigin: 'bottom', autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
-                    .fromTo('.home-made-map', { scale: 1, autoAlpha: 1 }, { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
+                // this.tlOverlap = gsap.timeline({
+                //     scrollTrigger: {
+                //         trigger: this.el,
+                //         start: `bottom-=${viewport.h * 2} bottom`,
+                //         end: `bottom bottom`,
+                //         scrub: 1
+                //     },
+                // })
+                // this.tlOverlap
+                //     .to('.home-made-body', { scale: 0.8, transformOrigin: 'top', autoAlpha: 0.6, duration: 1, ease: 'power2.in' })
+                //     .to('.home-made-title', { scale: .95, transformOrigin: 'bottom', autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
+                //     .fromTo('.home-made-map', { scale: 1, autoAlpha: 1 }, { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
             }
             horizontalLayout(sections) {
                 let sizeScroller = $(this.el).find('.solution-scroller').height();
