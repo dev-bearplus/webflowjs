@@ -1707,17 +1707,10 @@ const script = () => {
                         ...Array.from($(this.el).find('.prod-hiw-main-item')).flatMap((el, idx) => ([
                             new FadeIn({ el: $(el).find('.prod-hiw-main-item-graphic') }),
                             new FadeSplitText({ el: $(el).find('.prod-hiw-main-item-title').get(0) }),
-                        ]))
-                    ]
-                })
-                new MasterTimeline({
-                    triggerInit: this.el,
-                    scrollTrigger: { trigger: $(this.el).find('.prod-hiw-main-ruler'), start: 'top 85%' },
-                    allowMobile: true,
-                    tweenArr: [
+                        ])),
                         new FadeIn({ el: $(this.el).find('.prod-hiw-main-ruler').get(0) }),
                         new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-title').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-desc').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-desc').get(0) })
                     ]
                 })
             }
@@ -1734,6 +1727,25 @@ const script = () => {
                 gsap.set($(this.el).find('.prod-hiw-main-ruler-inner'), { '--progress': 0 });
                 $(this.el).find('.prod-hiw-main-ruler-inner').width($(this.el).find('.prod-hiw-main-ruler-inner').width() + $(this.el).find(".prod-hiw-main-list").width() - parseRem(80));
                 let rulerW = $(this.el).find('.prod-hiw-main-ruler-inner').width();
+
+                const animationSlide = {
+                    start: () => {
+                        gsap.to($(this.el).find('.prod-hiw-main-active'), { duration: .5, opacity: 0, filter: 'blur(2px)', scale: .98 });
+                        gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(0.3)' });
+                        gsap.to($(this.el).find('.prod-hiw-main-ruler-prog'), { scaleY: .9, duration: 1.5, opacity: .5 });
+                        gsap.to($(this.el).find('.prod-hiw-main-ruler-inner'), { duration: 1.5, filter: 'blur(2px)' });
+                    },
+                    end: () => {
+                        gsap.to($(this.el).find('.prod-hiw-main-active'), { duration: .5, opacity: 1, filter: 'blur(0px)', scale: 1, overwrite: true, clearProps: 'all' });
+                        gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(1.5)',overwrite: true, clearProps: 'all'  });
+                        gsap.to($(this.el).find('.prod-hiw-main-ruler-prog'), { scaleY: 1, duration: 1, opacity: 1, overwrite: true, clearProps: 'all'  });
+                        gsap.to($(this.el).find('.prod-hiw-main-ruler-inner'), { duration: 1, filter: 'blur(0px)', overwrite: true });
+                    },
+                }
+                const onSlide = () => {
+                    setTimeout(animationSlide.start, 50);
+                    setTimeout(animationSlide.end, 300);
+                }
 
                 let slider = new KeenSlider($(this.el).find(".prod-hiw-main-list").get(0), {
                     slides: {
@@ -1779,27 +1791,68 @@ const script = () => {
                         $(this.el).find('.slide-control.prev').toggleClass('disable', current === details.minIdx);
                     },
                     dragStarted: (slider) => {
-                        gsap.to($(this.el).find('.prod-hiw-main-active'), { duration: .5, opacity: 0, filter: 'blur(2px)', scale: .98 });
-                        gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(0.3)' });
-                        gsap.to($(this.el).find('.prod-hiw-main-ruler-prog'), { scaleY: .9, duration: 1.5, opacity: .5 });
-                        gsap.to($(this.el).find('.prod-hiw-main-ruler-inner'), { duration: 1.5, filter: 'blur(2px)' });
+                        animationSlide.start();
                         $(this.el).find('.prod-hiw-main-slide').addClass('on-grabbing');
-
                     },
                     dragEnded: (slider) => {
-                        gsap.to($(this.el).find('.prod-hiw-main-active'), { duration: .5, opacity: 1, filter: 'blur(0px)', scale: 1, overwrite: true, clearProps: 'all' });
-                        gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(1.5)',overwrite: true, clearProps: 'all'  });
-                        gsap.to($(this.el).find('.prod-hiw-main-ruler-prog'), { scaleY: 1, duration: 1, opacity: 1, overwrite: true, clearProps: 'all'  });
-                        gsap.to($(this.el).find('.prod-hiw-main-ruler-inner'), { duration: 1, filter: 'blur(0px)', overwrite: true });
+                        animationSlide.end();
                         $(this.el).find('.prod-hiw-main-slide').removeClass('on-grabbing');
+                    },
+                },
+                [(slider) => {
+                    let timeout
+                    let mouseOver = false
+                    let current = 0;
+
+                    function clearNextTimeout() {
+                        clearTimeout(timeout);
+                        current = slider.track.details.abs;
                     }
-                })
+                    function nextTimeout() {
+                        clearTimeout(timeout)
+                        if (mouseOver) return
+
+                        timeout = setTimeout(() => {
+                            current++;
+                            if (current >= $('.prod-hiw-main-item').length) {
+                                slider.moveToIdx(0, true);
+                                current = 0;
+                            }
+                            else {
+                                slider.next();
+                            }
+                            onSlide();
+                        }, 2000)
+                    }
+                    slider.on("created", () => {
+                        slider.container.addEventListener("mouseover", () => {
+                            mouseOver = true
+                            clearNextTimeout()
+                        })
+                        slider.container.addEventListener("mouseout", () => {
+                            mouseOver = false
+                            nextTimeout()
+                        })
+                        nextTimeout()
+                    })
+                    slider.on("dragStarted", clearNextTimeout);
+                    slider.on("animationEnded", nextTimeout);
+                    slider.on("updated", nextTimeout);
+                }]
+                )
 
                 $(this.el).find('.prod-hiw-main-item').on('click', function () {
                     slider.moveToIdx($(this).index());
+                    onSlide();
                 })
-                $(this.el).find('.slide-control.next').on('click', slider.next);
-                $(this.el).find('.slide-control.prev').on('click', slider.prev);
+                $(this.el).find('.slide-control.next').on('click', function() {
+                    slider.next();
+                    onSlide();
+                });
+                $(this.el).find('.slide-control.prev').on('click', function() {
+                    slider.prev();
+                    onSlide();
+                });
             }
         },
         Compare: class extends TriggerSetup {
