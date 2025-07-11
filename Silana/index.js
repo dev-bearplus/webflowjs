@@ -1509,8 +1509,7 @@ const script = () => {
                 let hasMoved = false;
 
                 const handleOnDown = (e) => {
-                    if (!$(this.el).find('.prod-hero-decor-scan-drag-inner:hover').length) return;
-
+                    if (viewport.w > 991 && !$(this.el).find('.prod-hero-decor-scan-drag-inner:hover').length) return;
                     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                     track.dataset.mouseDownAt = clientX - scanInner.getBoundingClientRect().left;
                     track.dataset.prevPercentage = track.dataset.percentage || -50;
@@ -1554,14 +1553,14 @@ const script = () => {
                     }
                 };
 
-                window.onmousedown = (e) => handleOnDown(e);
-                window.ontouchstart = (e) => handleOnDown(e);
+                scanInner.onmousedown = (e) => handleOnDown(e);
+                scanInner.ontouchstart = (e) => handleOnDown(e);
 
-                window.onmouseup = () => handleOnUp();
-                window.ontouchend = () => handleOnUp();
+                scanInner.onmouseup = () => handleOnUp(e);
+                scanInner.ontouchend = () => handleOnUp(e);
 
-                window.onmousemove = (e) => handleOnMove(e);
-                window.ontouchmove = (e) => handleOnMove(e);
+                scanInner.onmousemove = (e) => handleOnMove(e);
+                scanInner.ontouchmove = (e) => handleOnMove(e);
 
                 this.rafID = requestAnimationFrame(animate);
             }
@@ -1678,6 +1677,7 @@ const script = () => {
             constructor() {
                 super();
                 this.el = null;
+                this.slider = null;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.prod-hiw-wrap');
@@ -1710,8 +1710,8 @@ const script = () => {
                         new FadeIn({ el: $(this.el).find('.prod-hiw-main-active').get(0) }),
                         new FadeIn({ el: $(this.el).find('.home-hiw-main-decor').get(0) }),
                         ...Array.from($(this.el).find('.prod-hiw-main-item')).flatMap((el, idx) => ([
-                            new FadeIn({ el: $(el).find('.prod-hiw-main-item-graphic') }),
-                            new FadeSplitText({ el: $(el).find('.prod-hiw-main-item-title').get(0) }),
+                            idx !== 0 && new FadeIn({ el: $(el).find('.prod-hiw-main-item-graphic') }),
+                            idx !== 0 && new FadeSplitText({ el: $(el).find('.prod-hiw-main-item-title').get(0) }),
                         ])),
                         new FadeIn({ el: $(this.el).find('.prod-hiw-main-ruler').get(0), onComplete: () => this.slider.startAutoplay() }),
                         new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-title').get(0) }),
@@ -1728,7 +1728,7 @@ const script = () => {
                     $(this.el).find('.prod-hiw-main-content-item').eq(idx).addClass('active');
                 }
                 $(this.el).find(".prod-hiw-main-list").addClass('keen-slider');
-                $(this.el).find(".prod-hiw-main-item").addClass('keen-slider__slide');
+                $(this.el).find(".prod-hiw-main-list > *").addClass('keen-slider__slide');
                 gsap.set($(this.el).find('.prod-hiw-main-ruler-inner'), { '--progress': 0 });
                 $(this.el).find('.prod-hiw-main-ruler-inner').width($(this.el).find('.prod-hiw-main-ruler-inner').width() + $(this.el).find(".prod-hiw-main-list").width() - parseRem(80));
                 let rulerW = $(this.el).find('.prod-hiw-main-ruler-inner').width();
@@ -1752,30 +1752,27 @@ const script = () => {
                     setTimeout(animationSlide.end, 300);
                 }
 
-                let itemLength = $(this.el).find('.prod-hiw-main-item').length;
-
-                this.slider = new KeenSlider($(this.el).find(".prod-hiw-main-list").get(0), {
+                let slider = new KeenSlider($(this.el).find(".prod-hiw-main-list").get(0), {
                     slides: {
-                        perView: 3,
-                        spacing: parseRem(20),
-                        origin: "center"
+                        perView: "auto",
+                        spacing: parseRem(6)
                     },
                     defaultAnimation: {
                         duration: 1200,
                     },
+                    loop: true,
+                    mode: "snap",
                     breakpoints: {
                         "(min-width: 768px)": {
                             slides: {
-                                perView: 3,
-                                spacing: parseRem(43),
-                                origin: "center"
+                                perView: "auto",
+                                spacing: parseRem(43)
                             },
                         },
                         "(min-width: 992px)": {
                             slides: {
-                                perView: 3,
-                                spacing: parseRem(215),
-                                origin: "center"
+                                perView: "auto",
+                                spacing: parseRem(215)
                             },
                         },
                     },
@@ -1786,7 +1783,8 @@ const script = () => {
                     },
                     detailsChanged: (slider) => {
                         const details = slider.track.details;
-                        const current = details.abs;
+                        const current = details.rel;
+                        const total = details.slides.length;
                         let progress = slider.track.details.progress;
 
                         activeIndex(current);
@@ -1796,6 +1794,8 @@ const script = () => {
 
                         $(this.el).find('.slide-control.next').toggleClass('disable', current === details.maxIdx);
                         $(this.el).find('.slide-control.prev').toggleClass('disable', current === details.minIdx);
+
+                        (viewport.w <= 767) && gsap.set($(this.el).find(".prod-hiw-main-progress-inner"), { scaleX: `${((current + 1) / total) * 100}%` })
                     },
                     dragStarted: (slider) => {
                         animationSlide.start();
@@ -1808,61 +1808,36 @@ const script = () => {
                 },
                 [(slider) => {
                     let timeout
-                    let mouseOver = false
-                    let current = 0;
                     let isAutoplay = false;
 
-                    function clearNextTimeout() {
-                        clearTimeout(timeout);
-                        current = slider.track.details.abs;
-                    }
                     function nextTimeout() {
                         clearTimeout(timeout)
-                        if (!isAutoplay || mouseOver) return;
+                        if (!isAutoplay) return;
 
                         timeout = setTimeout(() => {
-                            current++;
-                            if (current >= $('.prod-hiw-main-item').length) {
-                                slider.moveToIdx(0, true);
-                                current = 0;
-                            }
-                            else {
-                                slider.next();
-                            }
+                            slider.next();
                             onSlide();
                         }, 2000)
                     }
 
-                    function startAutoplay() {
+                    const startAutoplay = () => {
                         isAutoplay = true;
                         nextTimeout();
                     }
 
-                    function stopAutoplay() {
+                    const stopAutoplay = () => {
                         isAutoplay = false;
-                        clearNextTimeout();
+                        clearTimeout(timeout);
                     }
                     slider.on("created", () => {
-                        console.log(isTouchDevice())
-                        slider.container.onmouseover = () => {
-                            mouseOver = true;
-                            clearNextTimeout();
-                        }
-                        slider.container.onmouseout = () => {
-                            mouseOver = false;
-                            nextTimeout();
-                        }
-                        slider.container.ontouchmove = () => {
-                            mouseOver = true;
-                            clearNextTimeout();
-                        }
-                        slider.container.ontouchend = () => {
-                            mouseOver = false;
-                            nextTimeout();
-                        }
-                        nextTimeout()
+                        slider.container.onmouseover = () => stopAutoplay();
+                        slider.container.ontouchmove = () => stopAutoplay();
+
+                        slider.container.onmouseout = () => startAutoplay();
+                        slider.container.ontouchend = () => startAutoplay();
+                        nextTimeout();
                     })
-                    slider.on("dragStarted", clearNextTimeout);
+                    slider.on("dragStarted", stopAutoplay);
                     slider.on("animationEnded", nextTimeout);
                     slider.on("updated", nextTimeout);
 
@@ -1870,17 +1845,14 @@ const script = () => {
                     slider.stopAutoplay = stopAutoplay;
                 }]
                 )
+                this.slider = slider;
 
-                $(this.el).find('.prod-hiw-main-item').on('click', function () {
-                    this.slider.moveToIdx($(this).index());
-                    onSlide();
-                })
                 $(this.el).find('.slide-control.next').on('click', function() {
-                    this.slider.next();
+                    slider.next();
                     onSlide();
                 });
                 $(this.el).find('.slide-control.prev').on('click', function() {
-                    this.slider.prev();
+                    slider.prev();
                     onSlide();
                 });
             }
@@ -1895,6 +1867,7 @@ const script = () => {
                 super.setTrigger(this.el, this.onTrigger.bind(this));
             }
             onTrigger() {
+                this.interact();
                 this.animationReveal();
             }
             animationReveal() {
@@ -1933,6 +1906,33 @@ const script = () => {
                         ]))
                     ],
                     stagger: 0.05
+                })
+            }
+            interact() {
+                if (viewport.w < 767) {
+                    this.cardSlide();
+                }
+            }
+            cardSlide() {
+                $(this.el).find(".prod-compare-table-body").addClass('keen-slider');
+                $(this.el).find(".prod-compare-table-item").addClass('keen-slider__slide');
+                $(this.el).find(".prod-compare-table-body").css('grid-column-gap', 0);
+                let slider = new KeenSlider($(this.el).find(".prod-compare-table-body").get(0), {
+                    slides: {
+                        perView: 'auto',
+                        spacing: parseRem(20),
+                    },
+                    defaultAnimation: {
+                        duration: 1000
+                    },
+                    dragSpeed: 1.2,
+                    rubberband: false,
+                    detailsChanged: (slider) => {
+                        const details = slider.track.details;
+                        const current = details.rel;
+                        const total = details.slides.length;
+                        (viewport.w <= 767) && gsap.set($(this.el).find(".prod-compare-progress-inner"), { scaleX: `${((current + 1) / total) * 100}%` })
+                    }
                 })
             }
         },
