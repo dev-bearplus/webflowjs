@@ -27,6 +27,11 @@ const script = () => {
             timer = setTimeout(() => { func.apply(this, args) }, timeout)
         }
     }
+    const isTouchDevice = () => {
+        return (('ontouchstart' in window) ||
+        (navigator.maxTouchPoints > 0) ||
+        (navigator.msMaxTouchPoints > 0));
+    }
     const lerp = (a, b, t) => (1 - t) * a + t * b;
     const distance = (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1);
     const isInViewport = (el) => {
@@ -1679,8 +1684,8 @@ const script = () => {
                 super.setTrigger(this.el, this.onTrigger.bind(this));
             }
             onTrigger() {
-                this.animationReveal();
                 this.interact();
+                this.animationReveal();
             }
             interact() {
                 this.cardSlide();
@@ -1708,7 +1713,7 @@ const script = () => {
                             new FadeIn({ el: $(el).find('.prod-hiw-main-item-graphic') }),
                             new FadeSplitText({ el: $(el).find('.prod-hiw-main-item-title').get(0) }),
                         ])),
-                        new FadeIn({ el: $(this.el).find('.prod-hiw-main-ruler').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.prod-hiw-main-ruler').get(0), onComplete: () => this.slider.startAutoplay() }),
                         new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-title').get(0) }),
                         new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-desc').get(0) })
                     ]
@@ -1747,7 +1752,9 @@ const script = () => {
                     setTimeout(animationSlide.end, 300);
                 }
 
-                let slider = new KeenSlider($(this.el).find(".prod-hiw-main-list").get(0), {
+                let itemLength = $(this.el).find('.prod-hiw-main-item').length;
+
+                this.slider = new KeenSlider($(this.el).find(".prod-hiw-main-list").get(0), {
                     slides: {
                         perView: 3,
                         spacing: parseRem(20),
@@ -1803,6 +1810,7 @@ const script = () => {
                     let timeout
                     let mouseOver = false
                     let current = 0;
+                    let isAutoplay = false;
 
                     function clearNextTimeout() {
                         clearTimeout(timeout);
@@ -1810,7 +1818,7 @@ const script = () => {
                     }
                     function nextTimeout() {
                         clearTimeout(timeout)
-                        if (mouseOver) return
+                        if (!isAutoplay || mouseOver) return;
 
                         timeout = setTimeout(() => {
                             current++;
@@ -1824,33 +1832,55 @@ const script = () => {
                             onSlide();
                         }, 2000)
                     }
+
+                    function startAutoplay() {
+                        isAutoplay = true;
+                        nextTimeout();
+                    }
+
+                    function stopAutoplay() {
+                        isAutoplay = false;
+                        clearNextTimeout();
+                    }
                     slider.on("created", () => {
-                        slider.container.addEventListener("mouseover", () => {
-                            mouseOver = true
-                            clearNextTimeout()
-                        })
-                        slider.container.addEventListener("mouseout", () => {
-                            mouseOver = false
-                            nextTimeout()
-                        })
+                        console.log(isTouchDevice())
+                        slider.container.onmouseover = () => {
+                            mouseOver = true;
+                            clearNextTimeout();
+                        }
+                        slider.container.onmouseout = () => {
+                            mouseOver = false;
+                            nextTimeout();
+                        }
+                        slider.container.ontouchmove = () => {
+                            mouseOver = true;
+                            clearNextTimeout();
+                        }
+                        slider.container.ontouchend = () => {
+                            mouseOver = false;
+                            nextTimeout();
+                        }
                         nextTimeout()
                     })
                     slider.on("dragStarted", clearNextTimeout);
                     slider.on("animationEnded", nextTimeout);
                     slider.on("updated", nextTimeout);
+
+                    slider.startAutoplay = startAutoplay;
+                    slider.stopAutoplay = stopAutoplay;
                 }]
                 )
 
                 $(this.el).find('.prod-hiw-main-item').on('click', function () {
-                    slider.moveToIdx($(this).index());
+                    this.slider.moveToIdx($(this).index());
                     onSlide();
                 })
                 $(this.el).find('.slide-control.next').on('click', function() {
-                    slider.next();
+                    this.slider.next();
                     onSlide();
                 });
                 $(this.el).find('.slide-control.prev').on('click', function() {
-                    slider.prev();
+                    this.slider.prev();
                     onSlide();
                 });
             }
