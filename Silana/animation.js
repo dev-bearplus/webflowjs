@@ -356,8 +356,7 @@ class ScaleLine {
 class ScaleInset {
     constructor({el, elInner, delay, duration, isDisableRevert }) {
         this.DOM = {
-            el: el, elInner: elInne
-            r || el?.querySelector('img')
+            el: el, elInner: elInner || el?.querySelector('img')
     };
         this.delay = delay;
         this.borderRad = gsap.getProperty(this.DOM.el, 'border-radius');
