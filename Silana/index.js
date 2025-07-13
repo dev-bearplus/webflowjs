@@ -1098,7 +1098,7 @@ const script = () => {
                     allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $(this.el).find('.home-challenge-label').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-challenge-title').get(0) })
+                        new FadeSplitText({ el: $(this.el).find('.home-challenge-title').get(0), isDisableRevert: true })
                     ]
                 })
                 new MasterTimeline({
@@ -1706,7 +1706,6 @@ const script = () => {
                     scrollTrigger: { trigger: $(this.el).find('.prod-hiw-main') },
                     allowMobile: true,
                     tweenArr: [
-                        new FadeIn({ el: $(this.el).find('.prod-hiw-main-control').get(0) }),
                         new FadeIn({ el: $(this.el).find('.prod-hiw-main-active').get(0) }),
                         new FadeIn({ el: $(this.el).find('.home-hiw-main-decor').get(0) }),
                         ...Array.from($(this.el).find('.prod-hiw-main-item')).flatMap((el, idx) => ([
@@ -1722,7 +1721,7 @@ const script = () => {
             cardSlide() {
                 const activeIndex = (idx) => {
                     $(this.el).find('.prod-hiw-main-item').removeClass('active');
-                    $(this.el).find('.prod-hiw-main-item').eq(idx).addClass('active');
+                    $(this.el).find('.prod-hiw-main-item').eq(idx + 1).addClass('active');
 
                     $(this.el).find('.prod-hiw-main-content-item').removeClass('active');
                     $(this.el).find('.prod-hiw-main-content-item').eq(idx).addClass('active');
