@@ -247,7 +247,7 @@ class FadeSplitText {
                         duration: .8,
                         ease: 'power2.out',
                         onComplete: () => {
-                            console.log(self)
+                            if (self.words[0].parentElement.classList.contains('txt-strike')) self.words[0].parentElement.classList.add('active');
                             if (!isDisableRevert) {
                                 self.revert();
                                 convertHyphen(self.elements[0]);
