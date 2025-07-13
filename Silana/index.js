@@ -1826,7 +1826,7 @@ const script = () => {
                         timeout = setTimeout(() => {
                             slider.next();
                             onSlide();
-                        }, 2000)
+                        }, 2900)
                     }
 
                     const startAutoplay = () => {
