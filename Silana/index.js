@@ -989,7 +989,8 @@ const script = () => {
                                 trigger: $(this.el).find('.home-about-main'),
                                 start: 'bottom bottom',
                                 end: `bottom+=${viewport.h * 0.5} top`,
-                                scrub: 1                            }
+                                scrub: 1
+                            }
                         })
                         .from($(this.el).find('.home-about-story-content'), { scale: 0.95, autoAlpha: 0.8, duration: 1, ease: 'power2.out'  }, 0)
                         .from($(this.el).find('.home-about-story-item:first-child .home-about-story-item-img'), { scale: 1.2, transformOrigin: 'top', autoAlpha: 0.5, duration: 1, ease: 'none' }, 0));
