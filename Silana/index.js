@@ -969,12 +969,13 @@ const script = () => {
                     triggerInit: this.el,
                     scrollTrigger: {
                         trigger: $(this.el).find('.home-about-main'),
-                        start: `bottom top+=${viewport.h * 0.5 - $(this.el).find('.home-about-story-content-item').height()}`
+                        start: `bottom top+=${viewport.h * 0.65 - $(this.el).find('.home-about-story-content-item').height()}`
                     },
                     allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $(this.el).find('.home-about-story-content-text .heading').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-about-story-content-text .txt-slider-wrap .heading:first-child').get(0), delay: "<=.04", onComplete: () =>  headingFlipping.play() })
+                        new FadeSplitText({ el: $(this.el).find('.home-about-story-content-text .txt-slider-wrap .heading:first-child').get(0), delay: "<=.04", onComplete: () => headingFlipping.play() }),
+                        new FadeIn({ el: $(this.el).find('.home-about-story-content-decor').get(0) })
                     ]
                 })
             }
@@ -986,10 +987,9 @@ const script = () => {
                         .timeline({
                             scrollTrigger: {
                                 trigger: $(this.el).find('.home-about-main'),
-                                start: 'top top',
+                                start: 'bottom bottom',
                                 end: `bottom+=${viewport.h * 0.5} top`,
-                                scrub: 1
-                            }
+                                scrub: 1                            }
                         })
                         .from($(this.el).find('.home-about-story-content'), { scale: 0.95, autoAlpha: 0.8, duration: 1, ease: 'power2.out'  }, 0)
                         .from($(this.el).find('.home-about-story-item:first-child .home-about-story-item-img'), { scale: 1.2, transformOrigin: 'top', autoAlpha: 0.5, duration: 1, ease: 'none' }, 0));
