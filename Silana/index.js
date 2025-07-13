@@ -1259,7 +1259,7 @@ const script = () => {
                             ]
                         ))
                     ],
-                    stagger: .08
+                    stagger: .03
                 })
             }
             animationScrub() {
