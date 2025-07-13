@@ -1114,7 +1114,7 @@ const script = () => {
                                 new FadeIn({ el: $(el).find('.home-challenge-item-ic').get(0) })
                             ]
                             if (idx === 0) {
-                                tween.push(new FadeSplitText({ el: $(el).find('.home-challenge-item-desc-txt .txt-richtext p').get(0) }))
+                                tween.push(new FadeSplitText({ el: $(el).find('.home-challenge-item-desc-txt .txt-richtext p').get(0), splitType: 'lines' }))
                                 tween.push(...Array.from($(el).find('.home-challenge-item-desc-txt .txt-richtext li')).map((li, idx) =>
                                     new FadeIn({ el: $(li).get(0), delay: idx === 0 ? '>=-1' : "<=.2" })))
                             }

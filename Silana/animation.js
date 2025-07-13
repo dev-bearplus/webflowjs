@@ -236,7 +236,7 @@ class FadeSplitText {
         let animation;
         document.fonts.ready.then(() => {
             this.textSplit = SplitText.create(this.DOM.el, {
-                type: "lines words",
+                type: this.splitType === 'words' ? "lines words" : 'lines',
                 mask: "lines",
                 autoSplit: true,
                 onSplit: (self) => {
@@ -244,7 +244,7 @@ class FadeSplitText {
                     animation = gsap.to(self[this.splitType], {
                         autoAlpha: 1,
                         yPercent: 0,
-                        stagger: 0.02,
+                        stagger: this.breakType == 'words' ? 0.02 : 0.1,
                         duration: .8,
                         ease: 'power2.out',
                         onComplete: () => {
