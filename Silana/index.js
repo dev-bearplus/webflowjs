@@ -962,6 +962,9 @@ const script = () => {
 
                 gsap.set($(this.el).find('.home-about-story-content-text .txt-slider-wrap .heading:not(:first-child)'), { autoAlpha: 0 })
 
+                let headingFlipping = new FlipText('.home-about-story-content-text .txt-slider-wrap');
+                headingFlipping.setup();
+
                 new MasterTimeline({
                     triggerInit: this.el,
                     scrollTrigger: {
@@ -971,7 +974,7 @@ const script = () => {
                     allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $(this.el).find('.home-about-story-content-text .heading').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-about-story-content-text .txt-slider-wrap .heading:first-child').get(0), delay: "<=.04", onComplete: () => this.changeTextOnScroll() })
+                        new FadeSplitText({ el: $(this.el).find('.home-about-story-content-text .txt-slider-wrap .heading:first-child').get(0), delay: "<=.04", onComplete: () =>  headingFlipping.play() })
                     ]
                 })
             }
@@ -1001,8 +1004,8 @@ const script = () => {
                                 scrub: 1
                             },
                         })
-                        .to($(this.el).find('.home-about-story-content'), { scale: 0.8, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, 0)
-                        .to($(this.el).find('.home-about-story-list'), { scale: 1.3, transformOrigin: 'bottom', autoAlpha: 0.5, duration: 1, ease: 'none'}, 0));
+                        .to($(this.el).find('.home-about-story-content'), { scale: 0.8, autoAlpha: 0.6, duration: 1, ease: 'power2.in', overwrite: true }, 0)
+                        .to($(this.el).find('.home-about-story-list'), { scale: 1.3, transformOrigin: 'bottom', autoAlpha: 0.5, duration: 1, ease: 'none', overwrite: true}, 0));
             }
             changeTextOnScroll() {
                 let wrapTextSlide = $(this.el).find('.home-about-story-content-text .txt-slider-wrap')
