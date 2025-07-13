@@ -1106,15 +1106,21 @@ const script = () => {
                     scrollTrigger: { trigger: this.el },
                     allowMobile: true,
                     tweenArr: [
-                        ...Array.from($(this.el).find('.home-challenge-item')).flatMap((el, idx) => (
-                            [
+                        ...Array.from($(this.el).find('.home-challenge-item')).flatMap((el, idx) => {
+                            let tween = [
                                 new ScaleLine({ el: $(el).find('.home-challenge-item-line').get(0) }),
                                 new FadeSplitText({ el: $(el).find('.home-challenge-item-label').get(0) }),
                                 new FadeSplitText({ el: $(el).find('.home-challenge-item-title').get(0) }),
-                                idx === 0 && new FadeSplitText({ el: $(el).find('.home-challenge-item-desc').get(0) }),
                                 new FadeIn({ el: $(el).find('.home-challenge-item-ic').get(0) })
                             ]
-                        ))
+                            if (idx === 0) {
+                                tween.push(new FadeSplitText({ el: $(el).find('.home-challenge-item-desc-txt .txt-richtext p').get(0) }))
+                                tween.push(...Array.from($(el).find('.home-challenge-item-desc-txt .txt-richtext li')).map((li, idx) =>
+                                    new FadeIn({ el: $(li).get(0), delay: idx === 0 ? '>=-1' : "<=.2" })))
+                            }
+
+                            return tween;
+                        })
                     ]
                 })
             }
