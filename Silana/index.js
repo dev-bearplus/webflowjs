@@ -1349,7 +1349,7 @@ const script = () => {
                         anticipatePin: 1,
                         snap: 1,
                         onUpdate: (self) => {
-                            if (self.progress > 0.7 && !fadeIn) {
+                            if (self.progress > 0.5 && !fadeIn) {
                                 fadeIn = true;
                                 this.tlFadeHead.play();
                                 this.tlFadeBody.play();
