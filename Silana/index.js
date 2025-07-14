@@ -1259,6 +1259,12 @@ const script = () => {
                 }
 
                 this.tlFadeHead = gsap.timeline({ paused: true })
+                if (viewport.w < 767) {
+                    this.tlFadeHead = gsap.timeline({
+                        trigger: $(this.el).find('.home-made-head'),
+                        start: `top top+=75%`
+                    })
+                }
                 new MasterTimeline({
                     triggerInit: this.el,
                     timeline: this.tlFadeHead,
@@ -1270,6 +1276,13 @@ const script = () => {
                 })
 
                 this.tlFadeBody = gsap.timeline({ paused: true })
+                if (viewport.w < 767) {
+                    this.tlFadeBody = gsap.timeline({
+                        trigger: $(this.el).find('.home-made-body'),
+                        start: `top top+=75%`,
+                        markers: true
+                    })
+                }
                 new MasterTimeline({
                     triggerInit: this.el,
                     timeline: this.tlFadeBody,
@@ -1379,8 +1392,10 @@ const script = () => {
                         onUpdate: (self) => {
                             if (self.progress > 0.5 && !fadeIn) {
                                 fadeIn = true;
-                                this.tlFadeHead.play();
-                                this.tlFadeBody.play();
+                                if (viewport.w >= 767) {
+                                    this.tlFadeHead.play();
+                                    this.tlFadeBody.play();
+                                }
                             }
                         }
                     }
