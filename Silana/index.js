@@ -1898,9 +1898,9 @@ const script = () => {
             activeIndex(idx) {
                 $(this.el).find('.prod-hiw-main-item').removeClass('active');
                 $(this.el).find(`.prod-hiw-main-item.step-${idx + 1}`).addClass('active');
-
+                if (idx < 0) return;
                 $(this.el).find('.prod-hiw-main-content-item').removeClass('active');
-                $(this.el).find('.prod-hiw-main-content-item').eq(idx - 1).addClass('active');
+                $(this.el).find('.prod-hiw-main-content-item').eq(idx).addClass('active');
             }
         },
         Compare: class extends TriggerSetup {
