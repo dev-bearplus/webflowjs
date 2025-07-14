@@ -686,8 +686,10 @@ const script = () => {
         }
         init(data) {
             this.el = document.querySelector('.header');
-            if (viewport.w <= 767) {
+            if (viewport.w <= 991) {
                 this.toggleNav();
+            }
+            if (viewport.w <= 767) {
                 this.adjustNavHeight();
             }
         }
@@ -1268,6 +1270,15 @@ const script = () => {
                 }
 
                 this.tlFadeHead = gsap.timeline({ paused: true })
+
+                if (viewport.w > 767 && viewport.w <= 991) {
+                    this.tlFadeHead = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: $(this.el).find('.home-made-head'),
+                            start: `top top+=75%`
+                        }
+                    })
+                }
                 new MasterTimeline({
                     triggerInit: this.el,
                     timeline: this.tlFadeHead,
@@ -1278,6 +1289,14 @@ const script = () => {
                 })
 
                 this.tlFadeBody = gsap.timeline({ paused: true })
+                if (viewport.w > 767 && viewport.w <= 991) {
+                    this.tlFadeBody = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: $(this.el).find('.home-made-body'),
+                            start: `top top+=75%`
+                        }
+                    })
+                }
                 new MasterTimeline({
                     triggerInit: this.el,
                     timeline: this.tlFadeBody,
@@ -1386,7 +1405,7 @@ const script = () => {
                         onUpdate: (self) => {
                             if (self.progress > 0.5 && !fadeIn) {
                                 fadeIn = true;
-                                if (viewport.w > 767) {
+                                if (viewport.w > 991) {
                                     this.tlFadeHead.play();
                                     this.tlFadeBody.play();
                                 }
@@ -1999,8 +2018,6 @@ const script = () => {
                 this.tlTriggerEnter = null;
             }
             setup(data, mode) {
-                console.log("setup")
-
                 this.el = data.next.container.querySelector('.about-hero-wrap');
                 if (mode === 'once') {
                     this.setupOnce(data);
@@ -2008,7 +2025,6 @@ const script = () => {
                     this.setupEnter(data);
                 }
                 else return;
-                console.log(isInViewport($(this.el).get(0)))
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
@@ -2023,9 +2039,6 @@ const script = () => {
                     paused: true,
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
-                console.log(
-                    "setup enter"
-                )
 
                 this.tlTriggerEnter = gsap.timeline({
                     scrollTrigger: {
@@ -2033,7 +2046,6 @@ const script = () => {
                         start: 'top bottom+=50%',
                         end: 'bottom top-=50%',
                         once: true,
-                        markers: true,
                         onEnter: () => this.tlEnter.play(),
                         onEnterBack: () => this.tlEnter.play(),
                         onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden'),
@@ -2042,7 +2054,6 @@ const script = () => {
                 this.animationReveal(this.tlEnter);
             }
             playOnce() {
-                console.log("play")
                 this.tlOnce.play();
             }
             playEnter() {
