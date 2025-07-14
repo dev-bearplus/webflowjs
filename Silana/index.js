@@ -679,7 +679,7 @@ const script = () => {
         }
         init(data) {
             this.el = document.querySelector('.header');
-            if (viewport.w < 767) {
+            if (viewport.w <= 767) {
                 this.toggleNav();
                 this.adjustNavHeight();
             }
@@ -1262,16 +1262,9 @@ const script = () => {
                 }
 
                 this.tlFadeHead = gsap.timeline({ paused: true })
-                if (viewport.w < 767) {
-                    // this.tlFadeHead = gsap.timeline({
-                    //     trigger: $(this.el).find('.home-made-head'),
-                    //     start: `top top+=75%`
-                    // })
-                }
                 new MasterTimeline({
                     triggerInit: this.el,
                     timeline: this.tlFadeHead,
-                    // allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $(this.el).find('.home-made-title').get(0), onComplete: () => headingFlipping.play() }),
                         new FadeIn({ el: $(this.el).find('.home-made-map').get(0) })
@@ -1279,17 +1272,9 @@ const script = () => {
                 })
 
                 this.tlFadeBody = gsap.timeline({ paused: true })
-                if (viewport.w < 767) {
-                    // this.tlFadeBody = gsap.timeline({
-                    //     trigger: $(this.el).find('.home-made-body'),
-                    //     start: `top top+=75%`,
-                    //     markers: true
-                    // })
-                }
                 new MasterTimeline({
                     triggerInit: this.el,
                     timeline: this.tlFadeBody,
-                    // allowMobile: true,
                     tweenArr: [
                         new ScaleLine({ el: $(this.el).find('.home-solution-line').get(0) }),
                         new ScaleLine({ el: $(this.el).find('.home-made-head-line').get(0) }),
@@ -1395,7 +1380,7 @@ const script = () => {
                         onUpdate: (self) => {
                             if (self.progress > 0.5 && !fadeIn) {
                                 fadeIn = true;
-                                if (viewport.w >= 767) {
+                                if (viewport.w > 767) {
                                     this.tlFadeHead.play();
                                     this.tlFadeBody.play();
                                 }
@@ -1966,7 +1951,7 @@ const script = () => {
                 })
             }
             interact() {
-                if (viewport.w < 767) {
+                if (viewport.w <= 767) {
                     this.cardSlide();
                 }
             }
@@ -2706,7 +2691,9 @@ const script = () => {
             onTrigger() {
                 this.animationReveal();
                 this.animationScrub();
-                this.createTOC();
+                if (viewport.w > 991) {
+                    this.createTOC();
+                }
             }
             animationReveal() {
 
