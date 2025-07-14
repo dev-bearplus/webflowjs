@@ -2282,7 +2282,8 @@ const script = () => {
                 const scrollTop = window.scrollY || window.pageYOffset;
                 const rectTop = $(this.el).get(0).getBoundingClientRect().top;
                 $(this.el).find('.about-team-info-avt-item').on('click', function () {
-                    // smoothScroll.lenis.scrollTo((scrollTop + rectTop) + (viewport.h * (viewport > 991 ? 1 : .25) * $(this).index()));
+                    let viewportStick = viewport.w > 991 ? 1 : .25;
+                    smoothScroll.lenis.scrollTo((scrollTop + rectTop) + (viewport.h * viewportStick * $(this).index()));
                 })
 
                 const onUpdateProgress = (progress) => {
