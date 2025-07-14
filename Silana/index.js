@@ -675,9 +675,14 @@ const script = () => {
     class Header {
         constructor() {
             this.el = null;
+            this.isOpen = false;
         }
         init(data) {
             this.el = document.querySelector('.header');
+            if (viewport.w < 767) {
+                $(this.el).find('.header-act').css('height', viewport.h - $(this.el).outerHeight());
+                this.toggleNav();
+            }
         }
         updateOnScroll(inst) {
             this.toggleHide(inst);
@@ -702,8 +707,27 @@ const script = () => {
                 $(this.el).removeClass("on-hide");
             }
         }
-        isOpen() {
-            return this.el.classList.contains('on-open-nav');
+        toggleNav() {
+            $(this.el).find('.header-toggle').on('click', this.handleClick.bind(this));
+            $(this.el).find('.header-link, .header-logo, .header-btn').on('click', () => setTimeout(() => this.close(), 800));
+        }
+        handleClick(e) {
+            e.preventDefault();
+            this.isOpen ? this.close() : this.open();
+        }
+        open() {
+            if (this.isOpen) return;
+            $('.header').addClass('on-open-nav');
+            $('.header-toggle').removeClass('active');
+            this.isOpen = true;
+            smoothScroll.lenis.stop();
+        }
+        close() {
+            if (!this.isOpen) return;
+            $('.header').removeClass('on-open-nav');
+            $('.header-toggle').removeClass('active');
+            this.isOpen = false;
+            smoothScroll.lenis.start();
         }
     }
     const header = new Header();
