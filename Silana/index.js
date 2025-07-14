@@ -1260,15 +1260,15 @@ const script = () => {
 
                 this.tlFadeHead = gsap.timeline({ paused: true })
                 if (viewport.w < 767) {
-                    this.tlFadeHead = gsap.timeline({
-                        trigger: $(this.el).find('.home-made-head'),
-                        start: `top top+=75%`
-                    })
+                    // this.tlFadeHead = gsap.timeline({
+                    //     trigger: $(this.el).find('.home-made-head'),
+                    //     start: `top top+=75%`
+                    // })
                 }
                 new MasterTimeline({
                     triggerInit: this.el,
                     timeline: this.tlFadeHead,
-                    allowMobile: true,
+                    // allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $(this.el).find('.home-made-title').get(0), onComplete: () => headingFlipping.play() }),
                         new FadeIn({ el: $(this.el).find('.home-made-map').get(0) })
@@ -1277,16 +1277,16 @@ const script = () => {
 
                 this.tlFadeBody = gsap.timeline({ paused: true })
                 if (viewport.w < 767) {
-                    this.tlFadeBody = gsap.timeline({
-                        trigger: $(this.el).find('.home-made-body'),
-                        start: `top top+=75%`,
-                        markers: true
-                    })
+                    // this.tlFadeBody = gsap.timeline({
+                    //     trigger: $(this.el).find('.home-made-body'),
+                    //     start: `top top+=75%`,
+                    //     markers: true
+                    // })
                 }
                 new MasterTimeline({
                     triggerInit: this.el,
                     timeline: this.tlFadeBody,
-                    allowMobile: true,
+                    // allowMobile: true,
                     tweenArr: [
                         new ScaleLine({ el: $(this.el).find('.home-solution-line').get(0) }),
                         new ScaleLine({ el: $(this.el).find('.home-made-head-line').get(0) }),
