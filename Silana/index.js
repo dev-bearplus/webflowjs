@@ -680,8 +680,11 @@ const script = () => {
         init(data) {
             this.el = document.querySelector('.header');
             if (viewport.w < 767) {
-                $(this.el).find('.header-act').css('height', viewport.h - $(this.el).outerHeight());
                 this.toggleNav();
+                this.adjustNavHeight();
+
+                window.addEventListener('resize', () => this.adjustNavHeight());
+                window.addEventListener('load', () => this.adjustNavHeight());
             }
         }
         updateOnScroll(inst) {
@@ -718,7 +721,7 @@ const script = () => {
         open() {
             if (this.isOpen) return;
             $('.header').addClass('on-open-nav');
-            $('.header-toggle').removeClass('active');
+            $('.header-toggle').addClass('active');
             this.isOpen = true;
             smoothScroll.lenis.stop();
         }
@@ -728,6 +731,9 @@ const script = () => {
             $('.header-toggle').removeClass('active');
             this.isOpen = false;
             smoothScroll.lenis.start();
+        }
+        adjustNavHeight() {
+            $(this.el).find('.header-act').css('height', viewport.h - $(this.el).outerHeight());
         }
     }
     const header = new Header();
@@ -1776,7 +1782,8 @@ const script = () => {
                 $(this.el).find(".prod-hiw-main-list").addClass('keen-slider');
                 $(this.el).find(".prod-hiw-main-list > *").addClass('keen-slider__slide');
                 gsap.set($(this.el).find('.prod-hiw-main-ruler-inner'), { '--progress': 0 });
-                $(this.el).find('.prod-hiw-main-ruler-inner').width($(this.el).find('.prod-hiw-main-ruler-inner').width() + $(this.el).find(".prod-hiw-main-list").width() - parseRem(80));
+                let cloneRuler = $(this.el).find('.prod-hiw-ruler-list').clone();
+                $(this.el).find('.prod-hiw-main-ruler-inner').append(cloneRuler);
                 let rulerW = $(this.el).find('.prod-hiw-main-ruler-inner').width();
 
                 const animationSlide = {
