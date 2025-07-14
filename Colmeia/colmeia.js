@@ -736,14 +736,11 @@ const mainScript = () => {
             formName: 'Contact us',
             hubspot: {
                 portalId: '144330454',
-                formId: 'd9d563ae-e649-4eb1-927c-e22368a3c440',
+                formId: 'f13948aa-8865-4eae-87bc-d74fd324a7ce',
                 fields: [
                     { name: 'firstname', value: (data) => data['First-Name'] },
                     { name: 'lastname', value: (data) => data['Last-Name'] },
-                    { name: 'phone', value: (data) => data['Phone-Number'] },
                     { name: 'email', value: (data) => data['Business-Email'] },
-                    { name: 'company', value: (data) => data['Company'] },
-                    { name: 'jobtitle', value: (data) => data['Job-Title'] },
                     { name: 'message', value: (data) => data['Message'] }
                 ]
             }
@@ -1150,7 +1147,7 @@ const mainScript = () => {
             }
         }
         let formID = `#${getIDFormName(formName)}`;
-
+        
         $(`${formID} .input-field-group .input-field.type-select`).attr('readonly', 'readonly');
         // $(`${formID} .input-field-group.hidden .input-field`).attr('disabled', '');
 
@@ -1329,7 +1326,6 @@ const mainScript = () => {
         }
         $(formID).on('submit', function (e) {
             if ($(`${formID} #bot-hunter`).val() != '') return;
-
             const data = mapFormToObject(e.target);
             const mappedFields = mapField(data);
             const dataSend = {
@@ -1339,6 +1335,7 @@ const mainScript = () => {
                     pageName: $('[data-page-name]').attr('data-page-name'),
                 },
             };
+            console.log(dataSend);
             $.ajax({
                 url: url,
                 method: 'POST',
@@ -2735,6 +2732,7 @@ const mainScript = () => {
                             heroSub.revert();
                             gsap.set('.contact-form-title, .contact-form-sub', { clearProps: 'all' });
                             gsap.set('.form-inner', { clearProps: 'all' });
+                            $('.contact-hero #bot-hunter').val('');
                         }
                     })
 
