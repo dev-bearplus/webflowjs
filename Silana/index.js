@@ -413,10 +413,11 @@ const script = () => {
         }
     }
     class FlipText {
-        constructor(wrapEl, onCycleComplete = () => {}) {
+        constructor(wrapEl, { onCycleComplete = () => {}, duration = 3 }) {
             this.wrapEl = wrapEl;
             this.tlMaster;
             this.onCycleComplete = onCycleComplete;
+            this.duration = duration;
         }
         setup() {
             let allSlideItems = $(this.wrapEl).find('.txt-slider-inner > *');
@@ -428,7 +429,7 @@ const script = () => {
             });
 
             const DEFAULT = {
-                duration: 3,
+                duration: this.duration,
                 ease: 'expo.inOut',
                 transform: {
                     out: `translate3d(0px, ${parseRem(25.5961)}px, -${parseRem(26.0468)}px) rotateX(-91deg)`,
@@ -644,13 +645,19 @@ const script = () => {
                 scrollTrigger: {
                     trigger: triggerEl,
                     start: 'clamp(top bottom+=50%)',
-                    end: 'clamp(bottom top)',
+                    end: 'bottom top-=50%',
                     onEnter: () => {
                         if (this.isPlayed && this.once) {
                             this.once = false;
                             this.onTrigger();
                         }
-                    }
+                    },
+                    onEnterBack: () => {
+                        if (this.isPlayed && this.once) {
+                            this.once = false;
+                            onTrigger();
+                        }
+                    },
                 }
             })
         }
@@ -901,18 +908,17 @@ const script = () => {
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
 
-                if (!isInViewport(this.el)) {
-                    this.tlTriggerEnter = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: this.el,
-                            start: 'top bottom+=50%',
-                            end: 'bottom top',
-                            once: true,
-                            onEnter: () => this.tlEnter.play(),
-                            onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
-                        }
-                    })
-                }
+                this.tlTriggerEnter = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => this.tlEnter.play(),
+                        onEnterBack: () => this.tlEnter.play(),
+                        onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                    }
+                })
 
                 this.animationReveal(this.tlEnter);
             }
@@ -920,9 +926,9 @@ const script = () => {
                 this.tlOnce.play();
             }
             playEnter() {
-                if (isInViewport(this.el)) {
-                    this.tlEnter.play();
-                }
+                // if (isInViewport(this.el)) {
+                //     this.tlEnter.play();
+                // }
             }
             animationReveal(timeline) {
                 new MasterTimeline({
@@ -989,7 +995,7 @@ const script = () => {
 
                 gsap.set($(this.el).find('.home-about-story-content-text .txt-slider-wrap .heading:not(:first-child)'), { autoAlpha: 0 })
 
-                let headingFlipping = new FlipText('.home-about-story-content-text .txt-slider-wrap');
+                let headingFlipping = new FlipText('.home-about-story-content-text .txt-slider-wrap', { duration: 1 });
                 headingFlipping.setup();
 
                 new MasterTimeline({
@@ -1504,27 +1510,26 @@ const script = () => {
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
 
-                if (!isInViewport(this.el)) {
-                    this.tlTriggerEnter = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: this.el,
-                            start: 'top bottom+=50%',
-                            end: 'bottom top',
-                            once: true,
-                            onEnter: () => this.tlEnter.play(),
-                            onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
-                        }
-                    })
-                }
+                this.tlTriggerEnter = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => this.tlEnter.play(),
+                        onEnterBack: () => this.tlEnter.play(),
+                        onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                    }
+                })
                 this.animationReveal(this.tlEnter);
             }
             playOnce() {
                 this.tlOnce.play();
             }
             playEnter() {
-                if (isInViewport(this.el)) {
-                    this.tlEnter.play();
-                }
+                // if (isInViewport(this.el)) {
+                //     this.tlEnter.play();
+                // }
             }
             dragTransform() {
                 const scanInner = $(this.el).find('.prod-hero-decor-scan').get(0);
@@ -1821,7 +1826,6 @@ const script = () => {
                         const current = details.rel;
                         const total = details.slides.length;
                         let progress = slider.track.details.progress;
-                        console.log(current)
                         this.activeIndex(current);
                         let progressX = ((progress * -50) * rulerW / 100) + (progress * parseRem(58));
                         let currentX = gsap.getProperty($(this.el).find('.prod-hiw-main-ruler-inner').get(0), 'x')
@@ -1995,6 +1999,8 @@ const script = () => {
                 this.tlTriggerEnter = null;
             }
             setup(data, mode) {
+                console.log("setup")
+
                 this.el = data.next.container.querySelector('.about-hero-wrap');
                 if (mode === 'once') {
                     this.setupOnce(data);
@@ -2002,6 +2008,7 @@ const script = () => {
                     this.setupEnter(data);
                 }
                 else return;
+                console.log(isInViewport($(this.el).get(0)))
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
@@ -2016,28 +2023,32 @@ const script = () => {
                     paused: true,
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
+                console.log(
+                    "setup enter"
+                )
 
-                if (!isInViewport(this.el)) {
-                    this.tlTriggerEnter = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: this.el,
-                            start: 'top bottom+=50%',
-                            end: 'bottom top',
-                            once: true,
-                            onEnter: () => this.tlEnter.play(),
-                            onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
-                        }
-                    })
-                }
+                this.tlTriggerEnter = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        markers: true,
+                        onEnter: () => this.tlEnter.play(),
+                        onEnterBack: () => this.tlEnter.play(),
+                        onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden'),
+                    }
+                })
                 this.animationReveal(this.tlEnter);
             }
             playOnce() {
+                console.log("play")
                 this.tlOnce.play();
             }
             playEnter() {
-                if (isInViewport(this.el)) {
-                    this.tlEnter.play();
-                }
+                // if (isInViewport(this.el)) {
+                //     this.tlEnter.play();
+                // }
             }
             animationReveal(timeline) {
                 new MasterTimeline({
@@ -2566,26 +2577,25 @@ const script = () => {
                     paused: true
                 })
 
-                if (!isInViewport(this.el)) {
-                    this.tlTriggerEnter = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: this.el,
-                            start: 'top bottom+=50%',
-                            end: 'bottom top',
-                            once: true,
-                            onEnter: () => this.tlEnter.play(),
-                            onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
-                        }
-                    })
-                }
+                this.tlTriggerEnter = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => this.tlEnter.play(),
+                        onEnterBack: () => this.tlEnter.play(),
+                        onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                    }
+                })
             }
             playOnce() {
                 this.tlOnce.play();
             }
             playEnter() {
-                if (isInViewport(this.el)) {
-                    this.tlEnter.play();
-                }
+                // if (isInViewport(this.el)) {
+                //     this.tlEnter.play();
+                // }
             }
             destroy() {
                 if (this.tlOnce) {
@@ -2645,26 +2655,25 @@ const script = () => {
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
 
-                if (!isInViewport(this.el)) {
-                    this.tlTriggerEnter = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: this.el,
-                            start: 'top bottom+=50%',
-                            end: 'bottom top',
-                            once: true,
-                            onEnter: () => this.tlEnter.play(),
-                            onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
-                        }
-                    })
-                }
+                this.tlTriggerEnter = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => this.tlEnter.play(),
+                        onEnterBack: () => this.tlEnter.play(),
+                        onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                    }
+                })
             }
             playOnce() {
                 this.tlOnce.play();
             }
             playEnter() {
-                if (isInViewport(this.el)) {
-                    this.tlEnter.play();
-                }
+                // if (isInViewport(this.el)) {
+                //     this.tlEnter.play();
+                // }
             }
             destroy() {
                 if (this.tlOnce) {
@@ -2778,9 +2787,6 @@ const script = () => {
                 $('.sub-content-toc').height() >= viewport.h && $('.sub-content-toc-list-inner').attr('data-lenis-prevent', '');
             }
         },
-        Footer: class extends Footer {
-            constructor() { super(); }
-        }
     }
     class PageManager {
         constructor(page) {
