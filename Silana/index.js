@@ -1719,23 +1719,21 @@ const script = () => {
                         new FadeIn({ el: $(this.el).find('.prod-hiw-main-active').get(0) }),
                         new FadeIn({ el: $(this.el).find('.home-hiw-main-decor').get(0) }),
                         ...Array.from($(this.el).find('.prod-hiw-main-item')).flatMap((el, idx) => ([
-                            idx !== 0 && new FadeIn({ el: $(el).find('.prod-hiw-main-item-graphic') }),
+                            idx !== 0 && new FadeIn({ el: $(el).find('.prod-hiw-main-item-inner') }),
                             idx !== 0 && new FadeSplitText({ el: $(el).find('.prod-hiw-main-item-title').get(0) }),
                         ])),
-                        new FadeIn({ el: $(this.el).find('.prod-hiw-main-ruler').get(0), onComplete: () => this.slider.startAutoplay() }),
+                        new FadeIn({ el: $(this.el).find('.prod-hiw-main-ruler').get(0), onComplete: () => {
+                            setTimeout(() => {
+                                this.slider.startAutoplay();
+                            }, 1000);
+                            this.activeIndex(0);
+                        } }),
                         new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-title').get(0) }),
                         new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-desc').get(0) })
                     ]
                 })
             }
             cardSlide() {
-                const activeIndex = (idx) => {
-                    $(this.el).find('.prod-hiw-main-item').removeClass('active');
-                    $(this.el).find('.prod-hiw-main-item').eq(idx + 1).addClass('active');
-
-                    $(this.el).find('.prod-hiw-main-content-item').removeClass('active');
-                    $(this.el).find('.prod-hiw-main-content-item').eq(idx).addClass('active');
-                }
                 $(this.el).find(".prod-hiw-main-list").addClass('keen-slider');
                 $(this.el).find(".prod-hiw-main-list > *").addClass('keen-slider__slide');
                 gsap.set($(this.el).find('.prod-hiw-main-ruler-inner'), { '--progress': 0 });
@@ -1788,15 +1786,15 @@ const script = () => {
                     rubberband: false,
                     created: () => {
                         $(this.el).find(".prod-hiw-main-list").css('grid-column-gap', 0);
-                        activeIndex(0);
+                        setTimeout(() => this.activeIndex(-1), 500);
                     },
                     detailsChanged: (slider) => {
                         const details = slider.track.details;
                         const current = details.rel;
                         const total = details.slides.length;
                         let progress = slider.track.details.progress;
-
-                        activeIndex(current);
+                        console.log(current)
+                        this.activeIndex(current);
                         let progressX = ((progress * -50) * rulerW / 100) + (progress * parseRem(58));
                         let currentX = gsap.getProperty($(this.el).find('.prod-hiw-main-ruler-inner').get(0), 'x')
                         gsap.quickSetter($(this.el).find('.prod-hiw-main-ruler-inner'), 'x', 'px')(lerp(currentX, progressX, 0.25));
@@ -1864,6 +1862,13 @@ const script = () => {
                     slider.prev();
                     onSlide();
                 });
+            }
+            activeIndex(idx) {
+                $(this.el).find('.prod-hiw-main-item').removeClass('active');
+                $(this.el).find(`.prod-hiw-main-item.step-${idx + 1}`).addClass('active');
+
+                $(this.el).find('.prod-hiw-main-content-item').removeClass('active');
+                $(this.el).find('.prod-hiw-main-content-item').eq(idx - 1).addClass('active');
             }
         },
         Compare: class extends TriggerSetup {
