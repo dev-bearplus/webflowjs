@@ -2777,6 +2777,9 @@ const script = () => {
                 }
                 $('.sub-content-toc').height() >= viewport.h && $('.sub-content-toc-list-inner').attr('data-lenis-prevent', '');
             }
+        },
+        Footer: class extends Footer {
+            constructor() { super(); }
         }
     }
     class PageManager {
