@@ -682,9 +682,6 @@ const script = () => {
             if (viewport.w < 767) {
                 this.toggleNav();
                 this.adjustNavHeight();
-
-                window.addEventListener('resize', () => this.adjustNavHeight());
-                window.addEventListener('load', () => this.adjustNavHeight());
             }
         }
         updateOnScroll(inst) {
