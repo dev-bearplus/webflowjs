@@ -1233,12 +1233,12 @@ const script = () => {
                 this.animationReveal();
             }
             animationReveal() {
-                let headingFlipping = new FlipText('.home-made-title-slide .txt-slider-wrap',
-                    (idx) =>
+                let headingFlipping = new FlipText('.home-made-title-slide .txt-slider-wrap', {
+                    onCycleComplete: (idx) =>
                         setTimeout(() => {
                             $(this.el).find('.home-made-map-img').eq(idx).addClass('active').siblings().removeClass('active');
                         }, 1000)
-                    );
+                });
                 headingFlipping.setup();
                 if (viewport.w < 991) {
                     new MasterTimeline({
