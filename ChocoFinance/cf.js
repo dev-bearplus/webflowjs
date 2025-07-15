@@ -4193,114 +4193,155 @@ const mainScript = () => {
         function thankReview() {
             let gapSlide = parseRem(20);
             let slideView = 5;
+
             if(viewport.w < 991 && viewport.w > 479){
                 slideView = 2.4;
             }
             else if(viewport.w < 479){
-                slideView= 1.2;
+                slideView = 1.2;
                 gapSlide = parseRem(24);
             }
-            let maxHeightSlide = parseRem(1200);
-            console.log(maxHeightSlide)
-            let widthSwiperSlide = ($('.thank-review-main').width() - gapSlide*(slideView -1))/slideView;
-            let avtAnonymous = 'https://cdn.prod.website-files.com/6385cd39c09f99658407a3ec/6837d7eedcaaae5738e36587_icon-anonymous.svg'
-            let swiperSlide = $('.thank-review-list').eq(0).clone();
-            let itemReview = swiperSlide.find('.thank-review-item').eq(0).clone();
-            let icRateGood = swiperSlide.find('.thank-review-item-rate-item.item-good').eq(0).clone();
-            let icRateBad = swiperSlide.find('.thank-review-item-rate-item.item-bad').eq(0).clone();
-            itemReview.find('.thank-review-item-rate-item').remove();
-            swiperSlide.css('width', widthSwiperSlide)
-            swiperSlide.find('.thank-review-item').remove();
-            $('.thank-review-inner').html('');
-            $('.thank-review-inner').append(swiperSlide.clone());
-            let i = 0;
-            getAllDataByType('user_review').then((res) => {
-                console.log(res)
-                if (res) {
-                    res.forEach((item, idx) => {
-                        let itemHtml = itemReview.clone();
-                        console.log(item.id)
-                        let newItem = createItemReview(item, itemHtml);
-                        if(viewport.w > 479){
-                            $('.thank-review-inner .thank-review-list').eq(i).append(newItem.clone());
-                            let currentHeigthSwiper = $('.thank-review-inner .thank-review-list').eq(i).height();
-                            if (currentHeigthSwiper > maxHeightSlide) {
-                                //$('.thank-review-inner .thank-review-list').eq(i) remove item last child
-                                $('.thank-review-inner .thank-review-list').eq(i).find('.thank-review-item').last().remove();
-                                $('.thank-review-inner').append(swiperSlide.clone())
-                                i++;
-                                $('.thank-review-inner .thank-review-list').eq(i).append(newItem.clone());
+            if(viewport.w > 479){
+                let maxHeightSlide = parseRem(1200);
+                let widthSwiperSlide = (
+                    $('.thank-review-main').width() - gapSlide * (slideView - 1)
+                ) / slideView;
+                let baseSlide = $('.thank-review-list').eq(0).clone().empty().css('width', widthSwiperSlide);
+                let itemsArray = $('.thank-review-item').toArray();
+                let swiperWrapper = $('.thank-review-inner').eq(0).empty();
+                let currentSlide = baseSlide.clone();
+                swiperWrapper.append(currentSlide);
+                let icRateGood = $(itemsArray[0]).find('.thank-review-item-rate-item.item-good').eq(0);
+                let icRateBad = $(itemsArray[0]).find('.thank-review-item-rate-item.item-bad').eq(0);
+                console.log(icRateGood)
+                itemsArray.forEach(function(item) {
+                    let rateWrapper = $(item).find('.thank-review-item-rate');
+                    rateWrapper.find('.thank-review-item-rate-item').remove();
+                    if(!rateWrapper.hasClass('w-condition-invisible')){
+                        let itemRate = parseInt($(item).attr('data-rate'));
+                        for(let i = 1 ; i <= 5; i ++){
+                            if(i <= itemRate) {
+                                rateWrapper.append(icRateGood.clone());
+                            }
+                            else {
+                                rateWrapper.append(icRateBad.clone());
                             }
                         }
-                        else {
-                            if (idx < 11) {
-                                $('.thank-review-inner .thank-review-list').eq(i).append(newItem.clone());
-                                i++;
-                                if(i < 10) {
-                                    $('.thank-review-inner').append(swiperSlide.clone())
-                                }
-                            }
-                        }
-                           
-                    })
-                    let swiper = new Swiper('.thank-review-main', {
-                        spaceBetween: gapSlide,
-                        slidesPerView: slideView,
-                        mousewheel: {
-                            enabled: true,
-                            forceToAxis: true,
-                        },
-                        freeMode: true,
-                        scrollbar: {
-                            el: ".thank-review-process",
-                            draggable: true,
-                          },
-                    });
-                    $('.thank-review-main').find('.load-ske').addClass('loaded');
-                    ScrollTrigger.refresh();
-                }
-            });
-            function createItemReview(item, itemHtml ){
-                itemHtml.attr('key', item.id)
-                if(!item.data.platform_icon.url ){
-                    console.log('anonymous')
-                    itemHtml.find('.thank-review-item-avt img').attr('src', avtAnonymous);
-                    itemHtml.find('.thank-review-item-platform').remove();
-                    itemHtml.find('.thank-review-item-rate').remove();
-                }else{
-                    itemHtml.find('.thank-review-item-platform-ic img').attr('src', item.data.platform_icon.url);
-                    if(item.data.avatar.url !== ''){
-                        itemHtml.find('.thank-review-item-avt img').attr('src', item.data.avatar.url);
                     }
-                }
-                itemHtml.find('.thank-review-item-content').text(item.data.review_content[0].text);
-                if(item.data.user_name[0] && item.data.user_name[0].text !== ''){
-                    if(item.data.date) {
-                        itemHtml.find('.thank-review-item-name').text(`${item.data.user_name[0].text},`)
+                    currentSlide.append(item);
+                    let currentHeight = currentSlide.height();
+                    if (currentHeight > maxHeightSlide) {
+                        $(item).detach();
+                        currentSlide = baseSlide.clone();
+                        swiperWrapper.append(currentSlide);
+                        currentSlide.append(item);
                     }
-                    else {
-                        itemHtml.find('.thank-review-item-name').text(`${item.data.user_name[0].text}`)
-                    }
-                }
-                else {
-                    itemHtml.find('.thank-review-item-name').remove();
-                }
-                if(item.data.date){
-                    itemHtml.find('.thank-review-item-date').text(toDateFormat(item.data.date))
-                }
-                else {
-                    itemHtml.find('.thank-review-item-date').remove();
-                }
-                if(item.data.number_rating !== null){
-                    for(let i = 0; i < item.data.number_rating; i++){
-                        itemHtml.find('.thank-review-item-rate').append(icRateGood.clone());
-                    }
-                    for(let i = 0; i < (5 - item.data.number_rating); i++){
-                        itemHtml.find('.thank-review-item-rate').append(icRateBad.clone());
-                    }
-                }
-                return itemHtml;
+                });
             }
+            $('.thank-review-item-inner').removeClass('load-ske');
+            let swiper = new Swiper('.thank-review-main', {
+                spaceBetween: gapSlide,
+                slidesPerView: slideView,
+                mousewheel: {
+                    enabled: true,
+                    forceToAxis: true,
+                },
+                freeMode: true,
+                scrollbar: {
+                    el: ".thank-review-process",
+                    draggable: true,
+                    },
+            });
+            ScrollTrigger.refresh();
+            
+            // swiperWrapper.append(swiperSlide);
+            // getAllDataByType('user_review').then((res) => {
+            //     console.log(res)
+            //     if (res) {
+            //         res.forEach((item, idx) => {
+            //             let itemHtml = itemReview.clone();
+            //             console.log(item.id)
+            //             let newItem = createItemReview(item, itemHtml);
+            //             if(viewport.w > 479){
+            //                 $('.thank-review-inner .thank-review-list').eq(i).append(newItem.clone());
+            //                 let currentHeigthSwiper = $('.thank-review-inner .thank-review-list').eq(i).height();
+            //                 if (currentHeigthSwiper > maxHeightSlide) {
+            //                     //$('.thank-review-inner .thank-review-list').eq(i) remove item last child
+            //                     $('.thank-review-inner .thank-review-list').eq(i).find('.thank-review-item').last().remove();
+            //                     $('.thank-review-inner').append(swiperSlide.clone())
+            //                     i++;
+            //                     $('.thank-review-inner .thank-review-list').eq(i).append(newItem.clone());
+            //                 }
+            //             }
+            //             else {
+            //                 if (idx < 11) {
+            //                     $('.thank-review-inner .thank-review-list').eq(i).append(newItem.clone());
+            //                     i++;
+            //                     if(i < 10) {
+            //                         $('.thank-review-inner').append(swiperSlide.clone())
+            //                     }
+            //                 }
+            //             }
+                           
+            //         })
+            //         let swiper = new Swiper('.thank-review-main', {
+            //             spaceBetween: gapSlide,
+            //             slidesPerView: slideView,
+            //             mousewheel: {
+            //                 enabled: true,
+            //                 forceToAxis: true,
+            //             },
+            //             freeMode: true,
+            //             scrollbar: {
+            //                 el: ".thank-review-process",
+            //                 draggable: true,
+            //               },
+            //         });
+            //         $('.thank-review-main').find('.load-ske').addClass('loaded');
+            //         ScrollTrigger.refresh();
+            //     }
+            // });
+            // function createItemReview(item, itemHtml ){
+            //     itemHtml.attr('key', item.id)
+            //     if(!item.data.platform_icon.url ){
+            //         console.log('anonymous')
+            //         itemHtml.find('.thank-review-item-avt img').attr('src', avtAnonymous);
+            //         itemHtml.find('.thank-review-item-platform').remove();
+            //         itemHtml.find('.thank-review-item-rate').remove();
+            //     }else{
+            //         itemHtml.find('.thank-review-item-platform-ic img').attr('src', item.data.platform_icon.url);
+            //         if(item.data.avatar.url !== ''){
+            //             itemHtml.find('.thank-review-item-avt img').attr('src', item.data.avatar.url);
+            //         }
+            //     }
+            //     itemHtml.find('.thank-review-item-content').text(item.data.review_content[0].text);
+            //     if(item.data.user_name[0] && item.data.user_name[0].text !== ''){
+            //         if(item.data.date) {
+            //             itemHtml.find('.thank-review-item-name').text(`${item.data.user_name[0].text},`)
+            //         }
+            //         else {
+            //             itemHtml.find('.thank-review-item-name').text(`${item.data.user_name[0].text}`)
+            //         }
+            //     }
+            //     else {
+            //         itemHtml.find('.thank-review-item-name').remove();
+            //     }
+            //     if(item.data.date){
+            //         itemHtml.find('.thank-review-item-date').text(toDateFormat(item.data.date))
+            //     }
+            //     else {
+            //         itemHtml.find('.thank-review-item-date').remove();
+            //     }
+            //     if(item.data.number_rating !== null){
+            //         for(let i = 0; i < item.data.number_rating; i++){
+            //             itemHtml.find('.thank-review-item-rate').append(icRateGood.clone());
+            //         }
+            //         for(let i = 0; i < (5 - item.data.number_rating); i++){
+            //             itemHtml.find('.thank-review-item-rate').append(icRateBad.clone());
+            //         }
+            //     }
+            //     return itemHtml;
+            // }
         }
         thankReview();
         function thankMention() {
