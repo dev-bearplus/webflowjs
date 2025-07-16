@@ -1248,6 +1248,34 @@ const mainScript = () => {
         })
     }
     updateInterestRate('.main')
+    function getAllDynamicData(richtextClass) {
+        let wrapper = $(richtextClass)
+        let allLink = wrapper.find('a')
+
+        allLink.each(function(idx, item) {
+            let href = $(item).attr('href')
+            if (href.includes('https://[data-rate')) {
+                let type = href.replace('https://', '').replace('http://', '').replace('[data-rate-', '').replace(']', '').includes('usd') ? 'usd' : 'sgd'
+                let rate = href.replace('https://', '').replace('http://', '').replace(`[data-rate-${type}=`, '').replace(']', '')
+                // console.log(type)
+                // console.log(rate)
+                // Create a new span element with the same content
+                let newDom = $('<span></span>');
+                if($(item).html().includes('strong')){
+                    newDom = $('<strong></strong>');
+                } 
+                
+                let span = newDom
+                    .html($(item).html())
+                    .attr(`data-rate-${type}`, rate);
+                // Replace the anchor with the span
+                console.log(span.html())
+                $(item).replaceWith(span);
+            }
+        })
+        updateInterestRate(richtextClass)
+    }
+    
     function setupDialCode(data, selectId) {
         //Get data
         let codes = data;
@@ -2485,20 +2513,30 @@ const mainScript = () => {
         }
 
         function homeGetFaq() {
-            getAllDataByType('faq').then((res) => {
-                if (res) {
-                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_homepage)
-                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_homepage', true)
-                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs);
-                    allFaq.forEach((i) => {
-                        createFaqNew(i).appendTo($('.home-faq-main'))
-                    })
-                    updateInterestRate('.home-faq-main');
-                    $('.home-faq-main').find('.load-ske').addClass('loaded')
-                    animateFaq();
-                    scrollToFaq();
-                }
-            });
+            if(isStagging()){
+                console.log('faq stagging')
+                getAllDynamicData('.home-faq--itemans');
+                animateFaq();
+                scrollToFaq();
+            }
+            else {
+                console.log('faq live')
+                getAllDataByType('faq').then((res) => {
+                    if (res) {
+                        let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_homepage)
+                        let allFaq = sortAsc(activeFaqItem, true, 'order_on_homepage', true)
+                        $('.home-faq-main').html('').attr(schemaFAQParentAttrs);
+                        allFaq.forEach((i) => {
+                            createFaqNew(i).appendTo($('.home-faq-main'))
+                        })
+                        updateInterestRate('.home-faq-main');
+                        $('.home-faq-main').find('.load-ske').addClass('loaded')
+                        animateFaq();
+                        scrollToFaq();
+                    }
+                });
+            }
+            
             function scrollToFaq() {
                 $('[data-scroll-faq]').on('click', function(e) {
                     e.preventDefault();
