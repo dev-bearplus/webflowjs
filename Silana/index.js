@@ -1170,7 +1170,6 @@ const script = () => {
                                     }
                                 });
                             }
-                            console.log(tween)
                             return tween;
                         })
                     ]
