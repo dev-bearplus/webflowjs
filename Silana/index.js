@@ -2,6 +2,9 @@ const script = () => {
     $.easing.exponentialEaseOut = function (t) {
         return Math.min(1, 1.001 - Math.pow(2, -10 * t));
     };
+    $.fn.hasAttr = function (name) {
+        return this.attr(name) !== undefined;
+    };
     barba.use(barbaPrefetch);
     if (history.scrollRestoration) {
         history.scrollRestoration = 'manual';
@@ -1780,7 +1783,8 @@ const script = () => {
                             this.activeIndex(0);
                         } }),
                         new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-title').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-desc').get(0) })
+                        new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-desc').get(0) }),
+                        ...Array.from($(this.el).find('.prod-hiw-main-control-item')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0) }))
                     ]
                 })
             }
@@ -1839,6 +1843,15 @@ const script = () => {
                     created: () => {
                         $(this.el).find(".prod-hiw-main-list").css('grid-column-gap', 0);
                         setTimeout(() => this.activeIndex(-1), 500);
+                    },
+                    slideChanged: (slider) => {
+                        // console.log('rel', slider.track.details.rel)
+                        // console.log('abs', slider.track.details.abs)
+
+                        // const total = slider.track.details.slides.length;
+                        // if (slider.track.details.abs === total * 2) {
+                        //     slider.moveToIdx(0);
+                        // }
                     },
                     detailsChanged: (slider) => {
                         const details = slider.track.details;
@@ -2477,9 +2490,9 @@ const script = () => {
             initInputValueCheck(selector = 'input') {
                 $(document).on('input', selector, function () {
                     if ($(this).val().trim() !== '') {
-                        $(this).addClass('has-value');
+                        $(this).addClass('filled');
                     } else {
-                        $(this).removeClass('has-value');
+                        $(this).removeClass('filled');
                     }
                 });
             }
@@ -2556,10 +2569,62 @@ const script = () => {
                 $('.contact-hero-form .overlay-bg').on('click', function(){
                     $('.contact-hero-form-success').removeClass('active');
                 })
-                $('.contact-hero-form-input[type="tel"]').bind('change keydown keyup', function (e) {
-                    let inputVal = $(this).val();
-                    $(this).val(inputVal.replace(/\D/g, ''));
+                $(`.contact-hero-form-input-wrap .contact-hero-form-input`).on('focus', function (e) {
+                    let inputWrap = $(this).closest('.contact-hero-form-input-wrap').addClass('active');
+                    inputWrap.addClass('active');
+                    if (!$(inputWrap).find('.iti__country-list').hasAttr('data-lenis-prevent')) {
+                        $(inputWrap).find('.iti__country-list').attr('data-lenis-prevent', '');
+                    }
                 })
+                $(`.contact-hero-form-input-wrap .contact-hero-form-input`).on('blur', function (e) {
+                    if ($(this).hasAttr('ms-code-phone-number')) {
+                        if (!$(`.contact-hero-form-input-wrap .iti__flag-container:hover`).length) {
+                            $(this).closest('.contact-hero-form-input-wrap').removeClass('active');
+                            $(this).closest('.contact-hero-form-input-wrap').toggleClass('filled', $(this).val() != '');
+                        }
+                    }
+                    else {
+                        $(this).closest('.contact-hero-form-input-wrap').removeClass('active');
+                        $(this).closest('.contact-hero-form-input-wrap').toggleClass('filled', $(this).val() != '');
+                    }
+                })
+                $('.contact-hero-form-input[type="tel"]').bind('change keydown keyup', function (e) {
+                        let inputVal = $(this).val();
+                        $(this).val(inputVal.replace(/\D/g, ''));
+                })
+                $(`.contact-hero-form-input[ms-code-phone-number]`).each(function() {
+                    let input = this;
+                    let preferredCountries = $(input).attr('ms-code-phone-number').split(',');
+
+                    let iti = window.intlTelInput(input, {
+                        preferredCountries: preferredCountries,
+                        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+                    });
+
+                    $.get("https://ipinfo.io", function(response) {
+                        var countryCode = response.country;
+                        iti.setCountry(countryCode);
+                    }, "jsonp");
+
+                    input.addEventListener('change', formatPhoneNumber);
+                    input.addEventListener('keyup', formatPhoneNumber);
+
+                    // Restrict input to digits and the plus sign
+                    input.addEventListener('input', function() {
+                        this.value = this.value.replace(/[^\d+]/g, '');
+                    });
+
+                    function formatPhoneNumber() {
+                        let formattedNumber = iti.getNumber(intlTelInputUtils.numberFormat.INTERNATIONAL);
+                        input.value = formattedNumber;
+                    }
+
+                    // var form = $(input).closest('form');
+                    // form.submit(function() {
+                    //     var formattedNumber = iti.getNumber(intlTelInputUtils.numberFormat.INTERNATIONAL);
+                    //     input.value = formattedNumber;
+                    // });
+                });
                 const formInner = $('.contact-hero-form-inner');
                 const successBox = $('.contact-hero-form-success');
                 formSubmitEvent.init({
