@@ -4177,23 +4177,46 @@ const mainScript = () => {
     }
     SCRIPT.thankyouScript = () => {
         function thankHero() {
-            let tl = gsap.timeline({
+            let tlScroll = gsap.timeline({
                 scrollTrigger: {
                   trigger: '.thank-hero',
                   start: viewport.w > 991 ? 'top+=50% bottom-=50%' : 'top+=70% bottom-=70%',
                   end: viewport.w > 991 ? 'bottom-=60% top-=60%' : 'bottom-=40% top-=40%',
                   scrub: 1,
                 }
-              });
+            });
+            let tlFirst = gsap.timeline({
+                onComplete: () => {
+                    tlScroll
+                        .fromTo('.thank-hero-ic', { yPercent: 0 }, { yPercent: -55 , ease: 'none'}, 0)
+                }
+            })
+            gsap.set('.thank-hero-title', { autoAlpha: 0})
+            gsap.set('.thank-hero-ic', { autoAlpha: 0, y: -40})
+            tlFirst
+                .to('.thank-hero-title', { autoAlpha: 1, duration: 1 })
+                .to('.thank-hero-ic', { autoAlpha: 1, y:0, duration: .8, clearProps: "all"}, '<=.6')
               
-              tl
-                .fromTo('.thank-hero-ic', { yPercent: 0 }, { yPercent: -20 , ease: 'none'}, 0)
         }
         thankHero();
         function thankReview() {
             let gapSlide = parseRem(20);
             let slideView = 5;
-
+            gsap.set('.thank-review-title', {autoAlpha: 0, yPercent: 40})
+            gsap.set('.thank-review-sub', {autoAlpha: 0, yPercent: 40})
+            gsap.set('.thank-review-list', {autoAlpha: 0, x: 40})
+            let tlReview = gsap.timeline({
+                scrollTrigger: {
+                  trigger: '.thank-review-inner',
+                  start: 'top top+=65%'
+                }
+            });
+            let tlTitle = gsap.timeline({
+                scrollTrigger: {
+                  trigger: '.thank-review-title-wrap',
+                  start: 'top top+=75%'
+                }
+            });
             if(viewport.w < 991 && viewport.w > 479){
                 slideView = 2.4;
             }
@@ -4202,7 +4225,7 @@ const mainScript = () => {
                 gapSlide = parseRem(24);
             }
             if(viewport.w > 479){
-                let maxHeightSlide = parseRem(1200);
+                let maxHeightSlide = parseRem(1054);
                 let widthSwiperSlide = (
                     $('.thank-review-main').width() - gapSlide * (slideView - 1)
                 ) / slideView;
@@ -4238,7 +4261,6 @@ const mainScript = () => {
                     }
                 });
             }
-            $('.thank-review-item-inner').removeClass('load-ske');
             let swiper = new Swiper('.thank-review-main', {
                 spaceBetween: gapSlide,
                 slidesPerView: slideView,
@@ -4253,97 +4275,72 @@ const mainScript = () => {
                     },
             });
             ScrollTrigger.refresh();
-            
-            // swiperWrapper.append(swiperSlide);
-            // getAllDataByType('user_review').then((res) => {
-            //     console.log(res)
-            //     if (res) {
-            //         res.forEach((item, idx) => {
-            //             let itemHtml = itemReview.clone();
-            //             console.log(item.id)
-            //             let newItem = createItemReview(item, itemHtml);
-            //             if(viewport.w > 479){
-            //                 $('.thank-review-inner .thank-review-list').eq(i).append(newItem.clone());
-            //                 let currentHeigthSwiper = $('.thank-review-inner .thank-review-list').eq(i).height();
-            //                 if (currentHeigthSwiper > maxHeightSlide) {
-            //                     //$('.thank-review-inner .thank-review-list').eq(i) remove item last child
-            //                     $('.thank-review-inner .thank-review-list').eq(i).find('.thank-review-item').last().remove();
-            //                     $('.thank-review-inner').append(swiperSlide.clone())
-            //                     i++;
-            //                     $('.thank-review-inner .thank-review-list').eq(i).append(newItem.clone());
-            //                 }
-            //             }
-            //             else {
-            //                 if (idx < 11) {
-            //                     $('.thank-review-inner .thank-review-list').eq(i).append(newItem.clone());
-            //                     i++;
-            //                     if(i < 10) {
-            //                         $('.thank-review-inner').append(swiperSlide.clone())
-            //                     }
-            //                 }
-            //             }
-                           
-            //         })
-            //         let swiper = new Swiper('.thank-review-main', {
-            //             spaceBetween: gapSlide,
-            //             slidesPerView: slideView,
-            //             mousewheel: {
-            //                 enabled: true,
-            //                 forceToAxis: true,
-            //             },
-            //             freeMode: true,
-            //             scrollbar: {
-            //                 el: ".thank-review-process",
-            //                 draggable: true,
-            //               },
-            //         });
-            //         $('.thank-review-main').find('.load-ske').addClass('loaded');
-            //         ScrollTrigger.refresh();
-            //     }
-            // });
-            // function createItemReview(item, itemHtml ){
-            //     itemHtml.attr('key', item.id)
-            //     if(!item.data.platform_icon.url ){
-            //         console.log('anonymous')
-            //         itemHtml.find('.thank-review-item-avt img').attr('src', avtAnonymous);
-            //         itemHtml.find('.thank-review-item-platform').remove();
-            //         itemHtml.find('.thank-review-item-rate').remove();
-            //     }else{
-            //         itemHtml.find('.thank-review-item-platform-ic img').attr('src', item.data.platform_icon.url);
-            //         if(item.data.avatar.url !== ''){
-            //             itemHtml.find('.thank-review-item-avt img').attr('src', item.data.avatar.url);
-            //         }
-            //     }
-            //     itemHtml.find('.thank-review-item-content').text(item.data.review_content[0].text);
-            //     if(item.data.user_name[0] && item.data.user_name[0].text !== ''){
-            //         if(item.data.date) {
-            //             itemHtml.find('.thank-review-item-name').text(`${item.data.user_name[0].text},`)
-            //         }
-            //         else {
-            //             itemHtml.find('.thank-review-item-name').text(`${item.data.user_name[0].text}`)
-            //         }
-            //     }
-            //     else {
-            //         itemHtml.find('.thank-review-item-name').remove();
-            //     }
-            //     if(item.data.date){
-            //         itemHtml.find('.thank-review-item-date').text(toDateFormat(item.data.date))
-            //     }
-            //     else {
-            //         itemHtml.find('.thank-review-item-date').remove();
-            //     }
-            //     if(item.data.number_rating !== null){
-            //         for(let i = 0; i < item.data.number_rating; i++){
-            //             itemHtml.find('.thank-review-item-rate').append(icRateGood.clone());
-            //         }
-            //         for(let i = 0; i < (5 - item.data.number_rating); i++){
-            //             itemHtml.find('.thank-review-item-rate').append(icRateBad.clone());
-            //         }
-            //     }
-            //     return itemHtml;
-            // }
+            tlTitle
+                .to('.thank-review-title', {autoAlpha: 1, yPercent: 0, duration: 1})
+                .to('.thank-review-sub', {autoAlpha: 1, yPercent: 0, duration: .8}, '<=.4')
+            tlReview
+                .to('.thank-review-list', {autoAlpha: 1, x: 0, duration: 1, stagger: .06})
         }
         thankReview();
+        function thankTeam() {
+            let isVideoAutoplay = true;
+            $('.thank-team-video-inner .el-video').get(0).currentTime = 1.84;
+            if(isVideoAutoplay) {
+                ScrollTrigger.create({
+                    trigger: '.thank-team',
+                    start: 'top top+=75%',
+                    onEnter: () => {
+                        $('.thank-team-video-trigger').addClass('hidden');
+                        $('.thank-team-video-inner .el-video')
+                        .prop('controls', true)
+                        .prop('autoplay', true)
+                        .prop('muted', true)
+                        .prop('playsinline', true)
+                        .get(0).play();
+                    }
+                });
+            }
+            else {
+                $('.thank-team-video-trigger').on('click', function(e) {
+                    e.preventDefault();
+                    $('.thank-team-video-trigger').addClass('hidden')
+                    $('.thank-team-video-inner .el-video').attr('controls', true);
+                    $('.thank-team-video-inner .el-video').get(0).play();
+                })
+            }
+        }
+        thankTeam()
+        function thankResult() {
+            let tlScroll = gsap.timeline({
+                scrollTrigger: {
+                  trigger: '.thank-result',
+                  start: 'top bottom',
+                  end: 'bottom top',
+                  scrub: 1,
+                }
+            });
+            let tlFirst = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.thank-result-title-wrap',
+                    start: 'top top+=75%'
+                },
+                onComplete: () => {
+                    tlScroll
+                        .fromTo('.thank-result-ic', { yPercent: 0 }, { yPercent: -55 , ease: 'none'}, 0)
+                }
+            })
+            gsap.set('.thank-result-label', { autoAlpha: 0})
+            gsap.set('.thank-result-title', { autoAlpha: 0})
+            gsap.set('.thank-result-sub', { autoAlpha: 0})
+            gsap.set('.thank-result-ic', { autoAlpha: 0, y: -60})
+            tlFirst
+                .to('.thank-result-label', { autoAlpha: 1, duration: .6 })
+                .to('.thank-result-title', { autoAlpha: 1, duration: 1 }, '<=.6')
+                .to('.thank-result-ic', { autoAlpha: 1, y:0, duration: .8}, '<=0')
+                .to('.thank-result-sub', { autoAlpha: 1, duration: .8 },'<=.6' )
+              
+        }
+        thankResult();
         function thankMention() {
             if(viewport.w < 767) {
                 $('.thank-mention-cms').addClass('swiper');
