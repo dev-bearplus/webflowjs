@@ -1000,7 +1000,7 @@ const script = () => {
 
                 gsap.set($(this.el).find('.home-about-story-content-text .txt-slider-wrap .heading:not(:first-child)'), { autoAlpha: 0 })
 
-                let headingFlipping = new FlipText('.home-about-story-content-text .txt-slider-wrap', { duration: 1 });
+                let headingFlipping = new FlipText('.home-about-story-content-text .txt-slider-wrap', { duration: 2 });
                 headingFlipping.setup();
 
                 new MasterTimeline({
@@ -1019,7 +1019,7 @@ const script = () => {
             }
             animationScrub() {
                 // new ParallaxImage({el: this.el.querySelector('.home-about-thumb-inner video'), scaleOffset: 0.1 });
-                this.el.querySelectorAll('.home-about-story-item').forEach((el, idx) => new ParallaxImage({el: el.querySelector('img'), scaleOffset: 0.2 }))
+                // this.el.querySelectorAll('.home-about-story-item').forEach((el, idx) => new ParallaxImage({el: el.querySelector('img'), scaleOffset: 0.2 }))
                 this.tlOverlap.push(
                     gsap
                         .timeline({
@@ -1156,11 +1156,21 @@ const script = () => {
                                 new FadeIn({ el: $(el).find('.home-challenge-item-ic').get(0) })
                             ]
                             if (idx === 0) {
-                                tween.push(new FadeSplitText({ el: $(el).find('.home-challenge-item-desc-txt .txt-richtext p').get(0), splitType: 'lines' }))
-                                tween.push(...Array.from($(el).find('.home-challenge-item-desc-txt .txt-richtext li')).map((li, idx) =>
-                                    new FadeIn({ el: $(li).get(0), delay: idx === 0 ? '>=-1' : "<=.2" })))
+                                $(el).find('.home-challenge-item-desc-txt .txt-richtext > *').each((_, element) => {
+                                    console.log(element.tagName)
+                                    if (element.tagName.toLowerCase() === 'p') {
+                                        tween.push(new FadeSplitText({
+                                            el: element,
+                                            splitType: 'lines',
+                                            delay: ""
+                                        }));
+                                    } else if (element.tagName.toLowerCase() === 'ul') {
+                                        tween.push(...Array.from($(element).find('li')).map((li, index) =>
+                                            new FadeIn({ el: $(li).get(0), delay: index === 0 ? '>=-1' : "<=.2" })))
+                                    }
+                                });
                             }
-
+                            console.log(tween)
                             return tween;
                         })
                     ]
