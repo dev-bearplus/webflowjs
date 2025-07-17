@@ -789,29 +789,15 @@ const mainScript = () => {
             super.setTrigger(this.setup.bind(this));
         }
         setup() {
+            let linkInner = $('.home-featured-view-all');
+            let dataLinkType = linkInner.attr('data-link-type');
+            let linkCurrent = linkInner.attr('href');
+            linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
             let tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.home-featured',
                     start: "top top+=55%",
                 },
-            })
-            $('.home-featured-right-item').each((idx, el) => {
-                let linkInner = $(el).find('.home-featured-right-item-inner')
-                let dataLinkType = linkInner.attr('data-link-type');
-                let linkCurrent = linkInner.attr('href');
-                linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
-            })
-            $('.home-featured-left-inner').each((idx, el) => {
-                let linkInner = $(el).find('.home-featured-left-inner-link')
-                let dataLinkType = linkInner.attr('data-link-type');
-                let linkCurrent = linkInner.attr('href');
-                linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
-            })
-            $('.home-featured-img-item').each((idx, el) => {
-                let linkInner = $(el).find('.home-featured-img-item-inner')
-                let dataLinkType = linkInner.attr('data-link-type');
-                let linkCurrent = linkInner.attr('href');
-                linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
             })
             $('.home-featured-img-item').each((idx, el) => {
                 let tlItem = gsap.timeline({
@@ -1280,6 +1266,10 @@ const mainScript = () => {
             super.setTrigger(this.setup.bind(this));
         }
         setup() {
+            let linkInner = $('.home-article-view-all');
+            let dataLinkType = linkInner.attr('data-link-type');
+            let linkCurrent = linkInner.attr('href');
+            linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
             let tlTitle = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.home-article-title-wrap',
