@@ -13,7 +13,6 @@ const script = () => {
     gsap.registerPlugin(ScrollTrigger, SplitText);
     ScrollTrigger.defaults({
         invalidateOnRefresh: true,
-        fastScrollEnd: true
     });
     const parseRem = (input) => {
         return input / 10 * parseFloat($('html').css('font-size'))
@@ -1414,7 +1413,6 @@ const script = () => {
                         end: `bottom+=${viewport.h * 1.5} bottom`,
                         scrub: 1,
                         anticipatePin: 1,
-                        snap: 1,
                         onUpdate: (self) => {
                             if (self.progress > 0.5 && !fadeIn) {
                                 fadeIn = true;
