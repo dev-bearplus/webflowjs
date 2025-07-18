@@ -1,3 +1,4 @@
+
 const script = () => {
     $.easing.exponentialEaseOut = function (t) {
         return Math.min(1, 1.001 - Math.pow(2, -10 * t));
@@ -2651,6 +2652,63 @@ const script = () => {
                     }
                 })
 
+                const { portalId, formId, fields } = hubspot;
+
+                const hubspot = {
+                    portalId: 145687733,
+                    formId: "69790463-8651-4e07-ad64-45f9c23549e9",
+                    fields: [
+                        { name: 'fullname', value: (data) => data['Name'] },
+                        { name: 'phone', value: (data) => data['Phone'] },
+                        { name: 'email', value: (data) => data['Email'] },
+                        { name: 'subject', value: (data) => data['Subject'] },
+                        { name: 'message', value: (data) => data['Message'] }
+                    ]
+                }
+                let url = `https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${formId}`;
+                const mapField = (data) => {
+                    if (!fields.length) return [];
+
+                    const result = fields.map((field) => {
+                        const { name, value } = field;
+                        if (!value) {
+                            return {
+                                name,
+                                value: data[name] || ""
+                            }
+                        }
+                        else {
+                            const getValue = value(data);
+                            return {
+                                name,
+                                value: getValue || ''
+                            }
+                        }
+                    })
+                    return result;
+                }
+                $(this.el).find("#contact-form").on('submit', function (e) {
+                    const data = mapFormToObject(e.target);
+                    const mappedFields = mapField(data);
+                    const dataSend = { fields: mappedFields };
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: JSON.stringify(dataSend),
+                        dataType: 'json',
+                        headers: {
+                            accept: 'application/json',
+                            'Access-Control-Allow-Origin': '*',
+                        },
+                        contentType: 'application/json',
+                        success: function (response) {
+                            console.log(response);
+                        },
+                        error: function (xhr, resp, text) {
+                            console.log(xhr, resp, text)
+                        }
+                    });
+                })
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
