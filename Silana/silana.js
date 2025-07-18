@@ -2598,10 +2598,10 @@ const script = () => {
                         $(this).closest('.contact-hero-form-input-wrap').toggleClass('filled', $(this).val() != '');
                     }
                 })
-                $('.contact-hero-form-input[type="tel"]').bind('change keydown keyup', function (e) {
-                        let inputVal = $(this).val();
-                        $(this).val(inputVal.replace(/\D/g, ''));
-                })
+                // $('.contact-hero-form-input[type="tel"]').bind('change keydown keyup', function (e) {
+                //         let inputVal = $(this).val();
+                //         $(this).val(inputVal.replace(/\D/g, ''));
+                // })
                 $(`.contact-hero-form-input[ms-code-phone-number]`).each(function() {
                     let input = this;
                     let preferredCountries = $(input).attr('ms-code-phone-number').split(',');

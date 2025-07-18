@@ -46,6 +46,14 @@ const script = () => {
         window.Webflow && window.Webflow.destroy();
         window.Webflow && window.Webflow.ready();
     }
+    const isInViewport = (el) => {
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        return (
+            rect.top <= (window.innerHeight) &&
+            rect.bottom >= 0
+        );
+    }
     const getAllScrollTrigger = (fn) => {
         let triggers = ScrollTrigger.getAll();
         triggers.forEach(trigger => {
@@ -189,10 +197,8 @@ const script = () => {
             this.lenis = new Lenis({})
             this.lenis.on('scroll', ScrollTrigger.update)
 
-            this.gl = new GL();
             this.lenis.on('scroll', (e) => {
                 this.updateOnScroll(e);
-                this.gl.onScroll(e)
             });
         }
         start() {
@@ -335,199 +341,224 @@ const script = () => {
             }
         }
     }
-    class Media {
-        constructor ({ gl, geometry, scene, renderer, screen, viewport, $el, img }) {
-            this.gl = gl
-            this.geometry = geometry
-            this.scene = scene
-            this.renderer = renderer
-            this.screen = screen
-            this.viewport = viewport
-            this.img = img
-            this.$el = $el
-            this.scroll = 0
+    // class Media {
+    //     constructor({ scene, geometry, renderer, screen, viewport, $el, image }) {
+    //         this.scene = scene;
+    //         this.geometry = geometry;
+    //         this.renderer = renderer;
+    //         this.screen = screen;
+    //         this.viewport = viewport;
+    //         this.image = image;
+    //         this.$el = $el;
+    //         this.scroll = 0;
+    //         this.blurStrength = .2;
 
-            this.createShader()
-            this.createMesh()
+    //         // Initialize material properties
+    //         this.materialProperties = {
+    //             uImageSize: { value: [0, 0] },
+    //             uPlaneSize: { value: [0, 0] },
+    //             uViewportSize: { value: [this.viewport.width, this.viewport.height] },
+    //             uTime: { value: 100 * Math.random() },
+    //             uBlurStrength: { value: this.blurStrength },
+    //             tMap: { value: null }
+    //         };
 
-            this.onResize()
-        }
-        createShader () {
-            const texture = new Texture(this.gl, {
-            generateMipmaps: false
-            })
+    //         this.createShader();
+    //         this.createMesh();
+    //         this.onResize();
+    //     }
 
-            this.program = new Program(this.gl, {
-            depthTest: false,
-            depthWrite: false,
-            fragmentShader,
-            vertexShader,
-            uniforms: {
-                tMap: { value: texture },
-                uPlaneSize: { value: [0, 0] },
-                uImageSize: { value: [0, 0] },
-                uViewportSize: { value: [this.viewport.width, this.viewport.height] },
-                uTime: { value: 100 * Math.random() },
-            },
-            transparent: true
-            })
+    //     createShader() {
+    //         // Create texture with proper parameters
+    //         const texture = new THREE.TextureLoader().load(this.image, (texture) => {
+    //             texture.minFilter = THREE.LinearFilter;
+    //             texture.magFilter = THREE.LinearFilter;
+    //             texture.generateMipmaps = false;
 
-            const image = new Image()
+    //             // Update uniforms with image dimensions
+    //             this.material.uniforms.uImageSize.value = [
+    //                 texture.image.naturalWidth,
+    //                 texture.image.naturalHeight
+    //             ];
+    //         });
 
-            image.src = this.img.src
-            image.onload = _ => {
-            texture.image = image
+    //         // Create shader material with improved parameters
+    //         this.material = new THREE.ShaderMaterial({
+    //             uniforms: this.materialProperties,
+    //             vertexShader,
+    //             fragmentShader,
+    //             depthTest: false,
+    //             depthWrite: false,
+    //             transparent: true,
+    //             side: THREE.DoubleSide
+    //         });
 
-            this.program.uniforms.uImageSize.value = [image.naturalWidth, image.naturalHeight]
-            }
-        }
-        createMesh () {
-            this.plane = new Mesh(this.gl, {
-            geometry: this.geometry,
-            program: this.program
-            })
+    //         // Set initial texture
+    //         this.material.uniforms.tMap.value = texture;
+    //     }
 
-            this.plane.setParent(this.scene)
-        }
-        onScroll (scroll) {
-            this.scroll = scroll
-            this.setY(this.y)
-        }
-        update () {
-            this.program.uniforms.uTime.value += 0.04
-        }
-        setScale (x, y) {
-            x = x || this.$el.offsetWidth
-            y = y || this.$el.offsetHeight
-            this.plane.scale.x = this.viewport.width * x / this.screen.width
-            this.plane.scale.y = this.viewport.height * y / this.screen.height
+    //     createMesh() {
+    //         this.plane = new THREE.Mesh(this.geometry, this.material);
+    //         this.scene.add(this.plane);
+    //     }
 
-            this.plane.program.uniforms.uPlaneSize.value = [this.plane.scale.x, this.plane.scale.y]
-        }
-        setX(x = 0) {
-            this.x = x
-            this.plane.position.x = -(this.viewport.width / 2) + (this.plane.scale.x / 2) + (this.x / this.screen.width) * this.viewport.width
-        }
-        setY(y = 0) {
-            this.y = y
-            this.plane.position.y = (this.viewport.height / 2) - (this.plane.scale.y / 2) - ((this.y - this.scroll) / this.screen.height) * this.viewport.height
-        }
-        onResize ({ screen, viewport } = {}) {
-            if (screen) {
-            this.screen = screen
-            }
+    //     onScroll(scroll) {
+    //         this.scroll = scroll;
+    //         this.setY();
+    //     }
 
-            if (viewport) {
-            this.viewport = viewport
-            this.plane.program.uniforms.uViewportSize.value = [this.viewport.width, this.viewport.height]
-            }
-            this.setScale()
+    //     update(time) {
+    //         this.material.uniforms.uTime.value += 0.04;
+    //         this.material.uniforms.uBlurStrength.value = this.blurStrength;
+    //     }
 
-            this.setX(this.$el.offsetLeft)
-            this.setY(this.$el.offsetTop)
-        }
-    }
-    class GL {
-        constructor () {
-            this.images = [...document.querySelectorAll('.home-hero-bg-item')]
+    //     setScale(x = null, y = null) {
+    //         x = x || this.$el.offsetWidth;
+    //         y = y || this.$el.offsetHeight;
 
-            this.createRenderer()
-            this.createCamera()
-            this.createScene()
+    //         const scaleX = this.viewport.width * x / this.screen.width;
+    //         const scaleY = this.viewport.height * y / this.screen.height;
 
-            this.onResize()
+    //         this.plane.scale.set(scaleX, scaleY, 1);
+    //         this.material.uniforms.uImageSize.value = [ scaleX, scaleY ];
+    //     }
 
-            this.createGeometry()
-            this.createMedias()
+    //     setX(x = 0) {
+    //         this.x = x;
+    //         this.plane.position.x = -(this.viewport.width / 2) +
+    //             (this.plane.scale.x / 2) +
+    //             (x / this.screen.width) * this.viewport.width;
+    //     }
 
-            this.update()
+    //     setY(y = null) {
+    //         y = y !== null ? y : this.y;
+    //         this.y = y;
+    //         this.plane.position.y = (this.viewport.height / 2) -
+    //             (this.plane.scale.y / 2) -
+    //             ((y - this.scroll) / this.screen.height) * this.viewport.height;
+    //     }
 
-            this.addEventListeners()
-        }
-        createRenderer () {
-            this.renderer = new Renderer({
-            canvas: document.querySelector('#gl'),
-            alpha: true
-            })
+    //     onResize({ screen, viewport } = {}) {
+    //         if (screen) {
+    //             this.screen = screen;
+    //         }
+    //         if (viewport) {
+    //             this.viewport = viewport;
+    //             this.material.uniforms.uViewportSize.value.set(this.viewport.width, this.viewport.height);
+    //         }
+    //         this.setScale();
+    //         this.setX(this.$el.offsetLeft);
+    //         this.setY(this.$el.offsetTop);
+    //     }
+    // }
+    // class GL {
+    //     constructor (el) {
+    //         // this.images = [...document.querySelectorAll('.home-hero-bg-item')]
+    //         this.el = el;
+    //         console.log(this.el)
+    //         this.canvas = document.querySelector('canvas');
+    //         this.images = Array.from(this.el.querySelectorAll('.home-hero-bg-item img')).map(img => img);
 
-            this.gl = this.renderer.gl
-        }
-        createCamera () {
-            this.camera = new Camera(this.gl)
-            this.camera.fov = 45
-            this.camera.position.z = 20
-        }
-        createScene () {
-            this.scene = new Transform()
-        }
-        createGeometry () {
-            this.planeGeometry = new Plane(this.gl, {
-            heightSegments: 50,
-            widthSegments: 100
-            })
-        }
-        createMedias () {
-            this.medias = this.images.map(item => {
-            return new Media({
-                gl: this.gl,
-                geometry: this.planeGeometry,
-                scene: this.scene,
-                renderer: this.renderer,
-                screen: this.screen,
-                viewport: this.viewport,
-                $el: item,
-                img: item.querySelector('img')
-            })
-            })
-        }
-        onResize () {
-            this.screen = {
-            width: window.innerWidth,
-            height: window.innerHeight
-            }
+    //         this.init();
+    //     }
+    //     init() {
+    //         this.createRenderer()
+    //         this.createCamera()
+    //         this.createScene()
 
-            this.renderer.setSize(this.screen.width, this.screen.height)
+    //         this.onResize()
 
-            this.camera.perspective({
-            aspect: this.gl.canvas.width / this.gl.canvas.height
-            })
+    //         this.createGeometry()
+    //         this.createMedias()
 
-            const fov = this.camera.fov * (Math.PI / 180)
-            const height = 2 * Math.tan(fov / 2) * this.camera.position.z
-            const width = height * this.camera.aspect
+    //         this.update()
 
-            this.viewport = {
-            height,
-            width
-            }
-            if (this.medias) {
-            this.medias.forEach(media => media.onResize({
-                screen: this.screen,
-                viewport: this.viewport
-            }))
-            this.onScroll({scroll: window.scrollY})
-            }
-        }
-        onScroll({scroll}) {
-            if (this.medias) {
-            this.medias.forEach(media => media.onScroll(scroll))
-            }
-        }
-        update() {
-            if (this.medias) {
-            this.medias.forEach(media => media.update())
-            }
+    //         this.addEventListeners()
+    //     }
+    //     createRenderer () {
+    //         this.renderer = new THREE.WebGLRenderer({
+    //             canvas: this.canvas,
+    //             alpha: true,
+    //             antialias: true,
+    //         })
+    //         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    //         this.renderer.setSize(this.el.clientWidth, this.el.clientHeight);
+    //     }
+    //     createCamera () {
+    //         this.camera = new THREE.PerspectiveCamera(45, this.el.clientWidth / this.el.clientHeight, 0.1, 1000);
+    //         this.camera.position.z = 20;
+    //     }
+    //     createScene () {
+    //         this.scene = new THREE.Scene();
+    //     }
+    //     createGeometry () {
+    //         this.planeGeometry = new THREE.PlaneGeometry(1, 1, 100, 50);
+    //     }
+    //     createMedias () {
+    //         this.medias = this.images.map((image, index) => {
+    //             return new Media({
+    //                 scene: this.scene,
+    //                 geometry: this.planeGeometry,
+    //                 renderer: this.renderer,
+    //                 screen: this.screen,
+    //                 viewport: this.viewport,
+    //                 image: image.src,
+    //                 length: this.images.length,
+    //                 index: index,
+    //                 $el: image,
+    //             });
+    //         });
+    //     }
+    //     onResize () {
+    //         if (!this.el) return;
+    //         this.screen = {
+    //             width: this.el.clientWidth,
+    //             height: this.el.clientHeight,
+    //         };
 
-            this.renderer.render({
-            scene: this.scene,
-            camera: this.camera
-            })
-            window.requestAnimationFrame(this.update.bind(this))
-        }
-        addEventListeners () {
-            window.addEventListener('resize', this.onResize.bind(this))
-        }
-    }
+    //         this.renderer.setSize(this.screen.width, this.screen.height);
+
+    //         this.camera.aspect = this.screen.width / this.screen.height;
+    //         this.camera.fov = 45;
+    //         this.camera.updateProjectionMatrix();
+
+    //         const fov = this.camera.fov * (Math.PI / 180)
+    //         const height = 2 * Math.tan(fov / 2) * this.camera.position.z
+    //         const width = height * this.camera.aspect
+
+    //         this.viewport = {
+    //             height,
+    //             width
+    //         }
+    //         if (this.medias) {
+    //             this.medias.forEach(media => media.onResize({
+    //                 screen: this.screen,
+    //                 viewport: this.viewport
+    //             }))
+    //             this.onScroll({scroll: window.scrollY})
+    //         }
+    //     }
+    //     onScroll({scroll}) {
+    //         if (this.medias) {
+    //             this.medias.forEach(media => media.onScroll(scroll))
+    //         }
+    //     }
+    //     update() {
+    //         if (isInViewport(this.canvas)) {
+    //             if (this.medias) {
+    //                 this.medias.forEach((media) => media.update());
+    //             }
+    //             this.renderer.render(this.scene, this.camera);
+    //         }
+    //         requestAnimationFrame(this.update.bind(this));
+    //     }
+    //     addEventListeners () {
+    //         window.addEventListener('resize', this.onResize.bind(this))
+    //     }
+    //     destroy() {
+    //         window.removeEventListener("resize", this.onResize);
+    //     }
+    // }
 
     class GlobalChange {
         constructor() {

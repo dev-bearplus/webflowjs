@@ -1,18 +1,11 @@
 const vertexShader = `
-   precision highp float;
-
-    attribute vec3 position;
-    attribute vec2 uv;
-
-    uniform mat4 modelViewMatrix;
-    uniform mat4 projectionMatrix;
+    precision highp float;
 
     varying vec2 vUv;
 
     void main() {
-    vUv = uv;
-
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
     }
 `;
 const fragmentShader = `
@@ -27,10 +20,6 @@ const fragmentShader = `
 
     varying vec2 vUv;
 
-    /*
-    by @arthurstammet
-    https://shadertoy.com/view/tdXXRM
-    */
     float tvNoise (vec2 p, float ta, float tb) {
     return fract(sin(p.x * ta + p.y * tb) * 5678.);
     }
@@ -40,13 +29,9 @@ const fragmentShader = `
     float rand(vec2 co){
     return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
     }
-    /*
-    inspired by https://www.shadertoy.com/view/4tSyzy
-    @anastadunbar
-    */
     vec3 blur(vec2 uv, sampler2D image, float blurAmount){
     vec3 blurredImage = vec3(0.);
-    float gradient = smoothstep(0.8, 0.0, 3.4 - (gl_FragCoord.y / uViewportSize.y) / uViewportSize.y) * uBlurStrength + smoothstep(0.8, 0.0, (gl_FragCoord.y / uViewportSize.y) / uViewportSize.y) * uBlurStrength;
+    float gradient = smoothstep(0.8, 0.0, gl_FragCoord.y / uViewportSize.y) * uBlurStrength;
     #define repeats 40.
     for (float i = 0.; i < repeats; i++) {
         vec2 q = vec2(cos(degrees((i / repeats) * 360.)), sin(degrees((i / repeats) * 360.))) * (rand(vec2(i, uv.x + uv.y)) + blurAmount);
