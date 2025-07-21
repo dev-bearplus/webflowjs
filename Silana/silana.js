@@ -135,13 +135,15 @@ const script = () => {
     })();
 
     function resetScroll(data) {
+        const defaultScroll = (target) => {
+            smoothScroll.lenis.scrollTo(target, {offset: -parseRem(100)})
+            setTimeout(() => smoothScroll.lenis.scrollTo(target, {offset: -parseRem(100)}), 400);
+            setTimeout(() => smoothScroll.lenis.scrollTo(target, {offset: -parseRem(100)}), 800);
+        };
         if (window.location.hash !== '') {
             if ($(window.location.hash).length >= 1) {
-                $("html").animate({ scrollTop: $(window.location.hash).offset().top - 100 }, 1200);
-
-                setTimeout(() => {
-                    $("html").animate({ scrollTop: $(window.location.hash).offset().top - 100 }, 1200);
-                }, 300);
+                let target = `#${window.location.hash.slice(1)}`;
+                defaultScroll(target);
             } else {
                 scrollTop()
             }
@@ -150,11 +152,7 @@ const script = () => {
             if (searchObj.sc) {
                 if ($(`#${searchObj.sc}`).length >= 1) {
                     let target = `#${searchObj.sc}`;
-                    setTimeout(() => {
-                        smoothScroll.lenis.scrollTo(`#${searchObj.sc}`, {
-                            offset: -100
-                        })
-                    }, 500);
+                    defaultScroll(target);
                     barba.history.add(`${window.location.pathname + target}`, 'barba', 'replace');
                 } else {
                     scrollTop()
@@ -1157,7 +1155,6 @@ const script = () => {
                             ]
                             if (idx === 0) {
                                 $(el).find('.home-challenge-item-desc-txt .txt-richtext > *').each((_, element) => {
-                                    console.log(element.tagName)
                                     if (element.tagName.toLowerCase() === 'p') {
                                         tween.push(new FadeSplitText({
                                             el: element,
@@ -1785,9 +1782,6 @@ const script = () => {
                             idx !== 0 && new FadeSplitText({ el: $(el).find('.prod-hiw-main-item-title').get(0) }),
                         ])),
                         new FadeIn({ el: $(this.el).find('.prod-hiw-main-ruler').get(0), onComplete: () => {
-                            setTimeout(() => {
-                                this.slider.startAutoplay();
-                            }, 1000);
                             this.activeIndex(0);
                         } }),
                         new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-title').get(0) }),
@@ -1908,20 +1902,20 @@ const script = () => {
                         isAutoplay = false;
                         clearTimeout(timeout);
                     }
-                    slider.on("created", () => {
-                        slider.container.onmouseover = () => stopAutoplay();
-                        slider.container.ontouchmove = () => stopAutoplay();
+                    // slider.on("created", () => {
+                    //     // slider.container.onmouseover = () => stopAutoplay();
+                    //     // slider.container.ontouchmove = () => stopAutoplay();
 
-                        slider.container.onmouseout = () => startAutoplay();
-                        slider.container.ontouchend = () => startAutoplay();
-                        nextTimeout();
-                    })
-                    slider.on("dragStarted", stopAutoplay);
-                    slider.on("animationEnded", nextTimeout);
-                    slider.on("updated", nextTimeout);
+                    //     // slider.container.onmouseout = () => startAutoplay();
+                    //     // slider.container.ontouchend = () => startAutoplay();
+                    //     nextTimeout();
+                    // })
+                    // slider.on("dragStarted", stopAutoplay);
+                    // slider.on("animationEnded", nextTimeout);
+                    // slider.on("updated", nextTimeout);
 
-                    slider.startAutoplay = startAutoplay;
-                    slider.stopAutoplay = stopAutoplay;
+                    // slider.startAutoplay = startAutoplay;
+                    // slider.stopAutoplay = stopAutoplay;
                 }]
                 )
                 this.slider = slider;

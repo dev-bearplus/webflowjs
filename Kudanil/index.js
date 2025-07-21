@@ -5,6 +5,12 @@ const script = () => {
     $.fn.hasAttr = function (name) {
         return this.attr(name) !== undefined;
     };
+    $.fn.select = function (name) {
+        return this.find(name).get(0);
+    };
+    $.fn.selectAll = function (name) {
+        return this.find(name);
+    };
     barba.use(barbaPrefetch);
 
     gsap.registerPlugin(ScrollTrigger);
@@ -17,7 +23,6 @@ const script = () => {
         h: window.innerHeight,
     };
     const device = { desktop: 991, tablet: 767, mobile: 479 }
-
     const cvUnit = (val, unit) => {
         let result;
         switch (true) {
@@ -846,6 +851,7 @@ const script = () => {
                 this.tlOnce = null;
                 this.tlEnter = null;
                 this.tlTriggerEnter = null;
+                this.tlOverlap = null;
             }
             setup(data, mode) {
                 this.el = data.next.container.querySelector('.home-hero-wrap');
@@ -855,6 +861,8 @@ const script = () => {
                     this.setupEnter(data);
                 }
                 else return;
+
+                this.animationScrub();
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
@@ -894,6 +902,19 @@ const script = () => {
             }
             animationReveal(timeline) {
             }
+            animationScrub() {
+                this.tlOverlap = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: 'top top',
+                        end: 'bottom bottom',
+                        scrub: 1
+                    }
+                })
+                this.tlOverlap
+                    .fromTo($(this.el).select('.home-hero-backdrop'), { autoAlpha: 0 }, { autoAlpha: 1 })
+                    .fromTo($(this.el).select('.home-hero-bg-item-inner'), { scale: 1 }, { scale: 1.02  }, 0);
+            }
             destroy() {
                 if (this.tlOnce) {
                     this.tlOnce.kill();
@@ -904,8 +925,91 @@ const script = () => {
                 if (this.tlTriggerEnter) {
                     this.tlTriggerEnter.kill();
                 }
+                if (this.tlOverlap) {
+                    this.tlOverlap.kill();
+
+                }
             }
         },
+        Gallery: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+                this.tlOverlap = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.home-gallery-wrap');
+                super.setTrigger(this.el, this.onTrigger.bind(this));
+            }
+            onTrigger() {
+                this.animationScrub();
+                this.animationReveal();
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+                this.tlFlipCard = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: 'top-=10px bottom',
+                        end: 'top-=10px top',
+                        scrub: true,
+                        markers: true
+                    }
+                })
+
+                $(this.el).selectAll('.home-gallery-main.start .home-gallery-item').each((idx, item) => {
+                    function getRandomInt(min, max) {
+                        return Math.floor(Math.random() * (max - min + 1)) + min;
+                    }
+                    // this.tlFlipCard.to(item,
+                    //     { x: (idx + 1) % 2 === 0 ? getRandomInt(10, 20) : getRandomInt(-20, -10), y: 0, rotation: (idx + 1) % 2 === 0 ? getRandomInt(5, 10) : getRandomInt(-10, -5) },
+                    //     {
+                    //         x: $(this.el).selectAll('.home-gallery-main.end .home-gallery-item').eq(idx).get(0).offsetLeft - $(this.el).find('.home-gallery-main.end').width() / 2 + $(item).width() / 2,
+                    //         y: $(this.el).selectAll('.home-gallery-main.end .home-gallery-item').eq(idx).get(0).offsetTop - viewport.h * .5,
+                    //         rotation: 0,
+                    //         duration: .8,
+                    //     },
+                    // "<=.015")
+                    let firstState = {
+                        x: (idx + 1) % 2 === 0 ? getRandomInt(10, 20) : getRandomInt(-20, -10),
+                        y: 0,
+                        rotation: (idx + 1) % 2 === 0 ? getRandomInt(5, 10) : getRandomInt(-10, -5)
+                    }
+                    let midState = {
+                        x: $(this.el).selectAll('.home-gallery-main.end .home-gallery-item').eq(idx).get(0).offsetLeft - $(this.el).find('.home-gallery-main.end').width() / 2 + $(item).width() / 2,
+                        y: $(this.el).selectAll('.home-gallery-main.end .home-gallery-item').eq(idx).get(0).offsetTop - viewport.h * .5,
+                        rotation: 0
+                    }
+                    gsap.set(item, { zIndex: idx, ...firstState });
+
+                    const maxHeight = 100;
+                    const baseDistance = 100;
+                    let speedFactor = $(item).height() / maxHeight;
+
+                    let lastState = {
+                        x: midState.x,
+                        y: midState.y + speedFactor * baseDistance,
+                        rotation: 0
+                    }
+                    this.tlFlipCard.to(item,
+                        {
+                            keyframes: {
+                                "0%": {...firstState},
+                                "50%": {...midState},
+                                "100%": {...lastState}
+                            },
+                            duration: .8,
+                        },
+                    "<=.015")
+                })
+            }
+            destroy() {
+                if (this.tlOverlap) {
+                    this.tlOverlap.kill();
+                }
+            }
+        }
     }
 
     class PageManager {
