@@ -1207,11 +1207,11 @@ const script = () => {
             }
             handleAccordion() {
                 const updateHeightText = () => $(this.el).find('.home-challenge-text-wrap').css('height', $(this.el).find('.home-challenge-list').outerHeight());
-                updateHeightText();
+                viewport.w > 991 && updateHeightText();
                 $(this.el).find('.home-challenge-item').on('click', debounce(function (e) {
                     let current = $(e.target).closest('.home-challenge-item');
                     $(current).addClass('active').siblings().removeClass('active');
-                    updateHeightText();
+                    viewport.w > 991 && updateHeightText();
                 }, 100))
             }
             destroy() {
