@@ -907,13 +907,14 @@ const script = () => {
                     scrollTrigger: {
                         trigger: this.el,
                         start: 'top top',
-                        end: 'bottom bottom',
+                        end: 'bottom 85%',
                         scrub: 1
                     }
                 })
                 this.tlOverlap
                     .fromTo($(this.el).select('.home-hero-backdrop'), { autoAlpha: 0 }, { autoAlpha: 1 })
-                    .fromTo($(this.el).select('.home-hero-bg-item-inner'), { scale: 1 }, { scale: 1.02  }, 0);
+                    .fromTo($(this.el).select('.home-hero-bg-item-inner'), { scale: 1 }, { scale: 1.02 }, 0)
+                    .fromTo($(this.el).select('.home-hero-text'), { autoAlpha: 1 }, { autoAlpha: 0 });
             }
             destroy() {
                 if (this.tlOnce) {
@@ -927,7 +928,6 @@ const script = () => {
                 }
                 if (this.tlOverlap) {
                     this.tlOverlap.kill();
-
                 }
             }
         },
@@ -952,56 +952,60 @@ const script = () => {
                     scrollTrigger: {
                         trigger: this.el,
                         start: 'top-=10px bottom',
-                        end: 'top-=10px top',
+                        end: 'top-=10px 50%',
                         scrub: true,
-                        markers: true
                     }
                 })
 
                 $(this.el).selectAll('.home-gallery-main.start .home-gallery-item').each((idx, item) => {
-                    function getRandomInt(min, max) {
-                        return Math.floor(Math.random() * (max - min + 1)) + min;
-                    }
-                    // this.tlFlipCard.to(item,
-                    //     { x: (idx + 1) % 2 === 0 ? getRandomInt(10, 20) : getRandomInt(-20, -10), y: 0, rotation: (idx + 1) % 2 === 0 ? getRandomInt(5, 10) : getRandomInt(-10, -5) },
-                    //     {
-                    //         x: $(this.el).selectAll('.home-gallery-main.end .home-gallery-item').eq(idx).get(0).offsetLeft - $(this.el).find('.home-gallery-main.end').width() / 2 + $(item).width() / 2,
-                    //         y: $(this.el).selectAll('.home-gallery-main.end .home-gallery-item').eq(idx).get(0).offsetTop - viewport.h * .5,
-                    //         rotation: 0,
-                    //         duration: .8,
-                    //     },
-                    // "<=.015")
                     let firstState = {
-                        x: (idx + 1) % 2 === 0 ? getRandomInt(10, 20) : getRandomInt(-20, -10),
+                        x: (idx + 1) % 2 === 0 ? gsap.utils.random(10, 20) : gsap.utils.random(-20, -10),
                         y: 0,
-                        rotation: (idx + 1) % 2 === 0 ? getRandomInt(5, 10) : getRandomInt(-10, -5)
+                        rotation: (idx + 1) % 2 === 0 ? gsap.utils.random(5, 10) : gsap.utils.random(-10, -5)
                     }
                     let midState = {
                         x: $(this.el).selectAll('.home-gallery-main.end .home-gallery-item').eq(idx).get(0).offsetLeft - $(this.el).find('.home-gallery-main.end').width() / 2 + $(item).width() / 2,
                         y: $(this.el).selectAll('.home-gallery-main.end .home-gallery-item').eq(idx).get(0).offsetTop - viewport.h * .5,
                         rotation: 0
                     }
+
                     gsap.set(item, { zIndex: idx, ...firstState });
 
-                    const maxHeight = 100;
-                    const baseDistance = 100;
-                    let speedFactor = $(item).height() / maxHeight;
+                    let randomY = gsap.utils.random(0, 20);
 
-                    let lastState = {
-                        x: midState.x,
-                        y: midState.y + speedFactor * baseDistance,
-                        rotation: 0
+                    this.tlFlipCard.fromTo(item, { ...firstState }, { ...midState }, "<=.015")
+
+                    gsap.timeline()
+                        .to($(item).select('img'), {
+                            scrollTrigger: { trigger: item, start: "top 90%", end: "top top", scrub: true },
+                            yPercent: randomY, ease: 'none'
+                        }, 0)
+                        .to($(item).select('.home-gallery-item-img-inner'), {
+                            scrollTrigger: { trigger: item, start: "top bottom+=10%", end: "top top", scrub: true },
+                            yPercent: -randomY, ease: 'none'
+                        }, 0);
+                })
+
+                this.tlShowText = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).prev(),
+                        start: 'bottom 85%',
+                        end: 'bottom bottom',
+                        endTrigger: this.el,
+                        scrub: true
                     }
-                    this.tlFlipCard.to(item,
-                        {
-                            keyframes: {
-                                "0%": {...firstState},
-                                "50%": {...midState},
-                                "100%": {...lastState}
-                            },
-                            duration: .8,
-                        },
-                    "<=.015")
+                })
+
+                $(this.el).selectAll('.home-gallery-text-item').each((idx, item) => {
+
+                    if (idx < $(this.el).selectAll('.home-gallery-text-item').length - 1) {
+                        this.tlShowText
+                            .fromTo(item, { autoAlpha: 0 }, { autoAlpha: 1, duration: 1 }, '>=0')
+                            .fromTo(item, { autoAlpha: 1 }, { autoAlpha: 0, duration: 1 }, '>=.5');
+                    } else {
+                        this.tlShowText.fromTo(item, { autoAlpha: 0 }, { autoAlpha: 1, duration: 1 }, '>=0');
+                    }
+                    gsap.set(item, { autoAlpha: 0 });
                 })
             }
             destroy() {

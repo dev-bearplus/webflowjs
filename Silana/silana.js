@@ -1206,9 +1206,11 @@ const script = () => {
                 this
             }
             handleAccordion() {
+                $(this.el).find('.home-challenge-text-wrap').css('height', $(this.el).find('.home-challenge-list').outerHeight());
                 $(this.el).find('.home-challenge-item').on('click', debounce(function (e) {
                     let current = $(e.target).closest('.home-challenge-item');
                     $(current).addClass('active').siblings().removeClass('active');
+                    $(this.el).find('.home-challenge-text-wrap').css('height', $(this.el).find('.home-challenge-list').outerHeight());
                 }, 100))
             }
             destroy() {
