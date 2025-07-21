@@ -1589,7 +1589,10 @@ const mainScript = () => {
                 $('.home-partner-inner').find('.home-partner-item').eq(1).before(textTemplate);
             }
         }
-        getHomePartners()
+        if(!isStagging()){
+            getHomePartners();
+
+        }
         function homeHeroHandle() {
             let ribbonOffset, humanOffset;
             if ($(window).width() > 991) {
@@ -2206,7 +2209,12 @@ const mainScript = () => {
                 }
             });
         }
-        getHomeTesti();
+        if(isStagging()){
+            homeTestiHandleNew();
+        }
+        else {
+            getHomeTesti();
+        }
         function homeTestiHandleNew() {
             console.log('init new testi')
             $('.home-testi-item').each(function(e) {
@@ -2215,13 +2223,15 @@ const mainScript = () => {
                 for (let x = 0; x < rate; x++) {
                     stars.eq(x).addClass('rate-true')
                 }
-                let store = $(this).find('.data-store').text();
-                if (store == 'Google') {
-                    $(this).find('.home-testi-item-rate').addClass('mod-gg')
-                } else if (store == 'Apple Store') {
-                    $(this).find('.home-testi-item-rate').addClass('mod-apple')
-                } else {
-                    $(this).find('.home-testi-item-rate').addClass('mod-trust')
+                if(!isStagging()){
+                    let store = $(this).find('.data-store').text();
+                    if (store == 'Google') {
+                        $(this).find('.home-testi-item-rate').addClass('mod-gg')
+                    } else if (store == 'Apple Store') {
+                        $(this).find('.home-testi-item-rate').addClass('mod-apple')
+                    } else {
+                        $(this).find('.home-testi-item-rate').addClass('mod-trust')
+                    }
                 }
             })
             if ($(window).width() > 991) {
@@ -2302,6 +2312,7 @@ const mainScript = () => {
                 }
             })
         }
+        
         function homeTestiHanlde() {
             // Update rate
             $('.home-testi-item').each(function(e) {
@@ -2642,19 +2653,27 @@ const mainScript = () => {
             });
         // }
         function homeGetFaq() {
-            getAllDataByType('faq').then((res) => {
-                if (res) {
-                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_how_it_works)
-                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_how_it_works', true)
-                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-                    allFaq.forEach((i) => {
-                        createFaqNew(i).appendTo($('.home-faq-main'))
-                    })
-                    updateInterestRate('.home-faq-main');
-                    $('.home-faq-main').find('.load-ske').addClass('loaded')
-                    animateFaq();
-                }
-            });
+            if(isStagging()){
+                console.log('faq stagging')
+                getAllDynamicData('.home-faq--itemans');
+                animateFaq();
+                scrollToFaq();
+            }
+            else {
+                getAllDataByType('faq').then((res) => {
+                    if (res) {
+                        let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_how_it_works)
+                        let allFaq = sortAsc(activeFaqItem, true, 'order_on_how_it_works', true)
+                        $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
+                        allFaq.forEach((i) => {
+                            createFaqNew(i).appendTo($('.home-faq-main'))
+                        })
+                        updateInterestRate('.home-faq-main');
+                        $('.home-faq-main').find('.load-ske').addClass('loaded')
+                        animateFaq();
+                    }
+                });
+            }
         }
         homeGetFaq();
 
@@ -2822,18 +2841,26 @@ const mainScript = () => {
 
         //aboutClimateHanlde();
         function aboutGetFaq() {
-            getAllDataByType('faq').then((res) => {
-                if (res) {
-                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_about_us)
-                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_about_us', true)
-                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-                    allFaq.forEach((i) => {
-                        createFaqNew(i).appendTo($('.home-faq-main'))
-                    })
-                    updateInterestRate('.home-faq-main');
-                    animateFaq();
-                }
-            });
+            if(isStagging()){
+                console.log('faq stagging')
+                getAllDynamicData('.home-faq--itemans');
+                animateFaq();
+                scrollToFaq();
+            } 
+            else {
+                getAllDataByType('faq').then((res) => {
+                    if (res) {
+                        let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_about_us)
+                        let allFaq = sortAsc(activeFaqItem, true, 'order_on_about_us', true)
+                        $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
+                        allFaq.forEach((i) => {
+                            createFaqNew(i).appendTo($('.home-faq-main'))
+                        })
+                        updateInterestRate('.home-faq-main');
+                        animateFaq();
+                    }
+                });
+            }
         }
         aboutGetFaq();
 
@@ -3413,8 +3440,41 @@ const mainScript = () => {
                 updateAllFaq();
             })
         }
-        faqGetFaq();
+        if(!isStagging()) {
+            faqGetFaq();
+        }
+        else {
+            updateUICateNew();
+            faqInteraction();
+            animateFaq();
+        }
         $('.faq-main-wrap').attr(schemaFAQParentAttrs);
+        function updateUICateNew() {
+            const stickySearchIcon = $('.faq-cate-inner .faq-stick-srch').eq(0);
+            const itemSearch = $('.faq-srch-item').eq(0).clone();
+            const listSearch = $('.faq-srch-drop-inner');
+            listSearch.html('')
+            $('.faq-cate-btn-list').prepend(stickySearchIcon);
+            faqCateSwiper = new Swiper('.faq-cate-btn-wrap.swiper', {
+                slidesPerView: 'auto',
+                mousewheel: true,
+                on: {
+                    afterInit: () => {
+                        $('.faq-stick-srch.mod-tb').addClass('after-init')
+                    }
+                }
+            })
+            $('.faq-cate-wrap').each((idx, faq) => {
+                $(faq).find('.faq-cate-list-item').each((idx, item) => {
+                    let newItemSearch  = itemSearch.clone();
+                    let dataScroll = $(item).find('.home-faq-item').attr('id');
+                    let title = $(item).find('.home-faq-item-ques').text();
+                    newItemSearch.attr('data-scrollto', dataScroll);
+                    newItemSearch.find('.txt-16').text(title);
+                    listSearch.append(newItemSearch);
+                })
+            })
+        }
         function updateUICate(allFaqCate) {
             $('.faq-cate-list').html('');
             const faqListTemplate = $('.faq-cate-wrap').eq(0).clone();
@@ -3882,7 +3942,28 @@ const mainScript = () => {
                 $('.sc-doc-main').find('.load-ske').addClass('loaded')
             })
         }
-        getAllDocs()
+        if(!isStagging()){
+            getAllDocs();
+        }
+        else {
+            updateTocUINew();
+            docInteractionNew();
+        }
+        function updateTocUINew() {
+            $('.term-toc-inner').html('');
+            let allCategories = $('.doc-main-content.active .doc-group-title');
+            allCategories.each((index, el) => {
+                let cateName = $(el).text();
+                let cateUID = $(el).attr('data-title');
+                console.log(el)
+                let cateStickyHtml = cateStickyTemplate.clone();
+                cateStickyHtml.find('.term-toc-item-number').text(`${index + 1}.`)
+                cateStickyHtml.find('.term-toc-item-txt').text(cateName)
+                cateStickyHtml.attr('data-toc', `${cateUID}`)
+                console.log(cateStickyHtml)
+                $('.term-toc-inner').append(cateStickyHtml)
+            })
+        }
         function updateDocUI(categoryParent,allCate, allDoc) {
             let cateItemTemplate = $('.doc-main-item-wrap').eq(0).clone();
             $('.doc-main-items').html('')
@@ -3987,18 +4068,68 @@ const mainScript = () => {
                 $('.term-toc-inner').removeClass('on-open');
             })
         }
-        $('.doc-main-tab-wrap').on('click', '.doc-main-tab', function(e) {
-            e.preventDefault();
-            console.log('click');
-            let target = $(this).attr('id');
-            // lenis.scrollTo(`#${target}`, { offset: -100 });
-            $('.doc-main-tab').removeClass('active');
-            $(this).addClass('active');
-            $('.doc-main-content-inner').removeClass('active');
-            $(`.doc-main-content-inner#${target}`).addClass('active');
-            updateTocUI();
-            $('.term-toc-head-txt').text($('.term-toc-inner .term-toc-item-link').eq(0).find('.term-toc-item-txt').text())
-        });
+        function docInteractionNew() {
+            let allCateGroups = $('.doc-main-content.active .doc-main-group');
+            $('.term-toc-head-txt').text($('.term-toc-item-link .term-toc-item-txt').eq(0).text())
+            lenis.on('scroll', function(e) {
+                for (let x = 0; x < allCateGroups.length; x++) {
+                    let top = allCateGroups.eq(x).get(0).getBoundingClientRect().top;
+                    if (top > 0 && top < ($(window).height() / 5)) {
+                        $('.term-toc-item-link').eq(x).addClass('active');
+                        $('.term-toc-item-link').not(`:eq(${x})`).removeClass('active');
+                        $('.term-toc-head-txt').text($('.term-toc-item-link.active .term-toc-item-txt').text())
+                    }
+                }
+            })
+            docTocNavNew();
+        }
+        function docTocNavNew() {
+            if ($(window).width() < 767) {
+                $('.term-toc-head').on('click', function(e) {
+                    e.preventDefault();
+                    if ($(this).hasClass('on-open')) {
+                        $(this).removeClass('on-open');
+                        $('.term-toc-inner').removeClass('on-open')
+                    } else {
+                        $(this).addClass('on-open');
+                        $('.term-toc-inner').addClass('on-open')
+                    }
+                })
+            }
+            $('.term-toc-inner').on('click','.term-toc-item-link', function (e) {
+                e.preventDefault();
+                let target = $(this).attr('data-toc');
+                console.log(`.doc-main-group[data-toc=${target}`)
+                lenis.scrollTo(`.doc-main-group[data-toc=${target}]`, { offset: -100, duration: 1.4})
+            })
+        }
+        if(!isStagging()){
+            $('.doc-main-tab-wrap').on('click', '.doc-main-tab', function(e) {
+                e.preventDefault();
+                console.log('click');
+                let target = $(this).attr('id');
+                // lenis.scrollTo(`#${target}`, { offset: -100 });
+                $('.doc-main-tab').removeClass('active');
+                $(this).addClass('active');
+                $('.doc-main-content-inner').removeClass('active');
+                $(`.doc-main-content-inner#${target}`).addClass('active');
+                updateTocUI();
+                $('.term-toc-head-txt').text($('.term-toc-inner .term-toc-item-link').eq(0).find('.term-toc-item-txt').text())
+            });
+        }
+        else {
+            $('.doc-main-tab-wrap').on('click', '.doc-main-tab', function(e) {
+                e.preventDefault();
+                let target = $(this).attr('data-category-parent');
+                // lenis.scrollTo(`#${target}`, { offset: -100 });
+                $('.doc-main-tab').removeClass('active');
+                $(this).addClass('active');
+                $('.doc-main-content').removeClass('active');
+                $(`.doc-main-content[data-category-parent=${target}]`).addClass('active');
+                updateTocUINew();
+                $('.term-toc-head-txt').text($('.term-toc-inner .term-toc-item-link').eq(0).find('.term-toc-item-txt').text())
+            });
+        }
     }
 
     SCRIPT.waitlistScript = () => {
@@ -4015,7 +4146,13 @@ const mainScript = () => {
             }
         })
         function usdGetFaq() {
-            getAllDataByType('faq').then((res) => {
+            if(isStagging()) {
+                getAllDynamicData('.home-faq--itemans');
+                animateFaq();
+                scrollToFaq();
+            }
+            else {
+                getAllDataByType('faq').then((res) => {
                 console.log(res)
                 if (res) {
                     let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_usd_page)
@@ -4030,6 +4167,7 @@ const mainScript = () => {
                     scrollToFaq();
                 }
             });
+            }
             function scrollToFaq() {
                 $('[data-scroll-faq]').on('click', function(e) {
                     e.preventDefault();
@@ -4089,19 +4227,27 @@ const mainScript = () => {
         }
         corporateHero();
         function corporateGetFaq() {
-            getAllDataByType('faq').then((res) => {
-                if (res) {
-                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_corporate_page)
-                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_corporate_page', true)
-                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-                    allFaq.forEach((i) => {
-                        createFaqNew(i).appendTo($('.home-faq-main'))
-                    })
-                    updateInterestRate('.home-faq-main');
-                    $('.home-faq-main').find('.load-ske').addClass('loaded')
-                    animateFaq();
-                }
-            });
+            if(isStagging()){
+                console.log('faq stagging')
+                getAllDynamicData('.home-faq--itemans');
+                animateFaq();
+                scrollToFaq();
+            }
+            else {
+                getAllDataByType('faq').then((res) => {
+                    if (res) {
+                        let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_corporate_page)
+                        let allFaq = sortAsc(activeFaqItem, true, 'order_on_corporate_page', true)
+                        $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
+                        allFaq.forEach((i) => {
+                            createFaqNew(i).appendTo($('.home-faq-main'))
+                        })
+                        updateInterestRate('.home-faq-main');
+                        $('.home-faq-main').find('.load-ske').addClass('loaded')
+                        animateFaq();
+                    }
+                });
+            }
         }
         corporateGetFaq();
         function getHomePartners() {
@@ -4157,20 +4303,28 @@ const mainScript = () => {
         }
         cardFee();
         function cardGetFaq() {
-            getAllDataByType('faq').then((res) => {
-                console.log(res)
-                if (res) {
-                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_card_page)
-                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_card_page', true)
-                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-                    allFaq.forEach((i) => {
-                        createFaqNew(i).appendTo($('.home-faq-main'))
-                    })
-                    updateInterestRate('.home-faq-main');
-                    $('.home-faq-main').find('.load-ske').addClass('loaded')
-                    animateFaq();
-                }
-            });
+            if(isStagging()){
+                console.log('faq stagging')
+                getAllDynamicData('.home-faq--itemans');
+                animateFaq();
+                scrollToFaq();
+            }
+            else {
+                getAllDataByType('faq').then((res) => {
+                    console.log(res)
+                    if (res) {
+                        let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_card_page)
+                        let allFaq = sortAsc(activeFaqItem, true, 'order_on_card_page', true)
+                        $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
+                        allFaq.forEach((i) => {
+                            createFaqNew(i).appendTo($('.home-faq-main'))
+                        })
+                        updateInterestRate('.home-faq-main');
+                        $('.home-faq-main').find('.load-ske').addClass('loaded')
+                        animateFaq();
+                    }
+                });
+            }
         }
         cardGetFaq();
         function cardReason(){
@@ -4240,6 +4394,9 @@ const mainScript = () => {
         function thankReview() {
             let gapSlide = parseRem(20);
             let slideView = 5;
+            let itemsArray = $('.thank-review-item').toArray();
+            let icRateGood = $(itemsArray[0]).find('.thank-review-item-rate-item.item-good').eq(0);
+            let icRateBad = $(itemsArray[0]).find('.thank-review-item-rate-item.item-bad').eq(0);
             gsap.set('.thank-review-title', {autoAlpha: 0, yPercent: 40})
             gsap.set('.thank-review-sub', {autoAlpha: 0, yPercent: 40})
             gsap.set('.thank-review-list', {autoAlpha: 0, x: 40})
@@ -4262,33 +4419,29 @@ const mainScript = () => {
                 slideView = 1.2;
                 gapSlide = parseRem(24);
             }
+            itemsArray.forEach(function(item) {
+                let rateWrapper = $(item).find('.thank-review-item-rate');
+                rateWrapper.find('.thank-review-item-rate-item').remove();
+                if(!rateWrapper.hasClass('w-condition-invisible')){
+                    let itemRate = parseInt($(item).attr('data-rate'));
+                    for(let i = 1 ; i <= 5; i ++){
+                        if(i <= itemRate) {
+                            rateWrapper.append(icRateGood.clone());
+                        }
+                        else {
+                            rateWrapper.append(icRateBad.clone());
+                        }
+                    }
+                }
+            });
             if(viewport.w > 479){
                 let maxHeightSlide = parseRem(1054);
-                let widthSwiperSlide = (
-                    $('.thank-review-main').width() - gapSlide * (slideView - 1)
-                ) / slideView;
+                let widthSwiperSlide = ($('.thank-review-main').width() - gapSlide * (slideView - 1)) / slideView;
                 let baseSlide = $('.thank-review-list').eq(0).clone().empty().css('width', widthSwiperSlide);
-                let itemsArray = $('.thank-review-item').toArray();
                 let swiperWrapper = $('.thank-review-inner').eq(0).empty();
                 let currentSlide = baseSlide.clone();
                 swiperWrapper.append(currentSlide);
-                let icRateGood = $(itemsArray[0]).find('.thank-review-item-rate-item.item-good').eq(0);
-                let icRateBad = $(itemsArray[0]).find('.thank-review-item-rate-item.item-bad').eq(0);
-                console.log(icRateGood)
                 itemsArray.forEach(function(item) {
-                    let rateWrapper = $(item).find('.thank-review-item-rate');
-                    rateWrapper.find('.thank-review-item-rate-item').remove();
-                    if(!rateWrapper.hasClass('w-condition-invisible')){
-                        let itemRate = parseInt($(item).attr('data-rate'));
-                        for(let i = 1 ; i <= 5; i ++){
-                            if(i <= itemRate) {
-                                rateWrapper.append(icRateGood.clone());
-                            }
-                            else {
-                                rateWrapper.append(icRateBad.clone());
-                            }
-                        }
-                    }
                     currentSlide.append(item);
                     let currentHeight = currentSlide.height();
                     if (currentHeight > maxHeightSlide) {
