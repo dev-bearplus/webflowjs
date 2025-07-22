@@ -287,6 +287,13 @@ const script = () => {
             globalHooks.triggerOncePlay(data);
             $('.loader').css('pointer-events', 'none');
             sessionStorage.setItem('isLoaded', true);
+            $('.body').css({
+                'overflow': 'initial',
+                'position': 'relative',
+                'max-height': 'none',
+                'inset': 'auto',
+                'overflow-y': 'initial'
+            })
         }
     }
     const loader = new Loader();
@@ -869,7 +876,6 @@ const script = () => {
                     paused: true,
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
-
                 // this.animationReveal(this.tlOnce);
             }
             setupEnter(data) {
@@ -913,8 +919,9 @@ const script = () => {
                 })
                 this.tlOverlap
                     .fromTo($(this.el).select('.home-hero-backdrop'), { autoAlpha: 0 }, { autoAlpha: 1 })
-                    .fromTo($(this.el).select('.home-hero-bg-item-inner'), { scale: 1 }, { scale: 1.02 }, 0)
-                    .fromTo($(this.el).select('.home-hero-text'), { autoAlpha: 1 }, { autoAlpha: 0 });
+                    .fromTo($(this.el).select('.home-hero-bg-item-inner'), { scale: 1 }, { scale: 1.02 }, "<=0")
+                    .fromTo($(this.el).select('.home-hero-bar'), { autoAlpha: 1, yPercent: 0 }, { autoAlpha: 0, yPercent: 5 }, "<=0")
+                    .fromTo($(this.el).select('.home-hero-text'), { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -cvUnit(5, 'rem') });
             }
             destroy() {
                 if (this.tlOnce) {
@@ -936,6 +943,7 @@ const script = () => {
                 super();
                 this.el = null;
                 this.tlOverlap = null;
+                this.tlChangeBG = null;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-gallery-wrap');
@@ -944,6 +952,7 @@ const script = () => {
             onTrigger() {
                 this.animationScrub();
                 this.animationReveal();
+                this.interact();
             }
             animationReveal() {
             }
@@ -990,28 +999,106 @@ const script = () => {
                     scrollTrigger: {
                         trigger: $(this.el).prev(),
                         start: 'bottom 85%',
-                        end: 'bottom bottom',
+                        end: 'bottom bottom+=150%',
                         endTrigger: this.el,
                         scrub: true
                     }
                 })
 
                 $(this.el).selectAll('.home-gallery-text-item').each((idx, item) => {
-
                     if (idx < $(this.el).selectAll('.home-gallery-text-item').length - 1) {
                         this.tlShowText
-                            .fromTo(item, { autoAlpha: 0 }, { autoAlpha: 1, duration: 1 }, '>=0')
-                            .fromTo(item, { autoAlpha: 1 }, { autoAlpha: 0, duration: 1 }, '>=.5');
+                            .fromTo(item, { autoAlpha: 0, y: cvUnit(3, 'rem') }, { autoAlpha: 1, y: 0 }, '>=0')
+                            .fromTo(item, { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -cvUnit(3, 'rem') }, '>=.5');
                     } else {
-                        this.tlShowText.fromTo(item, { autoAlpha: 0 }, { autoAlpha: 1, duration: 1 }, '>=0');
+                        this.tlShowText.fromTo(item, { autoAlpha: 0, y: cvUnit(3, 'rem') }, { autoAlpha: 1, y: 0 }, '>=0');
                     }
                     gsap.set(item, { autoAlpha: 0 });
+                })
+
+                this.tlOverlap = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).select('.home-gallery-blend'),
+                        start: 'top bottom+=20%',
+                        end: 'top top-=20%',
+                        scrub: true
+                    },
+                    duration: 1.5
+                })
+                this.tlChangeBG = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).select('.home-gallery-blend'),
+                        start: 'bottom 55%',
+                        end: 'bottom top',
+                        scrub: true
+                    },
+                })
+                this.tlOverlap
+                    .fromTo($(this.el).select('.home-gallery-blend'),
+                        { 'mask-size': '100% 120%' }, { 'mask-size': '280% 120%', duration: 1 })
+                    .fromTo($(this.el).select('.home-gallery-text-inner'),
+                        { autoAlpha: 1, scale: 1 }, { autoAlpha: 0, scale: 1.05, duration: 1 }, "<=.2")
+
+                this.tlChangeBG
+                    .fromTo($(this.el).select('.home-gallery'),
+                        { backgroundColor: 'rgba(242, 235, 227, 0)'}, { backgroundColor: 'rgba(242, 235, 227, 1)', duration: 1 })
+            }
+            interact() {
+                $(this.el).find('.home-gallery-item').on('click', (e) => {
+                    $(this.el).find('.home-gallery-zoom').addClass('active');
+                    $(this.el).find('.home-gallery-stick').addClass('on-zoom');
+                    let cloneEl = $(e.target).find('img').clone().addClass('img-h');
+                    gsap.set(cloneEl, { clearProps: 'all' });
+                    $(this.el).find('.home-gallery-zoom-img-inner').html('');
+                    $(this.el).find('.home-gallery-zoom-img-inner').append(cloneEl);
+                    smoothScroll.lenis.stop();
+                })
+                $(this.el).find('.home-gallery-zoom-close').on('click', () => {
+                    $(this.el).find('.home-gallery-zoom').removeClass('active');
+                    $(this.el).find('.home-gallery-stick').removeClass('on-zoom');
+                    smoothScroll.lenis.start();
                 })
             }
             destroy() {
                 if (this.tlOverlap) {
                     this.tlOverlap.kill();
                 }
+                if (this.tlChangeBG) {
+                    this.tlChangeBG.kill();
+                }
+            }
+        },
+        Map: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+                this.tlOverlap = null;
+                this.tlChangeBG = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.home-map-wrap');
+                super.setTrigger(this.el, this.onTrigger.bind(this));
+            }
+            onTrigger() {
+                this.animationScrub();
+                this.animationReveal();
+                this.interact();
+            }
+            animationScrub() {
+            }
+            animationReveal() {
+            }
+            interact() {
+                const activeIndex = (idx) => {
+                    $(this.el).find('.home-map-destin-item').eq(idx).addClass('active').siblings().removeClass('active');
+                    $(this.el).find('.home-map-location-item').eq(idx).addClass('active').siblings().removeClass('active');
+                }
+                $(this.el).find('.home-map-destin-item').on('mouseenter', function(e) {
+                    activeIndex($(this).index());
+                })
+                $(this.el).find('.home-map-location-item').on('mouseenter', function(e) {
+                    activeIndex($(this).index());
+                })
             }
         }
     }
