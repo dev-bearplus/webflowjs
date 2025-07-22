@@ -1100,6 +1100,9 @@ const script = () => {
                     activeIndex($(this).index());
                 })
             }
+        },
+        Yacth: class extends TriggerSetup {
+
         }
     }
 
