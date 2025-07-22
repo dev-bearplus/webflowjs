@@ -105,6 +105,7 @@ const mainScript = () => {
         if (historyTraversal) {
             $('.header-menu-inner').removeAttr('style');
             $('.header-menu-inner').removeClass('active'); 
+            $('.header-lang').removeClass('active')
         }
     })
     window.addEventListener('popstate', function(event) {
