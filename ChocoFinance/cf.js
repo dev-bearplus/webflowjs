@@ -725,8 +725,56 @@ const mainScript = () => {
     }
     // Scroll Events
     let header = $('.header');
+    function activeLang() {
+        $('.header-lang-btn').on('click', function(e) {
+            e.preventDefault();
+            $(this).toggleClass('active');
+            $('.header-lang-main').toggleClass('active');
+        })
+        $('.header-lang-nation-item').on('click', function(e) {
+            e.preventDefault();
+            let index = $(this).index();
+            $('.header-lang-nation-item').removeClass('active');
+            $(this).addClass('active');
+            $('.header-lang-content-list').removeClass('active');
+            $('.header-lang-content-list').eq(index).addClass('active');
+        })
+        function initLang() {
+            let currentLang = $('html').attr('lang');
+            console.log(currentLang)
+            if(currentLang) {
+                $('.header-lang-nation-item').each((idx, item) => {
+                    let nationName = $(item).attr('data-nation');
+                    console.log(nationName)
+                    if(currentLang.includes(nationName)) {
+                        $(item).addClass('active');
+                        $('.header-lang-content-list').removeClass('active');
+                        $('.header-lang-content-list').eq(idx).addClass('active');
+                        $('.header-lang-content-list').eq(idx).find('.header-lang-content-item').each((langIdx, langItem) => {
+                            let langItemCode = $(langItem).attr('data-lang-code');
+                            if(langItemCode == currentLang) {
+                                $(langItem).addClass('active');
+                                $('.header-lang-txt').text($(langItem).attr('data-lang-name'));
+                            }
+                        })
+                        return;
+                    }
+                })
+            }
+        }
+        initLang();
+    }
+    if(isStagging()){
+        activeLang();
+    }
     function scrollDown() {
         header.addClass('on-hide')
+        if($('.header-lang-main').length) {
+            $('.header-lang-main').removeClass('active');
+        }
+        if($('.header-lang-btn').length) {
+            $('.header-lang-btn').removeClass('active');
+        }
         if ($('.blog-page').length) {
             $('.blog-header').removeClass('on-scroll')
         }
@@ -4393,7 +4441,7 @@ const mainScript = () => {
         thankHero();
         function thankReview() {
             let gapSlide = parseRem(20);
-            let slideView = 5;
+            let slideView = 'auto';
             let itemsArray = $('.thank-review-item').toArray();
             let icRateGood = $(itemsArray[0]).find('.thank-review-item-rate-item.item-good').eq(0);
             let icRateBad = $(itemsArray[0]).find('.thank-review-item-rate-item.item-bad').eq(0);
@@ -4436,7 +4484,7 @@ const mainScript = () => {
             });
             if(viewport.w > 479){
                 let maxHeightSlide = parseRem(1054);
-                let widthSwiperSlide = ($('.thank-review-main').width() - gapSlide * (slideView - 1)) / slideView;
+                let widthSwiperSlide = parseRem(320);
                 let baseSlide = $('.thank-review-list').eq(0).clone().empty().css('width', widthSwiperSlide);
                 let swiperWrapper = $('.thank-review-inner').eq(0).empty();
                 let currentSlide = baseSlide.clone();
