@@ -914,7 +914,7 @@ const script = () => {
                         trigger: this.el,
                         start: 'top top',
                         end: 'bottom 85%',
-                        scrub: 1
+                        scrub: true
                     }
                 })
                 this.tlOverlap
