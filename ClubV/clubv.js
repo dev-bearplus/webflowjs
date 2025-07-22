@@ -105,6 +105,7 @@ const mainScript = () => {
         if (historyTraversal) {
             $('.header-menu-inner').removeAttr('style');
             $('.header-menu-inner').removeClass('active'); 
+            $('.header-lang').removeClass('active')
         }
     })
     window.addEventListener('popstate', function(event) {
@@ -1182,7 +1183,7 @@ const mainScript = () => {
                 },
             })
             $('.home-faq-item').each((idx, el) => {
-                let number = idx <=9? `0${idx+1}` : idx+1;
+                let number = idx <9? `0${idx+1}` : idx+1;
                 $(el).find('.home-faq-item-number').text(`(${number})`);
                 new MasterTimeline({
                     timeline: tlItem,
