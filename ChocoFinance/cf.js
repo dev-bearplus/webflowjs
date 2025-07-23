@@ -2257,12 +2257,12 @@ const mainScript = () => {
                 }
             });
         }
-        if(isStagging()){
+        // if(isStagging()){
             homeTestiHandleNew();
-        }
-        else {
-            getHomeTesti();
-        }
+        // }
+        // else {
+        //     getHomeTesti();
+        // }
         function homeTestiHandleNew() {
             console.log('init new testi')
             $('.home-testi-item').each(function(e) {
@@ -2572,29 +2572,29 @@ const mainScript = () => {
         }
 
         function homeGetFaq() {
-            if(isStagging()){
+            // if(isStagging()){
                 console.log('faq stagging')
                 getAllDynamicData('.home-faq--itemans');
                 animateFaq();
                 scrollToFaq();
-            }
-            else {
-                console.log('faq live')
-                getAllDataByType('faq').then((res) => {
-                    if (res) {
-                        let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_homepage)
-                        let allFaq = sortAsc(activeFaqItem, true, 'order_on_homepage', true)
-                        $('.home-faq-main').html('').attr(schemaFAQParentAttrs);
-                        allFaq.forEach((i) => {
-                            createFaqNew(i).appendTo($('.home-faq-main'))
-                        })
-                        updateInterestRate('.home-faq-main');
-                        $('.home-faq-main').find('.load-ske').addClass('loaded')
-                        animateFaq();
-                        scrollToFaq();
-                    }
-                });
-            }
+            // }
+            // else {
+            //     console.log('faq live')
+            //     getAllDataByType('faq').then((res) => {
+            //         if (res) {
+            //             let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_homepage)
+            //             let allFaq = sortAsc(activeFaqItem, true, 'order_on_homepage', true)
+            //             $('.home-faq-main').html('').attr(schemaFAQParentAttrs);
+            //             allFaq.forEach((i) => {
+            //                 createFaqNew(i).appendTo($('.home-faq-main'))
+            //             })
+            //             updateInterestRate('.home-faq-main');
+            //             $('.home-faq-main').find('.load-ske').addClass('loaded')
+            //             animateFaq();
+            //             scrollToFaq();
+            //         }
+            //     });
+            // }
             
             function scrollToFaq() {
                 $('[data-scroll-faq]').on('click', function(e) {
@@ -2701,27 +2701,26 @@ const mainScript = () => {
             });
         // }
         function homeGetFaq() {
-            if(isStagging()){
-                console.log('faq stagging')
+            // if(isStagging()){
                 getAllDynamicData('.home-faq--itemans');
                 animateFaq();
                 scrollToFaq();
-            }
-            else {
-                getAllDataByType('faq').then((res) => {
-                    if (res) {
-                        let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_how_it_works)
-                        let allFaq = sortAsc(activeFaqItem, true, 'order_on_how_it_works', true)
-                        $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-                        allFaq.forEach((i) => {
-                            createFaqNew(i).appendTo($('.home-faq-main'))
-                        })
-                        updateInterestRate('.home-faq-main');
-                        $('.home-faq-main').find('.load-ske').addClass('loaded')
-                        animateFaq();
-                    }
-                });
-            }
+            // }
+            // else {
+            //     getAllDataByType('faq').then((res) => {
+            //         if (res) {
+            //             let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_how_it_works)
+            //             let allFaq = sortAsc(activeFaqItem, true, 'order_on_how_it_works', true)
+            //             $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
+            //             allFaq.forEach((i) => {
+            //                 createFaqNew(i).appendTo($('.home-faq-main'))
+            //             })
+            //             updateInterestRate('.home-faq-main');
+            //             $('.home-faq-main').find('.load-ske').addClass('loaded')
+            //             animateFaq();
+            //         }
+            //     });
+            // }
         }
         homeGetFaq();
 
@@ -2889,26 +2888,26 @@ const mainScript = () => {
 
         //aboutClimateHanlde();
         function aboutGetFaq() {
-            if(isStagging()){
+            // if(isStagging()){
                 console.log('faq stagging')
                 getAllDynamicData('.home-faq--itemans');
                 animateFaq();
                 scrollToFaq();
-            } 
-            else {
-                getAllDataByType('faq').then((res) => {
-                    if (res) {
-                        let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_about_us)
-                        let allFaq = sortAsc(activeFaqItem, true, 'order_on_about_us', true)
-                        $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-                        allFaq.forEach((i) => {
-                            createFaqNew(i).appendTo($('.home-faq-main'))
-                        })
-                        updateInterestRate('.home-faq-main');
-                        animateFaq();
-                    }
-                });
-            }
+            // } 
+            // else {
+            //     getAllDataByType('faq').then((res) => {
+            //         if (res) {
+            //             let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_about_us)
+            //             let allFaq = sortAsc(activeFaqItem, true, 'order_on_about_us', true)
+            //             $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
+            //             allFaq.forEach((i) => {
+            //                 createFaqNew(i).appendTo($('.home-faq-main'))
+            //             })
+            //             updateInterestRate('.home-faq-main');
+            //             animateFaq();
+            //         }
+            //     });
+            // }
         }
         aboutGetFaq();
 
@@ -4195,28 +4194,28 @@ const mainScript = () => {
             }
         })
         function usdGetFaq() {
-            if(isStagging()) {
+            // if(isStagging()) {
                 getAllDynamicData('.home-faq--itemans');
                 animateFaq();
                 scrollToFaq();
-            }
-            else {
-                getAllDataByType('faq').then((res) => {
-                console.log(res)
-                if (res) {
-                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_usd_page)
-                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_usd_page', true)
-                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-                    allFaq.forEach((i) => {
-                        createFaqNew(i).appendTo($('.home-faq-main'))
-                    })
-                    updateInterestRate('.home-faq-main');
-                    $('.home-faq-main').find('.load-ske').addClass('loaded')
-                    animateFaq();
-                    scrollToFaq();
-                }
-            });
-            }
+            // }
+            // else {
+            //     getAllDataByType('faq').then((res) => {
+            //     console.log(res)
+            //     if (res) {
+            //         let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_usd_page)
+            //         let allFaq = sortAsc(activeFaqItem, true, 'order_on_usd_page', true)
+            //         $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
+            //         allFaq.forEach((i) => {
+            //             createFaqNew(i).appendTo($('.home-faq-main'))
+            //         })
+            //         updateInterestRate('.home-faq-main');
+            //         $('.home-faq-main').find('.load-ske').addClass('loaded')
+            //         animateFaq();
+            //         scrollToFaq();
+            //     }
+            // });
+            // }
             function scrollToFaq() {
                 $('[data-scroll-faq]').on('click', function(e) {
                     e.preventDefault();
@@ -4276,27 +4275,27 @@ const mainScript = () => {
         }
         corporateHero();
         function corporateGetFaq() {
-            if(isStagging()){
+            // if(isStagging()){
                 console.log('faq stagging')
                 getAllDynamicData('.home-faq--itemans');
                 animateFaq();
                 scrollToFaq();
-            }
-            else {
-                getAllDataByType('faq').then((res) => {
-                    if (res) {
-                        let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_corporate_page)
-                        let allFaq = sortAsc(activeFaqItem, true, 'order_on_corporate_page', true)
-                        $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-                        allFaq.forEach((i) => {
-                            createFaqNew(i).appendTo($('.home-faq-main'))
-                        })
-                        updateInterestRate('.home-faq-main');
-                        $('.home-faq-main').find('.load-ske').addClass('loaded')
-                        animateFaq();
-                    }
-                });
-            }
+            // }
+            // else {
+            //     getAllDataByType('faq').then((res) => {
+            //         if (res) {
+            //             let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_corporate_page)
+            //             let allFaq = sortAsc(activeFaqItem, true, 'order_on_corporate_page', true)
+            //             $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
+            //             allFaq.forEach((i) => {
+            //                 createFaqNew(i).appendTo($('.home-faq-main'))
+            //             })
+            //             updateInterestRate('.home-faq-main');
+            //             $('.home-faq-main').find('.load-ske').addClass('loaded')
+            //             animateFaq();
+            //         }
+            //     });
+            // }
         }
         corporateGetFaq();
         function getHomePartners() {
@@ -4352,28 +4351,28 @@ const mainScript = () => {
         }
         cardFee();
         function cardGetFaq() {
-            if(isStagging()){
+            // if(isStagging()){
                 console.log('faq stagging')
                 getAllDynamicData('.home-faq--itemans');
                 animateFaq();
                 scrollToFaq();
-            }
-            else {
-                getAllDataByType('faq').then((res) => {
-                    console.log(res)
-                    if (res) {
-                        let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_card_page)
-                        let allFaq = sortAsc(activeFaqItem, true, 'order_on_card_page', true)
-                        $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-                        allFaq.forEach((i) => {
-                            createFaqNew(i).appendTo($('.home-faq-main'))
-                        })
-                        updateInterestRate('.home-faq-main');
-                        $('.home-faq-main').find('.load-ske').addClass('loaded')
-                        animateFaq();
-                    }
-                });
-            }
+            // }
+            // else {
+            //     getAllDataByType('faq').then((res) => {
+            //         console.log(res)
+            //         if (res) {
+            //             let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_card_page)
+            //             let allFaq = sortAsc(activeFaqItem, true, 'order_on_card_page', true)
+            //             $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
+            //             allFaq.forEach((i) => {
+            //                 createFaqNew(i).appendTo($('.home-faq-main'))
+            //             })
+            //             updateInterestRate('.home-faq-main');
+            //             $('.home-faq-main').find('.load-ske').addClass('loaded')
+            //             animateFaq();
+            //         }
+            //     });
+            // }
         }
         cardGetFaq();
         function cardReason(){
