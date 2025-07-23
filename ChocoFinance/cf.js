@@ -4531,7 +4531,6 @@ const mainScript = () => {
                     onEnter: () => {
                         $('.thank-team-video-trigger').addClass('hidden');
                         $('.thank-team-video-inner .el-video')
-                        .prop('controls', true)
                         .prop('autoplay', true)
                         .prop('muted', true)
                         .prop('playsinline', true)
