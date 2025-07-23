@@ -2262,7 +2262,7 @@ const mainScript = () => {
                             .to(heroDesc.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
                             .to(heroTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, "<=.1")
                             .to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
-                            .from('.prod-hero-btn .btn', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' },  '>-.6')
+                            .from('.prod-hero-form', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' },  '>-.6')
                     }
                         animShowEl();   
                         $('.prod-hero-form button[type=submit]').on('click', function() {
