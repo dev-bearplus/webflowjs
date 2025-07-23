@@ -1637,10 +1637,10 @@ const mainScript = () => {
                 $('.home-partner-inner').find('.home-partner-item').eq(1).before(textTemplate);
             }
         }
-        if(!isStagging()){
-            getHomePartners();
+        // if(!isStagging()){
+        //     getHomePartners();
 
-        }
+        // }
         function homeHeroHandle() {
             let ribbonOffset, humanOffset;
             if ($(window).width() > 991) {
@@ -2271,16 +2271,16 @@ const mainScript = () => {
                 for (let x = 0; x < rate; x++) {
                     stars.eq(x).addClass('rate-true')
                 }
-                if(!isStagging()){
-                    let store = $(this).find('.data-store').text();
-                    if (store == 'Google') {
-                        $(this).find('.home-testi-item-rate').addClass('mod-gg')
-                    } else if (store == 'Apple Store') {
-                        $(this).find('.home-testi-item-rate').addClass('mod-apple')
-                    } else {
-                        $(this).find('.home-testi-item-rate').addClass('mod-trust')
-                    }
-                }
+                // if(!isStagging()){
+                //     let store = $(this).find('.data-store').text();
+                //     if (store == 'Google') {
+                //         $(this).find('.home-testi-item-rate').addClass('mod-gg')
+                //     } else if (store == 'Apple Store') {
+                //         $(this).find('.home-testi-item-rate').addClass('mod-apple')
+                //     } else {
+                //         $(this).find('.home-testi-item-rate').addClass('mod-trust')
+                //     }
+                // }
             })
             if ($(window).width() > 991) {
                 $('.home-testi-main').on('mouseenter', function(e) {
@@ -3488,14 +3488,14 @@ const mainScript = () => {
                 updateAllFaq();
             })
         }
-        if(!isStagging()) {
-            faqGetFaq();
-        }
-        else {
+        // if(!isStagging()) {
+        //     faqGetFaq();
+        // }
+        // else {
             updateUICateNew();
             faqInteraction();
             animateFaq();
-        }
+        // }
         $('.faq-main-wrap').attr(schemaFAQParentAttrs);
         function updateUICateNew() {
             const stickySearchIcon = $('.faq-cate-inner .faq-stick-srch').eq(0);
@@ -3990,13 +3990,13 @@ const mainScript = () => {
                 $('.sc-doc-main').find('.load-ske').addClass('loaded')
             })
         }
-        if(!isStagging()){
-            getAllDocs();
-        }
-        else {
+        // if(!isStagging()){
+        //     getAllDocs();
+        // }
+        // else {
             updateTocUINew();
             docInteractionNew();
-        }
+        // }
         function updateTocUINew() {
             $('.term-toc-inner').html('');
             let allCategories = $('.doc-main-content.active .doc-group-title');
@@ -4151,21 +4151,21 @@ const mainScript = () => {
                 lenis.scrollTo(`.doc-main-group[data-toc=${target}]`, { offset: -100, duration: 1.4})
             })
         }
-        if(!isStagging()){
-            $('.doc-main-tab-wrap').on('click', '.doc-main-tab', function(e) {
-                e.preventDefault();
-                console.log('click');
-                let target = $(this).attr('id');
-                // lenis.scrollTo(`#${target}`, { offset: -100 });
-                $('.doc-main-tab').removeClass('active');
-                $(this).addClass('active');
-                $('.doc-main-content-inner').removeClass('active');
-                $(`.doc-main-content-inner#${target}`).addClass('active');
-                updateTocUI();
-                $('.term-toc-head-txt').text($('.term-toc-inner .term-toc-item-link').eq(0).find('.term-toc-item-txt').text())
-            });
-        }
-        else {
+        // if(!isStagging()){
+        //     $('.doc-main-tab-wrap').on('click', '.doc-main-tab', function(e) {
+        //         e.preventDefault();
+        //         console.log('click');
+        //         let target = $(this).attr('id');
+        //         // lenis.scrollTo(`#${target}`, { offset: -100 });
+        //         $('.doc-main-tab').removeClass('active');
+        //         $(this).addClass('active');
+        //         $('.doc-main-content-inner').removeClass('active');
+        //         $(`.doc-main-content-inner#${target}`).addClass('active');
+        //         updateTocUI();
+        //         $('.term-toc-head-txt').text($('.term-toc-inner .term-toc-item-link').eq(0).find('.term-toc-item-txt').text())
+        //     });
+        // }
+        // else {
             $('.doc-main-tab-wrap').on('click', '.doc-main-tab', function(e) {
                 e.preventDefault();
                 let target = $(this).attr('data-category-parent');
@@ -4177,7 +4177,7 @@ const mainScript = () => {
                 updateTocUINew();
                 $('.term-toc-head-txt').text($('.term-toc-inner .term-toc-item-link').eq(0).find('.term-toc-item-txt').text())
             });
-        }
+        // }
     }
 
     SCRIPT.waitlistScript = () => {
