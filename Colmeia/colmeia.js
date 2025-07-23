@@ -746,6 +746,26 @@ const mainScript = () => {
             }
         });
         initForm({
+            formName: 'Email Form',
+            hubspot: {
+                portalId: '144330454',
+                formId: '33ed01a9-e44b-4e1c-9cae-3682148b1a23',
+                fields: [
+                    { name: 'email', value: (data) => data['Business-Email'] }
+                ]
+            }
+        });
+        initForm({
+            formName: 'Email Form Popup',
+            hubspot: {
+                portalId: '144330454',
+                formId: '33ed01a9-e44b-4e1c-9cae-3682148b1a23',
+                fields: [
+                    { name: 'email', value: (data) => data['Business-Email'] }
+                ]
+            }
+        });
+        initForm({
             formName: 'Request download guide',
             hubspot: {
                 portalId: '144330454',
@@ -2244,8 +2264,10 @@ const mainScript = () => {
                             .to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
                             .from('.prod-hero-btn .btn', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' },  '>-.6')
                     }
-                    animShowEl();
-
+                        animShowEl();   
+                        $('.prod-hero-form button[type=submit]').on('click', function() {
+                            $('.prod-hero-form #bot-hunter').val('');
+                        })
                     // let iframeSrc = new URL($('.prod-hero-thumb-vid-inner').attr('data-iframe-src'));
                     // let iframeTitle = $('.prod-hero-thumb-vid-inner').attr('data-iframe-title');
                     // $('.prod-hero-thumb-btn a').on('click', function (e) {
@@ -2715,6 +2737,9 @@ const mainScript = () => {
                     })
                     $('.schedule-hero-client-cms-list').addClass('animMarquee')
                 }
+                $('.schedule-hero button[type=submit]').on('click', function() {
+                    $('.schedule-hero #bot-hunter').val('');
+                })
                 marqueeLogo();
             }
         },
@@ -2732,7 +2757,6 @@ const mainScript = () => {
                             heroSub.revert();
                             gsap.set('.contact-form-title, .contact-form-sub', { clearProps: 'all' });
                             gsap.set('.form-inner', { clearProps: 'all' });
-                            $('.contact-hero #bot-hunter').val('');
                         }
                     })
 
@@ -2753,6 +2777,9 @@ const mainScript = () => {
                         tlItem
                             .to(labelItem.words, { yPercent: 0, autoAlpha: 1, duration: .6, stagger: .015 }, '<=.1')
                             .to(valItem.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .025 }, "<=.2")
+                    })
+                    $('.contact-hero button[type=submit]').on('click', function() {
+                        $('.contact-hero #bot-hunter').val('');
                     })
                 }
                 contactHero();
