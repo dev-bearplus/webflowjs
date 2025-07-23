@@ -899,9 +899,13 @@ const mainScript = () => {
 
     lenis.on('scroll', function (inst) {
         let threshold = inst.scroll > header.height();
-        if ($('.topbar').length) {
+        if ($('.announcement').length) {
+            threshold = inst.scroll > header.height() + $('.announcement').height();
+        }
+         if ($('.topbar').length) {
             threshold = inst.scroll > header.height() + $('.topbar').height();
         }
+        console.log(threshold)
         if (threshold) {
             header.addClass('on-scroll')
             if (inst.direction == 1) {
