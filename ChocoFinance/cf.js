@@ -3492,6 +3492,7 @@ const mainScript = () => {
         //     faqGetFaq();
         // }
         // else {
+            getAllDynamicData('.home-faq--itemans');
             updateUICateNew();
             faqInteraction();
             animateFaq();
