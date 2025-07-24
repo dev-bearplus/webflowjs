@@ -998,8 +998,8 @@ const script = () => {
 
                 gsap.set($(this.el).find('.home-about-story-content-text .txt-slider-wrap .heading:not(:first-child)'), { autoAlpha: 0 })
 
-                let headingFlipping = new FlipText('.home-about-story-content-text .txt-slider-wrap', { duration: 2 });
-                headingFlipping.setup();
+                // let headingFlipping = new FlipText('.home-about-story-content-text .txt-slider-wrap', { duration: 2 });
+                // headingFlipping.setup();
 
                 new MasterTimeline({
                     triggerInit: this.el,
@@ -1010,7 +1010,7 @@ const script = () => {
                     allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $(this.el).find('.home-about-story-content-text .heading').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-about-story-content-text .txt-slider-wrap .heading:first-child').get(0), delay: "<=.04", onComplete: () => headingFlipping.play() }),
+                        new FadeSplitText({ el: $(this.el).find('.home-about-story-content-text .txt-slider-wrap .heading:first-child').get(0), delay: "<=.04", onComplete: () => this.changeTextOnScroll() }),
                         new FadeIn({ el: $(this.el).find('.home-about-story-content-decor').get(0) })
                     ]
                 })
@@ -1069,13 +1069,14 @@ const script = () => {
                 this.tlChangeText = gsap.timeline({
                     scrollTrigger: {
                         trigger: this.el,
-                        start: `top+=${viewport.h * 1.2} top`,
-                        end: `bottom-=${viewport.h * 1.2} bottom`,
+                        start: `top+=${viewport.h} top`,
+                        end: `bottom-=${viewport.h} bottom`,
                         scrub: true,
                         fastScrollEnd: true,
                         onUpdate: ({ progress }) => {
-                            let index = this.getProgressIndex({ progress, N: allSlideItems.length, rootMargin: -0.01 });
+                            let index = this.getProgressIndex({ progress, N: allSlideItems.length, rootMargin: 0 });
                             if (index === lastIndex) return;
+                            console.log(index)
 
                             gsap.to(allSlideItems[index], { transform: 'translate(0px, 0px)', autoAlpha: 1, duration: DEFAULT.duration, ease: DEFAULT.ease } )
                             gsap.to(allSlideItems[lastIndex], { transform: DEFAULT.transform[index > lastIndex ? 'in' : 'out'], autoAlpha: 0, duration: DEFAULT.duration, ease: DEFAULT.ease } )
