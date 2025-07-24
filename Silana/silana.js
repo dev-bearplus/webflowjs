@@ -1797,6 +1797,7 @@ const script = () => {
             cardSlide() {
                 $(this.el).find(".prod-hiw-main-list").addClass('keen-slider');
                 $(this.el).find(".prod-hiw-main-list > *").addClass('keen-slider__slide');
+
                 gsap.set($(this.el).find('.prod-hiw-main-ruler-inner'), { '--progress': 0 });
                 let cloneRuler = $(this.el).find('.prod-hiw-ruler-list').clone();
                 $(this.el).find('.prod-hiw-main-ruler-inner').append(cloneRuler);
@@ -1932,6 +1933,28 @@ const script = () => {
                     slider.prev();
                     onSlide();
                 });
+
+                if (viewport.w <= 767) {
+                    const handleOnDown = (e) => {
+                        const startX = e.clientX;
+                        const startY = e.clientY;
+
+                        const handleOnMove = (e) => {
+                            const deltaX = e.clientX - startX;
+                            const deltaY = e.clientY - startY;
+
+                            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                                if (deltaX > 0) {
+                                    slider.prev()
+                                } else {
+                                    slider.next()
+                                }
+                            }
+                        };
+                        $(this.el).find('.prod-hiw-main-content').get(0).ontouchmove = (e) => handleOnMove(e.touches[0]);
+                    };
+                    $(this.el).find('.prod-hiw-main-content').get(0).ontouchstart = (e) => handleOnDown(e.touches[0]);
+                }
             }
             activeIndex(idx) {
                 $(this.el).find('.prod-hiw-main-item').removeClass('active');
