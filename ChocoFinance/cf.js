@@ -2353,6 +2353,8 @@ const mainScript = () => {
                         }
                     }
                 });
+
+                $('.home-testi-col-wrapper .load-ske').removeClass('load-ske')
             }
             ScrollTrigger.create({
                 trigger: '.home-card-title',
