@@ -845,7 +845,7 @@ const script = () => {
             }
         }
     }
-    const footer = new Footer();
+
     class CTA extends TriggerSetup {
         constructor() {
             super();
@@ -2647,7 +2647,6 @@ const script = () => {
                     }
                 })
 
-                const { portalId, formId, fields } = hubspot;
 
                 const hubspot = {
                     portalId: 145687733,
@@ -2660,6 +2659,7 @@ const script = () => {
                         { name: 'message', value: (data) => data['Message'] }
                     ]
                 }
+                const { portalId, formId, fields } = hubspot;
                 let url = `https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${formId}`;
                 const mapField = (data) => {
                     if (!fields.length) return [];
