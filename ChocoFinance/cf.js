@@ -2912,6 +2912,19 @@ const mainScript = () => {
             //         }
             //     });
             // }
+            function scrollToFaq() {
+                $('[data-scroll-faq]').on('click', function(e) {
+                    e.preventDefault();
+                    let target = $(this).attr('data-scroll-faq');
+                    if ($(`#${target}`).length >= 1) {
+                        lenis.scrollTo(target)
+                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
+                    } else {
+                        lenis.scrollTo(`${$(this).attr('href')}`)
+                    }
+
+                })
+            }
         }
         aboutGetFaq();
 
@@ -2938,6 +2951,7 @@ const mainScript = () => {
             requestAnimationFrame(() => {
                 $('.abt-team-cms').removeClass('on-hide')
             })
+            console.log('handleMobileDownload')
         }
         aboutTeamHandle()
 
@@ -4199,9 +4213,9 @@ const mainScript = () => {
         })
         function usdGetFaq() {
             // if(isStagging()) {
-                getAllDynamicData('.home-faq--itemans');
-                animateFaq();
-                scrollToFaq();
+            getAllDynamicData('.home-faq--itemans');
+            animateFaq();
+            scrollToFaq();
             // }
             // else {
             //     getAllDataByType('faq').then((res) => {
