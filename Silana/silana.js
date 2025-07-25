@@ -321,19 +321,75 @@ const script = () => {
                 paused: true
             })
 
+            if (data.next.namespace === 'home') {
+                gsap.set('.loader-logo svg, .loader-num .txt', { yPercent: 100, autoAlpha: 0 });
+                gsap.set('.loader-logo, .loader-num', { autoAlpha: 1 });
+                this.tlFirst = gsap.timeline({
+                    paused: true,
+                    defaults: {ease: 'none'}
+                })
+
+                this.tlFirst
+                    .to('.loader-logo svg, .loader-num .txt', { yPercent: 0, autoAlpha: 1, stagger: .05, ease: 'power1.inOut'  })
+
+                this.tlProg = gsap.timeline({
+                    paused: true,
+                    onUpdate() {
+                        let count = Math.floor(this.progress() * 100);
+                        $('.loader-num .txt').text(`${count}%`);
+                    },
+                    defaults: {ease: 'none'}
+                })
+                    .to('.loader-progress-inner', { scaleX: 1 });
+
+
+                this.tlAfter = gsap.timeline({
+                    paused: true,
+                    defaults: {ease: 'none'},
+                })
+                    .to('.loader-num .txt', { yPercent: 100, autoAlpha: 0, ease: 'power1.inOut' })
+
+                this.tlLoadDone = gsap.timeline({
+                    paused: true,
+                    onStart: () => {
+                        this.oncePlay(data);
+                    }
+                })
+                gsap.set('.loader-bg', {
+                    clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)'
+                })
+
+                let heightText = $('.loader-text').outerHeight();
+
+                this.tlLoadDone
+                    .to('.loader-bg.top', { clipPath: `polygon(0 0, 100% 0, 100% ${heightText}px, 0 ${heightText}px)`, duration: 1, ease: 'power2.inOut' }, 0)
+                    .to('.loader-bg.bot', { clipPath: ' polygon(0 100%, 100% 100%, 100% 100%, 0 100%)', duration: 1, ease: 'power2.inOut' }, "<=0")
+                    .to('.loader-progress', { top: heightText, y: 0, backgroundColor: '#2b2b2b33', duration: 1, ease: 'power2.inOut' }, "<=0")
+                    .to('.loader-text', { top: 0, y: 0, duration: 1, ease: 'power2.inOut' }, "<=0")
+                    .to('.loader-progress-inner', { autoAlpha: 0, duration: 1, ease: 'power2.inOut' }, "<=0")
+                    .to('.loader', { autoAlpha: 0, ease: 'power2.inOut'  }, "<=.96")
+                this.tlLoading
+                    .to(this.tlFirst, { duration: this.tlFirst.totalDuration(), progress: 1, ease: 'none' })
+                    .to(this.tlProg, { duration: this.tlProg.totalDuration() * (this.isLoaded ? 3 : 5), progress: 1, ease: 'circ.in' })
+                    .to(this.tlAfter, { duration: this.tlAfter.totalDuration(), progress: 1, ease: 'none' })
+                    .to(this.tlLoadDone, { duration: this.tlLoadDone.totalDuration(), progress: 1, ease: 'none' }, "<=0")
+            }
+
             this.tlLoadMaster = gsap.timeline({
                 paused: true,
                 delay: this.isLoaded ? 0 : 1,
-                duration: .5,
+                duration: data.next.namespace === 'home' ? 0 : .5,
                 onStart: () => {
                     this.onceSetup(data);
+                    setTimeout(() => $('.header').addClass('loaded'),300);
                 },
                 onComplete: () => {
                     this.oncePlay(data);
                 }
             })
+
             this.tlLoadMaster
-                .to(this.tlLoading, { duration: this.tlLoading.totalDuration(), progress: 1, ease: 'none' })
+                .to(this.tlLoading, { duration: this.tlLoading.totalDuration(), progress: 1, ease: 'none' }, "<=0")
         }
         play(data) {
             // requestAnimationFrame(() => {
@@ -900,6 +956,7 @@ const script = () => {
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
                     paused: true,
+                    delay: .3,
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
 
@@ -926,6 +983,7 @@ const script = () => {
                 this.animationReveal(this.tlEnter);
             }
             playOnce() {
+                console.log("play")
                 this.tlOnce.play();
             }
             playEnter() {
