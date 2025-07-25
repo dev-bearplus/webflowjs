@@ -330,7 +330,7 @@ const script = () => {
                 })
 
                 this.tlFirst
-                    .to('.loader-logo svg, .loader-num .txt', { yPercent: 0, autoAlpha: 1, stagger: .05, ease: 'power1.inOut'  })
+                    .to('.loader-logo svg, .loader-num .txt', { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .05, ease: 'power1.inOut'  })
 
                 this.tlProg = gsap.timeline({
                     paused: true,
@@ -367,17 +367,16 @@ const script = () => {
                     .to('.loader-progress', { top: heightText, y: 0, backgroundColor: '#2b2b2b33', duration: 1, ease: 'power2.inOut' }, "<=0")
                     .to('.loader-text', { top: 0, y: 0, duration: 1, ease: 'power2.inOut' }, "<=0")
                     .to('.loader-progress-inner', { autoAlpha: 0, duration: 1, ease: 'power2.inOut' }, "<=0")
-                    .to('.loader', { autoAlpha: 0, ease: 'power2.inOut'  }, "<=.96")
+                    .to('.loader', { autoAlpha: 0, ease: 'power2.inOut'  }, "<=.98")
                 this.tlLoading
                     .to(this.tlFirst, { duration: this.tlFirst.totalDuration(), progress: 1, ease: 'none' })
-                    .to(this.tlProg, { duration: this.tlProg.totalDuration() * (this.isLoaded ? 3 : 5), progress: 1, ease: 'circ.in' })
+                    .to(this.tlProg, { duration: this.tlProg.totalDuration() * (this.isLoaded ? 1 : 3), progress: 1, ease: 'circ.in' })
                     .to(this.tlAfter, { duration: this.tlAfter.totalDuration(), progress: 1, ease: 'none' })
                     .to(this.tlLoadDone, { duration: this.tlLoadDone.totalDuration(), progress: 1, ease: 'none' }, "<=0")
             }
 
             this.tlLoadMaster = gsap.timeline({
                 paused: true,
-                delay: this.isLoaded ? 0 : 1,
                 duration: data.next.namespace === 'home' ? 0 : .5,
                 onStart: () => {
                     this.onceSetup(data);
