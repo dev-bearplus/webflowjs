@@ -939,7 +939,19 @@ const mainScript = () => {
             }
         }
     });
-
+    function announcement() {
+        $('.body').css('--open-top', `${$('.announcement').outerHeight() * -1}px`)
+        console.log(`${$('.announcement').outerHeight() * -1}px`)
+        $(window).on('resize', debounce(function() {
+            if ($('.home-hero').length) {
+                resizeHomeHero();
+            }
+            $('.body').css('--open-top', `${$('.announcement').outerHeight() * -1}px`)
+        }))
+    }
+    if($('.announcement').length > 0) {
+        announcement();
+    }
     function topbar() {
         if ($('.topbar').length) {
             let pagiEl = $('<div class="topbar-pagi"></div>');
@@ -1064,7 +1076,11 @@ const mainScript = () => {
 
                 $('.nav').addClass('active');
                 $('.header').addClass('on-open');
-                if ($('.topbar').length) {
+                if ( $('.announcement').length) {
+                    $('.sticky-wrap').addClass('on-open');
+                    $('.body').css('--open-top', `${$('.announcement').outerHeight() * -1}px`)
+                }
+                if ($('.topbar').length ) {
                     $('.sticky-wrap').addClass('on-open');
                     $('.body').css('--open-top', `${$('.topbar').outerHeight() * -1}px`)
                 }
@@ -1072,7 +1088,7 @@ const mainScript = () => {
                     lenis.stop();
                 } else {
                     header.removeClass('on-hide')
-                    $('body').css('overflow', 'hidden')
+                    $('body').css('overflow', 'hidden');
                 }
             }
         })
@@ -1109,7 +1125,7 @@ const mainScript = () => {
                     }, 300);
                     $('.header').removeClass('on-open');
                 }
-                if ($('.topbar').length) {
+                if ($('.topbar').length || $('.announcement').length) {
                     $('.sticky-wrap').removeClass('on-open');
                     // $('.body').css('--open-top', `0px`)
                 }
