@@ -957,7 +957,18 @@ const script = () => {
                 this.tlOnce = gsap.timeline({
                     paused: true,
                     delay: .3,
-                    onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                    onStart: () => {
+                        $('[data-init-hidden]').removeAttr('data-init-hidden');
+                        requestAnimationFrame(() => {
+                            $('.body').css({
+                                'overflow': 'initial',
+                                'position': 'relative',
+                                'max-height': 'none',
+                                'inset': 'auto',
+                                'overflow-y': 'initial'
+                            })
+                        })
+                    }
                 })
 
                 this.animationReveal(this.tlOnce);
