@@ -176,6 +176,17 @@ const script = () => {
             }
         });
     }
+
+    function mapFormToObject(ele) {
+        return ([...new FormData(ele).entries()].reduce(
+            (prev, cur) => {
+                const name = cur[0];
+                const val = cur[1];
+                return { ...prev, [name]: val };
+            },
+            {}
+        ));
+    }
     class Mouse {
         constructor() {
             this.mousePos = {x: 0, y: 0};
@@ -2777,7 +2788,14 @@ const script = () => {
                 $(this.el).find("#contact-form").on('submit', function (e) {
                     const data = mapFormToObject(e.target);
                     const mappedFields = mapField(data);
-                    const dataSend = { fields: mappedFields };
+                    const dataSend = {
+                        fields: mappedFields,
+                        context: {
+                            pageUri: window.location.href,
+                            pageName: 'Contact page'
+                        }
+                    };
+                    console.log(dataSend)
                     $.ajax({
                         url: url,
                         method: 'POST',
