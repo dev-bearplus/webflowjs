@@ -362,39 +362,44 @@ const mainScript = () => {
         }
       })
     }
+    // set link pdf newroom 
+    const handleReplaceLink = () => {
+      if ($('.about-list-post-item').length > 0) {
+        $('.about-list-post-item').each((_idx, item) => {
+          const pdfLink = $(item).find('.about-news-list-clone-link').attr('href');
+          function isValidLink(link) {
+            const urlPattern = /https?:\/\/[^\s]+/;
+            return urlPattern.test(link);
+          };
+          if (isValidLink(pdfLink)) {
+            $(item).find('.about-list-post-item-inner').attr('href', pdfLink);
+            $(item).find('.about-list-post-item-inner').attr('target', '_blank');
+          } else {
+            const hrefInner = $(item).find('.about-list-post-item-inner').attr('href');
+            if (!hrefInner || hrefInner === '#') {
+              const title = $(item).find('.heading.txt-20').text().split(',')[0].trim();
+              const slug = generateSlug(title);
+              $(item).find('.about-list-post-item-inner').attr('href', `${document.location.href}/${slug}`);
+            }
+          }
+        })
+      }
+    }
     // Initial binding
     handlePaginationClick();
+    handleReplaceLink();
 
     // Watch for DOM changes
     const observer = new MutationObserver(() => {
       handlePaginationClick();
+      handleReplaceLink();
     });
 
     observer.observe(document.body, {
       childList: true,
       subtree: true
     });
-    // set link pdf newroom 
-    if ($('.about-list-post-item').length > 0) {
-      $('.about-list-post-item').each((_idx, item) => {
-        const pdfLink = $(item).find('.about-news-list-clone-link').attr('href');
-        function isValidLink(link) {
-          const urlPattern = /https?:\/\/[^\s]+/;
-          return urlPattern.test(link);
-        };
-        if (isValidLink(pdfLink)) {
-          $(item).find('.about-list-post-item-inner').attr('href', pdfLink);
-          $(item).find('.about-list-post-item-inner').attr('target', '_blank');
-        } else {
-          const hrefInner = $(item).find('.about-list-post-item-inner').attr('href');
-          if (!hrefInner || hrefInner === '#') {
-            const title = $(item).find('.heading.txt-20').text().split(',')[0].trim();
-            const slug = generateSlug(title);
-            $(item).find('.about-list-post-item-inner').attr('href', `${document.location.href}/${slug}`);
-          }
-        }
-      })
-    }
+
 
     $('.about-history-main').each((idx, item) => {
       let tl = new gsap.timeline({
