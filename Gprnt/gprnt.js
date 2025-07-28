@@ -392,7 +392,7 @@ const mainScript = () => {
     // Watch for DOM changes
     const observer = new MutationObserver(() => {
       handlePaginationClick();
-      handleReplaceLink();
+      // handleReplaceLink();
     });
 
     observer.observe(document.body, {
