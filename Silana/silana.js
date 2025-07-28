@@ -1,6 +1,10 @@
+
 const script = () => {
     $.easing.exponentialEaseOut = function (t) {
         return Math.min(1, 1.001 - Math.pow(2, -10 * t));
+    };
+    $.fn.hasAttr = function (name) {
+        return this.attr(name) !== undefined;
     };
     barba.use(barbaPrefetch);
     if (history.scrollRestoration) {
@@ -9,7 +13,6 @@ const script = () => {
     gsap.registerPlugin(ScrollTrigger, SplitText);
     ScrollTrigger.defaults({
         invalidateOnRefresh: true,
-        fastScrollEnd: true
     });
     const parseRem = (input) => {
         return input / 10 * parseFloat($('html').css('font-size'))
@@ -26,6 +29,11 @@ const script = () => {
             clearTimeout(timer)
             timer = setTimeout(() => { func.apply(this, args) }, timeout)
         }
+    }
+    const isTouchDevice = () => {
+        return (('ontouchstart' in window) ||
+        (navigator.maxTouchPoints > 0) ||
+        (navigator.msMaxTouchPoints > 0));
     }
     const lerp = (a, b, t) => (1 - t) * a + t * b;
     const distance = (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1);
@@ -108,7 +116,6 @@ const script = () => {
                     } else if (isCorrectForm) {
                         if (isSuccessful) {
                             onSuccess?.()
-                            console.log(inputSubmitText)
                             inputSubmitWrap.removeClass('disable');
                             inputSubmitText.text(inputSubmitTextFirst);
                         } else {
@@ -127,13 +134,15 @@ const script = () => {
     })();
 
     function resetScroll(data) {
+        const defaultScroll = (target) => {
+            smoothScroll.lenis.scrollTo(target, {offset: -parseRem(100)})
+            setTimeout(() => smoothScroll.lenis.scrollTo(target, {offset: -parseRem(100)}), 400);
+            setTimeout(() => smoothScroll.lenis.scrollTo(target, {offset: -parseRem(100)}), 800);
+        };
         if (window.location.hash !== '') {
             if ($(window.location.hash).length >= 1) {
-                $("html").animate({ scrollTop: $(window.location.hash).offset().top - 100 }, 1200);
-
-                setTimeout(() => {
-                    $("html").animate({ scrollTop: $(window.location.hash).offset().top - 100 }, 1200);
-                }, 300);
+                let target = `#${window.location.hash.slice(1)}`;
+                defaultScroll(target);
             } else {
                 scrollTop()
             }
@@ -142,11 +151,7 @@ const script = () => {
             if (searchObj.sc) {
                 if ($(`#${searchObj.sc}`).length >= 1) {
                     let target = `#${searchObj.sc}`;
-                    setTimeout(() => {
-                        smoothScroll.lenis.scrollTo(`#${searchObj.sc}`, {
-                            offset: -100
-                        })
-                    }, 500);
+                    defaultScroll(target);
                     barba.history.add(`${window.location.pathname + target}`, 'barba', 'replace');
                 } else {
                     scrollTop()
@@ -169,6 +174,17 @@ const script = () => {
                 getAllScrollTrigger("refresh");
             }
         });
+    }
+
+    function mapFormToObject(ele) {
+        return ([...new FormData(ele).entries()].reduce(
+            (prev, cur) => {
+                const name = cur[0];
+                const val = cur[1];
+                return { ...prev, [name]: val };
+            },
+            {}
+        ));
     }
     class Mouse {
         constructor() {
@@ -315,19 +331,74 @@ const script = () => {
                 paused: true
             })
 
+            if (data.next.namespace === 'home') {
+                gsap.set('.loader-logo svg, .loader-num .txt', { yPercent: 100, autoAlpha: 0 });
+                gsap.set('.loader-logo, .loader-num', { autoAlpha: 1 });
+                this.tlFirst = gsap.timeline({
+                    paused: true,
+                    defaults: {ease: 'none'}
+                })
+
+                this.tlFirst
+                    .to('.loader-logo svg, .loader-num .txt', { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .05, ease: 'power1.inOut'  })
+
+                this.tlProg = gsap.timeline({
+                    paused: true,
+                    onUpdate() {
+                        let count = Math.floor(this.progress() * 100);
+                        $('.loader-num .txt').text(`${count}%`);
+                    },
+                    defaults: {ease: 'none'}
+                })
+                    .to('.loader-progress-inner', { scaleX: 1 });
+
+
+                this.tlAfter = gsap.timeline({
+                    paused: true,
+                    defaults: {ease: 'none'},
+                })
+                    .to('.loader-num .txt', { yPercent: 100, autoAlpha: 0, ease: 'power1.inOut' })
+
+                this.tlLoadDone = gsap.timeline({
+                    paused: true,
+                    onStart: () => {
+                        this.oncePlay(data);
+                    }
+                })
+                gsap.set('.loader-bg', {
+                    clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)'
+                })
+
+                let heightText = $('.loader-text').outerHeight();
+
+                this.tlLoadDone
+                    .to('.loader-bg.top', { clipPath: `polygon(0 0, 100% 0, 100% ${heightText}px, 0 ${heightText}px)`, duration: 1, ease: 'power2.inOut' }, 0)
+                    .to('.loader-bg.bot', { clipPath: ' polygon(0 100%, 100% 100%, 100% 100%, 0 100%)', duration: 1, ease: 'power2.inOut' }, "<=0")
+                    .to('.loader-progress', { top: heightText, y: 0, backgroundColor: '#2b2b2b33', duration: 1, ease: 'power2.inOut' }, "<=0")
+                    .to('.loader-text', { top: 0, y: 0, duration: 1, ease: 'power2.inOut' }, "<=0")
+                    .to('.loader-progress-inner', { autoAlpha: 0, duration: 1, ease: 'power2.inOut' }, "<=0")
+                    .to('.loader', { autoAlpha: 0, ease: 'power2.inOut'  }, "<=.98")
+                this.tlLoading
+                    .to(this.tlFirst, { duration: this.tlFirst.totalDuration(), progress: 1, ease: 'none' })
+                    .to(this.tlProg, { duration: this.tlProg.totalDuration() * (this.isLoaded ? 1 : 3), progress: 1, ease: 'circ.in' })
+                    .to(this.tlAfter, { duration: this.tlAfter.totalDuration(), progress: 1, ease: 'none' })
+                    .to(this.tlLoadDone, { duration: this.tlLoadDone.totalDuration(), progress: 1, ease: 'none' }, "<=0")
+            }
+
             this.tlLoadMaster = gsap.timeline({
                 paused: true,
-                delay: this.isLoaded ? 0 : 1,
-                duration: .5,
+                duration: data.next.namespace === 'home' ? 0 : .5,
                 onStart: () => {
                     this.onceSetup(data);
+                    setTimeout(() => $('.header').addClass('loaded'),300);
                 },
                 onComplete: () => {
                     this.oncePlay(data);
                 }
             })
+
             this.tlLoadMaster
-                .to(this.tlLoading, { duration: this.tlLoading.totalDuration(), progress: 1, ease: 'none' })
+                .to(this.tlLoading, { duration: this.tlLoading.totalDuration(), progress: 1, ease: 'none' }, "<=0")
         }
         play(data) {
             // requestAnimationFrame(() => {
@@ -408,10 +479,11 @@ const script = () => {
         }
     }
     class FlipText {
-        constructor(wrapEl, onCycleComplete = () => {}) {
+        constructor(wrapEl, { onCycleComplete = () => {}, duration = 3 }) {
             this.wrapEl = wrapEl;
             this.tlMaster;
             this.onCycleComplete = onCycleComplete;
+            this.duration = duration;
         }
         setup() {
             let allSlideItems = $(this.wrapEl).find('.txt-slider-inner > *');
@@ -423,7 +495,7 @@ const script = () => {
             });
 
             const DEFAULT = {
-                duration: 3,
+                duration: this.duration,
                 ease: 'expo.inOut',
                 transform: {
                     out: `translate3d(0px, ${parseRem(25.5961)}px, -${parseRem(26.0468)}px) rotateX(-91deg)`,
@@ -639,13 +711,19 @@ const script = () => {
                 scrollTrigger: {
                     trigger: triggerEl,
                     start: 'clamp(top bottom+=50%)',
-                    end: 'clamp(bottom top)',
+                    end: 'bottom top-=50%',
                     onEnter: () => {
                         if (this.isPlayed && this.once) {
                             this.once = false;
                             this.onTrigger();
                         }
-                    }
+                    },
+                    onEnterBack: () => {
+                        if (this.isPlayed && this.once) {
+                            this.once = false;
+                            onTrigger();
+                        }
+                    },
                 }
             })
         }
@@ -670,9 +748,16 @@ const script = () => {
     class Header {
         constructor() {
             this.el = null;
+            this.isOpen = false;
         }
         init(data) {
             this.el = document.querySelector('.header');
+            if (viewport.w <= 991) {
+                this.toggleNav();
+            }
+            if (viewport.w <= 767) {
+                this.adjustNavHeight();
+            }
         }
         updateOnScroll(inst) {
             this.toggleHide(inst);
@@ -697,8 +782,30 @@ const script = () => {
                 $(this.el).removeClass("on-hide");
             }
         }
-        isOpen() {
-            return this.el.classList.contains('on-open-nav');
+        toggleNav() {
+            $(this.el).find('.header-toggle').on('click', this.handleClick.bind(this));
+            $(this.el).find('.header-link, .header-logo, .header-btn').on('click', () => setTimeout(() => this.close(), 800));
+        }
+        handleClick(e) {
+            e.preventDefault();
+            this.isOpen ? this.close() : this.open();
+        }
+        open() {
+            if (this.isOpen) return;
+            $('.header').addClass('on-open-nav');
+            $('.header-toggle').addClass('active');
+            this.isOpen = true;
+            smoothScroll.lenis.stop();
+        }
+        close() {
+            if (!this.isOpen) return;
+            $('.header').removeClass('on-open-nav');
+            $('.header-toggle').removeClass('active');
+            this.isOpen = false;
+            smoothScroll.lenis.start();
+        }
+        adjustNavHeight() {
+            $(this.el).find('.header-act').css('height', viewport.h - $(this.el).outerHeight());
         }
     }
     const header = new Header();
@@ -706,6 +813,7 @@ const script = () => {
         constructor() {
             super();
             this.el = null;
+            this.tlOverlap = null;
         }
         trigger(data) {
             this.el = data.next.container.querySelector('.footer');
@@ -714,8 +822,9 @@ const script = () => {
         onTrigger() {
             new Marquee($(this.el).find('.footer-bot-text [data-marquee="list"]'), 40).setup();
             new Marquee($(this.el).find('.footer-bot-ruler [data-marquee="list"]'), 10).setup();
-            $(this.el).find('.footer-cta-submit input[type="submit"]').on('click', function(e) {
+            $(this.el).find('.footer-cta-submit input[type="submit"]').on('click', (e) => {
                 let email = $(this.el).find('.footer-cta-input[name="email"]');
+
                 let flag = false;
                 if(email.val() === ''){
                     email.closest('.footer-cta-input-wrap').addClass('valid-null');
@@ -735,7 +844,23 @@ const script = () => {
                     return;
                 }
             })
+            $(this.el).find('.footer-main-logo').on('click', (e) => {
+                $(this.el).find('.footer-popup').addClass('active');
+                smoothScroll.lenis.stop();
+            })
+            $(this.el).find('.footer-popup-close').on('click', (e) => {
+                $(this.el).find('.footer-popup').removeClass('active');
+                smoothScroll.lenis.start();
+            })
+            $(window).on('click', (e) => {
+                if (!$(this.el).find('.footer-main-logo:hover').length)
+                    if (!$(this.el).find('.footer-popup-img:hover').length) {
+                        $(this.el).find('.footer-popup').removeClass('active');
+                        smoothScroll.lenis.start();
+                    }
+            })
             this.animationReveal();
+            this.animationScrub();
         }
         animationReveal() {
             new MasterTimeline({
@@ -783,10 +908,24 @@ const script = () => {
                 ]
             })
         }
+        animationScrub() {
+            this.tlOverlap = gsap.timeline({
+                scrollTrigger: {
+                    trigger: $(this.el).find('.footer-main-wrap'),
+                    start: 'bottom bottom',
+                    end: `bottom bottom-=${$(this.el).find('.footer-bot').outerHeight()}`,
+                    scrub: 1
+                }
+            })
+            this.tlOverlap.fromTo($(this.el).find('.footer-bot'), { yPercent: 20 }, { yPercent: 0, ease: 'sine.out' });
+        }
         destroy() {
+            if (this.tlOverlap) {
+                this.tlOverlap.kill();
+            }
         }
     }
-    const footer = new Footer();
+
     class CTA extends TriggerSetup {
         constructor() {
             super();
@@ -808,7 +947,6 @@ const script = () => {
                 tweenArr: [
                     new FadeIn({ el: $(this.el).find('.main-cta-bg').get(0) }),
                     new FadeSplitText({ el: $(this.el).find('.main-cta-title').get(0) }),
-                    new FadeSplitText({ el: $(this.el).find('.main-cta-desc').get(0) }),
                     new FadeIn({ el: $(this.el).find('.main-cta-btn').get(0) }),
                     new FadeIn({ el: $(this.el).find('.main-cta-decor').get(0) })
                 ]
@@ -842,7 +980,19 @@ const script = () => {
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
                     paused: true,
-                    onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                    delay: .3,
+                    onStart: () => {
+                        $('[data-init-hidden]').removeAttr('data-init-hidden');
+                        requestAnimationFrame(() => {
+                            $('.body').css({
+                                'overflow': 'initial',
+                                'position': 'relative',
+                                'max-height': 'none',
+                                'inset': 'auto',
+                                'overflow-y': 'initial'
+                            })
+                        })
+                    }
                 })
 
                 this.animationReveal(this.tlOnce);
@@ -853,18 +1003,17 @@ const script = () => {
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
 
-                if (!isInViewport(this.el)) {
-                    this.tlTriggerEnter = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: this.el,
-                            start: 'top bottom+=50%',
-                            end: 'bottom top',
-                            once: true,
-                            onEnter: () => this.tlEnter.play(),
-                            onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
-                        }
-                    })
-                }
+                this.tlTriggerEnter = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => this.tlEnter.play(),
+                        onEnterBack: () => this.tlEnter.play(),
+                        onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                    }
+                })
 
                 this.animationReveal(this.tlEnter);
             }
@@ -872,9 +1021,9 @@ const script = () => {
                 this.tlOnce.play();
             }
             playEnter() {
-                if (isInViewport(this.el)) {
-                    this.tlEnter.play();
-                }
+                // if (isInViewport(this.el)) {
+                //     this.tlEnter.play();
+                // }
             }
             animationReveal(timeline) {
                 new MasterTimeline({
@@ -941,28 +1090,32 @@ const script = () => {
 
                 gsap.set($(this.el).find('.home-about-story-content-text .txt-slider-wrap .heading:not(:first-child)'), { autoAlpha: 0 })
 
+                // let headingFlipping = new FlipText('.home-about-story-content-text .txt-slider-wrap', { duration: 2 });
+                // headingFlipping.setup();
+
                 new MasterTimeline({
                     triggerInit: this.el,
                     scrollTrigger: {
                         trigger: $(this.el).find('.home-about-main'),
-                        start: `bottom top+=${viewport.h * 0.5 - $(this.el).find('.home-about-story-content-item').height()}`
+                        start: `bottom top+=${viewport.h * 0.65 - $(this.el).find('.home-about-story-content-item').height()}`
                     },
                     allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $(this.el).find('.home-about-story-content-text .heading').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-about-story-content-text .txt-slider-wrap .heading:first-child').get(0), delay: "<=.04", onComplete: () => this.changeTextOnScroll() })
+                        new FadeSplitText({ el: $(this.el).find('.home-about-story-content-text .txt-slider-wrap .heading:first-child').get(0), delay: "<=.04", onComplete: () => this.changeTextOnScroll() }),
+                        new FadeIn({ el: $(this.el).find('.home-about-story-content-decor').get(0) })
                     ]
                 })
             }
             animationScrub() {
                 // new ParallaxImage({el: this.el.querySelector('.home-about-thumb-inner video'), scaleOffset: 0.1 });
-                this.el.querySelectorAll('.home-about-story-item').forEach((el, idx) => new ParallaxImage({el: el.querySelector('img'), scaleOffset: 0.2 }))
+                // this.el.querySelectorAll('.home-about-story-item').forEach((el, idx) => new ParallaxImage({el: el.querySelector('img'), scaleOffset: 0.2 }))
                 this.tlOverlap.push(
                     gsap
                         .timeline({
                             scrollTrigger: {
                                 trigger: $(this.el).find('.home-about-main'),
-                                start: 'top top',
+                                start: 'bottom bottom',
                                 end: `bottom+=${viewport.h * 0.5} top`,
                                 scrub: 1
                             }
@@ -980,8 +1133,8 @@ const script = () => {
                                 scrub: 1
                             },
                         })
-                        .to($(this.el).find('.home-about-story-content'), { scale: 0.8, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, 0)
-                        .to($(this.el).find('.home-about-story-list'), { scale: 1.3, transformOrigin: 'bottom', autoAlpha: 0.5, duration: 1, ease: 'none'}, 0));
+                        .to($(this.el).find('.home-about-story-content'), { scale: 0.8, autoAlpha: 0.6, duration: 1, ease: 'power2.in', overwrite: true }, 0)
+                        .to($(this.el).find('.home-about-story-list'), { scale: 1.3, transformOrigin: 'bottom', autoAlpha: 0.5, duration: 1, ease: 'none', overwrite: true}, 0));
             }
             changeTextOnScroll() {
                 let wrapTextSlide = $(this.el).find('.home-about-story-content-text .txt-slider-wrap')
@@ -1008,12 +1161,12 @@ const script = () => {
                 this.tlChangeText = gsap.timeline({
                     scrollTrigger: {
                         trigger: this.el,
-                        start: `top+=${viewport.h * 1.2} top`,
-                        end: `bottom-=${viewport.h * 1.2} bottom`,
+                        start: `top+=${viewport.h} top`,
+                        end: `bottom-=${viewport.h} bottom`,
                         scrub: true,
                         fastScrollEnd: true,
                         onUpdate: ({ progress }) => {
-                            let index = this.getProgressIndex({ progress, N: allSlideItems.length, rootMargin: -0.01 });
+                            let index = this.getProgressIndex({ progress, N: allSlideItems.length, rootMargin: 0 });
                             if (index === lastIndex) return;
 
                             gsap.to(allSlideItems[index], { transform: 'translate(0px, 0px)', autoAlpha: 1, duration: DEFAULT.duration, ease: DEFAULT.ease } )
@@ -1067,11 +1220,8 @@ const script = () => {
                 super.setTrigger(this.el, this.onTrigger.bind(this));
             }
             onTrigger() {
-                if (viewport.w <= 767) {
-                    this.slideCard();
-                }
-
                 this.animationReveal();
+                this.handleAccordion();
             }
             animationReveal() {
                 new MasterTimeline({
@@ -1080,7 +1230,7 @@ const script = () => {
                     allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $(this.el).find('.home-challenge-label').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-challenge-title').get(0) })
+                        new FadeSplitText({ el: $(this.el).find('.home-challenge-title').get(0), isDisableRevert: true })
                     ]
                 })
                 new MasterTimeline({
@@ -1088,15 +1238,29 @@ const script = () => {
                     scrollTrigger: { trigger: this.el },
                     allowMobile: true,
                     tweenArr: [
-                        ...Array.from($(this.el).find('.home-challenge-item')).flatMap((el, idx) => (
-                            [
+                        ...Array.from($(this.el).find('.home-challenge-item')).flatMap((el, idx) => {
+                            let tween = [
                                 new ScaleLine({ el: $(el).find('.home-challenge-item-line').get(0) }),
                                 new FadeSplitText({ el: $(el).find('.home-challenge-item-label').get(0) }),
                                 new FadeSplitText({ el: $(el).find('.home-challenge-item-title').get(0) }),
-                                new FadeSplitText({ el: $(el).find('.home-challenge-item-desc').get(0) }),
                                 new FadeIn({ el: $(el).find('.home-challenge-item-ic').get(0) })
                             ]
-                        ))
+                            if (idx === 0) {
+                                $(el).find('.home-challenge-item-desc-txt .txt-richtext > *').each((_, element) => {
+                                    if (element.tagName.toLowerCase() === 'p') {
+                                        tween.push(new FadeSplitText({
+                                            el: element,
+                                            splitType: 'lines',
+                                            delay: ""
+                                        }));
+                                    } else if (element.tagName.toLowerCase() === 'ul') {
+                                        tween.push(...Array.from($(element).find('li')).map((li, index) =>
+                                            new FadeIn({ el: $(li).get(0), delay: index === 0 ? '>=-1' : "<=.2" })))
+                                    }
+                                });
+                            }
+                            return tween;
+                        })
                     ]
                 })
             }
@@ -1131,31 +1295,16 @@ const script = () => {
                         .to($(item).find('.home-challenge-item-content-overlay'),
                             { autoAlpha: 0, duration: .2 }, "-=.6")
                 })
+                this
             }
-            slideCard() {
-                $(this.el).find(".home-challenge-list").addClass('keen-slider');
-                $(this.el).find(".home-challenge-list").css('grid-column-gap', 0);
-                $(this.el).find(".home-challenge-item").addClass('keen-slider__slide');
-                let slider = new KeenSlider(".home-challenge-list", {
-                    slides: {
-                        perView: 1.1,
-                        spacing: parseRem(16),
-                    },
-                    defaultAnimation: {
-                        duration: 1000
-                    },
-                    dragSpeed: 1.2,
-                },
-                [slider => {
-                    slider.on("detailsChanged", () => {
-                        const details = slider.track.details;
-                        const current = details.rel + 1;
-                        const total = details.slides.length;
-                        const progress = current / (total );
-
-                        $(this.el).find(".home-challenge-progress-inner").css('width', `${progress * 100}%`);
-                    });
-                }])
+            handleAccordion() {
+                const updateHeightText = () => $(this.el).find('.home-challenge-text-wrap').css('height', $(this.el).find('.home-challenge-list').outerHeight());
+                viewport.w > 991 && updateHeightText();
+                $(this.el).find('.home-challenge-item').on('click', debounce(function (e) {
+                    let current = $(e.target).closest('.home-challenge-item');
+                    $(current).toggleClass('active').siblings().removeClass('active');
+                    viewport.w > 991 && updateHeightText();
+                }, 100))
             }
             destroy() {
                 if (this.tlParallax.length > 0) {
@@ -1174,6 +1323,8 @@ const script = () => {
                 this.tlStickMade = null;
                 this.tlHorizontal = null;
                 this.tlOverlap = null;
+                this.tlFadeHead = null;
+                this.tlFadeBody = null;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.home-solution-wrap');
@@ -1186,12 +1337,12 @@ const script = () => {
                 this.animationReveal();
             }
             animationReveal() {
-                let headingFlipping = new FlipText('.home-made-title-slide .txt-slider-wrap',
-                    (idx) =>
+                let headingFlipping = new FlipText('.home-made-title-slide .txt-slider-wrap', {
+                    onCycleComplete: (idx) =>
                         setTimeout(() => {
                             $(this.el).find('.home-made-map-img').eq(idx).addClass('active').siblings().removeClass('active');
                         }, 1000)
-                    );
+                });
                 headingFlipping.setup();
                 if (viewport.w < 991) {
                     new MasterTimeline({
@@ -1207,50 +1358,52 @@ const script = () => {
                             new FadeSplitText({ el: $(this.el).find('.home-solution-desc').get(0) }),
                         ]
                     })
+                    new MasterTimeline({
+                        triggerInit: this.el,
+                        scrollTrigger: {
+                            trigger: this.el,
+                            start: `top top+=75%`
+                        },
+                        allowMobile: true,
+                        tweenArr: [
+                            new FadeIn({ el: $(this.el).find('.home-solution-main-transform').get(0), clearProps: 'transform, opacity' }),
+                            new FadeIn({ el: $(this.el).find('.home-solution-main-decor').get(0) }),
+                            new FadeIn({ el: $(this.el).find('.home-solution-main-vid').get(0) })
+                        ]
+                    })
+                }
+
+                this.tlFadeHead = gsap.timeline({ paused: true })
+
+                if (viewport.w > 767 && viewport.w <= 991) {
+                    this.tlFadeHead = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: $(this.el).find('.home-made-head'),
+                            start: `top top+=75%`
+                        }
+                    })
                 }
                 new MasterTimeline({
                     triggerInit: this.el,
-                    scrollTrigger: {
-                        trigger: this.el,
-                        start: viewport.w > 991 ? `top+=${viewport.h - $(this.el).find('.home-solution-title').get(0).offsetTop} top` : `top top+=75%`
-                    },
-                    allowMobile: true,
-                    tweenArr: [
-                        new FadeIn({ el: $(this.el).find('.home-solution-main-transform').get(0), clearProps: 'transform, opacity' }),
-                        new FadeIn({ el: $(this.el).find('.home-solution-main-decor').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.home-solution-main-vid').get(0) })
-                    ]
-                })
-                new MasterTimeline({
-                    triggerInit: this.el,
-                    scrollTrigger: {
-                        trigger: $(this.el).find('.home-made'),
-                        start: viewport.w > 991 ? `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.9)} top` : `top top+=75%`
-                    },
-                    allowMobile: true,
+                    timeline: this.tlFadeHead,
                     tweenArr: [
                         new FadeSplitText({ el: $(this.el).find('.home-made-title').get(0), onComplete: () => headingFlipping.play() }),
+                        new FadeIn({ el: $(this.el).find('.home-made-map').get(0) })
                     ],
                 })
+
+                this.tlFadeBody = gsap.timeline({ paused: true })
+                if (viewport.w > 767 && viewport.w <= 991) {
+                    this.tlFadeBody = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: $(this.el).find('.home-made-body'),
+                            start: `top top+=75%`
+                        }
+                    })
+                }
                 new MasterTimeline({
                     triggerInit: this.el,
-                    scrollTrigger: {
-                        trigger: $(this.el).find('.home-made'),
-                        start: viewport.w > 991 ? `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.7)} top` : `top top+=75%`,
-                    },
-                    allowMobile: true,
-                    tweenArr: [
-                        new FadeIn({ el: $(this.el).find('.home-made-map').get(0) })
-                    ]
-                })
-                new MasterTimeline({
-                    triggerInit: this.el,
-                    scrollTrigger: {
-                        trigger: $(this.el).find('.home-made'),
-                        start: viewport.w > 991 ? `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 2.2)} top` : `top top+=50%`,
-                        fastScrollEnd: true
-                    },
-                    allowMobile: true,
+                    timeline: this.tlFadeBody,
                     tweenArr: [
                         new ScaleLine({ el: $(this.el).find('.home-solution-line').get(0) }),
                         new ScaleLine({ el: $(this.el).find('.home-made-head-line').get(0) }),
@@ -1264,7 +1417,7 @@ const script = () => {
                             ]
                         ))
                     ],
-                    stagger: .08
+                    stagger: .03
                 })
             }
             animationScrub() {
@@ -1272,74 +1425,95 @@ const script = () => {
                     this.sections = this.el.querySelectorAll('section');
                     this.horizontalLayout(this.sections);
 
+                    this.tlFadeShirt = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: $(this.el).find('.home-solution'),
+                            start: `top+=${viewport.h} bottom`,
+                            end: `bottom-=${viewport.h * 2} bottom`,
+                            scrub: 1,
+                            anticipatePin: 1
+                        },
+                    })
+                    this.tlFadeShirt.fromTo($(this.el).find('.home-solution-main-inner'), { autoAlpha: 0 }, { autoAlpha: 1 });
+
                     this.tlStickSol = gsap.timeline({
                         scrollTrigger: {
                             trigger: $(this.el).find('.home-solution'),
                             start: `top+=${viewport.h * .8} top`,
-                            end: `bottom-=${viewport.h * 1.2} bottom`,
+                            end: `bottom-=${viewport.h * .2} bottom`,
                             scrub: 1,
-                            anticipatePin: 1,
-                        }
+                            anticipatePin: 1
+                        },
                     })
 
                     this.tlStickSol
                         .fromTo($(this.el).find('.home-solution-main-transform'), { bottom: '100%' }, { bottom: '0%' })
                         .fromTo($(this.el).find('.home-solution-main-vid-halftone'), { height: '100%' }, { height: '0%' }, "<=0")
 
-                    this.tlStickMade = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: $(this.el).find('.home-made'),
-                            scrub: 1,
-                            start: `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.9)} top`,
-                            end: 'bottom bottom',
-                            anticipatePin: 1
-                        }
-                    })
+                    //notes: animation overlap card
 
-                    const space_accord_process = parseInt($(this.el).find('.home-made-body-item-size').css('width'))
-                    this.el.querySelectorAll('.home-made-body-item').forEach((item, index) => {
-                        if (($(this.el).find('.home-made-body-item').length - 1) > index) {
-                            this.tlStickMade.to(item, { width: space_accord_process, ease: 'none' })
-                            this.tlStickMade.to($(item).find('.home-made-body-item-desc'), {autoAlpha:0,ease:'none'}, '<')
-                        }
-                        else {
-                            let space_accord_remaining = viewport.w - (space_accord_process * (this.el.querySelectorAll('.home-made-body-item').length - 1))
-                            this.tlStickMade.to(item, { width: space_accord_remaining, ease: 'none' }, 0)
-                        }
-                    })
+                    // this.tlStickMade = gsap.timeline({
+                    //     scrollTrigger: {
+                    //         trigger: $(this.el).find('.home-made'),
+                    //         scrub: 1,
+                    //         start: `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.9)} top`,
+                    //         end: 'bottom bottom',
+                    //         anticipatePin: 1
+                    //     }
+                    // })
+
+                    // const space_accord_process = parseInt($(this.el).find('.home-made-body-item-size').css('width'))
+                    // this.el.querySelectorAll('.home-made-body-item').forEach((item, index) => {
+                    //     if (($(this.el).find('.home-made-body-item').length - 1) > index) {
+                    //         this.tlStickMade.to(item, { width: space_accord_process, ease: 'none' })
+                    //         this.tlStickMade.to($(item).find('.home-made-body-item-desc'), {autoAlpha:0,ease:'none'}, '<')
+                    //     }
+                    //     else {
+                    //         let space_accord_remaining = viewport.w - (space_accord_process * (this.el.querySelectorAll('.home-made-body-item').length - 1))
+                    //         this.tlStickMade.to(item, { width: space_accord_remaining, ease: 'none' }, 0)
+                    //     }
+                    // })
                 }
 
-                this.tlOverlap = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: this.el,
-                        start: `bottom-=${viewport.h * 1.5} bottom`,
-                        end: `bottom bottom`,
-                        scrub: 1
-                    },
-                })
-                this.tlOverlap
-                    .to('.home-made-body', { scale: 0.8, transformOrigin: 'top', autoAlpha: 0.6, duration: 1, ease: 'power2.in' })
-                    .to('.home-made-title', { scale: .95, transformOrigin: 'bottom', autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
-                    .to('.home-made-map', { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
+                // this.tlOverlap = gsap.timeline({
+                //     scrollTrigger: {
+                //         trigger: this.el,
+                //         start: `bottom-=${viewport.h * 2} bottom`,
+                //         end: `bottom bottom`,
+                //         scrub: 1
+                //     },
+                // })
+                // this.tlOverlap
+                //     .to('.home-made-body', { scale: 0.8, transformOrigin: 'top', autoAlpha: 0.6, duration: 1, ease: 'power2.in' })
+                //     .to('.home-made-title', { scale: .95, transformOrigin: 'bottom', autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
+                //     .fromTo('.home-made-map', { scale: 1, autoAlpha: 1 }, { scale: 1.05, autoAlpha: 0.6, duration: 1, ease: 'power2.in' }, "<=0")
             }
             horizontalLayout(sections) {
                 let sizeScroller = $(this.el).find('.solution-scroller').height();
                 gsap.set(this.el.querySelector('.home-solution-inner'), { display: 'flex' })
-
                 ScrollTrigger.getAll().forEach(trigger => {
                     if (trigger.progress === 0) {
                         trigger.refresh();
                     }
                 });
 
+                let fadeIn = false;
                 this.tlHorizontal = gsap.timeline({
                     scrollTrigger: {
                         trigger: $(this.el).find('.solution-scroller'),
                         start: `top+=${viewport.h * 1.5} top`,
-                        end: `bottom+=${viewport.h * 1.3} bottom`,
+                        end: `bottom+=${viewport.h * 1.5} bottom`,
                         scrub: 1,
                         anticipatePin: 1,
-                        snap: 1
+                        onUpdate: (self) => {
+                            if (self.progress > 0.5 && !fadeIn) {
+                                fadeIn = true;
+                                if (viewport.w > 991) {
+                                    this.tlFadeHead.play();
+                                    this.tlFadeBody.play();
+                                }
+                            }
+                        }
                     }
                 })
 
@@ -1361,50 +1535,6 @@ const script = () => {
                 if (this.tlOverlap) {
                     this.tlOverlap.kill()
                 }
-            }
-        },
-        Benefit: class extends TriggerSetup {
-            constructor() {
-                super();
-                this.el = null;
-            }
-            trigger(data) {
-                this.el = data.next.container.querySelector('.home-benefit-wrap');
-                super.setTrigger(this.el, this.onTrigger.bind(this));
-            }
-            onTrigger() {
-                this.animationReveal();
-            }
-            animationReveal() {
-                new MasterTimeline({
-                    triggerInit: this.el,
-                    scrollTrigger: {
-                        trigger: this.el,
-                        start: `top top+=50%`
-                    },
-                    allowMobile: true,
-                    tweenArr: [
-                        new FadeSplitText({ el: $(this.el).find('.home-benefit-label').get(0) }),
-                        new FadeSplitText({ el: $(this.el).find('.home-benefit-title').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.home-benefit-btn').get(0) })
-                    ]
-                })
-                new MasterTimeline({
-                    triggerInit: this.el,
-                    scrollTrigger: {
-                        trigger: this.el,
-                        start: `top top+=50%`
-                    },
-                    allowMobile: true,
-                    tweenArr: [
-                        ...Array.from($(this.el).find('.home-benefit-item')).flatMap((el, idx) => [
-                            new ScaleLine({ el: $(el).find('.line').get(0) }),
-                            new FadeIn({ el: $(el).find('.home-benefit-item-ic').get(0) }),
-                            new FadeSplitText({ el: $(el).find('.home-benefit-item-content').get(0) })
-                        ])
-                    ],
-                    stagger: .08
-                })
             }
         },
         News: class extends TriggerSetup {
@@ -1502,27 +1632,26 @@ const script = () => {
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
 
-                if (!isInViewport(this.el)) {
-                    this.tlTriggerEnter = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: this.el,
-                            start: 'top bottom+=50%',
-                            end: 'bottom top',
-                            once: true,
-                            onEnter: () => this.tlEnter.play(),
-                            onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
-                        }
-                    })
-                }
+                this.tlTriggerEnter = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => this.tlEnter.play(),
+                        onEnterBack: () => this.tlEnter.play(),
+                        onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                    }
+                })
                 this.animationReveal(this.tlEnter);
             }
             playOnce() {
                 this.tlOnce.play();
             }
             playEnter() {
-                if (isInViewport(this.el)) {
-                    this.tlEnter.play();
-                }
+                // if (isInViewport(this.el)) {
+                //     this.tlEnter.play();
+                // }
             }
             dragTransform() {
                 const scanInner = $(this.el).find('.prod-hero-decor-scan').get(0);
@@ -1544,8 +1673,7 @@ const script = () => {
                 let hasMoved = false;
 
                 const handleOnDown = (e) => {
-                    if (!$(this.el).find('.prod-hero-decor-scan-drag:hover').length) return;
-
+                    if (viewport.w > 991 && !$(this.el).find('.prod-hero-decor-scan-drag-inner:hover').length) return;
                     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                     track.dataset.mouseDownAt = clientX - scanInner.getBoundingClientRect().left;
                     track.dataset.prevPercentage = track.dataset.percentage || -50;
@@ -1589,14 +1717,14 @@ const script = () => {
                     }
                 };
 
-                window.onmousedown = (e) => handleOnDown(e);
-                window.ontouchstart = (e) => handleOnDown(e);
+                scanInner.onmousedown = (e) => handleOnDown(e);
+                scanInner.ontouchstart = (e) => handleOnDown(e);
 
-                window.onmouseup = () => handleOnUp();
-                window.ontouchend = () => handleOnUp();
+                scanInner.onmouseup = () => handleOnUp(e);
+                scanInner.ontouchend = () => handleOnUp(e);
 
-                window.onmousemove = (e) => handleOnMove(e);
-                window.ontouchmove = (e) => handleOnMove(e);
+                scanInner.onmousemove = (e) => handleOnMove(e);
+                scanInner.ontouchmove = (e) => handleOnMove(e);
 
                 this.rafID = requestAnimationFrame(animate);
             }
@@ -1660,8 +1788,52 @@ const script = () => {
                     allowMobile: true,
                     tweenArr: [
                         new FadeSplitText({ el: $(this.el).find('.prod-solution-desc-txt').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.prod-solution-btn').get(0), delay: "<=.3" })
+                        new FadeIn({ el: $(this.el).find('.prod-solution-btn').get(0), delay: "<=50%" })
                     ]
+                })
+            }
+        },
+        Benefit: class extends TriggerSetup {
+            constructor() {
+                super();
+                this.el = null;
+            }
+            trigger(data) {
+                this.el = data.next.container.querySelector('.about-benefit-wrap');
+                super.setTrigger(this.el, this.onTrigger.bind(this));
+            }
+            onTrigger() {
+                this.animationReveal();
+            }
+            animationReveal() {
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: `top top+=50%`
+                    },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.about-benefit-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.about-benefit-title').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.about-benefit-btn').get(0) })
+                    ]
+                })
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: `top top+=50%`
+                    },
+                    allowMobile: true,
+                    tweenArr: [
+                        ...Array.from($(this.el).find('.about-benefit-item')).flatMap((el, idx) => [
+                            new ScaleLine({ el: $(el).find('.line').get(0) }),
+                            new FadeIn({ el: $(el).find('.about-benefit-item-ic').get(0) }),
+                            new FadeSplitText({ el: $(el).find('.about-benefit-item-content').get(0) })
+                        ])
+                    ],
+                    stagger: .08
                 })
             }
         },
@@ -1669,14 +1841,15 @@ const script = () => {
             constructor() {
                 super();
                 this.el = null;
+                this.slider = null;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.prod-hiw-wrap');
                 super.setTrigger(this.el, this.onTrigger.bind(this));
             }
             onTrigger() {
-                this.animationReveal();
                 this.interact();
+                this.animationReveal();
             }
             interact() {
                 this.cardSlide();
@@ -1697,89 +1870,189 @@ const script = () => {
                     scrollTrigger: { trigger: $(this.el).find('.prod-hiw-main') },
                     allowMobile: true,
                     tweenArr: [
-                        new FadeIn({ el: $(this.el).find('.prod-hiw-main-control').get(0) }),
                         new FadeIn({ el: $(this.el).find('.prod-hiw-main-active').get(0) }),
                         new FadeIn({ el: $(this.el).find('.home-hiw-main-decor').get(0) }),
                         ...Array.from($(this.el).find('.prod-hiw-main-item')).flatMap((el, idx) => ([
-                            new FadeIn({ el: $(el).find('.prod-hiw-main-item-graphic') }),
-                            new FadeSplitText({ el: $(el).find('.prod-hiw-main-item-title').get(0) }),
-                        ]))
-                    ]
-                })
-                new MasterTimeline({
-                    triggerInit: this.el,
-                    scrollTrigger: { trigger: $(this.el).find('.prod-hiw-main-ruler'), start: 'top 85%' },
-                    allowMobile: true,
-                    tweenArr: [
-                        new FadeIn({ el: $(this.el).find('.prod-hiw-main-ruler').get(0) }),
+                            idx !== 0 && new FadeIn({ el: $(el).find('.prod-hiw-main-item-inner') }),
+                            idx !== 0 && new FadeSplitText({ el: $(el).find('.prod-hiw-main-item-title').get(0) }),
+                        ])),
+                        new FadeIn({ el: $(this.el).find('.prod-hiw-main-ruler').get(0), onComplete: () => {
+                            this.activeIndex(0);
+                        } }),
                         new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-title').get(0) }),
                         new FadeSplitText({ el: $(this.el).find('.prod-hiw-main-content-item.active .prod-hiw-main-content-desc').get(0) }),
+                        ...Array.from($(this.el).find('.prod-hiw-main-control-item')).flatMap((el, idx) => new FadeIn({ el: $(el).get(0) }))
                     ]
                 })
             }
             cardSlide() {
-                const activeIndex = (idx) => {
-                    $(this.el).find('.prod-hiw-main-item').removeClass('active');
-                    $(this.el).find('.prod-hiw-main-item').eq(idx).addClass('active');
-
-                    $(this.el).find('.prod-hiw-main-content-item').removeClass('active');
-                    $(this.el).find('.prod-hiw-main-content-item').eq(idx).addClass('active');
-                }
                 $(this.el).find(".prod-hiw-main-list").addClass('keen-slider');
-                $(this.el).find(".prod-hiw-main-item").addClass('keen-slider__slide');
+                $(this.el).find(".prod-hiw-main-list > *").addClass('keen-slider__slide');
+
                 gsap.set($(this.el).find('.prod-hiw-main-ruler-inner'), { '--progress': 0 });
-                $(this.el).find('.prod-hiw-main-ruler-inner').width($(this.el).find('.prod-hiw-main-ruler-inner').width() + $(this.el).find(".prod-hiw-main-list").width() - parseRem(80));
+                let cloneRuler = $(this.el).find('.prod-hiw-ruler-list').clone();
+                $(this.el).find('.prod-hiw-main-ruler-inner').append(cloneRuler);
                 let rulerW = $(this.el).find('.prod-hiw-main-ruler-inner').width();
+
+                const animationSlide = {
+                    start: () => {
+                        gsap.to($(this.el).find('.prod-hiw-main-active'), { duration: .5, opacity: 0, filter: 'blur(2px)', scale: .98 });
+                        gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(0.3)' });
+                        gsap.to($(this.el).find('.prod-hiw-main-ruler-prog'), { scaleY: .9, duration: 1.5, opacity: .5 });
+                        gsap.to($(this.el).find('.prod-hiw-main-ruler-inner'), { duration: 1.5, filter: 'blur(2px)' });
+                    },
+                    end: () => {
+                        gsap.to($(this.el).find('.prod-hiw-main-active'), { duration: .5, opacity: 1, filter: 'blur(0px)', scale: 1, overwrite: true, clearProps: 'all' });
+                        gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(1.5)',overwrite: true, clearProps: 'all'  });
+                        gsap.to($(this.el).find('.prod-hiw-main-ruler-prog'), { scaleY: 1, duration: 1, opacity: 1, overwrite: true, clearProps: 'all'  });
+                        gsap.to($(this.el).find('.prod-hiw-main-ruler-inner'), { duration: 1, filter: 'blur(0px)', overwrite: true });
+                    },
+                }
+                const onSlide = () => {
+                    setTimeout(animationSlide.start, 50);
+                    setTimeout(animationSlide.end, 300);
+                }
 
                 let slider = new KeenSlider($(this.el).find(".prod-hiw-main-list").get(0), {
                     slides: {
-                        perView: 3,
-                        spacing: parseRem(215),
-                        origin: "center"
+                        perView: "auto",
+                        spacing: parseRem(6)
                     },
                     defaultAnimation: {
                         duration: 1200,
                     },
+                    loop: true,
+                    mode: "snap",
+                    breakpoints: {
+                        "(min-width: 768px)": {
+                            slides: {
+                                perView: "auto",
+                                spacing: parseRem(43)
+                            },
+                        },
+                        "(min-width: 992px)": {
+                            slides: {
+                                perView: "auto",
+                                spacing: parseRem(215)
+                            },
+                        },
+                    },
                     rubberband: false,
                     created: () => {
                         $(this.el).find(".prod-hiw-main-list").css('grid-column-gap', 0);
-                        activeIndex(0);
+                        setTimeout(() => this.activeIndex(-1), 500);
+                    },
+                    slideChanged: (slider) => {
+                        // console.log('rel', slider.track.details.rel)
+                        // console.log('abs', slider.track.details.abs)
+
+                        // const total = slider.track.details.slides.length;
+                        // if (slider.track.details.abs === total * 2) {
+                        //     slider.moveToIdx(0);
+                        // }
                     },
                     detailsChanged: (slider) => {
                         const details = slider.track.details;
-                        const current = details.abs;
+                        const current = details.rel;
+                        const total = details.slides.length;
                         let progress = slider.track.details.progress;
-
-                        activeIndex(current);
+                        this.activeIndex(current);
                         let progressX = ((progress * -50) * rulerW / 100) + (progress * parseRem(58));
                         let currentX = gsap.getProperty($(this.el).find('.prod-hiw-main-ruler-inner').get(0), 'x')
                         gsap.quickSetter($(this.el).find('.prod-hiw-main-ruler-inner'), 'x', 'px')(lerp(currentX, progressX, 0.25));
 
                         $(this.el).find('.slide-control.next').toggleClass('disable', current === details.maxIdx);
                         $(this.el).find('.slide-control.prev').toggleClass('disable', current === details.minIdx);
+
+                        (viewport.w <= 767) && gsap.set($(this.el).find(".prod-hiw-main-progress-inner"), { scaleX: `${((current + 1) / total) * 100}%` })
                     },
                     dragStarted: (slider) => {
-                        gsap.to($(this.el).find('.prod-hiw-main-active'), { duration: .5, opacity: 0, filter: 'blur(2px)', scale: .98 });
-                        gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(0.3)' });
-                        gsap.to($(this.el).find('.prod-hiw-main-ruler-prog'), { scaleY: .9, duration: 1.5, opacity: .5 });
-                        gsap.to($(this.el).find('.prod-hiw-main-ruler-inner'), { duration: 1.5, filter: 'blur(2px)' });
+                        animationSlide.start();
                         $(this.el).find('.prod-hiw-main-slide').addClass('on-grabbing');
-
                     },
                     dragEnded: (slider) => {
-                        gsap.to($(this.el).find('.prod-hiw-main-active'), { duration: .5, opacity: 1, filter: 'blur(0px)', scale: 1, overwrite: true, clearProps: 'all' });
-                        gsap.to($(this.el).find('.prod-hiw-main-active-ic'), { duration: 1.5, filter: 'contrast(1.5)',overwrite: true, clearProps: 'all'  });
-                        gsap.to($(this.el).find('.prod-hiw-main-ruler-prog'), { scaleY: 1, duration: 1, opacity: 1, overwrite: true, clearProps: 'all'  });
-                        gsap.to($(this.el).find('.prod-hiw-main-ruler-inner'), { duration: 1, filter: 'blur(0px)', overwrite: true });
+                        animationSlide.end();
                         $(this.el).find('.prod-hiw-main-slide').removeClass('on-grabbing');
-                    }
-                })
+                    },
+                },
+                [(slider) => {
+                    let timeout
+                    let isAutoplay = false;
 
-                $(this.el).find('.prod-hiw-main-item').on('click', function () {
-                    slider.moveToIdx($(this).index());
-                })
-                $(this.el).find('.slide-control.next').on('click', slider.next);
-                $(this.el).find('.slide-control.prev').on('click', slider.prev);
+                    function nextTimeout() {
+                        clearTimeout(timeout)
+                        if (!isAutoplay) return;
+
+                        timeout = setTimeout(() => {
+                            slider.next();
+                            onSlide();
+                        }, 2900)
+                    }
+
+                    const startAutoplay = () => {
+                        isAutoplay = true;
+                        nextTimeout();
+                    }
+
+                    const stopAutoplay = () => {
+                        isAutoplay = false;
+                        clearTimeout(timeout);
+                    }
+                    // slider.on("created", () => {
+                    //     // slider.container.onmouseover = () => stopAutoplay();
+                    //     // slider.container.ontouchmove = () => stopAutoplay();
+
+                    //     // slider.container.onmouseout = () => startAutoplay();
+                    //     // slider.container.ontouchend = () => startAutoplay();
+                    //     nextTimeout();
+                    // })
+                    // slider.on("dragStarted", stopAutoplay);
+                    // slider.on("animationEnded", nextTimeout);
+                    // slider.on("updated", nextTimeout);
+
+                    // slider.startAutoplay = startAutoplay;
+                    // slider.stopAutoplay = stopAutoplay;
+                }]
+                )
+                this.slider = slider;
+
+                $(this.el).find('.slide-control.next').on('click', function() {
+                    slider.next();
+                    onSlide();
+                });
+                $(this.el).find('.slide-control.prev').on('click', function() {
+                    slider.prev();
+                    onSlide();
+                });
+
+                if (viewport.w <= 767) {
+                    const handleOnDown = (e) => {
+                        const startX = e.clientX;
+                        const startY = e.clientY;
+
+                        const handleOnMove = (e) => {
+                            const deltaX = e.clientX - startX;
+                            const deltaY = e.clientY - startY;
+
+                            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                                if (deltaX > 0) {
+                                    slider.prev()
+                                } else {
+                                    slider.next()
+                                }
+                            }
+                        };
+                        $(this.el).find('.prod-hiw-main-content').get(0).ontouchmove = (e) => handleOnMove(e.touches[0]);
+                    };
+                    $(this.el).find('.prod-hiw-main-content').get(0).ontouchstart = (e) => handleOnDown(e.touches[0]);
+                }
+            }
+            activeIndex(idx) {
+                $(this.el).find('.prod-hiw-main-item').removeClass('active');
+                $(this.el).find(`.prod-hiw-main-item.step-${idx + 1}`).addClass('active');
+                if (idx < 0) return;
+                $(this.el).find('.prod-hiw-main-content-item').removeClass('active');
+                $(this.el).find('.prod-hiw-main-content-item').eq(idx).addClass('active');
             }
         },
         Compare: class extends TriggerSetup {
@@ -1792,6 +2065,7 @@ const script = () => {
                 super.setTrigger(this.el, this.onTrigger.bind(this));
             }
             onTrigger() {
+                this.interact();
                 this.animationReveal();
             }
             animationReveal() {
@@ -1830,6 +2104,33 @@ const script = () => {
                         ]))
                     ],
                     stagger: 0.05
+                })
+            }
+            interact() {
+                if (viewport.w <= 767) {
+                    this.cardSlide();
+                }
+            }
+            cardSlide() {
+                $(this.el).find(".prod-compare-table-body").addClass('keen-slider');
+                $(this.el).find(".prod-compare-table-item").addClass('keen-slider__slide');
+                $(this.el).find(".prod-compare-table-body").css('grid-column-gap', 0);
+                let slider = new KeenSlider($(this.el).find(".prod-compare-table-body").get(0), {
+                    slides: {
+                        perView: 'auto',
+                        spacing: parseRem(20),
+                    },
+                    defaultAnimation: {
+                        duration: 1000
+                    },
+                    dragSpeed: 1.2,
+                    rubberband: false,
+                    detailsChanged: (slider) => {
+                        const details = slider.track.details;
+                        const current = details.rel;
+                        const total = details.slides.length;
+                        (viewport.w <= 767) && gsap.set($(this.el).find(".prod-compare-progress-inner"), { scaleX: `${((current + 1) / total) * 100}%` })
+                    }
                 })
             }
         },
@@ -1872,27 +2173,26 @@ const script = () => {
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
 
-                if (!isInViewport(this.el)) {
-                    this.tlTriggerEnter = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: this.el,
-                            start: 'top bottom+=50%',
-                            end: 'bottom top',
-                            once: true,
-                            onEnter: () => this.tlEnter.play(),
-                            onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
-                        }
-                    })
-                }
+                this.tlTriggerEnter = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => this.tlEnter.play(),
+                        onEnterBack: () => this.tlEnter.play(),
+                        onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden'),
+                    }
+                })
                 this.animationReveal(this.tlEnter);
             }
             playOnce() {
                 this.tlOnce.play();
             }
             playEnter() {
-                if (isInViewport(this.el)) {
-                    this.tlEnter.play();
-                }
+                // if (isInViewport(this.el)) {
+                //     this.tlEnter.play();
+                // }
             }
             animationReveal(timeline) {
                 new MasterTimeline({
@@ -1952,8 +2252,8 @@ const script = () => {
                         scrollTrigger: { trigger: $(el) },
                         allowMobile: true,
                         tweenArr: [
-                            new ScaleInset({ el: $(el).find('.about-story-item-img-inner').get(0) }),
-                            new FadeSplitText({ el: $(el).find('.about-story-item-content').get(0) })
+                            new ScaleInset({ el: $(el).find('.about-story-item-img').get(0), elInner: $(el).find('.about-story-item-img-inner').get(0) }),
+                            new FadeSplitText({ el: $(el).find('.about-story-item-content').get(0),  })
                         ]
                     })
                 })
@@ -1976,17 +2276,15 @@ const script = () => {
                         duration: 1000
                     },
                     dragSpeed: 1.2,
-                },
-                [slider => {
-                    slider.on("detailsChanged", () => {
+                    detailsChanged: (slider) => {
                         const details = slider.track.details;
                         const current = details.rel + 1;
                         const total = details.slides.length;
                         const progress = current / (total );
 
                         $(this.el).find(".about-story-progress-inner").css('width', `${progress * 100}%`);
-                    });
-                }])
+                    },
+                })
             }
         },
         Vision: class extends TriggerSetup {
@@ -2029,14 +2327,17 @@ const script = () => {
                 super();
                 this.el = null;
                 this.tlOverlap = null;
+                this.currentIdx = 0;
             }
             trigger(data) {
                 this.el = data.next.container.querySelector('.about-team-wrap');
                 super.setTrigger(this.el, this.onTrigger.bind(this));
             }
             onTrigger() {
-                this.interact();
                 this.animationReveal();
+                if (viewport.w > 767) {
+                    this.animationScrub();
+                }
             }
             animationReveal() {
                 new MasterTimeline({
@@ -2050,15 +2351,6 @@ const script = () => {
                         new FadeIn({ el: $(this.el).find('.about-team-btn').get(0) })
                     ]
                 })
-                new MasterTimeline({
-                    triggerInit: this.el,
-                    scrollTrigger: { trigger: $(this.el).find('.about-team-info-avt'), start: 'top 80%' },
-                    allowMobile: true,
-                    tweenArr: [
-                        ...Array.from($(this.el).find('.about-team-info-avt-item')).flatMap((item, idx) => new FadeIn({ el: $(item).get(0) })),
-                        new FadeIn({ el: $(this.el).find('.about-team-info-avt-active-wrap').get(0) })
-                    ]
-                })
 
                 if (viewport.w > 767) {
                     new MasterTimeline({
@@ -2066,6 +2358,8 @@ const script = () => {
                         scrollTrigger: { trigger: $(this.el).find('.about-team-main') },
                         allowMobile: true,
                         tweenArr: [
+                            ...Array.from($(this.el).find('.about-team-info-avt-item')).flatMap((item, idx) => new FadeIn({ el: $(item).get(0) })),
+                            new FadeIn({ el: $(this.el).find('.about-team-info-avt-active-wrap').get(0) }),
                             new ScaleInset({ el: $(this.el).find('.about-team-avt-item-inner').eq(0).get(0) }),
                             new FadeSplitText({ el: $(this.el).find('.about-team-info-item.active .about-team-info-name').get(0) }),
                             new FadeSplitText({ el: $(this.el).find('.about-team-info-item.active .about-team-info-role').get(0) }),
@@ -2099,8 +2393,23 @@ const script = () => {
                     ))
                 }
             }
-            interact() {
-                let itemLength = $(this.el).find('.about-team-info-avt-item').length;
+            animationScrub() {
+                const itemLength = $(this.el).find('.about-team-info-item').length;
+                const step = 1 / itemLength;
+                const breakPoints = Array.from({ length: itemLength + 1 }, (_, index) => parseFloat((index * step).toPrecision(2)));
+
+                this.tlActive = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el),
+                        start: 'top top',
+                        end: 'bottom bottom',
+                        scrub: 1,
+                        onUpdate: (self) => {
+                            onUpdateProgress(self.progress);
+                        }
+                    }
+                })
+
                 const activeIndex = (index) => {
                     $(this.el).find('.about-team-avt-item').eq(index).addClass('active').siblings().removeClass('active');
                     $(this.el).find('.about-team-info-item').eq(index).addClass('active').siblings().removeClass('active');
@@ -2109,13 +2418,31 @@ const script = () => {
                     gsap.to($(this.el).find('.about-team-info-avt-active-ic'), { filter: 'contrast(0.3)', duration: .4, clearProps: 'all' });
                     $(this.el).find('.about-team-info-avt-item').eq(index).addClass('active').siblings().removeClass('active');
                     setTimeout(() => {
-                        $(this.el).find('.about-team-info-avt-active').css(`grid-template-${viewport.w > 991 ? 'columns' : 'rows'}`, `${index}fr 1fr ${itemLength - index - 1}fr`)
+                        $(this.el).find('.about-team-info-avt-active').css('grid-template-rows', `${index}fr 1fr ${itemLength - index - 1}fr`)
                     }, 100);
                 }
                 activeIndex(0);
+
+                const scrollTop = window.scrollY || window.pageYOffset;
+                const rectTop = $(this.el).get(0).getBoundingClientRect().top;
                 $(this.el).find('.about-team-info-avt-item').on('click', function () {
-                    activeIndex($(this).index());
+                    let viewportStick = viewport.w > 991 ? 1 : .25;
+                    smoothScroll.lenis.scrollTo((scrollTop + rectTop) + (viewport.h * viewportStick * $(this).index()));
                 })
+
+                const onUpdateProgress = (progress) => {
+                    for (let i = 0; i < breakPoints.length - 1; i++) {
+                        const startPoint = breakPoints[i];
+                        const endPoint = breakPoints[i + 1];
+
+                        if (progress >= startPoint && progress < endPoint) {
+                            if (this.currentIdx !== i) {
+                                this.currentIdx = i;
+                                activeIndex(this.currentIdx);
+                            };
+                        }
+                    }
+                }
             }
         },
         News: class extends TriggerSetup {
@@ -2202,7 +2529,7 @@ const script = () => {
                 $(this.el).find(".about-job-main-list").addClass('keen-slider');
                 $(this.el).find(".about-job-main-list").css('grid-column-gap', 0);
                 $(this.el).find(".about-job-main-item").addClass('keen-slider__slide');
-                let slider = new KeenSlider(".about-job-main-list", {
+                let slider = new KeenSlider($(this.el).find(".about-job-main-list").get(0), {
                     slides: {
                         perView: 'auto',
                         spacing: parseRem(20),
@@ -2283,9 +2610,9 @@ const script = () => {
             initInputValueCheck(selector = 'input') {
                 $(document).on('input', selector, function () {
                     if ($(this).val().trim() !== '') {
-                        $(this).addClass('has-value');
+                        $(this).addClass('filled');
                     } else {
-                        $(this).removeClass('has-value');
+                        $(this).removeClass('filled');
                     }
                 });
             }
@@ -2362,10 +2689,62 @@ const script = () => {
                 $('.contact-hero-form .overlay-bg').on('click', function(){
                     $('.contact-hero-form-success').removeClass('active');
                 })
-                $('.contact-hero-form-input[type="tel"]').bind('change keydown keyup', function (e) {
-                    let inputVal = $(this).val();
-                    $(this).val(inputVal.replace(/\D/g, ''));
+                $(`.contact-hero-form-input-wrap .contact-hero-form-input`).on('focus', function (e) {
+                    let inputWrap = $(this).closest('.contact-hero-form-input-wrap').addClass('active');
+                    inputWrap.addClass('active');
+                    if (!$(inputWrap).find('.iti__country-list').hasAttr('data-lenis-prevent')) {
+                        $(inputWrap).find('.iti__country-list').attr('data-lenis-prevent', '');
+                    }
                 })
+                $(`.contact-hero-form-input-wrap .contact-hero-form-input`).on('blur', function (e) {
+                    if ($(this).hasAttr('ms-code-phone-number')) {
+                        if (!$(`.contact-hero-form-input-wrap .iti__flag-container:hover`).length) {
+                            $(this).closest('.contact-hero-form-input-wrap').removeClass('active');
+                            $(this).closest('.contact-hero-form-input-wrap').toggleClass('filled', $(this).val() != '');
+                        }
+                    }
+                    else {
+                        $(this).closest('.contact-hero-form-input-wrap').removeClass('active');
+                        $(this).closest('.contact-hero-form-input-wrap').toggleClass('filled', $(this).val() != '');
+                    }
+                })
+                // $('.contact-hero-form-input[type="tel"]').bind('change keydown keyup', function (e) {
+                //         let inputVal = $(this).val();
+                //         $(this).val(inputVal.replace(/\D/g, ''));
+                // })
+                $(`.contact-hero-form-input[ms-code-phone-number]`).each(function() {
+                    let input = this;
+                    let preferredCountries = $(input).attr('ms-code-phone-number').split(',');
+
+                    let iti = window.intlTelInput(input, {
+                        preferredCountries: preferredCountries,
+                        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+                    });
+
+                    $.get("https://ipinfo.io", function(response) {
+                        var countryCode = response.country;
+                        iti.setCountry(countryCode);
+                    }, "jsonp");
+
+                    input.addEventListener('change', formatPhoneNumber);
+                    input.addEventListener('keyup', formatPhoneNumber);
+
+                    // Restrict input to digits and the plus sign
+                    input.addEventListener('input', function() {
+                        this.value = this.value.replace(/[^\d+]/g, '');
+                    });
+
+                    function formatPhoneNumber() {
+                        let formattedNumber = iti.getNumber(intlTelInputUtils.numberFormat.INTERNATIONAL);
+                        input.value = formattedNumber;
+                    }
+
+                    // var form = $(input).closest('form');
+                    // form.submit(function() {
+                    //     var formattedNumber = iti.getNumber(intlTelInputUtils.numberFormat.INTERNATIONAL);
+                    //     input.value = formattedNumber;
+                    // });
+                });
                 const formInner = $('.contact-hero-form-inner');
                 const successBox = $('.contact-hero-form-success');
                 formSubmitEvent.init({
@@ -2383,6 +2762,69 @@ const script = () => {
                     }
                 })
 
+
+                const hubspot = {
+                    portalId: 145687733,
+                    formId: "69790463-8651-4e07-ad64-45f9c23549e9",
+                    fields: [
+                        { name: 'fullname', value: (data) => data['Name'] },
+                        { name: 'phone', value: (data) => data['Phone'] },
+                        { name: 'email', value: (data) => data['Email'] },
+                        { name: 'subject', value: (data) => data['Subject'] },
+                        { name: 'message', value: (data) => data['Message'] }
+                    ]
+                }
+                const { portalId, formId, fields } = hubspot;
+                let url = `https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${formId}`;
+                const mapField = (data) => {
+                    if (!fields.length) return [];
+
+                    const result = fields.map((field) => {
+                        const { name, value } = field;
+                        if (!value) {
+                            return {
+                                name,
+                                value: data[name] || ""
+                            }
+                        }
+                        else {
+                            const getValue = value(data);
+                            return {
+                                name,
+                                value: getValue || ''
+                            }
+                        }
+                    })
+                    return result;
+                }
+                $(this.el).find("#contact-form").on('submit', function (e) {
+                    const data = mapFormToObject(e.target);
+                    const mappedFields = mapField(data);
+                    const dataSend = {
+                        fields: mappedFields,
+                        context: {
+                            pageUri: window.location.href,
+                            pageName: 'Contact page'
+                        }
+                    };
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: JSON.stringify(dataSend),
+                        dataType: 'json',
+                        headers: {
+                            accept: 'application/json',
+                            'Access-Control-Allow-Origin': '*',
+                        },
+                        contentType: 'application/json',
+                        success: function (response) {
+                            console.log(response);
+                        },
+                        error: function (xhr, resp, text) {
+                            console.log(xhr, resp, text)
+                        }
+                    });
+                })
             }
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
@@ -2395,26 +2837,25 @@ const script = () => {
                     paused: true
                 })
 
-                if (!isInViewport(this.el)) {
-                    this.tlTriggerEnter = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: this.el,
-                            start: 'top bottom+=50%',
-                            end: 'bottom top',
-                            once: true,
-                            onEnter: () => this.tlEnter.play(),
-                            onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
-                        }
-                    })
-                }
+                this.tlTriggerEnter = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => this.tlEnter.play(),
+                        onEnterBack: () => this.tlEnter.play(),
+                        onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                    }
+                })
             }
             playOnce() {
                 this.tlOnce.play();
             }
             playEnter() {
-                if (isInViewport(this.el)) {
-                    this.tlEnter.play();
-                }
+                // if (isInViewport(this.el)) {
+                //     this.tlEnter.play();
+                // }
             }
             destroy() {
                 if (this.tlOnce) {
@@ -2474,26 +2915,25 @@ const script = () => {
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
 
-                if (!isInViewport(this.el)) {
-                    this.tlTriggerEnter = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: this.el,
-                            start: 'top bottom+=50%',
-                            end: 'bottom top',
-                            once: true,
-                            onEnter: () => this.tlEnter.play(),
-                            onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
-                        }
-                    })
-                }
+                this.tlTriggerEnter = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => this.tlEnter.play(),
+                        onEnterBack: () => this.tlEnter.play(),
+                        onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                    }
+                })
             }
             playOnce() {
                 this.tlOnce.play();
             }
             playEnter() {
-                if (isInViewport(this.el)) {
-                    this.tlEnter.play();
-                }
+                // if (isInViewport(this.el)) {
+                //     this.tlEnter.play();
+                // }
             }
             destroy() {
                 if (this.tlOnce) {
@@ -2520,7 +2960,9 @@ const script = () => {
             onTrigger() {
                 this.animationReveal();
                 this.animationScrub();
-                this.createTOC();
+                if (viewport.w > 991) {
+                    this.createTOC();
+                }
             }
             animationReveal() {
 
@@ -2604,7 +3046,7 @@ const script = () => {
                 }
                 $('.sub-content-toc').height() >= viewport.h && $('.sub-content-toc-list-inner').attr('data-lenis-prevent', '');
             }
-        }
+        },
     }
     class PageManager {
         constructor(page) {

@@ -227,29 +227,33 @@ class RevealTextReset  {
     }
 }
 class FadeSplitText {
-    constructor({ el, delay, isDisableRevert, ...props }) {
+    constructor({ el, delay, splitType, isDisableRevert, ...props }) {
         if (!el || el.textContent === '') return;
         this.DOM = { el: el };
         this.delay = delay;
         this.textSplit = null;
+        this.splitType = splitType || 'words';
         let animation;
         document.fonts.ready.then(() => {
             this.textSplit = SplitText.create(this.DOM.el, {
-                type: "lines words",
+                type: this.splitType === 'words' ? "lines words" : 'lines',
                 mask: "lines",
                 autoSplit: true,
                 onSplit: (self) => {
-                    gsap.set(self.words, { autoAlpha: 0, yPercent: 100 });
-                    animation = gsap.to(self.words, {
+                    gsap.set(self[this.splitType], { autoAlpha: 0, yPercent: 100 });
+                    animation = gsap.to(self[this.splitType], {
                         autoAlpha: 1,
                         yPercent: 0,
-                        stagger: 0.02,
+                        stagger: this.splitType === 'words' ? 0.02 : 0.1,
                         duration: .8,
                         ease: 'power2.out',
                         onComplete: () => {
                             if (!isDisableRevert) {
                                 self.revert();
                                 convertHyphen(self.elements[0]);
+                            }
+                            if (this.DOM.el.querySelectorAll('.txt-strike').length !== 0) {
+                                this.DOM.el.querySelectorAll('.txt-strike').forEach(element => element.classList.add('active'));
                             }
                         },
                         ...props
@@ -354,7 +358,9 @@ class ScaleLine {
 }
 class ScaleInset {
     constructor({el, elInner, delay, duration, isDisableRevert }) {
-        this.DOM = { el: el, elInner: elInner || el?.querySelector('img') };
+        this.DOM = {
+            el: el, elInner: elInner || el?.querySelector('img')
+    };
         this.delay = delay;
         this.borderRad = gsap.getProperty(this.DOM.el, 'border-radius');
         this.animation = gsap

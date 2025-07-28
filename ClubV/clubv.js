@@ -105,6 +105,7 @@ const mainScript = () => {
         if (historyTraversal) {
             $('.header-menu-inner').removeAttr('style');
             $('.header-menu-inner').removeClass('active'); 
+            $('.header-lang').removeClass('active')
         }
     })
     window.addEventListener('popstate', function(event) {
@@ -789,29 +790,15 @@ const mainScript = () => {
             super.setTrigger(this.setup.bind(this));
         }
         setup() {
+            let linkInner = $('.home-featured-view-all');
+            let dataLinkType = linkInner.attr('data-link-type');
+            let linkCurrent = linkInner.attr('href');
+            linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
             let tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.home-featured',
                     start: "top top+=55%",
                 },
-            })
-            $('.home-featured-right-item').each((idx, el) => {
-                let linkInner = $(el).find('.home-featured-right-item-inner')
-                let dataLinkType = linkInner.attr('data-link-type');
-                let linkCurrent = linkInner.attr('href');
-                linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
-            })
-            $('.home-featured-left-inner').each((idx, el) => {
-                let linkInner = $(el).find('.home-featured-left-inner-link')
-                let dataLinkType = linkInner.attr('data-link-type');
-                let linkCurrent = linkInner.attr('href');
-                linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
-            })
-            $('.home-featured-img-item').each((idx, el) => {
-                let linkInner = $(el).find('.home-featured-img-item-inner')
-                let dataLinkType = linkInner.attr('data-link-type');
-                let linkCurrent = linkInner.attr('href');
-                linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
             })
             $('.home-featured-img-item').each((idx, el) => {
                 let tlItem = gsap.timeline({
@@ -1196,7 +1183,7 @@ const mainScript = () => {
                 },
             })
             $('.home-faq-item').each((idx, el) => {
-                let number = idx <=9? `0${idx+1}` : idx+1;
+                let number = idx <9? `0${idx+1}` : idx+1;
                 $(el).find('.home-faq-item-number').text(`(${number})`);
                 new MasterTimeline({
                     timeline: tlItem,
@@ -1280,6 +1267,10 @@ const mainScript = () => {
             super.setTrigger(this.setup.bind(this));
         }
         setup() {
+            let linkInner = $('.home-article-view-all');
+            let dataLinkType = linkInner.attr('data-link-type');
+            let linkCurrent = linkInner.attr('href');
+            linkInner.attr('href', `${linkCurrent}?type=${dataLinkType}`);
             let tlTitle = gsap.timeline({
                 scrollTrigger: {
                     trigger: '.home-article-title-wrap',

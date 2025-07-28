@@ -725,8 +725,56 @@ const mainScript = () => {
     }
     // Scroll Events
     let header = $('.header');
+    function activeLang() {
+        $('.header-lang-btn').on('click', function(e) {
+            e.preventDefault();
+            $(this).toggleClass('active');
+            $('.header-lang-main').toggleClass('active');
+        })
+        $('.header-lang-nation-item').on('click', function(e) {
+            e.preventDefault();
+            let index = $(this).index();
+            $('.header-lang-nation-item').removeClass('active');
+            $(this).addClass('active');
+            $('.header-lang-content-list').removeClass('active');
+            $('.header-lang-content-list').eq(index).addClass('active');
+        })
+        function initLang() {
+            let currentLang = $('html').attr('lang');
+            console.log(currentLang)
+            if(currentLang) {
+                $('.header-lang-nation-item').each((idx, item) => {
+                    let nationName = $(item).attr('data-nation');
+                    console.log(nationName)
+                    if(currentLang.includes(nationName)) {
+                        $(item).addClass('active');
+                        $('.header-lang-content-list').removeClass('active');
+                        $('.header-lang-content-list').eq(idx).addClass('active');
+                        $('.header-lang-content-list').eq(idx).find('.header-lang-content-item').each((langIdx, langItem) => {
+                            let langItemCode = $(langItem).attr('data-lang-code');
+                            if(langItemCode == currentLang) {
+                                $(langItem).addClass('active');
+                                $('.header-lang-txt').text($(langItem).attr('data-lang-name'));
+                            }
+                        })
+                        return;
+                    }
+                })
+            }
+        }
+        initLang();
+    }
+    if(isStagging()){
+        activeLang();
+    }
     function scrollDown() {
         header.addClass('on-hide')
+        if($('.header-lang-main').length) {
+            $('.header-lang-main').removeClass('active');
+        }
+        if($('.header-lang-btn').length) {
+            $('.header-lang-btn').removeClass('active');
+        }
         if ($('.blog-page').length) {
             $('.blog-header').removeClass('on-scroll')
         }
@@ -851,9 +899,13 @@ const mainScript = () => {
 
     lenis.on('scroll', function (inst) {
         let threshold = inst.scroll > header.height();
-        if ($('.topbar').length) {
+        if ($('.announcement').length) {
+            threshold = inst.scroll > header.height() + $('.announcement').height();
+        }
+         if ($('.topbar').length) {
             threshold = inst.scroll > header.height() + $('.topbar').height();
         }
+        console.log(threshold)
         if (threshold) {
             header.addClass('on-scroll')
             if (inst.direction == 1) {
@@ -887,7 +939,19 @@ const mainScript = () => {
             }
         }
     });
-
+    function announcement() {
+        $('.body').css('--open-top', `${$('.announcement').outerHeight() * -1}px`)
+        console.log(`${$('.announcement').outerHeight() * -1}px`)
+        $(window).on('resize', debounce(function() {
+            if ($('.home-hero').length) {
+                resizeHomeHero();
+            }
+            $('.body').css('--open-top', `${$('.announcement').outerHeight() * -1}px`)
+        }))
+    }
+    if($('.announcement').length > 0) {
+        announcement();
+    }
     function topbar() {
         if ($('.topbar').length) {
             let pagiEl = $('<div class="topbar-pagi"></div>');
@@ -1012,7 +1076,11 @@ const mainScript = () => {
 
                 $('.nav').addClass('active');
                 $('.header').addClass('on-open');
-                if ($('.topbar').length) {
+                if ( $('.announcement').length) {
+                    $('.sticky-wrap').addClass('on-open');
+                    $('.body').css('--open-top', `${$('.announcement').outerHeight() * -1}px`)
+                }
+                if ($('.topbar').length ) {
                     $('.sticky-wrap').addClass('on-open');
                     $('.body').css('--open-top', `${$('.topbar').outerHeight() * -1}px`)
                 }
@@ -1020,7 +1088,7 @@ const mainScript = () => {
                     lenis.stop();
                 } else {
                     header.removeClass('on-hide')
-                    $('body').css('overflow', 'hidden')
+                    $('body').css('overflow', 'hidden');
                 }
             }
         })
@@ -1057,7 +1125,7 @@ const mainScript = () => {
                     }, 300);
                     $('.header').removeClass('on-open');
                 }
-                if ($('.topbar').length) {
+                if ($('.topbar').length || $('.announcement').length) {
                     $('.sticky-wrap').removeClass('on-open');
                     // $('.body').css('--open-top', `0px`)
                 }
@@ -1248,6 +1316,34 @@ const mainScript = () => {
         })
     }
     updateInterestRate('.main')
+    function getAllDynamicData(richtextClass) {
+        let wrapper = $(richtextClass)
+        let allLink = wrapper.find('a')
+
+        allLink.each(function(idx, item) {
+            let href = $(item).attr('href')
+            if (href.includes('https://[data-rate')) {
+                let type = href.replace('https://', '').replace('http://', '').replace('[data-rate-', '').replace(']', '').includes('usd') ? 'usd' : 'sgd'
+                let rate = href.replace('https://', '').replace('http://', '').replace(`[data-rate-${type}=`, '').replace(']', '')
+                // console.log(type)
+                // console.log(rate)
+                // Create a new span element with the same content
+                let newDom = $('<span></span>');
+                if($(item).html().includes('strong')){
+                    newDom = $('<strong></strong>');
+                } 
+                
+                let span = newDom
+                    .html($(item).html())
+                    .attr(`data-rate-${type}`, rate);
+                // Replace the anchor with the span
+                console.log(span.html())
+                $(item).replaceWith(span);
+            }
+        })
+        updateInterestRate(richtextClass)
+    }
+    
     function setupDialCode(data, selectId) {
         //Get data
         let codes = data;
@@ -1561,7 +1657,10 @@ const mainScript = () => {
                 $('.home-partner-inner').find('.home-partner-item').eq(1).before(textTemplate);
             }
         }
-        getHomePartners()
+        // if(!isStagging()){
+        //     getHomePartners();
+
+        // }
         function homeHeroHandle() {
             let ribbonOffset, humanOffset;
             if ($(window).width() > 991) {
@@ -2178,7 +2277,12 @@ const mainScript = () => {
                 }
             });
         }
-        getHomeTesti();
+        // if(isStagging()){
+            homeTestiHandleNew();
+        // }
+        // else {
+        //     getHomeTesti();
+        // }
         function homeTestiHandleNew() {
             console.log('init new testi')
             $('.home-testi-item').each(function(e) {
@@ -2187,14 +2291,16 @@ const mainScript = () => {
                 for (let x = 0; x < rate; x++) {
                     stars.eq(x).addClass('rate-true')
                 }
-                let store = $(this).find('.data-store').text();
-                if (store == 'Google') {
-                    $(this).find('.home-testi-item-rate').addClass('mod-gg')
-                } else if (store == 'Apple Store') {
-                    $(this).find('.home-testi-item-rate').addClass('mod-apple')
-                } else {
-                    $(this).find('.home-testi-item-rate').addClass('mod-trust')
-                }
+                // if(!isStagging()){
+                //     let store = $(this).find('.data-store').text();
+                //     if (store == 'Google') {
+                //         $(this).find('.home-testi-item-rate').addClass('mod-gg')
+                //     } else if (store == 'Apple Store') {
+                //         $(this).find('.home-testi-item-rate').addClass('mod-apple')
+                //     } else {
+                //         $(this).find('.home-testi-item-rate').addClass('mod-trust')
+                //     }
+                // }
             })
             if ($(window).width() > 991) {
                 $('.home-testi-main').on('mouseenter', function(e) {
@@ -2263,6 +2369,8 @@ const mainScript = () => {
                         }
                     }
                 });
+
+                $('.home-testi-col-wrapper .load-ske').removeClass('load-ske')
             }
             ScrollTrigger.create({
                 trigger: '.home-card-title',
@@ -2274,6 +2382,7 @@ const mainScript = () => {
                 }
             })
         }
+        
         function homeTestiHanlde() {
             // Update rate
             $('.home-testi-item').each(function(e) {
@@ -2485,20 +2594,30 @@ const mainScript = () => {
         }
 
         function homeGetFaq() {
-            getAllDataByType('faq').then((res) => {
-                if (res) {
-                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_homepage)
-                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_homepage', true)
-                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs);
-                    allFaq.forEach((i) => {
-                        createFaqNew(i).appendTo($('.home-faq-main'))
-                    })
-                    updateInterestRate('.home-faq-main');
-                    $('.home-faq-main').find('.load-ske').addClass('loaded')
-                    animateFaq();
-                    scrollToFaq();
-                }
-            });
+            // if(isStagging()){
+                console.log('faq stagging')
+                getAllDynamicData('.home-faq--itemans');
+                animateFaq();
+                scrollToFaq();
+            // }
+            // else {
+            //     console.log('faq live')
+            //     getAllDataByType('faq').then((res) => {
+            //         if (res) {
+            //             let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_homepage)
+            //             let allFaq = sortAsc(activeFaqItem, true, 'order_on_homepage', true)
+            //             $('.home-faq-main').html('').attr(schemaFAQParentAttrs);
+            //             allFaq.forEach((i) => {
+            //                 createFaqNew(i).appendTo($('.home-faq-main'))
+            //             })
+            //             updateInterestRate('.home-faq-main');
+            //             $('.home-faq-main').find('.load-ske').addClass('loaded')
+            //             animateFaq();
+            //             scrollToFaq();
+            //         }
+            //     });
+            // }
+            
             function scrollToFaq() {
                 $('[data-scroll-faq]').on('click', function(e) {
                     e.preventDefault();
@@ -2604,19 +2723,26 @@ const mainScript = () => {
             });
         // }
         function homeGetFaq() {
-            getAllDataByType('faq').then((res) => {
-                if (res) {
-                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_how_it_works)
-                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_how_it_works', true)
-                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-                    allFaq.forEach((i) => {
-                        createFaqNew(i).appendTo($('.home-faq-main'))
-                    })
-                    updateInterestRate('.home-faq-main');
-                    $('.home-faq-main').find('.load-ske').addClass('loaded')
-                    animateFaq();
-                }
-            });
+            // if(isStagging()){
+                getAllDynamicData('.home-faq--itemans');
+                animateFaq();
+                scrollToFaq();
+            // }
+            // else {
+            //     getAllDataByType('faq').then((res) => {
+            //         if (res) {
+            //             let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_how_it_works)
+            //             let allFaq = sortAsc(activeFaqItem, true, 'order_on_how_it_works', true)
+            //             $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
+            //             allFaq.forEach((i) => {
+            //                 createFaqNew(i).appendTo($('.home-faq-main'))
+            //             })
+            //             updateInterestRate('.home-faq-main');
+            //             $('.home-faq-main').find('.load-ske').addClass('loaded')
+            //             animateFaq();
+            //         }
+            //     });
+            // }
         }
         homeGetFaq();
 
@@ -2784,18 +2910,39 @@ const mainScript = () => {
 
         //aboutClimateHanlde();
         function aboutGetFaq() {
-            getAllDataByType('faq').then((res) => {
-                if (res) {
-                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_about_us)
-                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_about_us', true)
-                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-                    allFaq.forEach((i) => {
-                        createFaqNew(i).appendTo($('.home-faq-main'))
-                    })
-                    updateInterestRate('.home-faq-main');
-                    animateFaq();
-                }
-            });
+            // if(isStagging()){
+                console.log('faq stagging')
+                getAllDynamicData('.home-faq--itemans');
+                animateFaq();
+                scrollToFaq();
+            // } 
+            // else {
+            //     getAllDataByType('faq').then((res) => {
+            //         if (res) {
+            //             let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_about_us)
+            //             let allFaq = sortAsc(activeFaqItem, true, 'order_on_about_us', true)
+            //             $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
+            //             allFaq.forEach((i) => {
+            //                 createFaqNew(i).appendTo($('.home-faq-main'))
+            //             })
+            //             updateInterestRate('.home-faq-main');
+            //             animateFaq();
+            //         }
+            //     });
+            // }
+            function scrollToFaq() {
+                $('[data-scroll-faq]').on('click', function(e) {
+                    e.preventDefault();
+                    let target = $(this).attr('data-scroll-faq');
+                    if ($(`#${target}`).length >= 1) {
+                        lenis.scrollTo(target)
+                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
+                    } else {
+                        lenis.scrollTo(`${$(this).attr('href')}`)
+                    }
+
+                })
+            }
         }
         aboutGetFaq();
 
@@ -2822,6 +2969,7 @@ const mainScript = () => {
             requestAnimationFrame(() => {
                 $('.abt-team-cms').removeClass('on-hide')
             })
+            console.log('handleMobileDownload')
         }
         aboutTeamHandle()
 
@@ -3375,8 +3523,42 @@ const mainScript = () => {
                 updateAllFaq();
             })
         }
-        faqGetFaq();
+        // if(!isStagging()) {
+        //     faqGetFaq();
+        // }
+        // else {
+            getAllDynamicData('.home-faq--itemans');
+            updateUICateNew();
+            faqInteraction();
+            animateFaq();
+        // }
         $('.faq-main-wrap').attr(schemaFAQParentAttrs);
+        function updateUICateNew() {
+            const stickySearchIcon = $('.faq-cate-inner .faq-stick-srch').eq(0);
+            const itemSearch = $('.faq-srch-item').eq(0).clone();
+            const listSearch = $('.faq-srch-drop-inner');
+            listSearch.html('')
+            $('.faq-cate-btn-list').prepend(stickySearchIcon);
+            faqCateSwiper = new Swiper('.faq-cate-btn-wrap.swiper', {
+                slidesPerView: 'auto',
+                mousewheel: true,
+                on: {
+                    afterInit: () => {
+                        $('.faq-stick-srch.mod-tb').addClass('after-init')
+                    }
+                }
+            })
+            $('.faq-cate-wrap').each((idx, faq) => {
+                $(faq).find('.faq-cate-list-item').each((idx, item) => {
+                    let newItemSearch  = itemSearch.clone();
+                    let dataScroll = $(item).find('.home-faq-item').attr('id');
+                    let title = $(item).find('.home-faq-item-ques').text();
+                    newItemSearch.attr('data-scrollto', dataScroll);
+                    newItemSearch.find('.txt-16').text(title);
+                    listSearch.append(newItemSearch);
+                })
+            })
+        }
         function updateUICate(allFaqCate) {
             $('.faq-cate-list').html('');
             const faqListTemplate = $('.faq-cate-wrap').eq(0).clone();
@@ -3844,7 +4026,28 @@ const mainScript = () => {
                 $('.sc-doc-main').find('.load-ske').addClass('loaded')
             })
         }
-        getAllDocs()
+        // if(!isStagging()){
+        //     getAllDocs();
+        // }
+        // else {
+            updateTocUINew();
+            docInteractionNew();
+        // }
+        function updateTocUINew() {
+            $('.term-toc-inner').html('');
+            let allCategories = $('.doc-main-content.active .doc-group-title');
+            allCategories.each((index, el) => {
+                let cateName = $(el).text();
+                let cateUID = $(el).attr('data-title');
+                console.log(el)
+                let cateStickyHtml = cateStickyTemplate.clone();
+                cateStickyHtml.find('.term-toc-item-number').text(`${index + 1}.`)
+                cateStickyHtml.find('.term-toc-item-txt').text(cateName)
+                cateStickyHtml.attr('data-toc', `${cateUID}`)
+                console.log(cateStickyHtml)
+                $('.term-toc-inner').append(cateStickyHtml)
+            })
+        }
         function updateDocUI(categoryParent,allCate, allDoc) {
             let cateItemTemplate = $('.doc-main-item-wrap').eq(0).clone();
             $('.doc-main-items').html('')
@@ -3949,18 +4152,68 @@ const mainScript = () => {
                 $('.term-toc-inner').removeClass('on-open');
             })
         }
-        $('.doc-main-tab-wrap').on('click', '.doc-main-tab', function(e) {
-            e.preventDefault();
-            console.log('click');
-            let target = $(this).attr('id');
-            // lenis.scrollTo(`#${target}`, { offset: -100 });
-            $('.doc-main-tab').removeClass('active');
-            $(this).addClass('active');
-            $('.doc-main-content-inner').removeClass('active');
-            $(`.doc-main-content-inner#${target}`).addClass('active');
-            updateTocUI();
-            $('.term-toc-head-txt').text($('.term-toc-inner .term-toc-item-link').eq(0).find('.term-toc-item-txt').text())
-        });
+        function docInteractionNew() {
+            let allCateGroups = $('.doc-main-content.active .doc-main-group');
+            $('.term-toc-head-txt').text($('.term-toc-item-link .term-toc-item-txt').eq(0).text())
+            lenis.on('scroll', function(e) {
+                for (let x = 0; x < allCateGroups.length; x++) {
+                    let top = allCateGroups.eq(x).get(0).getBoundingClientRect().top;
+                    if (top > 0 && top < ($(window).height() / 5)) {
+                        $('.term-toc-item-link').eq(x).addClass('active');
+                        $('.term-toc-item-link').not(`:eq(${x})`).removeClass('active');
+                        $('.term-toc-head-txt').text($('.term-toc-item-link.active .term-toc-item-txt').text())
+                    }
+                }
+            })
+            docTocNavNew();
+        }
+        function docTocNavNew() {
+            if ($(window).width() < 767) {
+                $('.term-toc-head').on('click', function(e) {
+                    e.preventDefault();
+                    if ($(this).hasClass('on-open')) {
+                        $(this).removeClass('on-open');
+                        $('.term-toc-inner').removeClass('on-open')
+                    } else {
+                        $(this).addClass('on-open');
+                        $('.term-toc-inner').addClass('on-open')
+                    }
+                })
+            }
+            $('.term-toc-inner').on('click','.term-toc-item-link', function (e) {
+                e.preventDefault();
+                let target = $(this).attr('data-toc');
+                console.log(`.doc-main-group[data-toc=${target}`)
+                lenis.scrollTo(`.doc-main-group[data-toc=${target}]`, { offset: -100, duration: 1.4})
+            })
+        }
+        // if(!isStagging()){
+        //     $('.doc-main-tab-wrap').on('click', '.doc-main-tab', function(e) {
+        //         e.preventDefault();
+        //         console.log('click');
+        //         let target = $(this).attr('id');
+        //         // lenis.scrollTo(`#${target}`, { offset: -100 });
+        //         $('.doc-main-tab').removeClass('active');
+        //         $(this).addClass('active');
+        //         $('.doc-main-content-inner').removeClass('active');
+        //         $(`.doc-main-content-inner#${target}`).addClass('active');
+        //         updateTocUI();
+        //         $('.term-toc-head-txt').text($('.term-toc-inner .term-toc-item-link').eq(0).find('.term-toc-item-txt').text())
+        //     });
+        // }
+        // else {
+            $('.doc-main-tab-wrap').on('click', '.doc-main-tab', function(e) {
+                e.preventDefault();
+                let target = $(this).attr('data-category-parent');
+                // lenis.scrollTo(`#${target}`, { offset: -100 });
+                $('.doc-main-tab').removeClass('active');
+                $(this).addClass('active');
+                $('.doc-main-content').removeClass('active');
+                $(`.doc-main-content[data-category-parent=${target}]`).addClass('active');
+                updateTocUINew();
+                $('.term-toc-head-txt').text($('.term-toc-inner .term-toc-item-link').eq(0).find('.term-toc-item-txt').text())
+            });
+        // }
     }
 
     SCRIPT.waitlistScript = () => {
@@ -3977,21 +4230,28 @@ const mainScript = () => {
             }
         })
         function usdGetFaq() {
-            getAllDataByType('faq').then((res) => {
-                console.log(res)
-                if (res) {
-                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_usd_page)
-                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_usd_page', true)
-                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-                    allFaq.forEach((i) => {
-                        createFaqNew(i).appendTo($('.home-faq-main'))
-                    })
-                    updateInterestRate('.home-faq-main');
-                    $('.home-faq-main').find('.load-ske').addClass('loaded')
-                    animateFaq();
-                    scrollToFaq();
-                }
-            });
+            // if(isStagging()) {
+            getAllDynamicData('.home-faq--itemans');
+            animateFaq();
+            scrollToFaq();
+            // }
+            // else {
+            //     getAllDataByType('faq').then((res) => {
+            //     console.log(res)
+            //     if (res) {
+            //         let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_usd_page)
+            //         let allFaq = sortAsc(activeFaqItem, true, 'order_on_usd_page', true)
+            //         $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
+            //         allFaq.forEach((i) => {
+            //             createFaqNew(i).appendTo($('.home-faq-main'))
+            //         })
+            //         updateInterestRate('.home-faq-main');
+            //         $('.home-faq-main').find('.load-ske').addClass('loaded')
+            //         animateFaq();
+            //         scrollToFaq();
+            //     }
+            // });
+            // }
             function scrollToFaq() {
                 $('[data-scroll-faq]').on('click', function(e) {
                     e.preventDefault();
@@ -4051,19 +4311,27 @@ const mainScript = () => {
         }
         corporateHero();
         function corporateGetFaq() {
-            getAllDataByType('faq').then((res) => {
-                if (res) {
-                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_corporate_page)
-                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_corporate_page', true)
-                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-                    allFaq.forEach((i) => {
-                        createFaqNew(i).appendTo($('.home-faq-main'))
-                    })
-                    updateInterestRate('.home-faq-main');
-                    $('.home-faq-main').find('.load-ske').addClass('loaded')
-                    animateFaq();
-                }
-            });
+            // if(isStagging()){
+                console.log('faq stagging')
+                getAllDynamicData('.home-faq--itemans');
+                animateFaq();
+                scrollToFaq();
+            // }
+            // else {
+            //     getAllDataByType('faq').then((res) => {
+            //         if (res) {
+            //             let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_corporate_page)
+            //             let allFaq = sortAsc(activeFaqItem, true, 'order_on_corporate_page', true)
+            //             $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
+            //             allFaq.forEach((i) => {
+            //                 createFaqNew(i).appendTo($('.home-faq-main'))
+            //             })
+            //             updateInterestRate('.home-faq-main');
+            //             $('.home-faq-main').find('.load-ske').addClass('loaded')
+            //             animateFaq();
+            //         }
+            //     });
+            // }
         }
         corporateGetFaq();
         function getHomePartners() {
@@ -4119,20 +4387,28 @@ const mainScript = () => {
         }
         cardFee();
         function cardGetFaq() {
-            getAllDataByType('faq').then((res) => {
-                console.log(res)
-                if (res) {
-                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_card_page)
-                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_card_page', true)
-                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-                    allFaq.forEach((i) => {
-                        createFaqNew(i).appendTo($('.home-faq-main'))
-                    })
-                    updateInterestRate('.home-faq-main');
-                    $('.home-faq-main').find('.load-ske').addClass('loaded')
-                    animateFaq();
-                }
-            });
+            // if(isStagging()){
+                console.log('faq stagging')
+                getAllDynamicData('.home-faq--itemans');
+                animateFaq();
+                scrollToFaq();
+            // }
+            // else {
+            //     getAllDataByType('faq').then((res) => {
+            //         console.log(res)
+            //         if (res) {
+            //             let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_card_page)
+            //             let allFaq = sortAsc(activeFaqItem, true, 'order_on_card_page', true)
+            //             $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
+            //             allFaq.forEach((i) => {
+            //                 createFaqNew(i).appendTo($('.home-faq-main'))
+            //             })
+            //             updateInterestRate('.home-faq-main');
+            //             $('.home-faq-main').find('.load-ske').addClass('loaded')
+            //             animateFaq();
+            //         }
+            //     });
+            // }
         }
         cardGetFaq();
         function cardReason(){
@@ -4177,132 +4453,168 @@ const mainScript = () => {
     }
     SCRIPT.thankyouScript = () => {
         function thankHero() {
-            let tl = gsap.timeline({
+            let tlScroll = gsap.timeline({
                 scrollTrigger: {
                   trigger: '.thank-hero',
                   start: viewport.w > 991 ? 'top+=50% bottom-=50%' : 'top+=70% bottom-=70%',
                   end: viewport.w > 991 ? 'bottom-=60% top-=60%' : 'bottom-=40% top-=40%',
                   scrub: 1,
                 }
-              });
+            });
+            let tlFirst = gsap.timeline({
+                onComplete: () => {
+                    tlScroll
+                        .fromTo('.thank-hero-ic', { yPercent: 0 }, { yPercent: -55 , ease: 'none'}, 0)
+                }
+            })
+            gsap.set('.thank-hero-title', { autoAlpha: 0})
+            gsap.set('.thank-hero-ic', { autoAlpha: 0, y: -40})
+            tlFirst
+                .to('.thank-hero-title', { autoAlpha: 1, duration: 1 })
+                .to('.thank-hero-ic', { autoAlpha: 1, y:0, duration: .8, clearProps: "all"}, '<=.6')
               
-              tl
-                .fromTo('.thank-hero-ic', { yPercent: 0 }, { yPercent: -20 , ease: 'none'}, 0)
         }
         thankHero();
         function thankReview() {
             let gapSlide = parseRem(20);
-            let slideView = 5;
+            let slideView = 'auto';
+            let itemsArray = $('.thank-review-item').toArray();
+            let icRateGood = $(itemsArray[0]).find('.thank-review-item-rate-item.item-good').eq(0);
+            let icRateBad = $(itemsArray[0]).find('.thank-review-item-rate-item.item-bad').eq(0);
+            gsap.set('.thank-review-title', {autoAlpha: 0, yPercent: 40})
+            gsap.set('.thank-review-sub', {autoAlpha: 0, yPercent: 40})
+            gsap.set('.thank-review-list', {autoAlpha: 0, x: 40})
+            let tlReview = gsap.timeline({
+                scrollTrigger: {
+                  trigger: '.thank-review-inner',
+                  start: 'top top+=65%'
+                }
+            });
+            let tlTitle = gsap.timeline({
+                scrollTrigger: {
+                  trigger: '.thank-review-title-wrap',
+                  start: 'top top+=75%'
+                }
+            });
             if(viewport.w < 991 && viewport.w > 479){
                 slideView = 2.4;
             }
             else if(viewport.w < 479){
-                slideView= 1.2;
+                slideView = 1.2;
                 gapSlide = parseRem(24);
             }
-            let maxHeightSlide = parseRem(1200);
-            console.log(maxHeightSlide)
-            let widthSwiperSlide = ($('.thank-review-main').width() - gapSlide*(slideView -1))/slideView;
-            let avtAnonymous = 'https://cdn.prod.website-files.com/6385cd39c09f99658407a3ec/6837d7eedcaaae5738e36587_icon-anonymous.svg'
-            let swiperSlide = $('.thank-review-list').eq(0).clone();
-            let itemReview = swiperSlide.find('.thank-review-item').eq(0).clone();
-            let icRateGood = swiperSlide.find('.thank-review-item-rate-item.item-good').eq(0).clone();
-            let icRateBad = swiperSlide.find('.thank-review-item-rate-item.item-bad').eq(0).clone();
-            itemReview.find('.thank-review-item-rate-item').remove();
-            swiperSlide.css('width', widthSwiperSlide)
-            swiperSlide.find('.thank-review-item').remove();
-            $('.thank-review-inner').html('');
-            $('.thank-review-inner').append(swiperSlide.clone());
-            let i = 0;
-            getAllDataByType('user_review').then((res) => {
-                console.log(res)
-                if (res) {
-                    res.forEach((item, idx) => {
-                        let itemHtml = itemReview.clone();
-                        console.log(item.id)
-                        let newItem = createItemReview(item, itemHtml);
-                        if(viewport.w > 479){
-                            $('.thank-review-inner .thank-review-list').eq(i).append(newItem.clone());
-                            let currentHeigthSwiper = $('.thank-review-inner .thank-review-list').eq(i).height();
-                            if (currentHeigthSwiper > maxHeightSlide) {
-                                //$('.thank-review-inner .thank-review-list').eq(i) remove item last child
-                                $('.thank-review-inner .thank-review-list').eq(i).find('.thank-review-item').last().remove();
-                                $('.thank-review-inner').append(swiperSlide.clone())
-                                i++;
-                                $('.thank-review-inner .thank-review-list').eq(i).append(newItem.clone());
-                            }
+            itemsArray.forEach(function(item) {
+                let rateWrapper = $(item).find('.thank-review-item-rate');
+                rateWrapper.find('.thank-review-item-rate-item').remove();
+                if(!rateWrapper.hasClass('w-condition-invisible')){
+                    let itemRate = parseInt($(item).attr('data-rate'));
+                    for(let i = 1 ; i <= 5; i ++){
+                        if(i <= itemRate) {
+                            rateWrapper.append(icRateGood.clone());
                         }
                         else {
-                            if (idx < 11) {
-                                $('.thank-review-inner .thank-review-list').eq(i).append(newItem.clone());
-                                i++;
-                                if(i < 10) {
-                                    $('.thank-review-inner').append(swiperSlide.clone())
-                                }
-                            }
+                            rateWrapper.append(icRateBad.clone());
                         }
-                           
-                    })
-                    let swiper = new Swiper('.thank-review-main', {
-                        spaceBetween: gapSlide,
-                        slidesPerView: slideView,
-                        mousewheel: {
-                            enabled: true,
-                            forceToAxis: true,
-                        },
-                        freeMode: true,
-                        scrollbar: {
-                            el: ".thank-review-process",
-                            draggable: true,
-                          },
-                    });
-                    $('.thank-review-main').find('.load-ske').addClass('loaded');
-                    ScrollTrigger.refresh();
+                    }
                 }
             });
-            function createItemReview(item, itemHtml ){
-                itemHtml.attr('key', item.id)
-                if(!item.data.platform_icon.url ){
-                    console.log('anonymous')
-                    itemHtml.find('.thank-review-item-avt img').attr('src', avtAnonymous);
-                    itemHtml.find('.thank-review-item-platform').remove();
-                    itemHtml.find('.thank-review-item-rate').remove();
-                }else{
-                    itemHtml.find('.thank-review-item-platform-ic img').attr('src', item.data.platform_icon.url);
-                    if(item.data.avatar.url !== ''){
-                        itemHtml.find('.thank-review-item-avt img').attr('src', item.data.avatar.url);
+            if(viewport.w > 479){
+                let maxHeightSlide = parseRem(1054);
+                let widthSwiperSlide = parseRem(320);
+                let baseSlide = $('.thank-review-list').eq(0).clone().empty().css('width', widthSwiperSlide);
+                let swiperWrapper = $('.thank-review-inner').eq(0).empty();
+                let currentSlide = baseSlide.clone();
+                swiperWrapper.append(currentSlide);
+                itemsArray.forEach(function(item) {
+                    currentSlide.append(item);
+                    let currentHeight = currentSlide.height();
+                    if (currentHeight > maxHeightSlide) {
+                        $(item).detach();
+                        currentSlide = baseSlide.clone();
+                        swiperWrapper.append(currentSlide);
+                        currentSlide.append(item);
                     }
-                }
-                itemHtml.find('.thank-review-item-content').text(item.data.review_content[0].text);
-                if(item.data.user_name[0] && item.data.user_name[0].text !== ''){
-                    if(item.data.date) {
-                        itemHtml.find('.thank-review-item-name').text(`${item.data.user_name[0].text},`)
-                    }
-                    else {
-                        itemHtml.find('.thank-review-item-name').text(`${item.data.user_name[0].text}`)
-                    }
-                }
-                else {
-                    itemHtml.find('.thank-review-item-name').remove();
-                }
-                if(item.data.date){
-                    itemHtml.find('.thank-review-item-date').text(toDateFormat(item.data.date))
-                }
-                else {
-                    itemHtml.find('.thank-review-item-date').remove();
-                }
-                if(item.data.number_rating !== null){
-                    for(let i = 0; i < item.data.number_rating; i++){
-                        itemHtml.find('.thank-review-item-rate').append(icRateGood.clone());
-                    }
-                    for(let i = 0; i < (5 - item.data.number_rating); i++){
-                        itemHtml.find('.thank-review-item-rate').append(icRateBad.clone());
-                    }
-                }
-                return itemHtml;
+                });
             }
+            let swiper = new Swiper('.thank-review-main', {
+                spaceBetween: gapSlide,
+                slidesPerView: slideView,
+                mousewheel: {
+                    enabled: true,
+                    forceToAxis: true,
+                },
+                freeMode: true,
+                scrollbar: {
+                    el: ".thank-review-process",
+                    draggable: true,
+                    },
+            });
+            ScrollTrigger.refresh();
+            tlTitle
+                .to('.thank-review-title', {autoAlpha: 1, yPercent: 0, duration: 1})
+                .to('.thank-review-sub', {autoAlpha: 1, yPercent: 0, duration: .8}, '<=.4')
+            tlReview
+                .to('.thank-review-list', {autoAlpha: 1, x: 0, duration: 1, stagger: .06})
         }
         thankReview();
+        function thankTeam() {
+            let isVideoAutoplay = true;
+            $('.thank-team-video-inner .el-video').get(0).currentTime = 1.84;
+            if(isVideoAutoplay) {
+                ScrollTrigger.create({
+                    trigger: '.thank-team',
+                    start: 'top top+=75%',
+                    onEnter: () => {
+                        $('.thank-team-video-trigger').addClass('hidden');
+                        $('.thank-team-video-inner .el-video')
+                        .prop('autoplay', true)
+                        .prop('muted', true)
+                        .prop('playsinline', true)
+                        .get(0).play();
+                    }
+                });
+            }
+            else {
+                $('.thank-team-video-trigger').on('click', function(e) {
+                    e.preventDefault();
+                    $('.thank-team-video-trigger').addClass('hidden')
+                    $('.thank-team-video-inner .el-video').attr('controls', true);
+                    $('.thank-team-video-inner .el-video').get(0).play();
+                })
+            }
+        }
+        thankTeam()
+        function thankResult() {
+            let tlScroll = gsap.timeline({
+                scrollTrigger: {
+                  trigger: '.thank-result',
+                  start: 'top bottom',
+                  end: 'bottom top',
+                  scrub: 1,
+                }
+            });
+            let tlFirst = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.thank-result-title-wrap',
+                    start: 'top top+=75%'
+                },
+                onComplete: () => {
+                    tlScroll
+                        .fromTo('.thank-result-ic', { yPercent: 0 }, { yPercent: -55 , ease: 'none'}, 0)
+                }
+            })
+            gsap.set('.thank-result-label', { autoAlpha: 0})
+            gsap.set('.thank-result-title', { autoAlpha: 0})
+            gsap.set('.thank-result-sub', { autoAlpha: 0})
+            gsap.set('.thank-result-ic', { autoAlpha: 0, y: -60})
+            tlFirst
+                .to('.thank-result-label', { autoAlpha: 1, duration: .6 })
+                .to('.thank-result-title', { autoAlpha: 1, duration: 1 }, '<=.6')
+                .to('.thank-result-ic', { autoAlpha: 1, y:0, duration: .8}, '<=0')
+                .to('.thank-result-sub', { autoAlpha: 1, duration: .8 },'<=.6' )
+              
+        }
+        thankResult();
         function thankMention() {
             if(viewport.w < 767) {
                 $('.thank-mention-cms').addClass('swiper');

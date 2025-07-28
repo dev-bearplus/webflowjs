@@ -70,7 +70,11 @@ const mainScript = () => {
             trigger[fn]();
         });
     }
-
+    function sendGGTag(data) {
+        if (window.dataLayer) {
+            window.dataLayer.push(data);
+        }
+    }
     function refreshOnBreakpoint() {
         const breakpoints = Object.values(device).sort((a, b) => a - b);
         const initialViewportWidth = window.innerWidth || document.documentElement.clientWidth;
@@ -134,7 +138,36 @@ const mainScript = () => {
             timer = setTimeout(func, wait, event);
         };
     }
+    function setupUnloadCheckForPlayer(player, video_name) {
+        if (!player || typeof player.getPlayerState !== 'function') {
+            console.warn('Invalid player passed to setupUnloadCheckForPlayer');
+            return;
+        }
+        window.addEventListener('beforeunload', function(e) {
+            const state = player.getPlayerState();
 
+            // Nếu video chưa kết thúc
+            if (state !== YT.PlayerState.ENDED) {
+            let currentTime = 0;
+            try {
+                if (typeof player.getCurrentTime === 'function') {
+                currentTime = player.getCurrentTime();
+                }
+            } catch (err) {
+                console.warn('Error getting current time:', err);
+            }
+
+            const videoData = player.getVideoData ? player.getVideoData() : {};
+            const videoId = videoData.video_id || 'unknown';
+            let data = {
+                event: 'video-youtube-close',
+                video_name : video_name,
+                time_video_play : currentTime
+            }
+            sendGGTag(data)
+            } 
+        });
+    }
     const documentHeightObserver = (() => {
         let previousHeight = document.documentElement.scrollHeight;
         let resizeObserver;
@@ -703,15 +736,32 @@ const mainScript = () => {
             formName: 'Contact us',
             hubspot: {
                 portalId: '144330454',
-                formId: 'd9d563ae-e649-4eb1-927c-e22368a3c440',
+                formId: 'f13948aa-8865-4eae-87bc-d74fd324a7ce',
                 fields: [
                     { name: 'firstname', value: (data) => data['First-Name'] },
                     { name: 'lastname', value: (data) => data['Last-Name'] },
-                    { name: 'phone', value: (data) => data['Phone-Number'] },
                     { name: 'email', value: (data) => data['Business-Email'] },
-                    { name: 'company', value: (data) => data['Company'] },
-                    { name: 'jobtitle', value: (data) => data['Job-Title'] },
                     { name: 'message', value: (data) => data['Message'] }
+                ]
+            }
+        });
+        initForm({
+            formName: 'Email Form',
+            hubspot: {
+                portalId: '144330454',
+                formId: '33ed01a9-e44b-4e1c-9cae-3682148b1a23',
+                fields: [
+                    { name: 'email', value: (data) => data['Business-Email'] }
+                ]
+            }
+        });
+        initForm({
+            formName: 'Email Form Popup',
+            hubspot: {
+                portalId: '144330454',
+                formId: '33ed01a9-e44b-4e1c-9cae-3682148b1a23',
+                fields: [
+                    { name: 'email', value: (data) => data['Business-Email'] }
                 ]
             }
         });
@@ -732,28 +782,65 @@ const mainScript = () => {
         });
     }
     const initAllPopup = () => {
+        let demoPlayer;
+        let demoPlayerState = null; 
+        const iframeId = $('.demo-vid-inner').attr('data-iframe-id');
+        const nameVideo = $('.demo-vid-inner').attr('data-name-video');
         initPopup('demo', {
             onOpen: () => {
-                let iframe = $('.demo-vid-inner iframe').length > 0 ? $('.demo-vid-inner iframe'): $('<iframe></iframe>');
-                let iframeSrc = new URL(`https://www.youtube.com/embed/${$('.demo-vid-inner').attr('data-iframe-id')}?origin=${window.location.origin}&autoplay=1`);
-                iframe.attr({
-                    'src': iframeSrc,
-                    'allow': 'autoplay',
-                    'title': 'COLMEIA - Job Architecture Made Easy!',
-                    'allowfullscreen': '',
-                    'width': '100%',
-                    'height': '100%',
-                    'frameborder': 0,
-                    'allow': 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
-                    'referrerpolicy': 'strict-origin-when-cross-origin'
+                if (!demoPlayer) {
+                    demoPlayer = new YT.Player($('.demo-vid-inner').get(0), {
+                    videoId: iframeId,
+                    playerVars: {
+                        autoplay: 1,
+                        origin: window.location.origin
+                    },
+                    events: {
+                        'onReady': function(event) {
+                            console.log('Player ready');
+                            let data = {
+                                event: 'video-youtube-start',
+                                video_name : nameVideo
+                            }
+                            console.log(data)
+                            sendGGTag(data);
+                        },
+                        'onStateChange': function(event) {
+                            demoPlayerState = event.data;
+                            if (event.data === YT.PlayerState.ENDED) {
+                                console.log('Video ended');
+
+                                let data = {
+                                    event: 'video-youtube-complete',
+                                    video_name : nameVideo
+                                }
+                                sendGGTag(data);
+                            }
+                        }
+                    },
+                
                 });
-                iframe.appendTo('.demo-vid-inner');
+                } else {
+                    demoPlayer.loadVideoById(iframeId);
+                    demoPlayer.playVideo();
+                }
             },
             onClose: () => {
-                let iframe = $('.demo-vid-inner iframe');
-                if (iframe) {
-                    let iframeSrc = iframe.attr('src');
-                    iframe.attr('src', '');
+                if (demoPlayer && demoPlayer.getCurrentTime) {
+                    console.log(demoPlayer.getCurrentTime())
+                    if (demoPlayerState !== YT.PlayerState.ENDED) {
+                        const seconds = demoPlayer.getCurrentTime();
+                        let data = {
+                            event: 'video-youtube-close',
+                            video_name : nameVideo,
+                            time_video_play : seconds
+                        }
+                        console.log(data)
+                        sendGGTag(data);
+                    } else {
+                        console.log('Video was complete, not sending current time.');
+                    }
+                    demoPlayer.stopVideo();
                 }
             }
         });
@@ -1080,7 +1167,7 @@ const mainScript = () => {
             }
         }
         let formID = `#${getIDFormName(formName)}`;
-
+        
         $(`${formID} .input-field-group .input-field.type-select`).attr('readonly', 'readonly');
         // $(`${formID} .input-field-group.hidden .input-field`).attr('disabled', '');
 
@@ -1259,7 +1346,6 @@ const mainScript = () => {
         }
         $(formID).on('submit', function (e) {
             if ($(`${formID} #bot-hunter`).val() != '') return;
-
             const data = mapFormToObject(e.target);
             const mappedFields = mapField(data);
             const dataSend = {
@@ -1269,6 +1355,7 @@ const mainScript = () => {
                     pageName: $('[data-page-name]').attr('data-page-name'),
                 },
             };
+            console.log(dataSend);
             $.ajax({
                 url: url,
                 method: 'POST',
@@ -1349,28 +1436,86 @@ const mainScript = () => {
 
                     animShowEl();
 
+                    // let iframeSrc = new URL($('.home-hero-thumb-vid-inner').attr('data-iframe-src'));
+                    // $('.home-hero-thumb-btn a').on('click', function (e) {
+                    //     e.preventDefault();
+                    //     iframeSrc += `?origin=${window.location.origin}&autoplay=1`;
+                    //     let iframe = $('<iframe></iframe>');
+                    //     iframe.attr({
+                    //         'src': iframeSrc,
+                    //         'allow': 'autoplay',
+                    //         'allowfullscreen': '',
+                    //         'width': '100%',
+                    //         'height': '100%',
+                    //         'frameborder': 0,
+                    //         'allow': 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+                    //         'referrerpolicy': 'strict-origin-when-cross-origin'
+                    //     });
+                    //     iframe.appendTo('.home-hero-thumb-vid-inner');
+                    //     gsap.to('.home-hero-thumb-overlay, .home-hero-thumb-btn', {
+                    //         autoAlpha: 0, onComplete: () => {
+                    //         $('.home-hero-thumb-overlay').remove();
+                    //         $('.home-hero-thumb-btn').remove();
+                    //     } });
+                    // })
+                    let homePlayer;
                     let iframeSrc = new URL($('.home-hero-thumb-vid-inner').attr('data-iframe-src'));
-                    $('.home-hero-thumb-btn a').on('click', function (e) {
+                    let videoId = iframeSrc.pathname.split('/').pop();
+                    let nameVideo = $('.home-hero-thumb-vid-inner').attr('data-name-video');
+                    let demoPlayerState = null;
+                    $('.home-hero-thumb-btn a').on('click', function(e) {
                         e.preventDefault();
-                        iframeSrc += `?origin=${window.location.origin}&autoplay=1`;
-                        let iframe = $('<iframe></iframe>');
-                        iframe.attr({
-                            'src': iframeSrc,
-                            'allow': 'autoplay',
-                            'allowfullscreen': '',
-                            'width': '100%',
-                            'height': '100%',
-                            'frameborder': 0,
-                            'allow': 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
-                            'referrerpolicy': 'strict-origin-when-cross-origin'
-                        });
-                        iframe.appendTo('.home-hero-thumb-vid-inner');
-                        gsap.to('.home-hero-thumb-overlay, .home-hero-thumb-btn', {
-                            autoAlpha: 0, onComplete: () => {
-                            $('.home-hero-thumb-overlay').remove();
-                            $('.home-hero-thumb-btn').remove();
-                        } });
-                    })
+                        if (!homePlayer) {
+                            homePlayer = new YT.Player($('.home-hero-thumb-vid-inner').get(0), {
+                            videoId: videoId,
+                            playerVars: {
+                                autoplay: 1,
+                                origin: window.location.origin
+                            },
+                            events: {
+                                'onReady': function(event) {
+                                    console.log('Video ready');
+                                    setupUnloadCheckForPlayer(homePlayer, nameVideo);
+                                    let data = {
+                                        event: 'video-youtube-start',
+                                        video_name : nameVideo
+                                    }
+                                    sendGGTag(data);
+                                    gsap.to('.home-hero-thumb-overlay, .home-hero-thumb-btn', {
+                                        autoAlpha: 0,
+                                        onComplete: () => {
+                                        $('.home-hero-thumb-overlay').remove();
+                                        $('.home-hero-thumb-btn').remove();
+                                        }
+                                    });
+                                },
+                                'onStateChange': function(event) {
+                                    demoPlayerState = event.data;
+                                    if (event.data === YT.PlayerState.ENDED) {
+                                        console.log('Video ended');
+
+                                        let data = {
+                                            event: 'video-youtube-complete',
+                                            video_name : nameVideo
+                                        }
+                                        sendGGTag(data);
+                                    }
+                                }
+                            }
+                            });
+                        } else {
+                            homePlayer.loadVideoById(videoId);
+                            homePlayer.playVideo();
+                            gsap.to('.home-hero-thumb-overlay, .home-hero-thumb-btn', {
+                                autoAlpha: 0,
+                                onComplete: () => {
+                                $('.home-hero-thumb-overlay').remove();
+                                $('.home-hero-thumb-btn').remove();
+                                }
+                            });
+                        }
+                        
+                    });
                 }
                 scHero();
 
@@ -2117,34 +2262,92 @@ const mainScript = () => {
                             .to(heroDesc.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
                             .to(heroTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, "<=.1")
                             .to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
-                            .from('.prod-hero-btn .btn', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' },  '>-.6')
+                            .from('.prod-hero-form', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' },  '>-.6')
                     }
-                    animShowEl();
+                        animShowEl();   
+                        $('.prod-hero-form button[type=submit]').on('click', function() {
+                            $('.prod-hero-form #bot-hunter').val('');
+                        })
+                    // let iframeSrc = new URL($('.prod-hero-thumb-vid-inner').attr('data-iframe-src'));
+                    // let iframeTitle = $('.prod-hero-thumb-vid-inner').attr('data-iframe-title');
+                    // $('.prod-hero-thumb-btn a').on('click', function (e) {
+                    //     e.preventDefault();
+                    //     iframeSrc += `?origin=${window.location.origin}&autoplay=1`;
+                    //     let iframe = $('<iframe></iframe>');
+                    //     iframe.attr({
+                    //         'src': iframeSrc,
+                    //         'title': iframeTitle,
+                    //         'allow': 'autoplay',
+                    //         'allowfullscreen': '',
+                    //         'width': '100%',
+                    //         'height': '100%',
+                    //         'frameborder': 0,
+                    //         'allow': 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+                    //         'referrerpolicy': 'strict-origin-when-cross-origin'
+                    //     });
 
-                    let iframeSrc = new URL($('.prod-hero-thumb-vid-inner').attr('data-iframe-src'));
-                    let iframeTitle = $('.prod-hero-thumb-vid-inner').attr('data-iframe-title');
+                    //     iframe.appendTo('.prod-hero-thumb-vid-inner');
+                    //     gsap.to('.prod-hero-thumb-overlay, .prod-hero-thumb-btn', {
+                    //         autoAlpha: 0, onComplete: () => {
+                    //         $('.prod-hero-thumb-overlay').remove();
+                    //         $('.prod-hero-thumb-btn').remove();
+                    //     } });
+                    // })
+                    let prodPlayer;
+                    let demoPlayerState = null;
+                    let nameVideo = $('.prod-hero-thumb-vid-inner').attr('data-name-video');
                     $('.prod-hero-thumb-btn a').on('click', function (e) {
                         e.preventDefault();
-                        iframeSrc += `?origin=${window.location.origin}&autoplay=1`;
-                        let iframe = $('<iframe></iframe>');
-                        iframe.attr({
-                            'src': iframeSrc,
-                            'title': iframeTitle,
-                            'allow': 'autoplay',
-                            'allowfullscreen': '',
-                            'width': '100%',
-                            'height': '100%',
-                            'frameborder': 0,
-                            'allow': 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
-                            'referrerpolicy': 'strict-origin-when-cross-origin'
+                        const iframeId = $('.prod-hero-thumb-vid-inner').attr('data-iframe-id');
+                        if (!prodPlayer) {
+                            prodPlayer = new YT.Player($('.prod-hero-thumb-vid-inner').get(0), {
+                            videoId: iframeId,
+                            playerVars: {
+                                autoplay: 1,
+                                origin: window.location.origin
+                            },
+                            events: {
+                                'onReady': function(event) {
+                                    console.log('Video ready');
+                                    setupUnloadCheckForPlayer(prodPlayer, nameVideo);
+                                    let data = {
+                                        event: 'video-youtube-start',
+                                        video_name : nameVideo
+                                    }
+                                    sendGGTag(data);
+                                    gsap.to('.prod-hero-thumb-overlay, .prod-hero-thumb-btn', {
+                                        autoAlpha: 0,
+                                        onComplete: () => {
+                                        $('.prod-hero-thumb-overlay').remove();
+                                        $('.prod-hero-thumb-btn').remove();
+                                        }
+                                    });
+                                },
+                                'onStateChange': function(event) {
+                                    demoPlayerState = event.data;
+                                    if (event.data === YT.PlayerState.ENDED) {
+                                        let data = {
+                                            event: 'video-youtube-complete',
+                                            video_name : nameVideo
+                                        }
+                                        sendGGTag(data);
+                                    }
+                                }
+                            }
+                            });
+                        } else {
+                            prodPlayer.loadVideoById(iframeId);
+                            prodPlayer.playVideo();
+                            gsap.to('.prod-hero-thumb-overlay, .prod-hero-thumb-btn', {
+                                autoAlpha: 0,
+                                onComplete: () => {
+                                $('.prod-hero-thumb-overlay').remove();
+                                $('.prod-hero-thumb-btn').remove();
+                            }
                         });
-                        iframe.appendTo('.prod-hero-thumb-vid-inner');
-                        gsap.to('.prod-hero-thumb-overlay, .prod-hero-thumb-btn', {
-                            autoAlpha: 0, onComplete: () => {
-                            $('.prod-hero-thumb-overlay').remove();
-                            $('.prod-hero-thumb-btn').remove();
-                        } });
-                    })
+                        }
+                    });
+                    
                 }
                 scHero();
 
@@ -2534,6 +2737,9 @@ const mainScript = () => {
                     })
                     $('.schedule-hero-client-cms-list').addClass('animMarquee')
                 }
+                $('.schedule-hero button[type=submit]').on('click', function() {
+                    $('.schedule-hero #bot-hunter').val('');
+                })
                 marqueeLogo();
             }
         },
@@ -2571,6 +2777,9 @@ const mainScript = () => {
                         tlItem
                             .to(labelItem.words, { yPercent: 0, autoAlpha: 1, duration: .6, stagger: .015 }, '<=.1')
                             .to(valItem.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .025 }, "<=.2")
+                    })
+                    $('.contact-hero button[type=submit]').on('click', function() {
+                        $('.contact-hero #bot-hunter').val('');
                     })
                 }
                 contactHero();
