@@ -2777,10 +2777,7 @@ const mainScript = () => {
                 startOfWeek.setDate(today.getDate() + diffToMonday);
                 
                 const endOfWeek = new Date(startOfWeek);
-                endOfWeek.setDate(startOfWeek.getDate() + 6);
-              
-                console.log("Start:", startOfWeek, "End:", endOfWeek);
-              
+                endOfWeek.setDate(startOfWeek.getDate() + 6);              
                 this.filterEvents(getDateRangeArray(startOfWeek, endOfWeek));
               
                 $('.event-calendar-item-date-txt').each(function () {
@@ -2790,8 +2787,11 @@ const mainScript = () => {
               
                   const [d, m, y] = dateStr.split('/').map(Number);
                   const itemDate = new Date(y, m - 1, d);
-                  
-                  if (itemDate >= startOfWeek && itemDate <= endOfWeek) {
+                  const start = new Date(startOfWeek.setHours(0, 0, 0, 0));
+                const end = new Date(endOfWeek.setHours(23, 59, 59, 999));
+                const item = new Date(itemDate.setHours(0, 0, 0, 0));
+                if (item >= start && item <= end) {
+                    console.log(itemDate)
                     $item.addClass('active');
                   } else {
                     $item.removeClass('active');
@@ -2802,7 +2802,6 @@ const mainScript = () => {
             function getDateRangeArray(start, end) {
                 let result = [];
                 let current = new Date(start);
-            
                 while (current <= end) {
                     const day = String(current.getDate()).padStart(2, '0');
                     const month = String(current.getMonth() + 1).padStart(2, '0');
