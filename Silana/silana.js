@@ -116,7 +116,6 @@ const script = () => {
                     } else if (isCorrectForm) {
                         if (isSuccessful) {
                             onSuccess?.()
-                            console.log(inputSubmitText)
                             inputSubmitWrap.removeClass('disable');
                             inputSubmitText.text(inputSubmitTextFirst);
                         } else {
@@ -845,6 +844,21 @@ const script = () => {
                     return;
                 }
             })
+            $(this.el).find('.footer-main-logo').on('click', (e) => {
+                $(this.el).find('.footer-popup').addClass('active');
+                smoothScroll.lenis.stop();
+            })
+            $(this.el).find('.footer-popup-close').on('click', (e) => {
+                $(this.el).find('.footer-popup').removeClass('active');
+                smoothScroll.lenis.start();
+            })
+            $(window).on('click', (e) => {
+                if (!$(this.el).find('.footer-main-logo:hover').length)
+                    if (!$(this.el).find('.footer-popup-img:hover').length) {
+                        $(this.el).find('.footer-popup').removeClass('active');
+                        smoothScroll.lenis.start();
+                    }
+            })
             this.animationReveal();
             this.animationScrub();
         }
@@ -1004,7 +1018,6 @@ const script = () => {
                 this.animationReveal(this.tlEnter);
             }
             playOnce() {
-                console.log("play")
                 this.tlOnce.play();
             }
             playEnter() {
@@ -1155,7 +1168,6 @@ const script = () => {
                         onUpdate: ({ progress }) => {
                             let index = this.getProgressIndex({ progress, N: allSlideItems.length, rootMargin: 0 });
                             if (index === lastIndex) return;
-                            console.log(index)
 
                             gsap.to(allSlideItems[index], { transform: 'translate(0px, 0px)', autoAlpha: 1, duration: DEFAULT.duration, ease: DEFAULT.ease } )
                             gsap.to(allSlideItems[lastIndex], { transform: DEFAULT.transform[index > lastIndex ? 'in' : 'out'], autoAlpha: 0, duration: DEFAULT.duration, ease: DEFAULT.ease } )
@@ -1290,7 +1302,7 @@ const script = () => {
                 viewport.w > 991 && updateHeightText();
                 $(this.el).find('.home-challenge-item').on('click', debounce(function (e) {
                     let current = $(e.target).closest('.home-challenge-item');
-                    $(current).addClass('active').siblings().removeClass('active');
+                    $(current).toggleClass('active').siblings().removeClass('active');
                     viewport.w > 991 && updateHeightText();
                 }, 100))
             }
@@ -2795,7 +2807,6 @@ const script = () => {
                             pageName: 'Contact page'
                         }
                     };
-                    console.log(dataSend)
                     $.ajax({
                         url: url,
                         method: 'POST',
