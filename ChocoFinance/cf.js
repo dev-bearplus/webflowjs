@@ -725,7 +725,7 @@ const mainScript = () => {
     }
     // Scroll Events
     let header = $('.header');
-    function activeLang() {
+    function activeLanguage() {
         $('.header-lang-btn').on('click', function(e) {
             e.preventDefault();
             $(this).toggleClass('active');
@@ -764,8 +764,23 @@ const mainScript = () => {
         }
         initLang();
     }
+    function initLanguage () {
+        $('.header-lang-content-item').each(function () {
+            const langCode = $(this).data('lang-code'); // ví dụ: 'en-HK'
+          
+            const baseUrl = window.location.origin;                 // ví dụ: https://example.com
+            const pathname = window.location.pathname;              // ví dụ: /about-us
+            const search = window.location.search || '';            // ví dụ: ?ref=google
+            const hash = window.location.hash || '';                // ví dụ: #section1
+          
+            const newUrl = `${baseUrl}/${langCode}${pathname}${search}${hash}`;
+          
+            $(this).attr('href', newUrl);
+          });
+    }
     if(isStagging()){
-        activeLang();
+        initLanguage();
+        activeLanguage();
     }
     function scrollDown() {
         header.addClass('on-hide')
