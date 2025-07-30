@@ -740,6 +740,22 @@ const mainScript = () => {
             $('.header-lang-content-list').eq(index).addClass('active');
         })
         function initLang() {
+            $('.header-lang-content-item').each(function () {
+                const langCode = $(this).data('lang-subdomain');
+              
+                const baseUrl = window.location.origin;                
+                const pathname = window.location.pathname;           
+                const search = window.location.search || '';            
+                const hash = window.location.hash || '';  
+                let newUrl = '';              
+                if(langCode != '') {
+                     newUrl = `${baseUrl}/${langCode}${pathname}${search}${hash}`;
+                }
+                else {
+                     newUrl = `${baseUrl}${pathname}${search}${hash}`;
+                }
+                $(this).attr('href', newUrl);
+              });
             let currentLang = $('html').attr('lang');
             console.log(currentLang)
             if(currentLang) {
@@ -764,22 +780,7 @@ const mainScript = () => {
         }
         initLang();
     }
-    function initLanguage () {
-        $('.header-lang-content-item').each(function () {
-            const langCode = $(this).data('lang-code'); // ví dụ: 'en-HK'
-          
-            const baseUrl = window.location.origin;                 // ví dụ: https://example.com
-            const pathname = window.location.pathname;              // ví dụ: /about-us
-            const search = window.location.search || '';            // ví dụ: ?ref=google
-            const hash = window.location.hash || '';                // ví dụ: #section1
-          
-            const newUrl = `${baseUrl}/${langCode}${pathname}${search}${hash}`;
-          
-            $(this).attr('href', newUrl);
-          });
-    }
     if(isStagging()){
-        initLanguage();
         activeLanguage();
     }
     function scrollDown() {
