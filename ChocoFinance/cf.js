@@ -740,30 +740,34 @@ const mainScript = () => {
             $('.header-lang-content-list').eq(index).addClass('active');
         })
         function initLang() {
-            const langCodes = $('.header-lang-content-item')
-            .map(function () {
-            return $(this).data('lang-subdomain');
-            })
-            .get()
-            .filter(Boolean); 
-            const langPattern = new RegExp(`^/(${langCodes.join('|')})`);
+            const langCodes = $('.header-lang-content-item').map(function () {
+                return $(this).data('lang-subdomain');
+            }).get().filter(Boolean);
+            
+            const langPattern = new RegExp(`^/(${langCodes.join('|')})(/|$)`);
+            
             $('.header-lang-content-item').each(function () {
                 const langSubDomain = $(this).data('lang-subdomain');
-
+            
                 const baseUrl = window.location.origin;
-                const pathname = window.location.pathname.replace(langPattern, ''); 
+                let pathname = window.location.pathname.replace(langPattern, '');
+            
+                // ✅ Remove leading slash if exists to avoid double slashes
+                pathname = pathname.replace(/^\/+/, '');
+            
                 const search = window.location.search || '';
                 const hash = window.location.hash || '';
-
+            
                 let newUrl = '';
                 if (langSubDomain !== '') {
-                    newUrl = `${baseUrl}/${langSubDomain}${pathname}${search}${hash}`;
+                    newUrl = `${baseUrl}/${langSubDomain}${pathname ? '/' + pathname : ''}${search}${hash}`;
                 } else {
-                    newUrl = `${baseUrl}${pathname}${search}${hash}`;
+                    newUrl = `${baseUrl}/${pathname}${search}${hash}`;
                 }
-
+            
                 $(this).attr('href', newUrl);
             });
+            
 
             let currentLang = $('html').attr('lang');
             console.log(currentLang)
