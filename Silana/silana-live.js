@@ -1095,7 +1095,7 @@ const script = () => {
                         new FadeSplitText({ el: $(this.el).find('.home-hero-title').get(0) }),
                         new FadeSplitText({ el: $(this.el).find('.home-hero-desc-txt').get(0) }),
                         new FadeSplitText({ el: $(this.el).find('.home-hero-cta').get(0) }),
-                        new FadeIn({ el: $(this.el).find('.home-hero-main-gif').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.home-hero-main-inner').get(0) }),
                         new FadeIn({ el: $(this.el).find('.home-hero-client').get(0), delay: "<=.3" }),
                     ]
                 });
