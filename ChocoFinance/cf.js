@@ -726,18 +726,29 @@ const mainScript = () => {
     // Scroll Events
     let header = $('.header');
     function activeLanguage() {
+        $(function () {
+            const langPaths = ['zh', 'hk-zh', 'hk-en'];
+            const pathname = window.location.pathname;
+          
+            langPaths.forEach(function (lang) {
+              const regex = new RegExp(`^/${lang}/.+`);
+              console.log(regex.test(pathname))
+              if (regex.test(pathname)) {
+                window.location.replace(`/${lang}`);
+              }
+            });
+        });
+          
         $('.header-lang-btn').on('click', function(e) {
             e.preventDefault();
             $(this).toggleClass('active');
             $('.header-lang-main').toggleClass('active');
         })
         $('.header-lang-nation-item').on('click', function(e) {
-            e.preventDefault();
-            let index = $(this).index();
-            $('.header-lang-nation-item').removeClass('active');
-            $(this).addClass('active');
-            $('.header-lang-content-list').removeClass('active');
-            $('.header-lang-content-list').eq(index).addClass('active');
+            if($(this).hasClass('active')){
+                e.preventDefault();
+                return;
+            }
         })
         function initLang() {
             const langCodes = $('.header-lang-content-item').map(function () {
@@ -748,11 +759,10 @@ const mainScript = () => {
             
             $('.header-lang-content-item').each(function () {
                 const langSubDomain = $(this).data('lang-subdomain');
-            
+                const isDefault = $(this).data('lang-default');
+                console.log(isDefault)
                 const baseUrl = window.location.origin;
                 let pathname = window.location.pathname.replace(langPattern, '');
-            
-                // ✅ Remove leading slash if exists to avoid double slashes
                 pathname = pathname.replace(/^\/+/, '');
             
                 const search = window.location.search || '';
@@ -766,6 +776,16 @@ const mainScript = () => {
                 }
             
                 $(this).attr('href', newUrl);
+                if(isDefault == true) {
+                    let indexParent = $(this).closest('.header-lang-content-list').index();
+                    $('.header-lang-nation-item').eq(indexParent).attr('href', newUrl);
+                }
+                $(this).on('click', function(e){
+                    if($(this).hasClass('active')){
+                        e.preventDefault();
+                        return; 
+                    }
+                })
             });
             
 
