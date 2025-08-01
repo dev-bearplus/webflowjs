@@ -1661,28 +1661,30 @@ const script = () => {
                     'data-prev-percentage': -50
                 });
 
-                let isDragging = false;
+                let isOnDown = false;
+                let isOnMove = false;
                 let targetPercentage = -50;
                 let currentPercentage = -50;
                 const MOVEMENT_THRESHOLD = 2;
-                let hasMoved = false;
 
                 const handleOnDown = (e) => {
                     if (viewport.w > 991 && !$(this.el).find('.prod-hero-decor-scan-drag-inner:hover').length) return;
                     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                     track.dataset.mouseDownAt = clientX - scanInner.getBoundingClientRect().left;
                     track.dataset.prevPercentage = track.dataset.percentage || -50;
-                    isDragging = true;
+                    track.dataset.initialX = track.dataset.mouseDownAt;
+                    isOnDown = true;
                 };
 
                 const handleOnUp = () => {
                     track.dataset.mouseDownAt = "0";
                     track.dataset.prevPercentage = currentPercentage;
-                    isDragging = false;
+                    isOnDown = false;
+                    isOnMove = false;
                 };
 
                 const animate = () => {
-                    if (isDragging && track.dataset.mouseDownAt !== "0") {
+                    if (isOnMove && track.dataset.mouseDownAt !== "0") {
                         const mouseDelta = parseFloat(track.dataset.mouseDownAt) - (track.dataset.currentX || 0);
                         const maxDelta = scanInner.getBoundingClientRect().width;
                         const percentage = (mouseDelta / maxDelta) * -100;
@@ -1700,15 +1702,15 @@ const script = () => {
                 };
 
                 const handleOnMove = (e) => {
-                    if (!isDragging) return;
+                    if (!isOnDown) return;
 
                     const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
                     track.dataset.currentX = clientX - scanInner.getBoundingClientRect().left;
 
                     const movement = Math.abs(parseFloat(track.dataset.currentX) - parseFloat(track.dataset.initialX));
                     if (movement > MOVEMENT_THRESHOLD) {
-                        hasMoved = true;
-                        track.dataset.mouseDownAt = track.dataset.currentX;
+                        isOnMove = true;
+                        track.dataset.mouseDownAt = track.dataset.initialX;
                     }
                 };
 
