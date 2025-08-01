@@ -703,7 +703,6 @@ const script = () => {
     class TriggerSetup {
         constructor() {
             this.tlTrigger = null;
-            this.isPlayed = false;
             this.once = true;
         }
         setTrigger(triggerEl, onTrigger) {
@@ -713,13 +712,13 @@ const script = () => {
                     start: 'clamp(top bottom+=50%)',
                     end: 'bottom top-=50%',
                     onEnter: () => {
-                        if (this.isPlayed && this.once) {
+                        if (this.once) {
                             this.once = false;
                             this.onTrigger();
                         }
                     },
                     onEnterBack: () => {
-                        if (this.isPlayed && this.once) {
+                        if (this.once) {
                             this.once = false;
                             onTrigger();
                         }
@@ -728,14 +727,9 @@ const script = () => {
             })
         }
         playTrigger() {
-            this.isPlayed = true;
-            console.log("play")
-            if (window.scrollY === 0) window.scrollTo(0, 10)
+            if (window.scrollY === 0) window.scrollTo(0, 1)
         }
         cleanTrigger() {
-            if (this.isPlayed) {
-                this.isPlayed = false;
-            }
             if (!this.once) {
                 this.once = true;
             }
@@ -1303,7 +1297,7 @@ const script = () => {
                 viewport.w > 991 && updateHeightText();
                 $(this.el).find('.home-challenge-item').on('click', debounce(function (e) {
                     let current = $(e.target).closest('.home-challenge-item');
-                    $(current).toggleClass('active').siblings().removeClass('active');
+                    $(current).addClass('active').siblings().removeClass('active');
                     viewport.w > 991 && updateHeightText();
                 }, 100))
             }
@@ -2524,7 +2518,13 @@ const script = () => {
                 })
             }
             interact() {
-                this.cardSlide();
+                if ($(this.el).find(".about-job-main-item").length > 0) {
+                    this.cardSlide();
+                }
+                else {
+                    $(this.el).find('.about-job-main-control').remove();
+                    $(this.el).find(".about-job-progress").remove();
+                }
             }
             cardSlide() {
                 $(this.el).find(".about-job-main-list").addClass('keen-slider');
@@ -2560,7 +2560,7 @@ const script = () => {
                         const totalSlides = slider.track.details.slides.length;
                         const perView = slider.options.slides.perView;
                         if (totalSlides <= perView) {
-                            $(this.el).find('.about-job-main-control').hide();
+                            $(this.el).find('.about-job-main-control').remove();
                         }
                     },
                     detailsChanged: (slider) => {

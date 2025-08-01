@@ -2575,6 +2575,7 @@ const script = () => {
                 }
                 else {
                     $(this.el).find('.about-job-main-control').remove();
+                    $(this.el).find(".about-job-progress").remove();
                 }
             }
             cardSlide() {
