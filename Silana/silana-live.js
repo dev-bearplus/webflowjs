@@ -730,7 +730,6 @@ const script = () => {
     class TriggerSetup {
         constructor() {
             this.tlTrigger = null;
-            this.isPlayed = false;
             this.once = true;
         }
         setTrigger(triggerEl, onTrigger) {
@@ -740,13 +739,13 @@ const script = () => {
                     start: 'clamp(top bottom+=50%)',
                     end: 'bottom top-=50%',
                     onEnter: () => {
-                        if (this.isPlayed && this.once) {
-                            this.once = false;
+                        if (this.once) {
                             this.onTrigger();
+                            this.once = false;
                         }
                     },
                     onEnterBack: () => {
-                        if (this.isPlayed && this.once) {
+                        if (this.once) {
                             this.once = false;
                             onTrigger();
                         }
@@ -755,13 +754,9 @@ const script = () => {
             })
         }
         playTrigger() {
-            this.isPlayed = true;
-            if (window.scrollY === 0) window.scrollTo(0, 2)
+            if (window.scrollY === 0) window.scrollTo(0, 1)
         }
         cleanTrigger() {
-            if (this.isPlayed) {
-                this.isPlayed = false;
-            }
             if (!this.once) {
                 this.once = true;
             }
@@ -1493,10 +1488,9 @@ const script = () => {
                     this.tlStickSol = gsap.timeline({
                         scrollTrigger: {
                             trigger: $(this.el).find('.home-solution'),
-                            start: `top+=${viewport.h * .8} top`,
-                            end: `bottom-=${viewport.h * .2} bottom`,
-                            scrub: 1,
-                            anticipatePin: 1
+                            start: `top top`,
+                            end: `bottom bottom`,
+                            scrub: 1
                         },
                     })
 
@@ -1512,7 +1506,6 @@ const script = () => {
                     //         scrub: 1,
                     //         start: `top+=${$(this.el).find('.home-solution').height() - (viewport.h * 1.9)} top`,
                     //         end: 'bottom bottom',
-                    //         anticipatePin: 1
                     //     }
                     // })
 
@@ -1558,7 +1551,6 @@ const script = () => {
                         start: `top+=${viewport.h * 1.5} top`,
                         end: `bottom+=${viewport.h * 1.5} bottom`,
                         scrub: 1,
-                        anticipatePin: 1,
                         onUpdate: (self) => {
                             if (self.progress > 0.5 && !fadeIn) {
                                 fadeIn = true;
@@ -2560,6 +2552,7 @@ const script = () => {
                 super.setTrigger(this.el, this.onTrigger.bind(this));
             }
             onTrigger() {
+                console.log("play")
                 this.interact();
                 this.animationReveal();
             }
