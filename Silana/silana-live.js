@@ -2570,7 +2570,12 @@ const script = () => {
                 })
             }
             interact() {
-                this.cardSlide();
+                if ($(this.el).find(".about-job-main-item").length > 0) {
+                    this.cardSlide();
+                }
+                else {
+                    $(this.el).find('.about-job-main-control').remove();
+                }
             }
             cardSlide() {
                 $(this.el).find(".about-job-main-list").addClass('keen-slider');
