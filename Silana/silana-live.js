@@ -1345,34 +1345,32 @@ const script = () => {
                         }, 1000)
                 });
                 headingFlipping.setup();
-                if (viewport.w < 991) {
-                    new MasterTimeline({
-                        triggerInit: this.el,
-                        scrollTrigger: {
-                            trigger: this.el,
-                            start: `top top+=75%`
-                        },
-                        allowMobile: true,
-                        tweenArr: [
-                            new FadeSplitText({ el: $(this.el).find('.home-solution-label').get(0) }),
-                            new FadeSplitText({ el: $(this.el).find('.home-solution-title').get(0) }),
-                            new FadeSplitText({ el: $(this.el).find('.home-solution-desc').get(0) }),
-                        ]
-                    })
-                    new MasterTimeline({
-                        triggerInit: this.el,
-                        scrollTrigger: {
-                            trigger: this.el,
-                            start: `top top+=75%`
-                        },
-                        allowMobile: true,
-                        tweenArr: [
-                            new FadeIn({ el: $(this.el).find('.home-solution-main-transform').get(0), clearProps: 'transform, opacity' }),
-                            new FadeIn({ el: $(this.el).find('.home-solution-main-decor').get(0) }),
-                            new FadeIn({ el: $(this.el).find('.home-solution-main-vid').get(0) })
-                        ]
-                    })
-                }
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: `top top+=75%`
+                    },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $(this.el).find('.home-solution-label').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-solution-title').get(0) }),
+                        new FadeSplitText({ el: $(this.el).find('.home-solution-desc').get(0) }),
+                    ]
+                })
+                new MasterTimeline({
+                    triggerInit: this.el,
+                    scrollTrigger: {
+                        trigger: this.el,
+                        start: `top top+=75%`
+                    },
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeIn({ el: $(this.el).find('.home-solution-main-transform').get(0), clearProps: 'transform, opacity' }),
+                        new FadeIn({ el: $(this.el).find('.home-solution-main-decor').get(0) }),
+                        new FadeIn({ el: $(this.el).find('.home-solution-main-vid').get(0) })
+                    ]
+                })
 
                 this.tlFadeHead = gsap.timeline({ paused: true })
 
@@ -1425,17 +1423,6 @@ const script = () => {
                 if (viewport.w > 991) {
                     this.sections = this.el.querySelectorAll('section');
                     this.horizontalLayout(this.sections);
-
-                    this.tlFadeShirt = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: $(this.el).find('.home-solution'),
-                            start: `top+=${viewport.h} bottom`,
-                            end: `bottom-=${viewport.h * 2} bottom`,
-                            scrub: 1,
-                            anticipatePin: 1
-                        },
-                    })
-                    this.tlFadeShirt.fromTo($(this.el).find('.home-solution-main-inner'), { autoAlpha: 0 }, { autoAlpha: 1 });
 
                     this.tlStickSol = gsap.timeline({
                         scrollTrigger: {
