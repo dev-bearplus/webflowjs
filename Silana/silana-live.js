@@ -2606,7 +2606,7 @@ const script = () => {
                         const totalSlides = slider.track.details.slides.length;
                         const perView = slider.options.slides.perView;
                         if (totalSlides <= perView) {
-                            $(this.el).find('.about-job-main-control').hide();
+                            $(this.el).find('.about-job-main-control').remove();
                         }
                     },
                     detailsChanged: (slider) => {
