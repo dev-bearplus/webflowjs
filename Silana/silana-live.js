@@ -37,6 +37,12 @@ const script = () => {
     }
     const lerp = (a, b, t) => (1 - t) * a + t * b;
     const distance = (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1);
+    const capitalizeFirstLetter = (str) => {
+        if (typeof str !== 'string' || str.length === 0) {
+            return str; // Handle non-string or empty inputs
+        }
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
     const isInViewport = (el) => {
         if (!el) return;
         const rect = el.getBoundingClientRect();
@@ -185,6 +191,27 @@ const script = () => {
             },
             {}
         ));
+    }
+    const mapField = (fields, data) => {
+        if (!fields.length) return [];
+
+        const result = fields.map((field) => {
+            const { name, value } = field;
+            if (!value) {
+                return {
+                    name,
+                    value: data[name] || ""
+                }
+            }
+            else {
+                const getValue = value(data);
+                return {
+                    name,
+                    value: getValue || ''
+                }
+            }
+        })
+        return result;
     }
     class Mouse {
         constructor() {
@@ -729,8 +756,7 @@ const script = () => {
         }
         playTrigger() {
             this.isPlayed = true;
-            console.log("play")
-            if (window.scrollY === 0) window.scrollTo(0, 10)
+            if (window.scrollY === 0) window.scrollTo(0, 2)
         }
         cleanTrigger() {
             if (this.isPlayed) {
@@ -862,6 +888,7 @@ const script = () => {
             })
             this.animationReveal();
             this.animationScrub();
+            this.interact();
         }
         animationReveal() {
             new MasterTimeline({
@@ -919,6 +946,45 @@ const script = () => {
                 }
             })
             this.tlOverlap.fromTo($(this.el).find('.footer-bot'), { yPercent: 20 }, { yPercent: 0, ease: 'sine.out' });
+        }
+        interact() {
+            const hubspot = {
+                portalId: 145687733,
+                formId: "18bab178-0fc8-4001-a541-da1066480e55",
+                fields: [
+                    { name: 'email', value: (data) => data['email'] }
+                ]
+            }
+            const { portalId, formId, fields } = hubspot;
+            let url = `https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${formId}`;
+            $(this.el).find("#email-form").on('submit', function (e) {
+                const data = mapFormToObject(e.target);
+                const mappedFields = mapField(fields, data);
+                const dataSend = {
+                    fields: mappedFields,
+                    context: {
+                        pageUri: window.location.href,
+                        pageName: `${capitalizeFirstLetter(namespace)} page`
+                    }
+                };
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: JSON.stringify(dataSend),
+                    dataType: 'json',
+                    headers: {
+                        accept: 'application/json',
+                        'Access-Control-Allow-Origin': '*',
+                    },
+                    contentType: 'application/json',
+                    success: function (response) {
+                        console.log(response);
+                    },
+                    error: function (xhr, resp, text) {
+                        console.log(xhr, resp, text)
+                    }
+                });
+            })
         }
         destroy() {
             if (this.tlOverlap) {
@@ -2755,7 +2821,7 @@ const script = () => {
                     portalId: 145687733,
                     formId: "b2778646-595a-41ee-8637-6e3b79222e01",
                     fields: [
-                        { name: 'fullname', value: (data) => data['Name'] },
+                        { name: 'firstname', value: (data) => data['name'] },
                         { name: 'phone', value: (data) => data['Phone'] },
                         { name: 'email', value: (data) => data['Email'] },
                         { name: 'subject', value: (data) => data['Subject'] },
@@ -2764,30 +2830,9 @@ const script = () => {
                 }
                 const { portalId, formId, fields } = hubspot;
                 let url = `https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${formId}`;
-                const mapField = (data) => {
-                    if (!fields.length) return [];
-
-                    const result = fields.map((field) => {
-                        const { name, value } = field;
-                        if (!value) {
-                            return {
-                                name,
-                                value: data[name] || ""
-                            }
-                        }
-                        else {
-                            const getValue = value(data);
-                            return {
-                                name,
-                                value: getValue || ''
-                            }
-                        }
-                    })
-                    return result;
-                }
                 $(this.el).find("#contact-form").on('submit', function (e) {
                     const data = mapFormToObject(e.target);
-                    const mappedFields = mapField(data);
+                    const mappedFields = mapField(fields, data);
                     const dataSend = {
                         fields: mappedFields,
                         context: {
