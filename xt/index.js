@@ -404,7 +404,15 @@ const script = () => {
             gsap.set('.loader-circle-btn', {pointerEvents: 'none'});
             // show frame and content
             // start the animation
+            let audio = new Audio('https://cdn.jsdelivr.net/gh/dev-bearplus/webflowjs@151aa311eebf067bf635d79dba7c7b7a54c95781/xt/start-sound.aac');
+            audio.play();
+            // btn1.forEach(btn => {
+            //     btn.addEventListener("click", () => {
+            //         btn.classList.toggle("active");
+            //     });
+            // });
             gsap.timeline({
+                delay: .1
             })
             .addLabel('start', 0)
             .to('.loader-circle-btn', {
