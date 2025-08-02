@@ -299,14 +299,12 @@ const script = () => {
             this.tlLoadMaster = null;
         }
         init(data) {
-            this.initEvents();
             this.tlLoading = gsap.timeline({
                 paused: true
             })
 
             gsap.set('.loader-circle-text', { transformOrigin: '50% 50%' });
             gsap.set(['.loader-circle-btn', '.loader-circle-text'], { opacity: 0 });
-            gsap.set('.loader', { clipPath: `circle(${cvUnit(50,'vh')}px at center)` });
             // don't allow to hover
             gsap.set('.loader-circle-btn', {pointerEvents: 'none'});
             this.tlLoading
@@ -320,7 +318,6 @@ const script = () => {
                     amount: 0.4
                 }
             }, 'start')
-            // scale in the texts & enter button and fade them in
             .to(['.loader-circle-text', '.loader-circle-btn'], {
                 duration: 3,
                 ease: 'expo.inOut',
@@ -331,18 +328,19 @@ const script = () => {
                     amount: 0.4
                 }
             }, 'start')
-
-            .add(() => gsap.set('.loader-circle-btn', {pointerEvents: 'auto'}), 'start+=2.5');
+            .add(() => gsap.set('.loader-circle-btn', {pointerEvents: 'auto'}), 'start+=2');
 
             this.tlLoadMaster = gsap.timeline({
                 paused: true,
                 delay: this.isLoaded ? 0 : 1,
-                duration: .5,
                 onStart: () => {
                     this.onceSetup(data);
+                    setTimeout(() => {
+                        this.initEvents(data);
+                    }, 1000);
                 },
                 onComplete: () => {
-                    this.oncePlay(data);
+
                 }
             })
             this.tlLoadMaster
@@ -355,7 +353,7 @@ const script = () => {
             // return;
             this.tlLoadMaster.play();
         }
-        initEvents() {
+        initEvents(data) {
             // click and hover events for the "enter" button:
             this.enterMouseEnterEv = () => {
                 gsap.killTweensOf(['.loader-circle-btn','.loader-circle-text']);
@@ -363,14 +361,15 @@ const script = () => {
                 gsap.to('.loader-circle-btn', {
                     duration: 1,
                     ease: 'expo',
-                    scale: 1.4
+                    scale: 1.4,
+                    opacity: 1
                 });
                 gsap.to('.loader-circle-text', {
                     duration: 2,
                     ease: 'expo',
                     scale: 1.15,
                     rotation: i => i%2 ? '-=90' : '+=90',
-                    opacity: 0.4,
+                    opacity: i => i < 2 ? 0.4 : 1,
                 });
             };
             this.enterMouseLeaveEv = () => {
@@ -390,13 +389,13 @@ const script = () => {
                     }
                 });
             };
-            this.enterClickEv = () => this.enter();
+            this.enterClickEv = () => this.enter(data);
 
             $('.loader-circle-btn').get(0).addEventListener('mouseenter', this.enterMouseEnterEv);
             $('.loader-circle-btn').get(0).addEventListener('mouseleave', this.enterMouseLeaveEv);
             $('.loader-circle-btn').get(0).addEventListener('click', this.enterClickEv);
         }
-        enter() {
+        enter(data) {
             // this.tlLoading.kill();
             // remove any event listener on the button
             $('.loader-circle-btn').get(0).removeEventListener('mouseenter', this.enterMouseEnterEv);
@@ -405,16 +404,17 @@ const script = () => {
             gsap.set('.loader-circle-btn', {pointerEvents: 'none'});
             // show frame and content
             // start the animation
-            gsap.timeline()
+            gsap.timeline({
+            })
             .addLabel('start', 0)
             .to('.loader-circle-btn', {
-                duration: 0.8,
+                duration: 1.1,
                 ease: 'back.in',
                 scale: 1,
                 // opacity: 0
             }, 'start')
             .to('.loader-circle-text', {
-                duration: 0.8,
+                duration: 1,
                 ease: 'back.in',
                 scale: 1.6,
                 opacity: 0,
@@ -424,8 +424,17 @@ const script = () => {
                 }
             }, 'start')
             .to('.loader', {
-                duration: 1.5,
-                ease: 'expo.inOut',
+                duration: 2.2,
+                ease: 'back.inOut',
+                rotationX: 50,
+                onStart: () => {
+                    setTimeout(() => {
+                        this.oncePlay(data);
+                    }, 250);
+                    setTimeout(() => {
+                        gsap.to('.loader-circle-btn', { rotation: '+=180', ease: 'power4.inOut', duration: 2 });
+                    }, 280);
+                },
                 // opacity: 0,
                 clipPath: `circle(${cvUnit(0,'rem')}px at center)`
             }, "<=0.1")
@@ -805,7 +814,7 @@ const script = () => {
                 this.tlOverlap = null;
             }
             setup(data, mode) {
-                this.el = data.next.container.querySelector('.body');
+                this.el = data.next.container.querySelector('.sc-hero-wrap');
                 if (mode === 'once') {
                     this.setupOnce(data);
                 } else if (mode === 'enter') {
@@ -818,6 +827,9 @@ const script = () => {
                     paused: true,
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
+                this.tlOnce
+                    .to($(this.el).find('.hero-logo'), { rotation: '+=180', rotationX: 50, ease: 'power4.inOut', duration: 2 })
+                    .from($(this.el).find('.hero-main-up'), { rotationX: 20, y: 20, x: -5, duration: 1.2, autoAlpha: 0 }, "<=.8")
             }
             setupEnter(data) {
                 this.tlEnter = gsap.timeline({
