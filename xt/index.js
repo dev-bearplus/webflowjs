@@ -836,8 +836,11 @@ const script = () => {
                     onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
                 })
                 this.tlOnce
-                    .to($(this.el).find('.hero-logo'), { rotation: '+=180', rotationX: 50, ease: 'power4.inOut', duration: 2 })
-                    .from($(this.el).find('.hero-main-up'), { rotationX: 20, y: 20, x: -5, duration: 1.2, autoAlpha: 0 }, "<=.8")
+                    .to($(this.el).find('.hero-logo'), { rotation: '+=180', rotationX: 50, ease: 'power4.inOut', duration: 2  })
+                    .from($(this.el).find('.hero-main-up'), { rotationX: 20, y: 20, x: -5, duration: 1.2, autoAlpha: 0  }, "<=.8")
+                    .from($(this.el).find('.hero-tracks-playing-item-inner'), {
+                        yPercent: 30, scale: .8, duration: 1.5, autoAlpha: 0, ease: 'circ.out',
+                        stagger: 0.04, clearProps: 'all' }, "<=0")
             }
             setupEnter(data) {
                 this.tlEnter = gsap.timeline({
