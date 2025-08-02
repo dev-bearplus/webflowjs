@@ -2688,7 +2688,6 @@ const script = () => {
                 $('.contact-hero-form-submit-real').on('click', function(e){
                     let name = $('.contact-hero-form-input[name="name"]');
                     let email = $('.contact-hero-form-input[name="Email"]');
-                    let phone = $('.contact-hero-form-input[name="Phone"]');
                     let subject = $('.contact-hero-form-input[name="Subject"]');
                     let flag = false;
                     if(name.val() === ''){
@@ -2697,13 +2696,6 @@ const script = () => {
                     }
                     else {
                         name.closest('.contact-hero-form-input-wrap').removeClass('valid-null');
-                    }
-                    if(phone.val() === ''){
-                        phone.closest('.contact-hero-form-input-wrap').addClass('valid-null');
-                        flag = true;
-                    }
-                    else {
-                        phone.closest('.contact-hero-form-input-wrap').removeClass('valid-null');
                     }
                     if(email.val() === ''){
                         email.closest('.contact-hero-form-input-wrap').addClass('valid-null');

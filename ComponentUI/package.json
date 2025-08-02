@@ -11,8 +11,8 @@
   "module": "./dist/index.module.js",
   "unpkg": "./dist/index.umd.js",
   "scripts": {
-    "build": "microbundle",
-    "dev": "microbundle watch"
+    "build": "microbundle -o dist/bp.js --no-pkg-main -f es --compress --no-sourcemap --external none",
+    "dev": "microbundle -w -o dist/bp.js --no-pkg-main -f es --compress --no-sourcemap --external none"
   },
   "devDependencies": {
     "microbundle": "^0.15.1"
