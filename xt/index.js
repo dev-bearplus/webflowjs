@@ -833,14 +833,33 @@ const script = () => {
             setupOnce(data) {
                 this.tlOnce = gsap.timeline({
                     paused: true,
-                    onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden')
+                    onStart: () => $('[data-init-hidden]').removeAttr('data-init-hidden'),
+                    onComplete: () => this.interact()
                 })
+                let scaleFactor = parseFloat(viewport.h / $(this.el).find('.hero-tracks-bar.fading').height()) * .23;
+                gsap.set($(this.el).find('.hero-tracks-bar.fading'), { scale: scaleFactor, yPercent: 0 })
+                setTimeout(() => {
+                    $(this.el).find('.hero-tracks-bar.fading .hero-tracks-list').addClass('active');
+                    $(this.el).find('.hero-tracks-bar.fading .hero-tracks-item').addClass('active');
+                }, 1300);
                 this.tlOnce
                     .to($(this.el).find('.hero-logo'), { rotation: '+=180', rotationX: 50, ease: 'power4.inOut', duration: 2  })
-                    .from($(this.el).find('.hero-main-up'), { rotationX: 20, y: 20, x: -5, duration: 1.2, autoAlpha: 0  }, "<=.8")
-                    .from($(this.el).find('.hero-tracks-playing-item-inner'), {
-                        yPercent: 30, scale: .8, duration: 1.5, autoAlpha: 0, ease: 'circ.out',
-                        stagger: 0.04, clearProps: 'all' }, "<=0")
+                    .to($(this.el).find('.hero-tracks-bar.fading'), {
+                        scale: 1, yPercent: 35, ease: 'power3.out', duration: 2,
+                        onStart: () => {
+                            $(this.el).find('.hero-tracks-bar.fading').removeClass('rotation');
+                        },
+                        onComplete: () => {
+                            $(this.el).find('.hero-tracks-bar.fading .hero-tracks-list').removeClass('active');
+                            $(this.el).find('.hero-tracks-bar.fading .hero-tracks-item').removeClass('active');
+                        }
+                    }, "<=0.6")
+                    .from($(this.el).find('.hero-bottom-tracks'), {  duration: 1, ease: 'power3.out', autoAlpha: 0  }, "<=0.3")
+                    .from($(this.el).find('.hero-main-up'), { rotationX: 20, y: 20, x: -5, duration: 1.2, autoAlpha: 0  }, "<=.3")
+                    .from($(this.el).find('.hero-bottom'), { yPercent: 110, duration: 1.2, ease: 'power3.out'  }, "<=0")
+                    .from($(this.el).find('.hero-bottom-playing'), { scale: 1.2, autoAlpha: 0, duration: 1.2, ease: 'power3.out'  }, "<=0.2")
+
+                this.activeSong(0);
             }
             setupEnter(data) {
                 this.tlEnter = gsap.timeline({
@@ -871,6 +890,28 @@ const script = () => {
             animationReveal(timeline) {
             }
             animationScrub() {
+            }
+            activeSong(idx) {
+                console.log($(this.el).find('.hero-tracks-playing-item').eq(idx))
+                $(this.el).find('.hero-tracks-playing-item').eq(idx).addClass('active').siblings().removeClass('active');
+            }
+            interact() {
+                $(this.el).find('.hero-bottom-tracks-open').on('click', (e) => {
+                    console.log("click")
+                    setTimeout(() => {
+                        $(this.el).find('.hero-tracks-bar.bottom').addClass('expand');
+                    }, 200);
+                    $(this.el).find('.hero-bottom-tracks').addClass('expand');
+                    $(this.el).find('.hero-tracks-bar.bottom .hero-tracks-list').addClass('active');
+                    $(this.el).find('.hero-tracks-bar.bottom .hero-tracks-item').addClass('active');
+                })
+                $(this.el).find('.hero-bottom-tracks .hero-tracks-item-img-inner').on('click', (e) => {
+                    // console.log("click")
+                    $(this.el).find('.hero-tracks-bar.bottom').removeClass('expand');
+                    $(this.el).find('.hero-bottom-tracks').removeClass('expand');
+                    $(this.el).find('.hero-tracks-bar.bottom .hero-tracks-list').toggleClass('active');
+                    $(this.el).find('.hero-tracks-bar.bottom .hero-tracks-item').toggleClass('active');
+                })
             }
             destroy() {
                 if (this.tlOnce) {
