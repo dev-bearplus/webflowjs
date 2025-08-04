@@ -2871,8 +2871,8 @@ const mainScript = () => {
                 slidesPerView: 1,
                 spaceBetween: parseRem(16),
                 navigation: {
-                    prevEl: '.ldp-news-pr .ldp-news-nav-prev',
-                    nextEl: '.ldp-news-pr .ldp-news-nav-next',
+                    prevEl: '.ldp-news-pr .ldp-news-ic-prev',
+                    nextEl: '.ldp-news-pr .ldp-news-ic-next',
                 },
                 breakpoints: {
                     768: {
@@ -2881,12 +2881,12 @@ const mainScript = () => {
                     },
                 },
             })
-            const NewsHub = new Swiper('.ld-news-hub .ldp-news-cms', {
+            const NewsHub = new Swiper('.ldp-news-hub .ldp-news-cms', {
                 slidesPerView: 1,
                 spaceBetween: parseRem(16),
                 navigation: {
-                    prevEl: '.ldp-news-hub .ldp-news-nav-prev',
-                    nextEl: '.ldp-news-hub .ldp-news-nav-next',
+                    prevEl: '.ldp-news-hub .ldp-news-ic-prev',
+                    nextEl: '.ldp-news-hub .ldp-news-ic-next',
                 },
                 breakpoints: {
                     768: {
