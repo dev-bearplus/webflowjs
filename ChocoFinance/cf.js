@@ -725,14 +725,33 @@ const mainScript = () => {
     }
     // Scroll Events
     let header = $('.header');
+    function suggestLanguage() {
+        const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone.toLowerCase();
+        if (userTimeZone.includes('asia') && (userTimeZone.includes('hong_kong') || userTimeZone.includes('shanghai') || userTimeZone.includes('beijing') || userTimeZone.includes('macau'))) {
+          return 'zh-HK'; 
+        } else if (userTimeZone.includes('asia') && (userTimeZone.includes('tokyo') || userTimeZone.includes('japan') || userTimeZone.includes('osaka'))) {
+          return 'ja-JP'; 
+        } else if (userTimeZone.includes('asia') && (userTimeZone.includes('dubai') || userTimeZone.includes('riyadh') || userTimeZone.includes('qatar') || userTimeZone.includes('bahrain'))) {
+          return 'ar-AE'; 
+        } else {
+          return 'en-SG';
+        }
+    }
+    function redirectCurrentLanguage(language) {
+        let urlCurrentLanguage = $(`.header-lang-content-item[data-lang-code= ${language}]`).attr('href');
+            if(urlCurrentLanguage){
+                window.location.href = urlCurrentLanguage;
+            }
+    }
+    function setLanguage(language) {
+        localStorage.setItem('preferredLanguage', language);
+    }
     function activeLanguage() {
         $(function () {
             const langPaths = ['zh', 'hk-zh', 'hk-en'];
             const pathname = window.location.pathname;
-          
             langPaths.forEach(function (lang) {
               const regex = new RegExp(`^/${lang}/.+`);
-              console.log(regex.test(pathname))
               if (regex.test(pathname)) {
                 window.location.replace(`/${lang}`);
               }
@@ -745,9 +764,15 @@ const mainScript = () => {
             $('.header-lang-main').toggleClass('active');
         })
         $('.header-lang-nation-item').on('click', function(e) {
+            e.preventDefault();
             if($(this).hasClass('active')){
-                e.preventDefault();
                 return;
+            }
+            else {
+                let url = $(this).attr('href');
+                let languageCodeItem = $(this).attr('data-lang-code');
+                setLanguage(languageCodeItem);
+                window.location.href= url;
             }
         })
         function initLang() {
@@ -760,9 +785,9 @@ const mainScript = () => {
             $('.header-lang-content-item').each(function () {
                 const langSubDomain = $(this).data('lang-subdomain');
                 const isDefault = $(this).data('lang-default');
-                console.log(isDefault)
                 const baseUrl = window.location.origin;
                 let pathname = window.location.pathname.replace(langPattern, '');
+                let languageCodeItem = $(this).attr('data-lang-code');
                 pathname = pathname.replace(/^\/+/, '');
             
                 const search = window.location.search || '';
@@ -779,18 +804,17 @@ const mainScript = () => {
                 if(isDefault == true) {
                     let indexParent = $(this).closest('.header-lang-content-list').index();
                     $('.header-lang-nation-item').eq(indexParent).attr('href', newUrl);
+                    $('.header-lang-nation-item').eq(indexParent).attr('data-lang-code', languageCodeItem);
                 }
                 $(this).on('click', function(e){
                     if($(this).hasClass('active')){
                         e.preventDefault();
                         return; 
                     }
+                    setLanguage(languageCodeItem);
                 })
-            });
-            
-
+            }); 
             let currentLang = $('html').attr('lang');
-            console.log(currentLang)
             if(currentLang) {
                 if(currentLang!='en-SG') {
                     $('.header').addClass('dark-mode')
@@ -815,6 +839,18 @@ const mainScript = () => {
     }
     if(isStagging()){
         activeLanguage();
+        const cachedLanguage = localStorage.getItem('preferredLanguage');
+        let currentLang = $('html').attr('lang');
+        if(!cachedLanguage){
+            let suggestedLanguage = suggestLanguage();
+            setLanguage(suggestedLanguage);
+            if(currentLang != suggestedLanguage){
+                redirectCurrentLanguage(suggestedLanguage);
+            }
+        }
+        else if (cachedLanguage && cachedLanguage != currentLang) {
+            redirectCurrentLanguage(cachedLanguage);
+        } 
     }
     function scrollDown() {
         header.addClass('on-hide')
