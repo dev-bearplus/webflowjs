@@ -2858,12 +2858,12 @@ const mainScript = () => {
     SCRIPT.landingpageNewScript = () => {
         getEarnAPI();
         let videoPlayed = false;
-        $('.ld-hero-vid-inner').on('click', function (e) {
+        $('.ldp-potential-video-inner').on('click', function (e) {
             e.preventDefault();
             if (!videoPlayed) {
                 $(this).find('video').attr('controls', 'true').removeAttr('muted').css('pointer-events', 'auto')
                 $(this).removeClass('hover-img').css('pointer-events', 'none')
-                $(this).find('.ld-hero-video-ic').addClass('de-active')
+                $(this).find('.ldp-potential-video-ic').addClass('de-active')
                 $(this).find('video').get(0).volume = 0.8;
                 $(this).find('video').get(0).muted = !$(this).find('video').get(0).muted;
                 videoPlayed = true;
