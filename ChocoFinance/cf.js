@@ -819,6 +819,7 @@ const mainScript = () => {
                 if(currentLang!='en-SG') {
                     $('.header').addClass('dark-mode')
                 }
+                console.log(currentLang)
                 $('.header-lang-nation-item').each((idx, item) => {
                     let nationName = $(item).attr('data-nation');
                     $('.header-lang-content-item').each((langIdx, langItem) => {
@@ -826,7 +827,11 @@ const mainScript = () => {
                         
                         if (langItemCode == currentLang) {
                             $(langItem).addClass('active');
-                            $('.header-lang-txt').text($(langItem).attr('data-lang-name'));
+                            let displayName = $(langItem).attr('data-lang-name');
+                            if (displayName.toLowerCase().includes('en')) {
+                                displayName = 'EN'
+                            }
+                            $('.header-lang-txt').text(displayName);
                             let indexList = $(langItem).closest('.header-lang-content-list').index();
                             $('.header-lang-content-list').eq(indexList).addClass('active');
                             $('.header-lang-nation-item').eq(indexList).addClass('active');
@@ -841,14 +846,14 @@ const mainScript = () => {
         activeLanguage();
         const cachedLanguage = localStorage.getItem('preferredLanguage');
         let currentLang = $('html').attr('lang');
-        if(!cachedLanguage){
+        // if (!cachedLanguage)
+        if(true){
             let suggestedLanguage = suggestLanguage();
             setLanguage(suggestedLanguage);
-            if(currentLang != suggestedLanguage){
-                redirectCurrentLanguage(suggestedLanguage);
-            }
-        }
-        else if (cachedLanguage && cachedLanguage != currentLang) {
+            // if(currentLang != suggestedLanguage){
+            //     redirectCurrentLanguage(suggestedLanguage);
+            // }
+        } else if (cachedLanguage && cachedLanguage != currentLang) {
             redirectCurrentLanguage(cachedLanguage);
         } 
     }
