@@ -926,7 +926,7 @@ const script = () => {
                     new FadeIn({ el: $(this.el).find('.footer-bot-text').get(0) }),
                     new FadeIn({ el: $(this.el).find('.footer-bot-ruler').get(0) }),
                     ...Array.from($(this.el).find('.footer-bot-link')).flatMap((el, idx) => new FadeSplitText({ el: $(el).get(0) })),
-                    new FadeSplitText({ el: $(this.el).find('.footer-copyright-main').get(0) }),
+                    new FadeSplitText({ el: $(this.el).find('.footer-copyright-main').get(0), onComplete: () => setTimeout(() => $(this.el).find('.footer-copyright-main a').addClass('hover-line'), 100) }),
                     new ScaleLine({ el: $(this.el).find('.footer-main-line').get(0) })
                 ]
             })
