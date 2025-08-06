@@ -38,7 +38,10 @@ const mainScript = () => {
     requestAnimationFrame(raf)
 
     $isMatchSticky = false
-
+    const viewport = {
+        w: window.innerWidth,
+        h: window.innerHeight,
+    };
     lenis.on('scroll', function (inst) {
         $('.header-menu-item-drop').removeClass('active');
         if ($isMatchSticky) {
@@ -2866,6 +2869,38 @@ const mainScript = () => {
                 videoPlayed = true;
             }
         })
+        function landingpageHero() {
+            if(viewport.w > 991) {
+                $('.ldp-hero-tab-item').hover(function() {
+                    $('.ldp-hero-tab-item').removeClass('active');
+                    $(this).addClass('active');
+                    let index = $(this).index();
+                    $('.ldp-hero-content-item').removeClass('active');
+                    $('.ldp-hero-content-item').eq(index).addClass('active');
+                })
+            }
+            else {
+                $('.ldp-hero-tab-item').on('click', function() {
+                    $('.ldp-hero-tab-item').removeClass('active');
+                    $(this).addClass('active');
+                    let index = $(this).index();
+                    $('.ldp-hero-content-item').removeClass('active');
+                    $('.ldp-hero-content-item').eq(index).addClass('active');
+                    $('.ldp-hero-content-wrap').addClass('active');
+                })
+                $('.ldp-hero-content-close').on('click', function() {
+                    $('.ldp-hero-content-wrap').removeClass('active');
+                    $('.ldp-hero-tab-item').removeClass('active');
+                })
+                $('.ldp-hero-content-wrap').click(function(e) {
+                    if (!$(e.target).closest('.ldp-hero-content').length) {
+                        $(this).removeClass('active');
+                        $('.ldp-hero-tab-item').removeClass('active');
+                    }
+                })
+            }
+        }
+        landingpageHero();
         function landingpageNews() {
             const NewsPr = new Swiper('.ldp-news-pr .ldp-news-cms', {
                 slidesPerView: 1,
