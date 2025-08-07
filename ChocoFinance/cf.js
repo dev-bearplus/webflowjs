@@ -748,7 +748,7 @@ const mainScript = () => {
     }
     function activeLanguage() {
         $(function () {
-            const langPaths = ['zh', 'hk-zh', 'hk-en'];
+            const langPaths = ['hk-zh-hans', 'hk-zh-hant', 'hk-en'];
             const pathname = window.location.pathname;
             langPaths.forEach(function (lang) {
               const regex = new RegExp(`^/${lang}/.+`);
