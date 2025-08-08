@@ -708,11 +708,20 @@ const mainScript = () => {
                             onSuccess?.()
                             console.log(inputSubmitText)
                             inputSubmit.text(inputSubmitText);
-                            let data = {
-                                event: 'button-name-submit',
-                                button_name_submit : inputSubmitText
+                            if(inputSubmitText.trim() == 'Contact An Expert'){
+                                let data = {
+                                    event: 'button_contact_an_expert_submit',
+                                    button_name_submit : inputSubmitText
+                                }
+                                sendGGTag(data)
                             }
-                            sendGGTag(data)
+                            else if(inputSubmitText.trim() == "Schedule Free Demo"){
+                                let data = {
+                                    event: 'button_schedule_a_demo_submit',
+                                    button_name_submit : inputSubmitText
+                                }
+                                sendGGTag(data)
+                            }
                         } else {
                             onFail?.()
                         }
@@ -721,11 +730,20 @@ const mainScript = () => {
                             onSuccess?.()
                             console.log(inputSubmitText)
                             inputSubmit.text(inputSubmitText);
-                            let data = {
-                                event: 'button-name-submit',
-                                button_name_submit : inputSubmitText
+                            if(inputSubmitText.trim() == 'Contact An Expert'){
+                                let data = {
+                                    event: 'button_contact_an_expert_submit',
+                                    button_name_submit : inputSubmitText
+                                }
+                                sendGGTag(data)
                             }
-                            sendGGTag(data)
+                            else if(inputSubmitText.trim() == "Schedule Free Demo"){
+                                let data = {
+                                    event: 'button_schedule_a_demo_submit',
+                                    button_name_submit : inputSubmitText
+                                }
+                                sendGGTag(data)
+                            }
                         } else {
                             onFail?.()
                         }
