@@ -38,7 +38,7 @@ class PageFellowShip {
             canvas.height = Math.max(1, height);
 
 
-            const countDependOnWidth = width * height / 100;
+            const countDependOnWidth = width * height / 200;
             console.log('countDependOnWidth', countDependOnWidth)
             const seedCount = Math.min(3000, countDependOnWidth);
             this.seedPixels(seedCount);
@@ -96,7 +96,6 @@ class PageFellowShip {
             oscillationSpeed: 0.02 + Math.random() * 0.03, // Speed of oscillation
             oscillationRange: 0.5 + Math.random() * 0.1, // Range of oscillation (-range to +range)
             oscillationOffset: Math.random() * Math.PI * 2, // Random starting phase
-            // Random behavior: 33% go to 50%, 33% go to 75%, 33% go to 100%
             goesToTop: Math.floor(Math.random() * 3), // 0, 1, or 2
         };
     }
