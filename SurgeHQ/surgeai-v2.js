@@ -23,6 +23,7 @@ class PageFellowShip {
         this.speedGain = 2; // faster when moving up (top faster)
         this.bottomBiasPower = 2; // stronger density bias to bottom
 
+
         // Style and attach
         canvas.style.display = "block";
         canvas.style.width = "100%";
@@ -36,10 +37,14 @@ class PageFellowShip {
             canvas.width = Math.max(1, width);
             canvas.height = Math.max(1, height);
 
-            const seedCount = 2000
+
+            const countDependOnWidth = width * height / 100;
+            console.log('countDependOnWidth', countDependOnWidth)
+            const seedCount = Math.min(3000, countDependOnWidth);
             this.seedPixels(seedCount);
         };
         this.resizeCanvas = resizeCanvas;
+
         resizeCanvas();
 
         // Animate
@@ -74,9 +79,7 @@ class PageFellowShip {
     }
 
     createPixel() {
-        const minSize = 4;
-        const maxSize = 8;
-        const size = 4//Math.random() < 0.8 ? minSize : maxSize;
+        const size = 4;
         const upwardSpeed = 0.3 + Math.random() * 1.2; // base upward speed
         const h = this.canvas.height || 1;
         // Bottom-biased start position: more particles near bottom (stronger bias)
@@ -91,8 +94,10 @@ class PageFellowShip {
             alpha: 0.3 + Math.random() * 0.7,
             // Add properties for horizontal oscillation
             oscillationSpeed: 0.02 + Math.random() * 0.03, // Speed of oscillation
-            oscillationRange: 0.5 + Math.random() * 2, // Range of oscillation (-range to +range)
+            oscillationRange: 0.5 + Math.random() * 0.1, // Range of oscillation (-range to +range)
             oscillationOffset: Math.random() * Math.PI * 2, // Random starting phase
+            // Random behavior: 33% go to 50%, 33% go to 75%, 33% go to 100%
+            goesToTop: Math.floor(Math.random() * 3), // 0, 1, or 2
         };
     }
 
@@ -126,12 +131,14 @@ class PageFellowShip {
                 // new random speed and opacity each spawn
                 p.vx = 0; // Reset horizontal movement
                 p.vy = -(0.3 + Math.random() * 0.9);
-                // p.alpha = 0.3 + Math.random() * 0.7;
                 p.alpha = 1;
+                // p.alpha = 0.3 + Math.random() * 0.7;
                 // Reset oscillation properties
-                p.oscillationSpeed = 0.02 + Math.random() * 0.03;
-                p.oscillationRange = 0.5 + Math.random() * 0.5;
+                p.oscillationSpeed = 0.02 + Math.random() * 0.05;
+                p.oscillationRange = 0.5 + Math.random() * 0.1;
                 p.oscillationOffset = Math.random() * Math.PI * 2;
+                // Keep the same goesToTop behavior for this particle
+                // p.goesToTop remains unchanged
             }
         }
     }
@@ -148,10 +155,20 @@ class PageFellowShip {
             const snappedY = Math.round(p.y / this.pixelStep) * this.pixelStep;
             const finalX = snappedX + p.size / 2 + p.vx;
             const finalY = snappedY + p.size / 2 + p.vy;
-            // Fade with height: opacity increases as y increases  
-            const height = this.canvas.height || 1;
-            const t = Math.max(0, Math.min(1, snappedY / height));
-            const alphaScale = 0.2 + 0.8 * t; // top ~0.2 → bottom ~1.0
+            const baseHeight = this.canvas.height;
+
+            const normalizedY = Math.max(0, Math.min(1, snappedY / baseHeight));
+            let alphaScale;
+            if (p.goesToTop === 0) {
+                //50%
+                alphaScale = normalizedY <= 0.5 ? 0 : (normalizedY - 0.5) * 2;
+            } else if (p.goesToTop === 1) {
+                //75%
+                alphaScale = normalizedY <= 0.25 ? 0 : (normalizedY - 0.25) * 1.33;
+            } else {
+                //100%
+                alphaScale = normalizedY;
+            }
             ctx.globalAlpha = Math.max(0, Math.min(1, p.alpha * alphaScale));
             ctx.fillStyle = "#666666";
             ctx.beginPath();
