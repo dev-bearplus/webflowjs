@@ -708,6 +708,11 @@ const mainScript = () => {
                             onSuccess?.()
                             console.log(inputSubmitText)
                             inputSubmit.text(inputSubmitText);
+                            let data = {
+                                event: 'button-name-submit',
+                                button_name_submit : inputSubmitText
+                            }
+                            sendGGTag(data)
                         } else {
                             onFail?.()
                         }
@@ -716,6 +721,11 @@ const mainScript = () => {
                             onSuccess?.()
                             console.log(inputSubmitText)
                             inputSubmit.text(inputSubmitText);
+                            let data = {
+                                event: 'button-name-submit',
+                                button_name_submit : inputSubmitText
+                            }
+                            sendGGTag(data)
                         } else {
                             onFail?.()
                         }
