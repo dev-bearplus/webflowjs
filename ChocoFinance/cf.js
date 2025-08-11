@@ -4529,8 +4529,9 @@ const mainScript = () => {
         }
         stickyCard();
         function cardHero(){
-           let itemMarquee =  $('.card-hero-marquee-txt').eq(0).clone();
-           const width = $('.card-hero-marquee-txt').eq(0).width();
+            let itemMarquee =  $('.card-hero-marquee-txt').eq(0).clone();
+            const width = $('.card-hero-marquee-txt').eq(0).width();
+            if(width <= 0) return;
             const length = Math.floor($(window).width() / width) + 1;
             console.log(width)
             for (let i = 0; i < length; i++) {
