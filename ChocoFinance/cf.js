@@ -999,7 +999,8 @@ const mainScript = () => {
          if ($('.topbar').length) {
             threshold = inst.scroll > header.height() + $('.topbar').height();
         }
-        if (threshold && inst.scroll > 0) {
+        console.log(threshold)
+        if (threshold) {
             header.addClass('on-scroll')
             if (inst.direction == 1) {
                 // down
@@ -1081,7 +1082,7 @@ const mainScript = () => {
         let lastScrollTop = 0;
         $(window).on('scroll', function(e) {
             let st = $(this).scrollTop();
-            if (st > lastScrollTop){
+            if (st > lastScrollTop && st > $('.announcement').height()){
                 scrollDown()
             } else {
                 scrollUp();
