@@ -766,17 +766,40 @@ const mainScript = () => {
             $(this).toggleClass('active');
             $('.header-lang-main').toggleClass('active');
         })
-        $('.header-lang-nation-item').on('click', function(e) {
-            e.preventDefault();
-            if($(this).hasClass('active')){
-                return;
-            }
-            else {
-                let url = $(this).attr('href');
-                let languageCodeItem = $(this).attr('data-lang-code');
-                window.location.href= url;
-            }
-        })
+        $('.header-lang-nation-item').hover(
+            function(e) {
+                if($(this).hasClass('active')) return;
+                let index = $(this).index();
+                $('.header-lang-nation-item').removeClass('active');
+                $(this).addClass('active')
+                let heightCurrent = $('.header-lang-content-inner').height();
+                let heightWillChange = $('.header-lang-content-list').eq(index).height();
+                $('.header-lang-content-list').removeClass('active');
+                if(heightCurrent > heightWillChange){
+                    $('.header-lang-content-list').eq(index).addClass('active');
+                    setTimeout(function() {
+                        $('.header-lang-content-inner').height(heightWillChange);
+                    }, 200)
+                }
+                else {
+                    $('.header-lang-content-inner').height(heightWillChange);
+                    setTimeout(function() {
+                        $('.header-lang-content-list').eq(index).addClass('active');
+                    }, 200)
+                }
+                
+            },
+            // function(){
+            //     if($(this).hasClass('active')) return;
+            //     let indexActive = $('.header-lang-nation-item.active').index();
+            //     let heightContent = $('.header-lang-content-list').eq(indexActive).height();
+            //     $('.header-lang-content-inner').height(heightContent);
+            //     $('.header-lang-content-list').removeClass('active');
+            //     setTimeout(function(){
+            //         $('.header-lang-content-list').eq(indexActive).addClass('active');
+            //     },200)
+            // }
+        )
         function initLang() {
             const langCodes = $('.header-lang-content-item').map(function () {
                 return $(this).data('lang-subdomain');
@@ -834,6 +857,7 @@ const mainScript = () => {
                             }
                             $('.header-lang-txt').text(displayName);
                             let indexList = $(langItem).closest('.header-lang-content-list').index();
+                            $('.header-lang-content-inner').height($('.header-lang-content-list').eq(indexList).height());
                             $('.header-lang-content-list').eq(indexList).addClass('active');
                             $('.header-lang-nation-item').eq(indexList).addClass('active');
                         }
@@ -844,6 +868,15 @@ const mainScript = () => {
         initLang();
     }
     activeLanguage();
+    let firstLoad = sessionStorage.getItem('firstLoad');
+    if(!firstLoad){
+        let currentLang = $('html').attr('lang');
+        let suggestedLanguage = suggestLanguage();
+        if(currentLang != suggestedLanguage){
+            redirectCurrentLanguage(suggestedLanguage);
+        }
+        sessionStorage.setItem('firstLoad', true)
+    }
     // const cachedLanguage = localStorage.getItem('selectedLanguage');
     // let currentLang = $('html').attr('lang');
     // if (!cachedLanguage){
