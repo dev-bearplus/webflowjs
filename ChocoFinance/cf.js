@@ -740,14 +740,14 @@ const mainScript = () => {
     if (localStorage.getItem('preferredLanguage') !== null) {
         localStorage.removeItem('preferredLanguage');
     }
+    if (localStorage.getItem('selectedLanguage') !== null) {
+        localStorage.removeItem('selectedLanguage');
+    }
     function redirectCurrentLanguage(language) {
         let urlCurrentLanguage = $(`.header-lang-content-item[data-lang-code= ${language}]`).attr('href');
             if(urlCurrentLanguage){
                 window.location.href = urlCurrentLanguage;
             }
-    }
-    function setLanguage(language) {
-        localStorage.setItem('selectedLanguage', language);
     }
     function activeLanguage() {
         $(function () {
@@ -774,7 +774,6 @@ const mainScript = () => {
             else {
                 let url = $(this).attr('href');
                 let languageCodeItem = $(this).attr('data-lang-code');
-                setLanguage(languageCodeItem);
                 window.location.href= url;
             }
         })
@@ -814,7 +813,6 @@ const mainScript = () => {
                         e.preventDefault();
                         return; 
                     }
-                    setLanguage(languageCodeItem);
                 })
             }); 
             let currentLang = $('html').attr('lang');
@@ -846,8 +844,8 @@ const mainScript = () => {
         initLang();
     }
     activeLanguage();
-    const cachedLanguage = localStorage.getItem('selectedLanguage');
-    let currentLang = $('html').attr('lang');
+    // const cachedLanguage = localStorage.getItem('selectedLanguage');
+    // let currentLang = $('html').attr('lang');
     // if (!cachedLanguage){
     //     let suggestedLanguage = suggestLanguage();
     //     console.log(suggestLanguage);
@@ -858,9 +856,9 @@ const mainScript = () => {
     // } else if (cachedLanguage && cachedLanguage != currentLang) {
     //     redirectCurrentLanguage(cachedLanguage);
     // } 
-    if (cachedLanguage && cachedLanguage != currentLang) {
-        redirectCurrentLanguage(cachedLanguage);
-    } 
+    // if (cachedLanguage && cachedLanguage != currentLang) {
+    //     redirectCurrentLanguage(cachedLanguage);
+    // } 
     function scrollDown() {
         header.addClass('on-hide')
         if($('.header-lang-main').length) {
