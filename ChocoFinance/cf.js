@@ -766,15 +766,52 @@ const mainScript = () => {
             $(this).toggleClass('active');
             $('.header-lang-main').toggleClass('active');
         })
-        $('.header-lang-nation-item').hover(
-            function(e) {
-                if($(this).hasClass('active')) return;
+        if(viewport.w > 991){
+            $('.header-lang-nation-item').hover(
+                function(e) {
+                    if($(this).hasClass('active')) return;
+                    let index = $(this).index();
+                    $('.header-lang-nation-item').removeClass('active');
+                    $(this).addClass('active')
+                    let heightCurrent = $('.header-lang-content-inner').height();
+                    let heightWillChange = $('.header-lang-content-list').eq(index).height();
+                    $('.header-lang-content-list').removeClass('active');
+                    if(heightCurrent > heightWillChange){
+                        $('.header-lang-content-list').eq(index).addClass('active');
+                        setTimeout(function() {
+                            $('.header-lang-content-inner').height(heightWillChange);
+                        }, 200)
+                    }
+                    else {
+                        $('.header-lang-content-inner').height(heightWillChange);
+                        setTimeout(function() {
+                            $('.header-lang-content-list').eq(index).addClass('active');
+                        }, 200)
+                    }
+                    
+                },
+                // function(){
+                //     if($(this).hasClass('active')) return;
+                //     let indexActive = $('.header-lang-nation-item.active').index();
+                //     let heightContent = $('.header-lang-content-list').eq(indexActive).height();
+                //     $('.header-lang-content-inner').height(heightContent);
+                //     $('.header-lang-content-list').removeClass('active');
+                //     setTimeout(function(){
+                //         $('.header-lang-content-list').eq(indexActive).addClass('active');
+                //     },200)
+                // }
+            )
+        }
+        else {
+            $('.header-lang-nation-item').on('click', function(e){
+                e.preventDefault();
                 let index = $(this).index();
                 $('.header-lang-nation-item').removeClass('active');
-                $(this).addClass('active')
+                $(this).addClass('active');
                 let heightCurrent = $('.header-lang-content-inner').height();
                 let heightWillChange = $('.header-lang-content-list').eq(index).height();
                 $('.header-lang-content-list').removeClass('active');
+                console.log($('.header-lang-content-list').eq(index))
                 if(heightCurrent > heightWillChange){
                     $('.header-lang-content-list').eq(index).addClass('active');
                     setTimeout(function() {
@@ -787,19 +824,9 @@ const mainScript = () => {
                         $('.header-lang-content-list').eq(index).addClass('active');
                     }, 200)
                 }
-                
-            },
-            // function(){
-            //     if($(this).hasClass('active')) return;
-            //     let indexActive = $('.header-lang-nation-item.active').index();
-            //     let heightContent = $('.header-lang-content-list').eq(indexActive).height();
-            //     $('.header-lang-content-inner').height(heightContent);
-            //     $('.header-lang-content-list').removeClass('active');
-            //     setTimeout(function(){
-            //         $('.header-lang-content-list').eq(indexActive).addClass('active');
-            //     },200)
-            // }
-        )
+            })
+        }
+        
         function initLang() {
             const langCodes = $('.header-lang-content-item').map(function () {
                 return $(this).data('lang-subdomain');
