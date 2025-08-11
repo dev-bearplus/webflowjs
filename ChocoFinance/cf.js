@@ -999,8 +999,7 @@ const mainScript = () => {
          if ($('.topbar').length) {
             threshold = inst.scroll > header.height() + $('.topbar').height();
         }
-        console.log(threshold)
-        if (threshold) {
+        if (threshold && inst.scroll > 0) {
             header.addClass('on-scroll')
             if (inst.direction == 1) {
                 // down
