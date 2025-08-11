@@ -737,6 +737,9 @@ const mainScript = () => {
           return 'en-SG';
         }
     }
+    if (localStorage.getItem('preferredLanguage') !== null) {
+        localStorage.removeItem('preferredLanguage');
+    }
     function redirectCurrentLanguage(language) {
         let urlCurrentLanguage = $(`.header-lang-content-item[data-lang-code= ${language}]`).attr('href');
             if(urlCurrentLanguage){
@@ -744,7 +747,7 @@ const mainScript = () => {
             }
     }
     function setLanguage(language) {
-        localStorage.setItem('preferredLanguage', language);
+        localStorage.setItem('selectedLanguage', language);
     }
     function activeLanguage() {
         $(function () {
@@ -843,7 +846,7 @@ const mainScript = () => {
         initLang();
     }
     activeLanguage();
-    const cachedLanguage = localStorage.getItem('preferredLanguage');
+    const cachedLanguage = localStorage.getItem('selectedLanguage');
     let currentLang = $('html').attr('lang');
     // if (!cachedLanguage){
     //     let suggestedLanguage = suggestLanguage();
