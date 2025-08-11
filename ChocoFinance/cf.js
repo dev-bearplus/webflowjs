@@ -842,21 +842,22 @@ const mainScript = () => {
         }
         initLang();
     }
-    if(isStagging()){
-        activeLanguage();
-        const cachedLanguage = localStorage.getItem('preferredLanguage');
-        let currentLang = $('html').attr('lang');
-        // if (!cachedLanguage)
-        if(true){
-            let suggestedLanguage = suggestLanguage();
-            setLanguage(suggestedLanguage);
-            // if(currentLang != suggestedLanguage){
-            //     redirectCurrentLanguage(suggestedLanguage);
-            // }
-        } else if (cachedLanguage && cachedLanguage != currentLang) {
-            redirectCurrentLanguage(cachedLanguage);
-        } 
-    }
+    activeLanguage();
+    const cachedLanguage = localStorage.getItem('preferredLanguage');
+    let currentLang = $('html').attr('lang');
+    // if (!cachedLanguage){
+    //     let suggestedLanguage = suggestLanguage();
+    //     console.log(suggestLanguage);
+    //     setLanguage(suggestedLanguage);
+    //     if(currentLang != suggestedLanguage){
+    //         redirectCurrentLanguage(suggestedLanguage);
+    //     }
+    // } else if (cachedLanguage && cachedLanguage != currentLang) {
+    //     redirectCurrentLanguage(cachedLanguage);
+    // } 
+    if (cachedLanguage && cachedLanguage != currentLang) {
+        redirectCurrentLanguage(cachedLanguage);
+    } 
     function scrollDown() {
         header.addClass('on-hide')
         if($('.header-lang-main').length) {
