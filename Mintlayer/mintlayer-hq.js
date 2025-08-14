@@ -568,6 +568,8 @@ const mainScript = () => {
     }
     const SCRIPT = {};
     SCRIPT.landingpageNewScript = () => {
+        $('.ldp-hero-tab-item').eq(0).addClass('active');
+        $('.ldp-hero-content-item').eq(0).addClass('active');
         initAnimPath('.stak-tool-link-img', { duration: 6, delay: 3, fade: true });
         getEarnAPI();
         let videoPlayed = false;
