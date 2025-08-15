@@ -3281,10 +3281,32 @@ const mainScript = () => {
         function updateTabTable () {
             //Setup HTML
             let richtextEl = $('.art-layout-main-rictxt');
+
             richtextEl.find('a[href*="tab-table"]').each((idx, item) => {
-                $(item).attr('href', '#').css('pointer-events', 'none').on('click', function(e) {e.preventDefault});
-                $(item).closest('p').attr('data-tab-table', idx).addClass('tab-table-item').css('cursor', 'pointer');
-            })
+                $(item)
+                    .attr('href', '#')
+                    .css('pointer-events', 'none')
+                    .on('click', function(e) { e.preventDefault(); });
+
+                $(item)
+                    .closest('p')
+                    .attr('data-tab-table', idx)
+                    .addClass('tab-table-item')
+                    .css('cursor', 'pointer');
+            });
+
+            const $tabItems = richtextEl.find('.tab-table-item');
+            const $wrapItems = $('<div class="tab-table-item-wrapper"></div>');
+
+            $tabItems.each(function(idx) {
+                const $clone = $(this).clone(true);
+                $clone.attr('data-tab-table', idx);
+                $wrapItems.append($clone);
+            });
+
+            $tabItems.last().after($wrapItems);
+            $tabItems.remove();
+
             richtextEl.find('.tab-table-content').each((idx, item) => {
                 $(item).closest('.w-embed').attr('data-tab-table', idx).addClass('tab-table-content');
             })
