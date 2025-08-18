@@ -879,10 +879,9 @@ const mainScript = () => {
                         if (langItemCode == currentLang) {
                             $(langItem).addClass('active');
                             let displayName = $(langItem).attr('data-lang-name');
-                            if (displayName.toLowerCase().includes('en')) {
-                                displayName = 'EN'
-                            }
+                            let flagUrl = $(langItem).attr('data-flag');
                             $('.header-lang-txt').text(displayName);
+                            $('.header-lang-ic img').attr('src',flagUrl);
                             let indexList = $(langItem).closest('.header-lang-content-list').index();
                             $('.header-lang-content-inner').height($('.header-lang-content-list').eq(indexList).height());
                             $('.header-lang-content-list').eq(indexList).addClass('active');
