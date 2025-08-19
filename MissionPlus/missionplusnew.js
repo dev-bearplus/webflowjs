@@ -84,7 +84,7 @@ const mainScript = () => {
   function isInHeaderCheck(el) {
     const rect = $(el).get(0).getBoundingClientRect();
     const headerRect = $(".header").get(0).getBoundingClientRect();
-    return rect.bottom >= 0 && rect.top - headerRect.height  <= 0;
+    return rect.bottom >= 0 && rect.top - headerRect.height <= 0;
   }
   const distance = (x1, y1, x2, y2) => {
     return Math.hypot(x2 - x1, y2 - y1);
@@ -110,9 +110,9 @@ const mainScript = () => {
   });
   function activeItem(elArr, index) {
     elArr.forEach((el, idx) => {
-        $(el).removeClass('active').eq(index).addClass('active')
-    })
-}
+      $(el).removeClass("active").eq(index).addClass("active");
+    });
+  }
   window.addEventListener("popstate", function (event) {
     location.reload();
   });
@@ -141,6 +141,50 @@ const mainScript = () => {
   const parseRem = (input) => {
     return (input / 10) * parseFloat($("html").css("font-size"));
   };
+  const lettersAndSymbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+
+  function shuffleChars($chars) {
+    // lấy tập ký tự gốc có trong item => array gồm các character khác nhau
+    const originalChars = [...new Set($chars.map((i, c) => $(c).text()).get())];
+
+    $chars.each(function(idx, char){
+        gsap.killTweensOf(char);
+        gsap.fromTo(char,
+            { opacity: 0 },
+            {
+                duration: 0.06,
+                innerHTML: () => originalChars[Math.floor(Math.random() * originalChars.length)],
+                repeat: 4,
+                repeatRefresh: true,
+                opacity: 1,
+                repeatDelay: 0.05,
+                onComplete: () => gsap.set(char, { innerHTML: $(char).data('initial'), delay: 0.03 }),
+            }
+        );
+    });
+}
+
+
+  function initShuffleHover() {
+    let hover_shuffle_txt = new SplitType('[data-hover="hover-shuffle"] [data-hover="hover-shuffle-child"]', {types: 'lines, words, chars', lineClass: 'bp-line'});
+    $('[data-hover="hover-shuffle"]').each(function () {
+      const $el    = $(this);
+      const $chars = $el.find('.char');
+
+      // lock width ban đầu để hiệu ứng không làm co giãn phần tử
+      $el.css('width', $el.outerWidth() + 'px');
+
+      // cache nội dung ban đầu
+      $chars.each(function(_,c){
+          $(c).data('initial', $(c).text());
+      });
+
+      $el.on('mouseenter', function(){
+          shuffleChars($chars);
+      });
+    });
+  }
+  initShuffleHover();
   class TriggerSetup {
     constructor(triggerEl) {
       this.tlTrigger;
@@ -218,27 +262,40 @@ const mainScript = () => {
       let gotBtnSize = false;
       if ($("[data-cursor]:hover").length) {
         switch (type) {
-            case "hidden":
-                $(".cursor").addClass("on-hover-hidden");
-                break;
-            case 'txtLink':
-                $('.cursor-inner').addClass('on-hover-sm');
-                let targetEl;
-                if ($('[data-cursor]:hover').attr('data-cursor-txtLink') == 'parent') {
-                    targetEl = $('[data-cursor]:hover').parent()
-                } else if ($('[data-cursor]:hover').attr('data-cursor-txtLink') == 'child') {
-                    targetEl = $('[data-cursor]:hover').find('[data-cursor-txtLink-child]')
-                } else {
-                    targetEl = $('[data-cursor]:hover')
-                }
+          case "hidden":
+            $(".cursor").addClass("on-hover-hidden");
+            break;
+          case "txtLink":
+            $(".cursor-inner").addClass("on-hover-sm");
+            let targetEl;
+            if (
+              $("[data-cursor]:hover").attr("data-cursor-txtLink") == "parent"
+            ) {
+              targetEl = $("[data-cursor]:hover").parent();
+            } else if (
+              $("[data-cursor]:hover").attr("data-cursor-txtLink") == "child"
+            ) {
+              targetEl = $("[data-cursor]:hover").find(
+                "[data-cursor-txtLink-child]"
+              );
+            } else {
+              targetEl = $("[data-cursor]:hover");
+            }
 
-                let targetGap = 8;
-                if ($('[data-cursor]:hover').attr('data-cursor-txtLink-gap')) {
-                    targetGap = $('[data-cursor]:hover').attr('data-cursor-txtLink-gap')
-                }
-                this.targetX = targetEl.get(0).getBoundingClientRect().left - parseRem(targetGap) - $('.cursor-inner.on-hover-sm').width() / 2;
-                this.targetY = targetEl.get(0).getBoundingClientRect().top + targetEl.get(0).getBoundingClientRect().height / 2;
-                break;
+            let targetGap = 8;
+            if ($("[data-cursor]:hover").attr("data-cursor-txtLink-gap")) {
+              targetGap = $("[data-cursor]:hover").attr(
+                "data-cursor-txtLink-gap"
+              );
+            }
+            this.targetX =
+              targetEl.get(0).getBoundingClientRect().left -
+              parseRem(targetGap) -
+              $(".cursor-inner.on-hover-sm").width() / 2;
+            this.targetY =
+              targetEl.get(0).getBoundingClientRect().top +
+              targetEl.get(0).getBoundingClientRect().height / 2;
+            break;
           default:
             break;
         }
@@ -337,19 +394,22 @@ const mainScript = () => {
       this.tl.play();
     }
     interact() {
-        $('.header-menu-item.has-submenu').on('click', function() {
-            $(this).toggleClass('active')
-        })
+      $(".header-menu-item.has-submenu").on("click", function () {
+        $(this).toggleClass("active");
+      });
     }
     toggleColorMode = (color) => {
-        let elArr = Array.from($(`[data-section="${color}"]`));
-        if (elArr.some(function (el) { return isInHeaderCheck(el) })) {
-            $('.header').addClass(`on-${color}`);
-        } 
-        else if( !$('.header').hasClass('on-show-menu')) {
-            $('.header').removeClass(`on-${color}`);
-        }
-    }
+      let elArr = Array.from($(`[data-section="${color}"]`));
+      if (
+        elArr.some(function (el) {
+          return isInHeaderCheck(el);
+        })
+      ) {
+        $(".header").addClass(`on-${color}`);
+      } else if (!$(".header").hasClass("on-show-menu")) {
+        $(".header").removeClass(`on-${color}`);
+      }
+    };
   }
   const header = new Header();
   class Footer extends TriggerSetup {
@@ -379,14 +439,13 @@ const mainScript = () => {
     }
     // header.toggleOnScroll(lenis);
     // header.toggleColorMode('white');
-    header.toggleColorMode('blue');
+    header.toggleColorMode("blue");
     lenis.on("scroll", function (inst) {
-        header.toggleColorMode('blue');
-        // header.toggleOnScroll(lenis);
-        // header.toggleOnHide(inst);
+      header.toggleColorMode("blue");
+      // header.toggleOnScroll(lenis);
+      // header.toggleOnHide(inst);
     });
   };
-  /** (💡)  - START PAGE */
   if (window.scrollY > 0) {
     lenis.scrollTo(0, {
       duration: 0.001,
@@ -396,6 +455,5 @@ const mainScript = () => {
     initGlobal();
     ScrollTrigger.refresh();
   }
-  /** (💡) **/
 };
 window.onload = mainScript;
