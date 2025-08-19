@@ -384,6 +384,19 @@ const mainScript = () => {
     //         rateExtent = '-usd';
     //     }
     // }
+    function scrollToFaq() {
+        $('[data-scroll-faq]').on('click', function(e) {
+            e.preventDefault();
+            let target = $(this).attr('data-scroll-faq');
+            if ($(`#${target}`).length >= 1) {
+                lenis.scrollTo(target)
+                $(`#${target}`).find('.home-faq-item-head').trigger('click')
+            } else {
+                lenis.scrollTo(`${$(this).attr('href')}`)
+            }
+
+        })
+    }
     function updateRichtextFaqClass(faqHtml) {
         let ans = faqHtml.find('.home-faq--itemans');
         // Paragraphs
@@ -2768,20 +2781,6 @@ const mainScript = () => {
             //         }
             //     });
             // }
-            
-            function scrollToFaq() {
-                $('[data-scroll-faq]').on('click', function(e) {
-                    e.preventDefault();
-                    let target = $(this).attr('data-scroll-faq');
-                    if ($(`#${target}`).length >= 1) {
-                        lenis.scrollTo(target)
-                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
-                    } else {
-                        lenis.scrollTo(`${$(this).attr('href')}`)
-                    }
-
-                })
-            }
         }
         homeGetFaq();
 
@@ -2894,19 +2893,6 @@ const mainScript = () => {
             //         }
             //     });
             // }
-            function scrollToFaq() {
-                $('[data-scroll-faq]').on('click', function(e) {
-                    e.preventDefault();
-                    let target = $(this).attr('data-scroll-faq');
-                    if ($(`#${target}`).length >= 1) {
-                        lenis.scrollTo(target)
-                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
-                    } else {
-                        lenis.scrollTo(`${$(this).attr('href')}`)
-                    }
-
-                })
-            }
         }
         homeGetFaq();
 
@@ -3094,19 +3080,6 @@ const mainScript = () => {
             //         }
             //     });
             // }
-            function scrollToFaq() {
-                $('[data-scroll-faq]').on('click', function(e) {
-                    e.preventDefault();
-                    let target = $(this).attr('data-scroll-faq');
-                    if ($(`#${target}`).length >= 1) {
-                        lenis.scrollTo(target)
-                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
-                    } else {
-                        lenis.scrollTo(`${$(this).attr('href')}`)
-                    }
-
-                })
-            }
         }
         aboutGetFaq();
 
@@ -4438,22 +4411,7 @@ const mainScript = () => {
             //     }
             // });
             // }
-            function scrollToFaq() {
-                $('[data-scroll-faq]').on('click', function(e) {
-                    e.preventDefault();
-                    console.log('click')
-                    e.preventDefault();
-                    let target = $(this).attr('data-scroll-faq');
-                    console.log(target)
-                    if ($(`#${target}`).length >= 1) {
-                        lenis.scrollTo(target)
-                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
-                    } else {
-                        lenis.scrollTo(`${$(this).attr('href')}`)
-                    }
-
-                })
-            }
+            
         }
 
         usdGetFaq();
@@ -4844,19 +4802,6 @@ const mainScript = () => {
                     scrollToFaq();
                 }
             });
-            function scrollToFaq() {
-                $('[data-scroll-faq]').on('click', function(e) {
-                    e.preventDefault();
-                    let target = $(this).attr('data-scroll-faq');
-                    if ($(`#${target}`).length >= 1) {
-                        lenis.scrollTo(target)
-                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
-                    } else {
-                        lenis.scrollTo(`${$(this).attr('href')}`)
-                    }
-
-                })
-            }
         }
         thankGetFaq();
     }
@@ -4951,19 +4896,6 @@ const mainScript = () => {
                     scrollToFaq();
                 }
             });
-            function scrollToFaq() {
-                $('[data-scroll-faq]').on('click', function(e) {
-                    e.preventDefault();
-                    let target = $(this).attr('data-scroll-faq');
-                    if ($(`#${target}`).length >= 1) {
-                        lenis.scrollTo(target)
-                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
-                    } else {
-                        lenis.scrollTo(`${$(this).attr('href')}`)
-                    }
-
-                })
-            }
         }
         homeGetFaq();
         
