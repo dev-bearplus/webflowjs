@@ -139,7 +139,7 @@ const script = () => {
                                 filter[key].find('.drop-toogle-content-title .text-l').css('display', 'none');
                                 filter[key].find('.drop-toggle-title').removeClass('is-active');
                             }
-                            console.log(checkEmpty());
+                            checkEmpty()
                         })
                     })
                 }
@@ -155,7 +155,9 @@ const script = () => {
 
                             checkbox.find('input').on('change', (e) => {
                                 if (e.target.checked) {
-                                    filterCurrent[key].push(item);
+                                    filterCurrent[key] = item;
+                                    filter[key].find('.filter-checkbox-field input').not(e.target).prop('checked', false)
+                                    filter[key].find('.filter-checkbox-field .filter-checkbox').not(checkbox.find('.filter-checkbox')).removeClass('w--redirected-checked');
                                     products.forEach((product) => {
                                         let productWrap = $(product).parent();
                                         let data = JSON.parse(productWrap.find('.filter-data').text());
@@ -168,7 +170,7 @@ const script = () => {
                                     })
                                 }
                                 else {
-                                    filterCurrent[key].splice(filterCurrent[key].indexOf(item), 1)
+                                    filterCurrent[key] = [];
                                     products.forEach((product) => {
                                         $(product).parent().removeClass(`hidden-${key.toLowerCase()}`);
                                     })
@@ -176,13 +178,13 @@ const script = () => {
                                 if (filterCurrent[key].length !== 0) {
                                     filter[key].find('.drop-toogle-content-title .text-l').css('display', 'block');
                                     filter[key].find('.drop-toggle-title').addClass('is-active');
-                                    filter[key].find('.drop-toogle-content-title .text-l').text(filterCurrent[key].join(', '));
+                                    filter[key].find('.drop-toogle-content-title .text-l').text(filterCurrent[key]);
                                 }
                                 else {
                                     filter[key].find('.drop-toogle-content-title .text-l').css('display', 'none');
                                     filter[key].find('.drop-toggle-title').removeClass('is-active');
                                 }
-                                console.log(checkEmpty());
+                                checkEmpty()
                             })
                         }
                     })
