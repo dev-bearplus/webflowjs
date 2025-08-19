@@ -150,7 +150,7 @@ const mainScript = () => {
     $chars.each(function(idx, char){
         gsap.killTweensOf(char);
         gsap.fromTo(char,
-            { opacity: 0 },
+            { opacity: 1 },
             {
                 duration: 0.06,
                 innerHTML: () => originalChars[Math.floor(Math.random() * originalChars.length)],
