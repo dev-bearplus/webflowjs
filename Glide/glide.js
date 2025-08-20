@@ -114,7 +114,12 @@ const script = () => {
                 Object.entries(item).forEach(([key, value]) => {
                     if (value.length !== 0 && key !== 'slug') {
                         // Add only unique values using Set
-                        filterData[key] = [...new Set([...filterData[key], ...value])];
+                        filterData[key] =
+                            [...new Set([...filterData[key], ...value])].sort((a, b) => {
+                                const countA = (a.match(/\$/g) || []).length;
+                                const countB = (b.match(/\$/g) || []).length;
+                                return countA - countB;
+                        });
                     }
                 })
             })
@@ -131,8 +136,8 @@ const script = () => {
                 dropList.text('');
                 value.forEach((item) => {
                     let cloneItem = key === 'charter' ? radioClone.clone() : checkBoxClone.clone();
-                    let id = item.replace(/^\d+\.\s*/, '').replace(/\s*\([^)]*\)/g, '').toLowerCase().trim().replace(/[\s\W-]+/g, '-').replace(/^-+|-+$/g, '');
-                    if ($('.main').attr('id') !== id) {
+                    if (!/^[A-Z]+$/.test(item)) {
+                        let id = item.replace(/^\d+\.\s*/, '').replace(/\s*\([^)]*\)/g, '').toLowerCase().trim().replace(/[\s\W-]+/g, '-').replace(/^-+|-+$/g, '');
                         cloneItem.find('.text-m').text(item);
                         cloneItem.find('input').attr('id', id);
                         dropList.append(cloneItem);
