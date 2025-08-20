@@ -3,7 +3,6 @@ const script = () => {
         if (sessionStorage.getItem("popupShown") === "true") {
             return;
         }
-        console.log(sessionStorage.getItem("popupShown"));
 
         $.getJSON("https://ipapi.co/json/?key=MQpEwzeaXMdKhgiWlw1dUbaA4BODdDwMtQAVfusqgxhxBW3SWh", function(data) {
             if (data && data.country_code) {
@@ -53,6 +52,58 @@ const script = () => {
         })
     }
     const SCRIPT = {}
+    SCRIPT.surfScript = () => {
+        console.log("surf");
+        window.fsAttributes.push(['cmsfilter', (filterInstances) => {
+            const [filter] = filterInstances;
+            const dropdowns = document.querySelectorAll('.dropdown.in-filter');
+            filter.listInstance.on('renderitems', (renderedItems) => {
+                console.log('renderitems event', renderedItems);
+                console.log('filter event', filter);
+            });
+
+            filter.listInstance.on('additems', (addedItems) => {
+                console.log('additems event', addedItems);
+            });
+            filter.filtersData.forEach((item) => {
+                console.log(item)
+            })
+            dropdowns.forEach(drop => {
+                const options = [];
+                const title = drop.querySelector('.drop-toogle-content-title .drop-toggle-title');
+                const tip = drop.querySelector('.drop-toogle-content-title .text-l');
+
+                const checkboxes = drop.querySelectorAll('.filter-checkbox-field');
+                const radios = drop.querySelectorAll('.filter-radio-button-field');
+
+                title.classList.remove('is-active');
+                checkboxes.forEach((ch, i) => {
+                    const chText = ch.querySelector('span').textContent;
+                    let attr = ch.querySelector('span').getAttribute('fs-cmsfilter-field');
+                    const count = filter.listInstance.items.filter(item => item.element.querySelector(`[fs-cmsfilter-field='${attr}']`).textContent === chText).length;
+                    if (count === 0) {
+                        ch.style.display = 'none';
+                    }
+                })
+                drop.addEventListener('change', (e) => {
+                    tip.textContent = '';
+                    const checkedCheckboxes = drop.querySelectorAll('input:checked');
+                    checkedCheckboxes.forEach((ch, i) => {
+                        const chText = i === 0 ? ch.parentNode.querySelector('span').textContent : `, ${ch.parentNode.querySelector('span').textContent}`;
+                        tip.textContent += chText;
+                    })
+                    if (tip.textContent) {
+                        tip.style.display = 'block';
+                        title.classList.add('is-active');
+                    } else {
+                        tip.style.display = 'none';
+                        title.classList.remove('is-active');
+                    }
+                })
+            })
+            },
+        ]);
+    }
     SCRIPT.subpageScript = () => {
         $('.form-block').each(async(_, block) => {
             const products = [...$(block).find('.products-card')];
