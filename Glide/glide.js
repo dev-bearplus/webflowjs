@@ -1,4 +1,30 @@
 const script = () => {
+    function checkLocation() {
+        if (sessionStorage.getItem("popupShown") === "true") {
+            return;
+        }
+        console.log(sessionStorage.getItem("popupShown"));
+
+        $.getJSON("https://ipapi.co/json/?key=MQpEwzeaXMdKhgiWlw1dUbaA4BODdDwMtQAVfusqgxhxBW3SWh", function(data) {
+            if (data && data.country_code) {
+                var countryCode = data.country_code.toLowerCase();
+                console.log(data);
+
+                if (countryCode === "id") { // Indonesia
+                    sessionStorage.setItem("popupShown", "true");
+                    $(".bp-popup").addClass("active");
+                }
+            } else {
+                console.log("Không lấy được thông tin quốc gia.");
+            }
+        }).fail(function() {
+            console.log("Lỗi gọi ipapi");
+        });
+    }
+    checkLocation();
+    $('.bp-popup-close').on('click', function() {
+        $('.bp-popup').removeClass('active')
+    })
     const fetchProduct = (id) => {
         let data = [];
         return new Promise(async (resolve, reject) => {
@@ -28,7 +54,6 @@ const script = () => {
     }
     const SCRIPT = {}
     SCRIPT.subpageScript = () => {
-        console.log("run")
         $('.form-block').each(async(_, block) => {
             const products = [...$(block).find('.products-card')];
             const filter = {
@@ -102,93 +127,64 @@ const script = () => {
                 $(block).find('.filter-empty').css('display', hiddenCount === products.length ? 'block' : 'none');
             }
             Object.entries(filterData).forEach(([key, value]) => {
-                if (key === 'charter') {
-                    filter[key].find('.drop-list-content').text('');
-                    value.forEach((item) => {
-                        let radio = radioClone.clone();
-                        radio.find('.text-m').text(item);
-                        radio.find('input').attr('id', item.toLowerCase().trim().replace(/[\s\W-]+/g, '-').replace(/^-+|-+$/g, ''));
-                        filter[key].find('.drop-list-content').append(radio);
+                let dropList = key === 'charter' ? filter[key].find('.drop-list-content') : filter[key].find('.collection-list');
+                dropList.text('');
+                value.forEach((item) => {
+                    let cloneItem = key === 'charter' ? radioClone.clone() : checkBoxClone.clone();
+                    let id = item.replace(/^\d+\.\s*/, '').replace(/\s*\([^)]*\)/g, '').toLowerCase().trim().replace(/[\s\W-]+/g, '-').replace(/^-+|-+$/g, '');
+                    if ($('.main').attr('id') !== id) {
+                        cloneItem.find('.text-m').text(item);
+                        cloneItem.find('input').attr('id', id);
+                        dropList.append(cloneItem);
+                    }
+                })
+                filter[key].on('change', (e) => {
+                    const checkedCheckboxes = filter[key].find('input:checked');
+                    filterCurrent[key] = [...checkedCheckboxes].map((el) => $(el).parent().find('span').text());
 
-                        radio.find('input').on('change', (e) => {
-                            if (e.target.checked) {
-                                filterCurrent[key] = item;
-                                products.forEach((product) => {
-                                    let productWrap = $(product).parent();
-                                    let data = JSON.parse(productWrap.find('.filter-data').text());
-                                    if (data[key].includes(item)) {
-                                        productWrap.removeClass(`hidden-${key.toLowerCase()}`);
-                                    }
-                                    else {
-                                        productWrap.addClass(`hidden-${key.toLowerCase()}`);
-                                    }
-                                })
-                            }
-                            else {
-                                filterCurrent[key] = [];
-                                products.forEach((product) => {
-                                    $(product).parent().removeClass(`hidden-${key.toLowerCase()}`);
-                                })
-                            }
-                            if (filterCurrent[key].length !== 0) {
-                                filter[key].find('.drop-toogle-content-title .text-l').css('display', 'block');
-                                filter[key].find('.drop-toggle-title').addClass('is-active');
-                                filter[key].find('.drop-toogle-content-title .text-l').text(filterCurrent[key]);
-                            }
-                            else {
-                                filter[key].find('.drop-toogle-content-title .text-l').css('display', 'none');
-                                filter[key].find('.drop-toggle-title').removeClass('is-active');
-                            }
-                            checkEmpty()
-                        })
-                    })
-                }
-                else {
-                    filter[key].find('.collection-list').text('');
-                    value.forEach((item) => {
-                        let checkbox = checkBoxClone.clone();
-                        let id = item.replace(/^\d+\.\s*/, '').replace(/\s*\([^)]*\)/g, '').toLowerCase().trim().replace(/[\s\W-]+/g, '-').replace(/^-+|-+$/g, '');
-                        if ($('.main').attr('id') !== id) {
-                            checkbox.find('.text-m').text(item);
-                            checkbox.attr('id', id);
-                            filter[key].find('.collection-list').append(checkbox);
-
-                            checkbox.find('input').on('change', (e) => {
-                                if (e.target.checked) {
-                                    filterCurrent[key] = item;
-                                    filter[key].find('.filter-checkbox-field input').not(e.target).prop('checked', false)
-                                    filter[key].find('.filter-checkbox-field .filter-checkbox').not(checkbox.find('.filter-checkbox')).removeClass('w--redirected-checked');
-                                    products.forEach((product) => {
-                                        let productWrap = $(product).parent();
-                                        let data = JSON.parse(productWrap.find('.filter-data').text());
-                                        if (data[key].includes(item)) {
-                                            productWrap.removeClass(`hidden-${key.toLowerCase()}`);
-                                        }
-                                        else {
-                                            productWrap.addClass(`hidden-${key.toLowerCase()}`);
-                                        }
-                                    })
-                                }
-                                else {
-                                    filterCurrent[key] = [];
-                                    products.forEach((product) => {
-                                        $(product).parent().removeClass(`hidden-${key.toLowerCase()}`);
-                                    })
-                                }
-                                if (filterCurrent[key].length !== 0) {
-                                    filter[key].find('.drop-toogle-content-title .text-l').css('display', 'block');
-                                    filter[key].find('.drop-toggle-title').addClass('is-active');
-                                    filter[key].find('.drop-toogle-content-title .text-l').text(filterCurrent[key]);
-                                }
-                                else {
-                                    filter[key].find('.drop-toogle-content-title .text-l').css('display', 'none');
-                                    filter[key].find('.drop-toggle-title').removeClass('is-active');
-                                }
-                                checkEmpty()
-                            })
+                    if (filterCurrent[key].length !== 0) {
+                        filter[key].find('.drop-toogle-content-title .text-l').css('display', 'block');
+                        filter[key].find('.drop-toggle-title').addClass('is-active');
+                        if (key === 'charter') {
+                            filter[key].find('.drop-toogle-content-title .text-l').text(filterCurrent[key]);
                         }
-                    })
-                }
+                        else {
+                            filter[key].find('.drop-toogle-content-title .text-l').text(filterCurrent[key].join(', '));
+                        }
+                    }
+                    else {
+                        filter[key].find('.drop-toogle-content-title .text-l').css('display', 'none');
+                        filter[key].find('.drop-toggle-title').removeClass('is-active');
+                    }
+
+                    // Reset all products to visible first
+                    products.forEach(product => {
+                        $(product).parent().removeClass(`hidden-${key.toLowerCase()}`);
+                        checkEmpty();
+                    });
+
+                    // If no checkboxes are checked, show all products
+                    if (checkedCheckboxes.length === 0) {
+                        return;
+                    }
+
+                    // Hide products that don't match ALL selected filters
+                    products.forEach((product) => {
+                        let productWrap = $(product).parent();
+                        let data = JSON.parse(productWrap.find('.filter-data').text());
+                        let selectedValues = [...checkedCheckboxes].map(checkbox => $(checkbox).parent().find('span').text());
+
+                        // Check if product has at least one match with selected filters
+                        let hasMatch = selectedValues.some(value =>
+                            data[key].some(productValue => productValue === value)
+                        );
+
+                        if (!hasMatch) {
+                            productWrap.addClass(`hidden-${key.toLowerCase()}`);
+                            checkEmpty();
+                        }
+                    });
+                })
             })
 
             $(block).find('.filter-actions').on('click', (e) => {
@@ -211,5 +207,5 @@ const script = () => {
     if (pageName) {
         SCRIPT[`${pageName}Script`]();
     }
-}
+};
 window.onload = script;
