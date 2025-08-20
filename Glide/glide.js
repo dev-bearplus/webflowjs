@@ -83,7 +83,6 @@ const script = () => {
                     const chText = ch.querySelector('span').textContent;
                     let attr = ch.querySelector('span').getAttribute('fs-cmsfilter-field');
                     const count = filter.listInstance.items.filter(item => item.element.querySelector(`[fs-cmsfilter-field='${attr}']`).textContent === chText).length;
-                    console.log(count);
                     if (count === 0) {
                         ch.style.display = 'none';
                     }
