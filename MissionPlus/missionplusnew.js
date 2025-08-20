@@ -323,34 +323,14 @@ const mainScript = () => {
       super.init(this.play.bind(this));
     }
     setup() {
-      replaceHyphenWithSpan($(".home-hero-title"));
+      // replaceHyphenWithSpan($(".home-hero-title"));
       new MasterTimeline({
         timeline: this.tl,
         allowMobile: true,
         tweenArr: [
-          new FadeSplitText({
-            el: $(".home-hero-year").get(0),
-            isFast: true,
-            onMask: true,
-          }),
-          new FadeSplitText({
-            el: $(".home-hero-title").get(0),
-            isFast: true,
-            onMask: true,
-            delay: "<=0",
-          }),
-          new FadeSplitText({
-            el: $(".home-hero-intro-label").get(0),
-            isFast: true,
-            onMask: true,
-            delay: "<=.1",
-          }),
-          new FadeSplitText({
-            el: $(".home-hero-intro-body").get(0),
-            isFast: true,
-            onMask: true,
-            delay: "<=.1",
-          }),
+          new FadeSplitText({ el: $(".home-hero-title").get(0), isFast: true, onMask: true, delay: "<=0",}),
+          new FadeSplitText({ el: $(".home-hero-sub").get(0), isFast: true, onMask: true, delay: "<=.1",}),
+          new FadeIn({el: $(".home-hero-btn"),delay: '<=.1'})
         ],
       });
     }
@@ -359,6 +339,26 @@ const mainScript = () => {
     }
   }
   const homeHero = new HomeHero();
+  class HomeTesti extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      let swiperTesti = new Swiper(".home-testi-cms", {
+        slidesPerView: 'auto',
+        navigation: {
+          prevEl: ".home-testi-control-item-prev",
+          nextEl: ".home-testi-control-item-next",
+        },
+      });
+    }
+    interact() {}
+  }
+  const homeTesti = new HomeTesti('.home-testi');
   class Header extends TriggerSetupHero {
     constructor() {
       super();
@@ -422,6 +422,7 @@ const mainScript = () => {
   const SCRIPT = {
     homeScript: () => {
       homeHero.trigger();
+      homeTesti.trigger();
       footer.trigger();
     },
   };
