@@ -82,7 +82,10 @@ const script = () => {
                 checkboxes.forEach((ch, i) => {
                     const chText = ch.querySelector('span').textContent;
                     let attr = ch.querySelector('span').getAttribute('fs-cmsfilter-field');
-                    const count = filter.listInstance.items.filter(item => item.element.querySelector(`[fs-cmsfilter-field='${attr}']`).textContent === chText).length;
+                    const count = filter.listInstance.items.filter(item => {
+                        const elements = item.element.querySelectorAll(`[fs-cmsfilter-field='${attr}']`);
+                        return Array.from(elements).some(el => el.textContent === chText);
+                    }).length;
                     if (count === 0) {
                         ch.style.display = 'none';
                     }
