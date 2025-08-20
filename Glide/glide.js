@@ -54,6 +54,8 @@ const script = () => {
     const SCRIPT = {}
     SCRIPT.surfScript = () => {
         console.log("surf");
+        window.fsAttributes.push(['cmsload', (listInstances) => {
+        window.fsAttributes.cmsfilter.init();
         window.fsAttributes.push(['cmsfilter', (filterInstances) => {
             const [filter] = filterInstances;
             const dropdowns = document.querySelectorAll('.dropdown.in-filter');
@@ -81,6 +83,7 @@ const script = () => {
                     const chText = ch.querySelector('span').textContent;
                     let attr = ch.querySelector('span').getAttribute('fs-cmsfilter-field');
                     const count = filter.listInstance.items.filter(item => item.element.querySelector(`[fs-cmsfilter-field='${attr}']`).textContent === chText).length;
+                    console.log(count);
                     if (count === 0) {
                         ch.style.display = 'none';
                     }
@@ -103,6 +106,9 @@ const script = () => {
             })
             },
         ]);
+        // The callback passes a `listInstances` array with all the `CMSList` instances on the page.
+        },
+    ]);
     }
     SCRIPT.subpageScript = () => {
         $('.form-block').each(async(_, block) => {
