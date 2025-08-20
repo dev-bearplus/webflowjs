@@ -354,6 +354,13 @@ const mainScript = () => {
           prevEl: ".home-testi-control-item-prev",
           nextEl: ".home-testi-control-item-next",
         },
+        pagination: {
+          el: '.home-testi-control-pagi',
+          bulletClass: 'home-testi-control-pagi-item',
+          bulletActiveClass: 'active',
+          clickable: true,
+          
+      },
       });
     }
     interact() {}
