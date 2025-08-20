@@ -55,57 +55,57 @@ const script = () => {
     SCRIPT.surfScript = () => {
         console.log("surf");
         window.fsAttributes.push(['cmsload', (listInstances) => {
-        window.fsAttributes.cmsfilter.init();
-        window.fsAttributes.push(['cmsfilter', (filterInstances) => {
-            const [filter] = filterInstances;
-            const dropdowns = document.querySelectorAll('.dropdown.in-filter');
-            filter.listInstance.on('renderitems', (renderedItems) => {
-                console.log('renderitems event', renderedItems);
-                console.log('filter event', filter);
-            });
+            window.fsAttributes.cmsfilter.init();
+            window.fsAttributes.push(['cmsfilter', (filterInstances) => {
+                const [filter] = filterInstances;
+                const dropdowns = document.querySelectorAll('.dropdown.in-filter');
+                filter.listInstance.on('renderitems', (renderedItems) => {
+                    console.log('renderitems event', renderedItems);
+                    console.log('filter event', filter);
+                });
 
-            filter.listInstance.on('additems', (addedItems) => {
-                console.log('additems event', addedItems);
-            });
-            filter.filtersData.forEach((item) => {
-                console.log(item)
-            })
-            dropdowns.forEach(drop => {
-                const options = [];
-                const title = drop.querySelector('.drop-toogle-content-title .drop-toggle-title');
-                const tip = drop.querySelector('.drop-toogle-content-title .text-l');
-
-                const checkboxes = drop.querySelectorAll('.filter-checkbox-field');
-                const radios = drop.querySelectorAll('.filter-radio-button-field');
-
-                title.classList.remove('is-active');
-                checkboxes.forEach((ch, i) => {
-                    const chText = ch.querySelector('span').textContent;
-                    let attr = ch.querySelector('span').getAttribute('fs-cmsfilter-field');
-                    const count = filter.listInstance.items.filter(item => {
-                        const elements = item.element.querySelectorAll(`[fs-cmsfilter-field='${attr}']`);
-                        return Array.from(elements).some(el => el.textContent === chText);
-                    }).length;
-                    if (count === 0) {
-                        ch.style.display = 'none';
-                    }
+                filter.listInstance.on('additems', (addedItems) => {
+                    console.log('additems event', addedItems);
+                });
+                filter.filtersData.forEach((item) => {
+                    console.log(item)
                 })
-                drop.addEventListener('change', (e) => {
-                    tip.textContent = '';
-                    const checkedCheckboxes = drop.querySelectorAll('input:checked');
-                    checkedCheckboxes.forEach((ch, i) => {
-                        const chText = i === 0 ? ch.parentNode.querySelector('span').textContent : `, ${ch.parentNode.querySelector('span').textContent}`;
-                        tip.textContent += chText;
+                dropdowns.forEach(drop => {
+                    const options = [];
+                    const title = drop.querySelector('.drop-toogle-content-title .drop-toggle-title');
+                    const tip = drop.querySelector('.drop-toogle-content-title .text-l');
+
+                    const checkboxes = drop.querySelectorAll('.filter-checkbox-field');
+                    const radios = drop.querySelectorAll('.filter-radio-button-field');
+
+                    title.classList.remove('is-active');
+                    checkboxes.forEach((ch, i) => {
+                        const chText = ch.querySelector('span').textContent;
+                        let attr = ch.querySelector('span').getAttribute('fs-cmsfilter-field');
+                        const count = filter.listInstance.items.filter(item => {
+                            const elements = item.element.querySelectorAll(`[fs-cmsfilter-field='${attr}']`);
+                            return Array.from(elements).some(el => el.textContent === chText);
+                        }).length;
+                        if (count === 0) {
+                            ch.style.display = 'none';
+                        }
                     })
-                    if (tip.textContent) {
-                        tip.style.display = 'block';
-                        title.classList.add('is-active');
-                    } else {
-                        tip.style.display = 'none';
-                        title.classList.remove('is-active');
-                    }
+                    drop.addEventListener('change', (e) => {
+                        tip.textContent = '';
+                        const checkedCheckboxes = drop.querySelectorAll('input:checked');
+                        checkedCheckboxes.forEach((ch, i) => {
+                            const chText = i === 0 ? ch.parentNode.querySelector('span').textContent : `, ${ch.parentNode.querySelector('span').textContent}`;
+                            tip.textContent += chText;
+                        })
+                        if (tip.textContent) {
+                            tip.style.display = 'block';
+                            title.classList.add('is-active');
+                        } else {
+                            tip.style.display = 'none';
+                            title.classList.remove('is-active');
+                        }
+                    })
                 })
-            })
             },
         ]);
         // The callback passes a `listInstances` array with all the `CMSList` instances on the page.
@@ -265,6 +265,12 @@ const script = () => {
                     filterCurrent[key] = [];
                 })
             })
+        })
+        $('.subnav-link').each((_, link) => {
+            console.log($(`section#${$(link).attr('href').substring(1)}`).length !== 0);
+            if ($(`section#${$(link).attr('href').substring(1)}`).length === 0) {
+                $(link).addClass('w-condition-invisible');
+            }
         })
     }
     const pageName = $('main.main').attr('data-namespace');
