@@ -152,12 +152,12 @@ const mainScript = () => {
         gsap.fromTo(char,
             { opacity: 1 },
             {
-                duration: 0.06,
+                duration: 0.045,
                 innerHTML: () => originalChars[Math.floor(Math.random() * originalChars.length)],
                 repeat: 4,
                 repeatRefresh: true,
                 opacity: 1,
-                repeatDelay: 0.05,
+                repeatDelay: 0.02,
                 onComplete: () => gsap.set(char, { innerHTML: $(char).data('initial'), delay: 0.03 }),
             }
         );
@@ -170,11 +170,6 @@ const mainScript = () => {
     $('[data-hover="hover-shuffle"]').each(function () {
       const $el    = $(this);
       const $chars = $el.find('.char');
-
-      // lock width ban đầu để hiệu ứng không làm co giãn phần tử
-      $el.css('width', $el.outerWidth() + 'px');
-
-      // cache nội dung ban đầu
       $chars.each(function(_,c){
           $(c).data('initial', $(c).text());
       });
