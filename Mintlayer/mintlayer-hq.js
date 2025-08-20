@@ -572,16 +572,28 @@ const mainScript = () => {
         $('.ldp-hero-content-item').eq(0).addClass('active');
         initAnimPath('.stak-tool-link-img', { duration: 6, delay: 3, fade: true });
         getEarnAPI();
-        let videoPlayed = false;
+        let videoPlayed1 = false;
+        $('.ldp-vid-main').on('click', function (e) {
+            e.preventDefault();
+            if (!videoPlayed1) {
+                $(this).find('video').attr('controls', 'true').removeAttr('muted').css('pointer-events', 'auto')
+                $(this).removeClass('hover-img').css('pointer-events', 'none')
+                $(this).find('.ldp-vid-ic').addClass('de-active')
+                $(this).find('video').get(0).volume = 0.8;
+                $(this).find('video').get(0).muted = !$(this).find('video').get(0).muted;
+                videoPlayed1 = true;
+            }
+        })
+        let videoPlayed2 = false;
         $('.ldp-potential-video-inner').on('click', function (e) {
             e.preventDefault();
-            if (!videoPlayed) {
+            if (!videoPlayed2) {
                 $(this).find('video').attr('controls', 'true').removeAttr('muted').css('pointer-events', 'auto')
                 $(this).removeClass('hover-img').css('pointer-events', 'none')
                 $(this).find('.ldp-potential-video-ic').addClass('de-active')
                 $(this).find('video').get(0).volume = 0.8;
                 $(this).find('video').get(0).muted = !$(this).find('video').get(0).muted;
-                videoPlayed = true;
+                videoPlayed2 = true;
             }
         })
         function landingpageHero() {

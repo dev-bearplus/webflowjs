@@ -180,6 +180,10 @@ const mainScript = () => {
     });
   }
   initShuffleHover();
+  function isValidEmail(email) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  }  
   class TriggerSetup {
     constructor(triggerEl) {
       this.tlTrigger;
@@ -251,7 +255,26 @@ const mainScript = () => {
           lerp(targetInnerY, this.targetY - lenis.velocity / 16, 0.1)
         );
       }
+      ['blue', 'black'].forEach(color => {
+        const inSectionColor = $(`[data-section="${color}"]`).toArray().some(el => this.isMouseInSection(el));
+        if(inSectionColor) {
+          $('.cursor-inner').addClass(`on-${color}`);
+        } else {
+          $('.cursor-inner').removeClass(`on-${color}`);
+        }
+      });
     }
+    isMouseInSection(el) {
+      const rect = el.getBoundingClientRect();
+      // pointer.x & pointer.y là tọa độ chuột hiện tại bạn đã có trong class Cursor
+      return (
+        pointer.x >= rect.left &&
+        pointer.x <= rect.right &&
+        pointer.y >= rect.top &&
+        pointer.y <= rect.bottom
+      );
+    }
+    
     onHover() {
       let type = $("[data-cursor]:hover").attr("data-cursor");
       let gotBtnSize = false;
@@ -259,6 +282,12 @@ const mainScript = () => {
         switch (type) {
           case "hidden":
             $(".cursor").addClass("on-hover-hidden");
+            break;
+          case "arrow":
+            $(".cursor").addClass("on-hover-arrow");
+            break;
+          case "drag":
+            $(".cursor").addClass("on-hover-drag");
             break;
           case "txtLink":
             $(".cursor-inner").addClass("on-hover-sm");
@@ -300,6 +329,8 @@ const mainScript = () => {
     }
     reset() {
       $(".cursor").removeClass("on-hover-hidden");
+      $(".cursor").removeClass("on-hover-arrow");
+      $(".cursor").removeClass("on-hover-drag");
     }
   }
   let cursor = new Cursor();
@@ -410,6 +441,7 @@ const mainScript = () => {
         $(".header").addClass(`on-${color}`);
       } else if (!$(".header").hasClass("on-show-menu")) {
         $(".header").removeClass(`on-${color}`);
+
       }
     };
   }
@@ -423,7 +455,18 @@ const mainScript = () => {
       this.interact();
     }
     setup() {}
-    interact() {}
+    interact() {
+      $('.footer-form-input').on('input', function() {
+        let val = $(this).val();
+        let check = isValidEmail(val);
+        if(check){
+          $('.footer-form-input-submit').addClass('active');
+        }
+        else {
+          $('.footer-form-input-submit').removeClass('active');
+        }
+      })
+    }
   }
   const footer = new Footer(".footer-wrap");
   const SCRIPT = {
