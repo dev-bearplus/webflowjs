@@ -75,14 +75,14 @@ const mainScript = () => {
         }
     });
     async function updateDownloadButton() {
-        const repo = "mintlayer/mintlayer-core"; // Thay repo nếu cần
+        const repo = "mintlayer/mintlayer-core";
         const apiUrl = `https://api.github.com/repos/${repo}/releases/latest`;
         try {
             const response = await fetch(apiUrl);
             const data = await response.json();
 
             if (data.assets && data.assets.length > 0) {
-                const latestVersion = data.tag_name; // Lấy version mới nhất (vd: v0.5.1)
+                const latestVersion = data.tag_name;
                 $('.footer-download-link').attr('href', `https://github.com/mintlayer/mintlayer-core/releases/tag/${latestVersion}`);
             } else {
                 console.error("No assets found for the latest release.");
@@ -367,9 +367,9 @@ const mainScript = () => {
         }
     })
     async function handleCrawContent() {
-        const octokit = new Octokit({
-            auth: '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'
-        })
+        // const octokit = new Octokit({
+        //     auth: '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'
+        // })
         /**
          * @type {browser_download_url}: string;
          * @type {content_type}: string;
@@ -386,8 +386,9 @@ const mainScript = () => {
          *@type {url}: string;
          */
         try {
-            const releaseResponse = await octokit.request('GET /repos/mintlayer/mintlayer-core/releases/latest');
-            const latestRelease = releaseResponse.data;
+            // const releaseResponse = await octokit.request('GET /repos/mintlayer/mintlayer-core/releases/latest');
+            const releaseResponse = await fetch('https://api.github.com/repos/mintlayer/mintlayer-core/releases/latest');
+            const latestRelease = await releaseResponse.json();
             const assets = [...latestRelease.assets];
 
             const readmeContent = latestRelease.body;
@@ -2108,7 +2109,7 @@ const mainScript = () => {
     SCRIPT.eventScript = () => {
         $('.event-main-table-body').each((idx, el) => {
             let itemLength = $(el).find('.event-main-table-row').length;
-            let parent =  $(el).closest('.event-main-wrap');
+            let parent = $(el).closest('.event-main-wrap');
             if (itemLength === 0) {
                 if (parent.hasClass('event-main-upcoming')) {
                     parent.find('.event-main-desc').text("We don't have any events scheduled right now. Check back soon!");
@@ -2121,7 +2122,7 @@ const mainScript = () => {
             }
         })
 
-        
+
         function ActiveEvent(type, timeEvent) {
             let currentTime = new Date(); // current time in user local
             switch (type) {
@@ -2131,12 +2132,12 @@ const mainScript = () => {
                     return timeEvent < currentTime;
             }
         }
-        
+
         $('.event-main-upcoming-cms').each((idx, el) => {
             let eventType = $(el).attr('data-event-type');
-        
+
             $(el).find('.event-main-table-row-inner').each((idx, item) => {
-                let timeEnd = new Date($(item).attr('time-end')); 
+                let timeEnd = new Date($(item).attr('time-end'));
                 if (ActiveEvent(eventType, timeEnd)) {
                     $(item).hide();
                 }
