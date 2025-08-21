@@ -384,6 +384,19 @@ const mainScript = () => {
     //         rateExtent = '-usd';
     //     }
     // }
+    function scrollToFaq() {
+        $('[data-scroll-faq]').on('click', function(e) {
+            e.preventDefault();
+            let target = $(this).attr('data-scroll-faq');
+            if ($(`#${target}`).length >= 1) {
+                lenis.scrollTo(target)
+                $(`#${target}`).find('.home-faq-item-head').trigger('click')
+            } else {
+                lenis.scrollTo(`${$(this).attr('href')}`)
+            }
+
+        })
+    }
     function updateRichtextFaqClass(faqHtml) {
         let ans = faqHtml.find('.home-faq--itemans');
         // Paragraphs
@@ -737,14 +750,17 @@ const mainScript = () => {
           return 'en-SG';
         }
     }
+    if (localStorage.getItem('preferredLanguage') !== null) {
+        localStorage.removeItem('preferredLanguage');
+    }
+    if (localStorage.getItem('selectedLanguage') !== null) {
+        localStorage.removeItem('selectedLanguage');
+    }
     function redirectCurrentLanguage(language) {
         let urlCurrentLanguage = $(`.header-lang-content-item[data-lang-code= ${language}]`).attr('href');
             if(urlCurrentLanguage){
                 window.location.href = urlCurrentLanguage;
             }
-    }
-    function setLanguage(language) {
-        localStorage.setItem('preferredLanguage', language);
     }
     function activeLanguage() {
         $(function () {
@@ -763,18 +779,67 @@ const mainScript = () => {
             $(this).toggleClass('active');
             $('.header-lang-main').toggleClass('active');
         })
-        $('.header-lang-nation-item').on('click', function(e) {
-            e.preventDefault();
-            if($(this).hasClass('active')){
-                return;
-            }
-            else {
-                let url = $(this).attr('href');
-                let languageCodeItem = $(this).attr('data-lang-code');
-                setLanguage(languageCodeItem);
-                window.location.href= url;
-            }
-        })
+        if(viewport.w > 991){
+            $('.header-lang-nation-item').hover(
+                function(e) {
+                    if($(this).hasClass('active')) return;
+                    let index = $(this).index();
+                    $('.header-lang-nation-item').removeClass('active');
+                    $(this).addClass('active')
+                    let heightCurrent = $('.header-lang-content-inner').height();
+                    let heightWillChange = $('.header-lang-content-list').eq(index).height();
+                    $('.header-lang-content-list').removeClass('active');
+                    if(heightCurrent > heightWillChange){
+                        $('.header-lang-content-list').eq(index).addClass('active');
+                        setTimeout(function() {
+                            $('.header-lang-content-inner').height(heightWillChange);
+                        }, 200)
+                    }
+                    else {
+                        $('.header-lang-content-inner').height(heightWillChange);
+                        setTimeout(function() {
+                            $('.header-lang-content-list').eq(index).addClass('active');
+                        }, 200)
+                    }
+                    
+                },
+                // function(){
+                //     if($(this).hasClass('active')) return;
+                //     let indexActive = $('.header-lang-nation-item.active').index();
+                //     let heightContent = $('.header-lang-content-list').eq(indexActive).height();
+                //     $('.header-lang-content-inner').height(heightContent);
+                //     $('.header-lang-content-list').removeClass('active');
+                //     setTimeout(function(){
+                //         $('.header-lang-content-list').eq(indexActive).addClass('active');
+                //     },200)
+                // }
+            )
+        }
+        else {
+            $('.header-lang-nation-item').on('click', function(e){
+                e.preventDefault();
+                let index = $(this).index();
+                $('.header-lang-nation-item').removeClass('active');
+                $(this).addClass('active');
+                let heightCurrent = $('.header-lang-content-inner').height();
+                let heightWillChange = $('.header-lang-content-list').eq(index).height();
+                $('.header-lang-content-list').removeClass('active');
+                console.log($('.header-lang-content-list').eq(index))
+                if(heightCurrent > heightWillChange){
+                    $('.header-lang-content-list').eq(index).addClass('active');
+                    setTimeout(function() {
+                        $('.header-lang-content-inner').height(heightWillChange);
+                    }, 200)
+                }
+                else {
+                    $('.header-lang-content-inner').height(heightWillChange);
+                    setTimeout(function() {
+                        $('.header-lang-content-list').eq(index).addClass('active');
+                    }, 200)
+                }
+            })
+        }
+        
         function initLang() {
             const langCodes = $('.header-lang-content-item').map(function () {
                 return $(this).data('lang-subdomain');
@@ -811,7 +876,6 @@ const mainScript = () => {
                         e.preventDefault();
                         return; 
                     }
-                    setLanguage(languageCodeItem);
                 })
             }); 
             let currentLang = $('html').attr('lang');
@@ -828,11 +892,11 @@ const mainScript = () => {
                         if (langItemCode == currentLang) {
                             $(langItem).addClass('active');
                             let displayName = $(langItem).attr('data-lang-name');
-                            if (displayName.toLowerCase().includes('en')) {
-                                displayName = 'EN'
-                            }
+                            let flagUrl = $(langItem).attr('data-flag');
                             $('.header-lang-txt').text(displayName);
+                            $('.header-lang-ic img').attr('src',flagUrl);
                             let indexList = $(langItem).closest('.header-lang-content-list').index();
+                            $('.header-lang-content-inner').height($('.header-lang-content-list').eq(indexList).height());
                             $('.header-lang-content-list').eq(indexList).addClass('active');
                             $('.header-lang-nation-item').eq(indexList).addClass('active');
                         }
@@ -842,21 +906,31 @@ const mainScript = () => {
         }
         initLang();
     }
-    if(isStagging()){
-        activeLanguage();
-        const cachedLanguage = localStorage.getItem('preferredLanguage');
+    activeLanguage();
+    let firstLoad = sessionStorage.getItem('firstLoad');
+    if(!firstLoad){
         let currentLang = $('html').attr('lang');
-        // if (!cachedLanguage)
-        if(true){
-            let suggestedLanguage = suggestLanguage();
-            setLanguage(suggestedLanguage);
-            // if(currentLang != suggestedLanguage){
-            //     redirectCurrentLanguage(suggestedLanguage);
-            // }
-        } else if (cachedLanguage && cachedLanguage != currentLang) {
-            redirectCurrentLanguage(cachedLanguage);
-        } 
+        let suggestedLanguage = suggestLanguage();
+        if(currentLang != suggestedLanguage){
+            redirectCurrentLanguage(suggestedLanguage);
+        }
+        sessionStorage.setItem('firstLoad', true)
     }
+    // const cachedLanguage = localStorage.getItem('selectedLanguage');
+    // let currentLang = $('html').attr('lang');
+    // if (!cachedLanguage){
+    //     let suggestedLanguage = suggestLanguage();
+    //     console.log(suggestLanguage);
+    //     setLanguage(suggestedLanguage);
+    //     if(currentLang != suggestedLanguage){
+    //         redirectCurrentLanguage(suggestedLanguage);
+    //     }
+    // } else if (cachedLanguage && cachedLanguage != currentLang) {
+    //     redirectCurrentLanguage(cachedLanguage);
+    // } 
+    // if (cachedLanguage && cachedLanguage != currentLang) {
+    //     redirectCurrentLanguage(cachedLanguage);
+    // } 
     function scrollDown() {
         header.addClass('on-hide')
         if($('.header-lang-main').length) {
@@ -1078,7 +1152,7 @@ const mainScript = () => {
         let lastScrollTop = 0;
         $(window).on('scroll', function(e) {
             let st = $(this).scrollTop();
-            if (st > lastScrollTop){
+            if (st > lastScrollTop && st > $('.announcement').height()){
                 scrollDown()
             } else {
                 scrollUp();
@@ -2707,20 +2781,6 @@ const mainScript = () => {
             //         }
             //     });
             // }
-            
-            function scrollToFaq() {
-                $('[data-scroll-faq]').on('click', function(e) {
-                    e.preventDefault();
-                    let target = $(this).attr('data-scroll-faq');
-                    if ($(`#${target}`).length >= 1) {
-                        lenis.scrollTo(target)
-                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
-                    } else {
-                        lenis.scrollTo(`${$(this).attr('href')}`)
-                    }
-
-                })
-            }
         }
         homeGetFaq();
 
@@ -2833,19 +2893,6 @@ const mainScript = () => {
             //         }
             //     });
             // }
-            function scrollToFaq() {
-                $('[data-scroll-faq]').on('click', function(e) {
-                    e.preventDefault();
-                    let target = $(this).attr('data-scroll-faq');
-                    if ($(`#${target}`).length >= 1) {
-                        lenis.scrollTo(target)
-                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
-                    } else {
-                        lenis.scrollTo(`${$(this).attr('href')}`)
-                    }
-
-                })
-            }
         }
         homeGetFaq();
 
@@ -3033,19 +3080,6 @@ const mainScript = () => {
             //         }
             //     });
             // }
-            function scrollToFaq() {
-                $('[data-scroll-faq]').on('click', function(e) {
-                    e.preventDefault();
-                    let target = $(this).attr('data-scroll-faq');
-                    if ($(`#${target}`).length >= 1) {
-                        lenis.scrollTo(target)
-                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
-                    } else {
-                        lenis.scrollTo(`${$(this).attr('href')}`)
-                    }
-
-                })
-            }
         }
         aboutGetFaq();
 
@@ -3219,10 +3253,32 @@ const mainScript = () => {
         function updateTabTable () {
             //Setup HTML
             let richtextEl = $('.art-layout-main-rictxt');
+
             richtextEl.find('a[href*="tab-table"]').each((idx, item) => {
-                $(item).attr('href', '#').css('pointer-events', 'none').on('click', function(e) {e.preventDefault});
-                $(item).closest('p').attr('data-tab-table', idx).addClass('tab-table-item').css('cursor', 'pointer');
-            })
+                $(item)
+                    .attr('href', '#')
+                    .css('pointer-events', 'none')
+                    .on('click', function(e) { e.preventDefault(); });
+
+                $(item)
+                    .closest('p')
+                    .attr('data-tab-table', idx)
+                    .addClass('tab-table-item')
+                    .css('cursor', 'pointer');
+            });
+
+            const $tabItems = richtextEl.find('.tab-table-item');
+            const $wrapItems = $('<div class="tab-table-item-wrapper"></div>');
+
+            $tabItems.each(function(idx) {
+                const $clone = $(this).clone(true);
+                $clone.attr('data-tab-table', idx);
+                $wrapItems.append($clone);
+            });
+
+            $tabItems.last().after($wrapItems);
+            $tabItems.remove();
+
             richtextEl.find('.tab-table-content').each((idx, item) => {
                 $(item).closest('.w-embed').attr('data-tab-table', idx).addClass('tab-table-content');
             })
@@ -4355,22 +4411,7 @@ const mainScript = () => {
             //     }
             // });
             // }
-            function scrollToFaq() {
-                $('[data-scroll-faq]').on('click', function(e) {
-                    e.preventDefault();
-                    console.log('click')
-                    e.preventDefault();
-                    let target = $(this).attr('data-scroll-faq');
-                    console.log(target)
-                    if ($(`#${target}`).length >= 1) {
-                        lenis.scrollTo(target)
-                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
-                    } else {
-                        lenis.scrollTo(`${$(this).attr('href')}`)
-                    }
-
-                })
-            }
+            
         }
 
         usdGetFaq();
@@ -4467,8 +4508,9 @@ const mainScript = () => {
         }
         stickyCard();
         function cardHero(){
-           let itemMarquee =  $('.card-hero-marquee-txt').eq(0).clone();
-           const width = $('.card-hero-marquee-txt').eq(0).width();
+            let itemMarquee =  $('.card-hero-marquee-txt').eq(0).clone();
+            const width = $('.card-hero-marquee-txt').eq(0).width();
+            if(width <= 0) return;
             const length = Math.floor($(window).width() / width) + 1;
             console.log(width)
             for (let i = 0; i < length; i++) {
@@ -4760,19 +4802,6 @@ const mainScript = () => {
                     scrollToFaq();
                 }
             });
-            function scrollToFaq() {
-                $('[data-scroll-faq]').on('click', function(e) {
-                    e.preventDefault();
-                    let target = $(this).attr('data-scroll-faq');
-                    if ($(`#${target}`).length >= 1) {
-                        lenis.scrollTo(target)
-                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
-                    } else {
-                        lenis.scrollTo(`${$(this).attr('href')}`)
-                    }
-
-                })
-            }
         }
         thankGetFaq();
     }
@@ -4867,19 +4896,6 @@ const mainScript = () => {
                     scrollToFaq();
                 }
             });
-            function scrollToFaq() {
-                $('[data-scroll-faq]').on('click', function(e) {
-                    e.preventDefault();
-                    let target = $(this).attr('data-scroll-faq');
-                    if ($(`#${target}`).length >= 1) {
-                        lenis.scrollTo(target)
-                        $(`#${target}`).find('.home-faq-item-head').trigger('click')
-                    } else {
-                        lenis.scrollTo(`${$(this).attr('href')}`)
-                    }
-
-                })
-            }
         }
         homeGetFaq();
         

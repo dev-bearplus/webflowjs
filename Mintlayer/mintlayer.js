@@ -2631,12 +2631,18 @@ const mainScript = () => {
 
     }
     SCRIPT.blogsScript = () => {
-
+        var text = $('.term-privacy-hero-content').text().trim();
+        var wordCount = text.split(/\s+/).length;
+    
+        var averageSpeed = 250;
+        var minutes = Math.ceil(wordCount / averageSpeed);
+    
+        // Nếu muốn hiển thị lên trang
+        $('.reading-time').text(minutes + " mins");
         const figure = $('.term-privacy-hero-content').find('figure')
-
         if (figure.length > 0) {
             figure.eq(0).append(`<div id="elevenlabs-audionative-widget" data-height="90" data-width="100%" data-frameborder="no" data-scrolling="no" data-publicuserid="ab48332d81a433131c20b00c5c10990401d078df86fa1f4dfa00ea9a01ba1c47" data-playerurl="https://elevenlabs.io/player/index.html" >Loading the <a href="https://elevenlabs.io/text-to-speech" target="_blank" rel="noopener">Elevenlabs Text to Speech</a> AudioNative Player...</div>
-    <script src="https://elevenlabs.io/player/audioNativeHelper.js" type="text/javascript"></script>`)
+            <script src="https://elevenlabs.io/player/audioNativeHelper.js" type="text/javascript"></script>`)
         }
     }
     SCRIPT.formScript = () => {
