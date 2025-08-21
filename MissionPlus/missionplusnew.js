@@ -268,21 +268,18 @@ const mainScript = () => {
         let controlPrev = $('[data-cursor="drag"]:hover').attr('data-control-prev');
         let controlNext = $('[data-cursor="drag"]:hover').attr('data-control-next');
         if (pointer.x > midX) {
-          // Bên phải -> prev
-          $(".cursor").removeClass("left").addClass("right");
           if ($(`.${controlNext}`).hasClass("swiper-button-disabled")) {
-            $(".cursor").addClass("disabled");
+            $(".cursor").removeClass("right").addClass("left");
+
           } else {
-            $(".cursor").removeClass("disabled");
+            $(".cursor").removeClass("left").addClass("right");
           }
         } else {
-          // Bên trái -> next
-          $(".cursor").removeClass("right").addClass("left");
       
           if ($(`.${controlPrev}`).hasClass("swiper-button-disabled")) {
-            $(".cursor").addClass("disabled");
+            $(".cursor").removeClass("left").addClass("right");
           } else {
-            $(".cursor").removeClass("disabled");
+            $(".cursor").removeClass("right").addClass("left");
           }
         }
       } else {
@@ -291,7 +288,6 @@ const mainScript = () => {
     }
     isMouseInSection(el) {
       const rect = el.getBoundingClientRect();
-      // pointer.x & pointer.y là tọa độ chuột hiện tại bạn đã có trong class Cursor
       return (
         pointer.x >= rect.left &&
         pointer.x <= rect.right &&
@@ -425,9 +421,10 @@ const mainScript = () => {
       $(document).on("click", (e) =>{
         if ($('.home-testi-cms[data-cursor="drag"]:hover').length) {
           const midX = viewport.w/ 2;
-          if (e.clientX > midX) {
+          if ($('.cursor').hasClass('right')) {
             this.swiperTesti.slideNext();
-          } else {
+          } 
+          else {
             this.swiperTesti.slidePrev();
           }
         }
