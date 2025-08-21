@@ -263,6 +263,31 @@ const mainScript = () => {
           $('.cursor-inner').removeClass(`on-${color}`);
         }
       });
+      if ($('[data-cursor="drag"]:hover').length) {
+        const midX = viewport.w / 2;
+        let controlPrev = $('[data-cursor="drag"]:hover').attr('data-control-prev');
+        let controlNext = $('[data-cursor="drag"]:hover').attr('data-control-next');
+        if (pointer.x > midX) {
+          // Bên phải -> prev
+          $(".cursor").removeClass("left").addClass("right");
+          if ($(`.${controlNext}`).hasClass("swiper-button-disabled")) {
+            $(".cursor").addClass("disabled");
+          } else {
+            $(".cursor").removeClass("disabled");
+          }
+        } else {
+          // Bên trái -> next
+          $(".cursor").removeClass("right").addClass("left");
+      
+          if ($(`.${controlPrev}`).hasClass("swiper-button-disabled")) {
+            $(".cursor").addClass("disabled");
+          } else {
+            $(".cursor").removeClass("disabled");
+          }
+        }
+      } else {
+        $(".cursor").removeClass("left right disabled");
+      }      
     }
     isMouseInSection(el) {
       const rect = el.getBoundingClientRect();
@@ -373,14 +398,16 @@ const mainScript = () => {
   class HomeTesti extends TriggerSetup {
     constructor(triggerEl) {
       super(triggerEl);
+      this.swiperTesti;
     }
     trigger() {
       super.setTrigger(this.setup.bind(this));
       this.interact();
     }
     setup() {
-      let swiperTesti = new Swiper(".home-testi-cms", {
+      this.swiperTesti = new Swiper(".home-testi-cms", {
         slidesPerView: 'auto',
+        speed: 1000,
         navigation: {
           prevEl: ".home-testi-control-item-prev",
           nextEl: ".home-testi-control-item-next",
@@ -394,7 +421,18 @@ const mainScript = () => {
       },
       });
     }
-    interact() {}
+    interact() {
+      $(document).on("click", (e) =>{
+        if ($('.home-testi-cms[data-cursor="drag"]:hover').length) {
+          const midX = viewport.w/ 2;
+          if (e.clientX > midX) {
+            this.swiperTesti.slideNext();
+          } else {
+            this.swiperTesti.slidePrev();
+          }
+        }
+      });
+    }
   }
   const homeTesti = new HomeTesti('.home-testi');
   class Header extends TriggerSetupHero {
@@ -429,6 +467,11 @@ const mainScript = () => {
     interact() {
       $(".header-menu-item.has-submenu").on("click", function () {
         $(this).toggleClass("active");
+      });
+      $(document).on("click", function (e) {
+        if (!$(e.target).closest(".header-menu-item.has-submenu").length) {
+          $(".header-menu-item.has-submenu").removeClass("active");
+        }
       });
     }
     toggleColorMode = (color) => {
