@@ -313,7 +313,7 @@ const mainScript = () => {
     }
     function sendDataToBrevo(dataToSend) {
         if (typeof jQuery === 'undefined') {
-            console.error('jQuery chưa được tải. Hãy đảm bảo rằng jQuery đã được thêm vào dự án.');
+            console.error('jQuery has not been loaded. Please ensure jQuery is added to the project.');
             return;
         }
         const apiUrl = "https://cbe4734c.sibforms.com/serve/MUIFAI_dKpCBkcG0YgTWON7UTAtcJXagV-FZjyIABRx8zzm8kmg0QC6lsfAqd6zBLuuv9TsFyWj_BGqeM1FQSDs34ng6sjJ6F6tNORXTIXZMETUUEjq0hig-G9Oa31pA9SRWWJXI7XydHV8CW3jNZAgxjROi4H1ABOCQ4EalU8dZbHtaRyd7yTJQ-W0H_YSI-gbszLHiR9W4gBqw?isAjax=1";
@@ -386,8 +386,7 @@ const mainScript = () => {
          *@type {url}: string;
          */
         try {
-            // const releaseResponse = await octokit.request('GET /repos/mintlayer/mintlayer-core/releases/latest');
-            const releaseResponse = await fetch('https://api.github.com/repos/mintlayer/mintlayer-core/releases/latest');
+            const releaseResponse = await fetch('https://explorer.mintlayer.org/api/github/latest-release');
             const latestRelease = await releaseResponse.json();
             const assets = [...latestRelease.assets];
 
@@ -2633,10 +2632,10 @@ const mainScript = () => {
     SCRIPT.blogsScript = () => {
         var text = $('.term-privacy-hero-content').text().trim();
         var wordCount = text.split(/\s+/).length;
-    
+
         var averageSpeed = 250;
         var minutes = Math.ceil(wordCount / averageSpeed);
-    
+
         // Nếu muốn hiển thị lên trang
         $('.reading-time').text(minutes + " mins");
         const figure = $('.term-privacy-hero-content').find('figure')
