@@ -179,7 +179,7 @@ const mainScript = () => {
       });
     });
   }
-  initShuffleHover();
+  viewport.w> 991 && initShuffleHover();
   function isValidEmail(email) {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -268,18 +268,21 @@ const mainScript = () => {
         let controlPrev = $('[data-cursor="drag"]:hover').attr('data-control-prev');
         let controlNext = $('[data-cursor="drag"]:hover').attr('data-control-next');
         if (pointer.x > midX) {
+          // Bên phải -> prev
+          $(".cursor").removeClass("left").addClass("right");
           if ($(`.${controlNext}`).hasClass("swiper-button-disabled")) {
-            $(".cursor").removeClass("right").addClass("left");
-
+            $(".cursor").addClass("disabled");
           } else {
-            $(".cursor").removeClass("left").addClass("right");
+            $(".cursor").removeClass("disabled");
           }
         } else {
+          // Bên trái -> next
+          $(".cursor").removeClass("right").addClass("left");
       
           if ($(`.${controlPrev}`).hasClass("swiper-button-disabled")) {
-            $(".cursor").removeClass("left").addClass("right");
+            $(".cursor").addClass("disabled");
           } else {
-            $(".cursor").removeClass("right").addClass("left");
+            $(".cursor").removeClass("disabled");
           }
         }
       } else {
@@ -376,6 +379,18 @@ const mainScript = () => {
     }
     setup() {
       // replaceHyphenWithSpan($(".home-hero-title"));
+      this.swiperTesti = new Swiper(".home-hero-post-cms", {
+        slidesPerView: 1,
+        speed: 600,
+        navigation: {
+          prevEl: ".home-hero-post-control-item-prev",
+          nextEl: ".home-hero-post-control-item-next",
+        },
+        effect: "fade",
+        fadeEffect: {
+          crossFade: true,
+        },
+      });
       new MasterTimeline({
         timeline: this.tl,
         allowMobile: true,
@@ -391,6 +406,64 @@ const mainScript = () => {
     }
   }
   const homeHero = new HomeHero();
+  class HomeService extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      if(viewport.w < 768){
+        $('.home-service-cms').addClass('swiper')
+        $('.home-service-cms-inner').addClass('swiper-wrapper')
+        $('.home-service-item').addClass('swiper-slide')
+        let swiperService = new Swiper(".home-service-cms", {
+          slidesPerView: 'auto',
+          speed: 600,
+          pagination: {
+            el: '.home-service-pagi',
+            bulletClass: 'home-service-pagi-item',
+            bulletActiveClass: 'active',
+            clickable: true,
+          },
+        });
+      }
+    }
+    interact() {
+    }
+  }
+  let homeService = new HomeService('.home-service')
+  class HomeIndustry extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      if(viewport.w < 768){
+        $('.home-industry-cms').addClass('swiper')
+        $('.home-industry-list').addClass('swiper-wrapper')
+        $('.home-industry-item').addClass('swiper-slide')
+        let swiperService = new Swiper(".home-industry-cms", {
+          slidesPerView: 'auto',
+          speed: 600,
+          pagination: {
+            el: '.home-industry-pagi',
+            bulletClass: 'home-industry-pagi-item',
+            bulletActiveClass: 'active',
+            clickable: true,
+          },
+        });
+      }
+    }
+    interact() {
+    }
+  }
+  let homeIndustry = new HomeIndustry('.home-industry')
   class HomeTesti extends TriggerSetup {
     constructor(triggerEl) {
       super(triggerEl);
@@ -403,7 +476,7 @@ const mainScript = () => {
     setup() {
       this.swiperTesti = new Swiper(".home-testi-cms", {
         slidesPerView: 'auto',
-        speed: 1000,
+        speed: 600,
         navigation: {
           prevEl: ".home-testi-control-item-prev",
           nextEl: ".home-testi-control-item-next",
@@ -421,10 +494,9 @@ const mainScript = () => {
       $(document).on("click", (e) =>{
         if ($('.home-testi-cms[data-cursor="drag"]:hover').length) {
           const midX = viewport.w/ 2;
-          if ($('.cursor').hasClass('right')) {
+          if (e.clientX > midX) {
             this.swiperTesti.slideNext();
-          } 
-          else {
+          } else {
             this.swiperTesti.slidePrev();
           }
         }
@@ -432,6 +504,7 @@ const mainScript = () => {
     }
   }
   const homeTesti = new HomeTesti('.home-testi');
+ 
   class Header extends TriggerSetupHero {
     constructor() {
       super();
@@ -468,6 +541,19 @@ const mainScript = () => {
       $(document).on("click", function (e) {
         if (!$(e.target).closest(".header-menu-item.has-submenu").length) {
           $(".header-menu-item.has-submenu").removeClass("active");
+        }
+      });
+      $(".header-toggle").on("click",  () => {
+        if($('.header').hasClass('active')){
+          lenis.start();
+          $('.header').removeClass('active');
+          this.toggleColorMode('blue');
+          console.log('khanh')
+        }
+        else {
+          lenis.stop();
+          $('.header').removeClass('on-blue');
+          $('.header').addClass('active')
         }
       });
     }
@@ -512,6 +598,8 @@ const mainScript = () => {
   const SCRIPT = {
     homeScript: () => {
       homeHero.trigger();
+      homeService.trigger();
+      homeIndustry.trigger();
       homeTesti.trigger();
       footer.trigger();
     },
