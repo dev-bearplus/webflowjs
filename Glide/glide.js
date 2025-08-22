@@ -54,51 +54,51 @@ const script = () => {
     const SCRIPT = {}
     SCRIPT.surfScript = () => {
         window.fsAttributes.push(['cmsload', (listInstances) => {
-            window.fsAttributes.cmsfilter.init();
+            // window.fsAttributes.cmsfilter.init();
             window.fsAttributes.push(['cmsfilter', (filterInstances) => {
                 const [filter] = filterInstances;
                 const dropdowns = document.querySelectorAll('.dropdown.in-filter');
-                dropdowns.forEach(drop => {
-                    const options = [];
-                    const title = drop.querySelector('.drop-toogle-content-title .drop-toggle-title');
-                    const tip = drop.querySelector('.drop-toogle-content-title .text-l');
+                    dropdowns.forEach(drop => {
+                        const options = [];
+                        const title = drop.querySelector('.drop-toogle-content-title .drop-toggle-title');
+                        const tip = drop.querySelector('.drop-toogle-content-title .text-l');
 
-                    const checkboxes = drop.querySelectorAll('.filter-checkbox-field');
-                    const radios = drop.querySelectorAll('.filter-radio-button-field');
+                        const checkboxes = drop.querySelectorAll('.filter-checkbox-field');
+                        const radios = drop.querySelectorAll('.filter-radio-button-field');
 
-                    title.classList.remove('is-active');
-                    checkboxes.forEach((ch, i) => {
-                        const chText = ch.querySelector('span').textContent;
-                        let attr = ch.querySelector('span').getAttribute('fs-cmsfilter-field');
-                        const count = filter.listInstance.items.filter(item => {
-                            const elements = item.element.querySelectorAll(`[fs-cmsfilter-field='${attr}']`);
-                            return Array.from(elements).some(el => el.textContent === chText);
-                        }).length;
-                        if (count === 0) {
-                            ch.style.display = 'none';
-                        }
-                    })
-                    drop.addEventListener('change', (e) => {
-                        tip.textContent = '';
-                        const checkedCheckboxes = drop.querySelectorAll('input:checked');
-                        checkedCheckboxes.forEach((ch, i) => {
-                            const chText = i === 0 ? ch.parentNode.querySelector('span').textContent : `, ${ch.parentNode.querySelector('span').textContent}`;
-                            tip.textContent += chText;
+                        title.classList.remove('is-active');
+                        checkboxes.forEach((ch, i) => {
+                            const chText = ch.querySelector('span').textContent;
+                            let attr = ch.querySelector('span').getAttribute('fs-cmsfilter-field');
+                            const count = filter.listInstance.items.filter(item => {
+                                const elements = item.element.querySelectorAll(`[fs-cmsfilter-field='${attr}']`);
+                                return Array.from(elements).some(el => el.textContent === chText);
+                            }).length;
+                            if (count === 0) {
+                                ch.style.display = 'none';
+                            }
                         })
-                        if (tip.textContent) {
-                            tip.style.display = 'block';
-                            title.classList.add('is-active');
-                        } else {
-                            tip.style.display = 'none';
-                            title.classList.remove('is-active');
-                        }
+                        drop.addEventListener('change', (e) => {
+                            tip.textContent = '';
+                            const checkedCheckboxes = drop.querySelectorAll('input:checked');
+                            checkedCheckboxes.forEach((ch, i) => {
+                                const chText = i === 0 ? ch.parentNode.querySelector('span').textContent : `, ${ch.parentNode.querySelector('span').textContent}`;
+                                tip.textContent += chText;
+                            })
+                            if (tip.textContent) {
+                                tip.style.display = 'block';
+                                title.classList.add('is-active');
+                            } else {
+                                tip.style.display = 'none';
+                                title.classList.remove('is-active');
+                            }
+                        })
                     })
-                })
-            },
-        ]);
+                },
+            ]);
         // The callback passes a `listInstances` array with all the `CMSList` instances on the page.
-        },
-    ]);
+        }]);
+
     }
     SCRIPT.subpageScript = () => {
         $('.form-block').each(async(_, block) => {
