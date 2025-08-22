@@ -53,23 +53,11 @@ const script = () => {
     }
     const SCRIPT = {}
     SCRIPT.surfScript = () => {
-        console.log("surf");
         window.fsAttributes.push(['cmsload', (listInstances) => {
             window.fsAttributes.cmsfilter.init();
             window.fsAttributes.push(['cmsfilter', (filterInstances) => {
                 const [filter] = filterInstances;
                 const dropdowns = document.querySelectorAll('.dropdown.in-filter');
-                filter.listInstance.on('renderitems', (renderedItems) => {
-                    console.log('renderitems event', renderedItems);
-                    console.log('filter event', filter);
-                });
-
-                filter.listInstance.on('additems', (addedItems) => {
-                    console.log('additems event', addedItems);
-                });
-                filter.filtersData.forEach((item) => {
-                    console.log(item)
-                })
                 dropdowns.forEach(drop => {
                     const options = [];
                     const title = drop.querySelector('.drop-toogle-content-title .drop-toggle-title');
@@ -182,14 +170,6 @@ const script = () => {
                     }
                 })
             })
-            const checkEmpty = () => {
-                const hiddenCount = products.reduce((count, product) => {
-                    const hiddenClasses = $(product).parent().attr('class')?.match(/hidden-\S+/g) || [];
-                    return count + (hiddenClasses.length > 0 ? 1 : 0);
-                }, 0);
-
-                $(block).find('.filter-empty').css('display', hiddenCount === products.length ? 'block' : 'none');
-            }
             Object.entries(filterData).forEach(([key, value]) => {
                 let dropList = key === 'charter' ? filter[key].find('.drop-list-content') : filter[key].find('.collection-list');
                 dropList.text('');
@@ -220,11 +200,13 @@ const script = () => {
                         filter[key].find('.drop-toogle-content-title .text-l').css('display', 'none');
                         filter[key].find('.drop-toggle-title').removeClass('is-active');
                     }
-
+                    requestAnimationFrame(() => {
+                        updateShowMore(key.toLowerCase());
+                        checkEmpty();
+                    });
                     // Reset all products to visible first
                     products.forEach(product => {
                         $(product).parent().removeClass(`hidden-${key.toLowerCase()}`);
-                        checkEmpty();
                     });
 
                     // If no checkboxes are checked, show all products
@@ -245,7 +227,6 @@ const script = () => {
 
                         if (!hasMatch) {
                             productWrap.addClass(`hidden-${key.toLowerCase()}`);
-                            checkEmpty();
                         }
                     });
                 })
@@ -264,10 +245,58 @@ const script = () => {
                     filter[key].find('.filter-checkbox-field .filter-checkbox, .filter-radio-button-field .filter-radio-button').removeClass('w--redirected-checked');
                     filterCurrent[key] = [];
                 })
+                updateShowMore();
             })
+            $(block).find('.button-m').off('click').on('click', function (e) {
+                e.preventDefault();
+                let hiddenItems = $(block).find('.products-item:hidden');
+                let hiddenItemsLength = hiddenItems.length;
+                let showItems = hiddenItemsLength >= LIMIT ? LIMIT : hiddenItemsLength;
+                hiddenItems.each((index, item) => {
+                    if (index < showItems) {
+                        $(item).removeClass('hide-show-more').addClass('loaded');
+                    }
+                });
+                if (hiddenItemsLength <= LIMIT) {
+                    $(this).hide();
+                }
+            });
+
+            const LIMIT = $(window).width() > 767 ? 6 : 2;
+            const updateShowMore = (filterID) => {
+                $(block).find('.products-item.loaded').removeClass('loaded');
+                $(block).find('.products-item:not([class*="hidden-"])').each((index, item) => {
+                    if (index >= LIMIT && !$(item).hasClass('loaded')) {
+                        $(item).addClass('hide-show-more');
+                    }
+                    else {
+                        $(item).addClass('loaded');
+                        $(item).removeClass('hide-show-more');
+                    }
+                });
+
+                const totalItems = filterID ? $(block).find('.products-item:not([class*="hidden-"])') : $(block).find('.products-item');
+                const loadedItems = filterID ? $(block).find(`.products-item.loaded:not([class*="hidden-"])`) : $(block).find('.products-item.loaded');
+
+                if ($(block).find('.hide-show-more').length === 0 || totalItems.length <= LIMIT || loadedItems.length >= totalItems.length) {
+                    $(block).find('.button-m').hide();
+                } else {
+                    $(block).find('.button-m').show();
+                }
+            }
+            const checkEmpty = () => {
+                const hiddenCount = products.reduce((count, product) => {
+                    const hiddenClasses = $(product).parent().attr('class')?.match(/hidden-\S+/g) || [];
+                    return count + (hiddenClasses.length > 0 ? 1 : 0);
+                }, 0);
+
+                $(block).find('.filter-empty').css('display', hiddenCount === products.length ? 'block' : 'none');
+            }
+
+            updateShowMore();
+            checkEmpty();
         })
         $('.subnav-link').each((_, link) => {
-            console.log($(`section#${$(link).attr('href').substring(1)}`).length !== 0);
             if ($(`section#${$(link).attr('href').substring(1)}`).length === 0) {
                 $(link).addClass('w-condition-invisible');
             }
