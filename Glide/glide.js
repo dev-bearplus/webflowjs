@@ -247,9 +247,13 @@ const script = () => {
                 })
                 updateShowMore();
             })
+
+            const LIMIT = $(window).width() > 767 ? 6 : 2;
+
             $(block).find('.button-m').off('click').on('click', function (e) {
                 e.preventDefault();
-                let hiddenItems = $(block).find('.products-item:hidden');
+                let hiddenItems = $(block).find('.products-item.hide-show-more');
+                console.log(hiddenItems)
                 let hiddenItemsLength = hiddenItems.length;
                 let showItems = hiddenItemsLength >= LIMIT ? LIMIT : hiddenItemsLength;
                 hiddenItems.each((index, item) => {
@@ -262,9 +266,9 @@ const script = () => {
                 }
             });
 
-            const LIMIT = $(window).width() > 767 ? 6 : 2;
             const updateShowMore = (filterID) => {
                 $(block).find('.products-item.loaded').removeClass('loaded');
+                $(block).find('.products-item.hide-show-more').removeClass('hide-show-more');
                 $(block).find('.products-item:not([class*="hidden-"])').each((index, item) => {
                     if (index >= LIMIT && !$(item).hasClass('loaded')) {
                         $(item).addClass('hide-show-more');
