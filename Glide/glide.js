@@ -254,7 +254,6 @@ const script = () => {
             $(block).find('.button-m').off('click').on('click', function (e) {
                 e.preventDefault();
                 let hiddenItems = $(block).find('.products-item.hide-show-more');
-                console.log(hiddenItems)
                 let hiddenItemsLength = hiddenItems.length;
                 let showItems = hiddenItemsLength >= LIMIT ? LIMIT : hiddenItemsLength;
                 hiddenItems.each((index, item) => {
