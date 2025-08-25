@@ -386,6 +386,10 @@ const mainScript = () => {
           prevEl: ".home-hero-post-control-item-prev",
           nextEl: ".home-hero-post-control-item-next",
         },
+        pagination: {
+          el: '.home-hero-post-pagi',
+          type: "fraction",
+        },
         effect: "fade",
         fadeEffect: {
           crossFade: true,
@@ -475,19 +479,28 @@ const mainScript = () => {
     }
     setup() {
       this.swiperTesti = new Swiper(".home-testi-cms", {
-        slidesPerView: 'auto',
+        slidesPerView: 3,
         speed: 600,
         navigation: {
           prevEl: ".home-testi-control-item-prev",
           nextEl: ".home-testi-control-item-next",
         },
+       
         pagination: {
           el: '.home-testi-control-pagi',
           bulletClass: 'home-testi-control-pagi-item',
           bulletActiveClass: 'active',
-          clickable: true,
-          
-      },
+          clickable: true,  
+        },
+        breakpoints: {
+          768: {
+              spaceBetween: parseRem(16),
+              pagination: {
+                el: '.home-testi-control-number',
+                type: "fraction",
+              },
+          }
+        }
       });
     }
     interact() {
@@ -569,7 +582,27 @@ const mainScript = () => {
         $(".header").removeClass(`on-${color}`);
 
       }
-    };
+    }
+    toggleHide = (inst) => {
+      const scrollTop = document.documentElement.scrollTop || window.scrollY
+      if ($('.header').hasClass('active')) return;
+      const isScrollHeader = scrollTop > $('.header').height() * (viewport.w > 767 ? 5 : 1.5)
+      let debounceTimer;
+
+      debounceTimer && clearTimeout(debounceTimer);
+
+      debounceTimer = setTimeout(() => {
+          if (isScrollHeader) {
+              if (inst.direction >= 1) {
+                  $('.header').addClass('on-hide');
+              } else {
+                  $('.header').removeClass('on-hide');
+              }
+          } else {
+              $('.header').removeClass('on-hide');
+          }
+      }, 100);
+    }
   }
   const header = new Header();
   class Footer extends TriggerSetup {
@@ -601,12 +634,18 @@ const mainScript = () => {
       homeService.trigger();
       homeIndustry.trigger();
       homeTesti.trigger();
-      footer.trigger();
+     
     },
+    industryScript: () => {
+    },
+    contactScript: () => {
+      
+    }
   };
   const initGlobal = () => {
     cursor.init();
     header.trigger();
+    footer.trigger();
     const pageName = $(".main").attr("data-barba-namespace");
     if (pageName) {
       SCRIPT[`${pageName}Script`]();
@@ -616,6 +655,7 @@ const mainScript = () => {
     header.toggleColorMode("blue");
     lenis.on("scroll", function (inst) {
       header.toggleColorMode("blue");
+      header.toggleHide(inst);
       // header.toggleOnScroll(lenis);
       // header.toggleOnHide(inst);
     });
