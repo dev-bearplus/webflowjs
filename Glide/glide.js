@@ -175,7 +175,9 @@ const script = () => {
                 dropList.text('');
                 value.forEach((item) => {
                     let cloneItem = key === 'charter' ? radioClone.clone() : checkBoxClone.clone();
-                    if (!/^[A-Z]+$/.test(item)) {
+                    // Skip items that are all uppercase without spaces
+                    if (!/^[A-Z]+$/.test(item.replace(/\s/g, ''))) {
+                        console.log(item)
                         let id = item.replace(/^\d+\.\s*/, '').replace(/\s*\([^)]*\)/g, '').toLowerCase().trim().replace(/[\s\W-]+/g, '-').replace(/^-+|-+$/g, '');
                         cloneItem.find('.text-m').text(item);
                         cloneItem.find('input').attr('id', id);
