@@ -388,7 +388,17 @@ const mainScript = () => {
         },
         pagination: {
           el: '.home-hero-post-pagi',
-          type: "fraction",
+          bulletClass: 'home-service-pagi-item',
+          bulletActiveClass: 'active',
+          clickable: true,  
+        },
+        breakpoints: {
+          991: {
+            pagination: {
+              el: '.home-hero-post-pagi',
+              type: "fraction",
+            },
+          }
         },
         effect: "fade",
         fadeEffect: {
