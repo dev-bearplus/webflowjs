@@ -1747,6 +1747,12 @@ const mainScript = () => {
                     }
                 }
                 checkActionRedirect();
+
+                function handlePopup() {
+                    initPopup('promo');
+                    setTimeout(() => $('.promo-popup-trigger').trigger('click'), 3000);
+                }
+                handlePopup();
             },
             beforeLeave() {
                 requestID && cancelAnimationFrame(requestID);
