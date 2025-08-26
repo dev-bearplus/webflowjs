@@ -165,7 +165,7 @@ const mainScript = () => {
                 time_video_play : currentTime
             }
             sendGGTag(data)
-            } 
+            }
         });
     }
     const documentHeightObserver = (() => {
@@ -811,7 +811,7 @@ const mainScript = () => {
     }
     const initAllPopup = () => {
         let demoPlayer;
-        let demoPlayerState = null; 
+        let demoPlayerState = null;
         const iframeId = $('.demo-vid-inner').attr('data-iframe-id');
         const nameVideo = $('.demo-vid-inner').attr('data-name-video');
         initPopup('demo', {
@@ -846,7 +846,7 @@ const mainScript = () => {
                             }
                         }
                     },
-                
+
                 });
                 } else {
                     demoPlayer.loadVideoById(iframeId);
@@ -1195,7 +1195,7 @@ const mainScript = () => {
             }
         }
         let formID = `#${getIDFormName(formName)}`;
-        
+
         $(`${formID} .input-field-group .input-field.type-select`).attr('readonly', 'readonly');
         // $(`${formID} .input-field-group.hidden .input-field`).attr('disabled', '');
 
@@ -1542,7 +1542,7 @@ const mainScript = () => {
                                 }
                             });
                         }
-                        
+
                     });
                 }
                 scHero();
@@ -2292,7 +2292,7 @@ const mainScript = () => {
                             .to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
                             .from('.prod-hero-form', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' },  '>-.6')
                     }
-                        animShowEl();   
+                        animShowEl();
                         $('.prod-hero-form button[type=submit]').on('click', function() {
                             $('.prod-hero-form #bot-hunter').val('');
                         })
@@ -2375,7 +2375,7 @@ const mainScript = () => {
                         });
                         }
                     });
-                    
+
                 }
                 scHero();
 
@@ -2675,6 +2675,23 @@ const mainScript = () => {
                     }
                 }
                 scRelated();
+
+                function handlePopup() {
+                    if ($('.promo-popup:visible').length !== 0) {
+                        let isTriggerPopup = false;
+                        initPopup('promo');
+                        let DISPLAY_RANGE = parseFloat(Number($('.promo-popup [data-display]').attr('data-display')) / 100);
+                        lenis.on('scroll', (e) => {
+                            if (e.scroll > ($('.ar-content').height() * DISPLAY_RANGE) + $('.ar-content').offset().top) {
+                                if (!isTriggerPopup) {
+                                    $('.promo-popup-trigger').trigger('click');
+                                    isTriggerPopup = true;
+                                }
+                            }
+                        })
+                    }
+                }
+                handlePopup();
             }
         },
         story: {
@@ -2792,7 +2809,7 @@ const mainScript = () => {
                         .to(heroTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .025 })
                         .to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .015 }, "<=.1")
                         .to('.form-inner', { autoAlpha: 1, y: 0, duration: 1 }, "<=.3")
-                    
+
                     let tlItem = gsap.timeline({
                         defaults: { ease: 'power2.out' },
                         onComplete: () => {
