@@ -479,7 +479,7 @@ const mainScript = () => {
     }
     setup() {
       this.swiperTesti = new Swiper(".home-testi-cms", {
-        slidesPerView: 3,
+        slidesPerView: 'auto',
         speed: 600,
         navigation: {
           prevEl: ".home-testi-control-item-prev",
@@ -493,7 +493,8 @@ const mainScript = () => {
           clickable: true,  
         },
         breakpoints: {
-          768: {
+          991: {
+            slidesPerView: 3,
               spaceBetween: parseRem(16),
               pagination: {
                 el: '.home-testi-control-number',
@@ -517,6 +518,23 @@ const mainScript = () => {
     }
   }
   const homeTesti = new HomeTesti('.home-testi');
+  class IndustryProfile extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+      this.swiperTesti;
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      
+    }
+    interact() {
+      
+    }
+  }
+  const industryProfile = new IndustryProfile('.industry-profile');
  
   class Header extends TriggerSetupHero {
     constructor() {
