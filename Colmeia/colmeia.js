@@ -893,6 +893,24 @@ const mainScript = () => {
                 })
             }
         });
+        if ($('.promo-popup').length !== 0) {
+            initPopup('promo');
+            let DISPLAY_RANGE = parseFloat(Number($('.promo-popup [data-display]').attr('data-display')) / 100);
+            if (DISPLAY_RANGE !== 0) {
+                let isTriggerPopup = false;
+                lenis.on('scroll', (e) => {
+                    if (e.scroll > ($('.ar-content').height() * DISPLAY_RANGE) + $('.ar-content').offset().top) {
+                        if (!isTriggerPopup) {
+                            $('.promo-popup-trigger').trigger('click');
+                            isTriggerPopup = true;
+                        }
+                    }
+                })
+            }
+            else {
+                setTimeout(() => $('.promo-popup-trigger').trigger('click'), 3000);
+            }
+        }
     }
     let pageName = $('[data-page-name]').attr('data-page-name');
     let subPageName = $('[data-page-name]').attr('data-page-name') === $('[data-gtm-page]').attr('data-gtm-page') ? '' : $('[data-gtm-page]').attr('data-gtm-page');
@@ -1747,12 +1765,6 @@ const mainScript = () => {
                     }
                 }
                 checkActionRedirect();
-
-                function handlePopup() {
-                    initPopup('promo');
-                    setTimeout(() => $('.promo-popup-trigger').trigger('click'), 3000);
-                }
-                handlePopup();
             },
             beforeLeave() {
                 requestID && cancelAnimationFrame(requestID);
@@ -2681,23 +2693,6 @@ const mainScript = () => {
                     }
                 }
                 scRelated();
-
-                function handlePopup() {
-                    if ($('.promo-popup:visible').length !== 0) {
-                        let isTriggerPopup = false;
-                        initPopup('promo');
-                        let DISPLAY_RANGE = parseFloat(Number($('.promo-popup [data-display]').attr('data-display')) / 100);
-                        lenis.on('scroll', (e) => {
-                            if (e.scroll > ($('.ar-content').height() * DISPLAY_RANGE) + $('.ar-content').offset().top) {
-                                if (!isTriggerPopup) {
-                                    $('.promo-popup-trigger').trigger('click');
-                                    isTriggerPopup = true;
-                                }
-                            }
-                        })
-                    }
-                }
-                handlePopup();
             }
         },
         story: {
