@@ -517,16 +517,7 @@ const mainScript = () => {
       });
     }
     interact() {
-      $(document).on("click", (e) =>{
-        if ($('.home-testi-cms[data-cursor="drag"]:hover').length) {
-          const midX = viewport.w/ 2;
-          if (e.clientX > midX) {
-            this.swiperTesti.slideNext();
-          } else {
-            this.swiperTesti.slidePrev();
-          }
-        }
-      });
+      
     }
   }
   const homeTesti = new HomeTesti('.home-testi');
@@ -566,6 +557,7 @@ const mainScript = () => {
         toggleProfile+=toggleItem;
       })
       $(".industry-profile-filter-all").find('.label-txt').text(toggleProfile);
+      $(".filter-total-show").text(toggleProfile);
     }
     interact() {
       const $all = $('[data-filter-item="all"]');
@@ -578,21 +570,20 @@ const mainScript = () => {
         const total = $child.length;
         const checked = $child.filter('.active').length;
         $all.removeClass('active has-filter');
-        if (checked === 0) {
+        if (checked === 0 || checked === total) {
           $all.addClass('active');
-          $('.industry-profile-post-item').show();
-        } else if (checked === total) {
-          $all.addClass('active');
-          $('.industry-profile-post-item').show();
-        } else {
+          activeItem();
+          $('.industry-profile-post-item').show().addClass('active');
+        }  else {
           $all.addClass('has-filter');
-          $('.industry-profile-post-item').hide();
+          $('.industry-profile-post-item').hide().removeClass('active');
           $child.filter('.active').each(function () {
             const cat = $(this).data('category');
-            $('.industry-profile-post-item[data-category="' + cat + '"]').show();
+            activeItem();
+            $('.industry-profile-post-item[data-category="' + cat + '"]').show().addClass('active');
           });
         }
-        
+        $(".filter-total-show").text($('.industry-profile-post-item.active').length);
       });
       $all.on('click', function () {
         if(!$(this)) return;
@@ -600,13 +591,16 @@ const mainScript = () => {
         if($(this).hasClass('active') || $(this).hasClass('has-filter')){
           $child.removeClass('active');
           $all.removeClass('has-filter').removeClass('active');
-          $('.industry-profile-post-item').show();
+          activeItem();
+          $('.industry-profile-post-item').show().addClass('active');
         }
         else {
           $child.addClass('active');
           $all.addClass('active');
-          $('.industry-profile-post-item').show();
+          activeItem();
+          $('.industry-profile-post-item').show().addClass('active');
         }
+        $(".filter-total-show").text($('.industry-profile-post-item.active').length);
       });
       function scrollToTop() {
         let heightHeader = parseFloat($('.header').height())*-1;
@@ -614,6 +608,9 @@ const mainScript = () => {
           duration: .6,
           offset: heightHeader,
         })
+      }
+      function activeItem() {
+        gsap.fromTo('.industry-profile-post-item', {autoAlpha: 0, y: 30}, {autoAlpha: 1, y: 0, duration: .6, stagger: .03})
       }
     }
   }
