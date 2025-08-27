@@ -491,6 +491,8 @@ const mainScript = () => {
       this.swiperTesti = new Swiper(".home-testi-cms", {
         slidesPerView: 'auto',
         speed: 600,
+        longSwipesRatio : 0,
+        threshold: 10,
         navigation: {
           prevEl: ".home-testi-control-item-prev",
           nextEl: ".home-testi-control-item-next",
@@ -528,6 +530,24 @@ const mainScript = () => {
     }
   }
   const homeTesti = new HomeTesti('.home-testi');
+  class IndustrySupport extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+      this.swiperTesti;
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      let topSticky = (viewport.h - $('.industry-support-title-inner').height() + $('.header').height())/2;
+      $('.industry-support-title-inner').css('top', topSticky)
+    }
+    interact() {
+     
+    }
+  }
+  const industrySupport = new IndustrySupport('.industry-support');
   class IndustryProfile extends TriggerSetup {
     constructor(triggerEl) {
       super(triggerEl);
@@ -538,10 +558,63 @@ const mainScript = () => {
       this.interact();
     }
     setup() {
-      
+      let toggleProfile = 0;
+      $('.industry-profile-filter-item').each((idx, item) => {
+        let category = $(item).find('.industry-profile-filter-item-ic').attr('data-category');
+        let toggleItem =$(`.industry-profile-post-item[data-category=${category}]`).length;
+        $(item).find('.label-txt').text(toggleItem);
+        toggleProfile+=toggleItem;
+      })
+      $(".industry-profile-filter-all").find('.label-txt').text(toggleProfile);
     }
     interact() {
-      
+      const $all = $('[data-filter-item="all"]');
+      const $child = $('[data-filter-item="child"]');
+    
+      // Click child
+      $child.on('click', function () {
+        scrollToTop();
+        $(this).toggleClass('active');
+        const total = $child.length;
+        const checked = $child.filter('.active').length;
+        $all.removeClass('active has-filter');
+        if (checked === 0) {
+          $all.addClass('active');
+          $('.industry-profile-post-item').show();
+        } else if (checked === total) {
+          $all.addClass('active');
+          $('.industry-profile-post-item').show();
+        } else {
+          $all.addClass('has-filter');
+          $('.industry-profile-post-item').hide();
+          $child.filter('.active').each(function () {
+            const cat = $(this).data('category');
+            $('.industry-profile-post-item[data-category="' + cat + '"]').show();
+          });
+        }
+        
+      });
+      $all.on('click', function () {
+        if(!$(this)) return;
+        scrollToTop();
+        if($(this).hasClass('active') || $(this).hasClass('has-filter')){
+          $child.removeClass('active');
+          $all.removeClass('has-filter').removeClass('active');
+          $('.industry-profile-post-item').show();
+        }
+        else {
+          $child.addClass('active');
+          $all.addClass('active');
+          $('.industry-profile-post-item').show();
+        }
+      });
+      function scrollToTop() {
+        let heightHeader = parseFloat($('.header').height())*-1;
+        lenis.scrollTo('.industry-profile-filter-inner', {
+          duration: .6,
+          offset: heightHeader,
+        })
+      }
     }
   }
   const industryProfile = new IndustryProfile('.industry-profile');
@@ -665,6 +738,8 @@ const mainScript = () => {
      
     },
     industryScript: () => {
+      industryProfile.trigger();
+      industrySupport.trigger();
     },
     contactScript: () => {
       
@@ -683,7 +758,7 @@ const mainScript = () => {
     header.toggleColorMode("blue");
     lenis.on("scroll", function (inst) {
       header.toggleColorMode("blue");
-      header.toggleHide(inst);
+      // header.toggleHide(inst);
       // header.toggleOnScroll(lenis);
       // header.toggleOnHide(inst);
     });
