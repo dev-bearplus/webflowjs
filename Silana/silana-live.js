@@ -1399,13 +1399,9 @@ const script = () => {
                 this.animationReveal();
             }
             animationReveal() {
-                console.log("run")
-                console.log()
                 $(this.el).find('.home-made-map').css({
                     'grid-area': '1/6/4/-2'
-                    // 'cssText': 'grid-area: 1/6/4/-2 !important;'
                 });
-                // gsap.set($(this.el).find('.home-made-map'), { gridArea: '1/6/4/-2 !important' }); //hotfix
                 let headingFlipping = new FlipText('.home-made-title-slide .txt-slider-wrap', {
                     onCycleComplete: (idx) =>
                         setTimeout(() => {
