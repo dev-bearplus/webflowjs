@@ -611,7 +611,12 @@ const mainScript = () => {
       $('.industry-profile-filter-item').each((idx, item) => {
         let category = $(item).find('.industry-profile-filter-item-ic').attr('data-category');
         let toggleItem =$(`.industry-profile-post-item[data-category=${category}]`).length;
-        $(item).find('.label-txt').text(toggleItem);
+        if(toggleItem>0){
+          $(item).find('.label-txt').text(toggleItem);
+        }
+        else {
+          $(item).hide();
+        }
         toggleProfile+=toggleItem;
       })
       $(".industry-profile-filter-all").find('.label-txt').text(toggleProfile);
