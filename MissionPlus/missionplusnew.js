@@ -654,13 +654,13 @@ const mainScript = () => {
         if($(this).hasClass('active') || $(this).hasClass('has-filter')){
           $child.removeClass('active');
           $all.removeClass('has-filter').removeClass('active');
-          activeItem();
+          setTimeout(activeItem, 100)
           $('.industry-profile-post-item').show().addClass('active');
         }
         else {
           $child.addClass('active');
           $all.addClass('active');
-          activeItem();
+          setTimeout(activeItem, 100)
           $('.industry-profile-post-item').show().addClass('active');
         }
         $(".filter-total-show").text($('.industry-profile-post-item.active').length);
