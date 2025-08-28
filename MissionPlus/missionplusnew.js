@@ -699,7 +699,6 @@ const mainScript = () => {
         if($('.header').hasClass('active')){
           lenis.start();
           $('.header').removeClass('active');
-          alert('remove active')
           this.toggleColorMode('blue');
           console.log('khanh')
         }
