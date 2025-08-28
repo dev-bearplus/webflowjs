@@ -537,7 +537,6 @@ const mainScript = () => {
           start: "top-=10% center",
           end: "bottom-=10% center",
           scrub: 1,
-          markers: true
         },
       });
       tl.fromTo('.home-cta-video', {yPercent: 0}, {yPercent: -70, duration: .4, ease: 'none'});
