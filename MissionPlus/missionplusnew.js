@@ -521,6 +521,32 @@ const mainScript = () => {
     }
   }
   const homeTesti = new HomeTesti('.home-testi');
+  class HomeCta extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+      this.swiperTesti;
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      let tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: this.triggerEl,
+          start: "top-=10% center",
+          end: "bottom-=10% center",
+          scrub: 1,
+          markers: true
+        },
+      });
+      tl.fromTo('.home-cta-video', {yPercent: 0}, {yPercent: -70, duration: .4, ease: 'none'});
+    }
+    interact() {
+      
+    }
+  }
+  const homeCta = new HomeCta('.home-cta');
   class IndustrySupport extends TriggerSetup {
     constructor(triggerEl) {
       super(triggerEl);
@@ -531,8 +557,25 @@ const mainScript = () => {
       this.interact();
     }
     setup() {
-      let topSticky = (viewport.h - $('.industry-support-title-inner').height() + $('.header').height())/2;
-      $('.industry-support-title-inner').css('top', topSticky)
+      if(viewport.w > 991){
+        let topSticky = (viewport.h - $('.industry-support-title-inner').height() + $('.header').height())/2;
+        $('.industry-support-title-inner').css('top', topSticky)
+      }
+      else {
+        $('.industry-support-cms').addClass('swiper')
+        $('.industry-support-list').addClass('swiper-wrapper')
+        $('.industry-support-item').addClass('swiper-slide')
+        let swiperSupport = new Swiper(".industry-support-cms", {
+          slidesPerView: 'auto',
+          speed: 400,
+          pagination: {
+            el: '.industry-support-pagi',
+            bulletClass: 'industry-support-pagi-item',
+            bulletActiveClass: 'active',
+            clickable: true,  
+          }
+        })
+      }
     }
     interact() {
      
@@ -615,7 +658,6 @@ const mainScript = () => {
     }
   }
   const industryProfile = new IndustryProfile('.industry-profile');
- 
   class Header extends TriggerSetupHero {
     constructor() {
       super();
@@ -732,7 +774,6 @@ const mainScript = () => {
       homeService.trigger();
       homeIndustry.trigger();
       homeTesti.trigger();
-     
     },
     industryScript: () => {
       industryProfile.trigger();
@@ -745,6 +786,7 @@ const mainScript = () => {
   const initGlobal = () => {
     cursor.init();
     header.trigger();
+    homeCta.trigger();
     footer.trigger();
     const pageName = $(".main").attr("data-barba-namespace");
     if (pageName) {
