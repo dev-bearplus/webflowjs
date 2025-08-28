@@ -458,6 +458,11 @@ const mainScript = () => {
       this.interact();
     }
     setup() {
+      $('.home-industry-item').each((idx, item) => {
+        let textLabel = idx+1 <=9 ? `0${idx+1}`: idx+1;
+        console.log(textLabel)
+        $(item).find('.label-txt').text(textLabel)
+      })
       if(viewport.w < 768){
         $('.home-industry-cms').addClass('swiper')
         $('.home-industry-list').addClass('swiper-wrapper')
@@ -700,7 +705,7 @@ const mainScript = () => {
           lenis.start();
           $('.header').removeClass('active');
           this.toggleColorMode('blue');
-          console.log('khanh')
+
         }
         else {
           lenis.stop();
