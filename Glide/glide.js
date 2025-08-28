@@ -131,16 +131,16 @@ const script = () => {
             let radioClone = $(block).find('.filter-radio-button-field').eq(0).clone();
 
             Object.entries(filterData).forEach(([key, value]) => {
-                if (key === 'charter') {
-                    let radio = radioClone.clone();
-                    radio.text('Loading...');
-                    filter[key].find('.drop-list-content').append(radio);
-                }
-                else {
-                    let checkbox = checkBoxClone.clone();
-                    checkbox.text('Loading...');
-                    filter[key].find('.collection-list').append(checkbox);
-                }
+                // if (key === 'charter') {
+                //     let radio = radioClone.clone();
+                //     radio.text('Loading...');
+                //     filter[key].find('.drop-list-content').append(radio);
+                // }
+                // else {
+                // }
+                let checkbox = checkBoxClone.clone();
+                checkbox.text('Loading...');
+                filter[key].find('.collection-list').append(checkbox);
             })
             Object.entries(filter).forEach(([key, value]) => {
                 if (value.length) {
@@ -171,10 +171,12 @@ const script = () => {
                 })
             })
             Object.entries(filterData).forEach(([key, value]) => {
-                let dropList = key === 'charter' ? filter[key].find('.drop-list-content') : filter[key].find('.collection-list');
+                // let dropList = key === 'charter' ? filter[key].find('.drop-list-content') : filter[key].find('.collection-list');
+                let dropList = filter[key].find('.collection-list');
                 dropList.text('');
                 value.forEach((item) => {
-                    let cloneItem = key === 'charter' ? radioClone.clone() : checkBoxClone.clone();
+                    // let cloneItem = key === 'charter' ? radioClone.clone() : checkBoxClone.clone();
+                    let cloneItem = checkBoxClone.clone();
                     // Skip items that are all uppercase without spaces
                     if (!/^[A-Z]+$/.test(item.replace(/\s/g, ''))) {
                         let id = item.replace(/^\d+\.\s*/, '').replace(/\s*\([^)]*\)/g, '').toLowerCase().trim().replace(/[\s\W-]+/g, '-').replace(/^-+|-+$/g, '');
