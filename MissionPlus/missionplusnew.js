@@ -786,6 +786,65 @@ const mainScript = () => {
     }
   }
   const industryProfile = new IndustryProfile('.industry-profile');
+  class SubpageHero extends TriggerSetupHero {
+    constructor() {
+      super();
+      this.tl = null;
+    }
+    trigger() {
+      this.setup();
+      super.init(this.play.bind(this));
+      
+    }
+    setup() {
+      this.initContentPopup();
+      $(window).on('scroll', (e)=> {
+        this.itemContentActiveCheck('.sp-content-main-richtext h2');
+      })
+      $('.sp-content-table-item-list').on('click', '.sp-content-table-item-wrap', function(e) {
+        e.preventDefault();
+        $('.sp-content-table-item-wrap').removeClass('active');
+        $(this).addClass('active');
+        let dataHeader = $(this).attr('data-title');
+        var scrollTop =  $('.sp-content-main-richtext').scrollTop() - $('.sp-content-main-richtext').offset().top + $(`.sp-content-main-richtext h2[data-title="${dataHeader}"]`).offset().top ;
+        console.log(scrollTop )
+        lenis.scrollTo(scrollTop, {
+          duration: 1
+        })
+      })
+    }
+    itemContentActiveCheck(el) {
+      for (let i = 0; i < $(el).length; i++) {
+          let top = $(el).eq(i).get(0).getBoundingClientRect().top;
+          console.log(top)
+          if (top > 0 && top - $(el).eq(i).height()   < ($(window).height()/2)) {
+              $('.sp-content-table-item-wrap').removeClass('active');
+              $('.sp-content-table-item-wrap').eq(i).addClass('active');
+          }
+          }
+    }
+    initContentPopup() {
+      let titleLeft = $('.sp-content-table-item-wrap').eq(0).clone();
+      $('.sp-content-table-item-wrap').remove();
+      $('.sp-content-main-richtext h2').each((i, el) => {
+          $(el).attr('data-title', `toch-${i}`);
+          let titleLeftClone = titleLeft.clone();
+          if(i == 0) {
+              titleLeftClone.addClass('active');
+          }
+          let index = i+1<=9 ?`0${i+1}` : i+1;
+          let cleanText = $(el).text().replace(/^\d+\.\s*/, '');
+          titleLeftClone.find('.sp-content-table-item-title').text(cleanText);
+          titleLeftClone.find('.label-txt').text(index);
+          titleLeftClone.attr('data-title', `toch-${i}`);
+          $('.sp-content-table-item-list').append(titleLeftClone);
+      })
+  }
+    play() {
+      this.tl.play();
+    }
+  }
+  const subpageHero = new SubpageHero();
   class Header extends TriggerSetupHero {
     constructor() {
       super();
@@ -909,6 +968,9 @@ const mainScript = () => {
     },
     contactScript: () => {
       
+    },
+    subpageScript: () => {
+      subpageHero.trigger();
     }
   };
   const initGlobal = () => {
