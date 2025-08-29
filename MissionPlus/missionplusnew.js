@@ -625,9 +625,24 @@ const mainScript = () => {
     interact() {
       const $all = $('[data-filter-item="all"]');
       const $child = $('[data-filter-item="child"]');
-    
       // Click child
+      $('.industry-profile-post-item').each((idx, item) => {
+        if(idx > 5){
+          $(item).addClass('view-more');
+        }
+      })
+      $('.industry-profile-post-cms-btn').on('click', function(){
+        $('.industry-profile-post-item').removeClass('view-more')
+        $('.industry-profile-post-cms-line').hide();
+        $('.industry-profile-post-cms-btn').hide().addClass('hidden');
+        setTimeout(scrollToTop, 100)
+        setTimeout(activeItem, 100)
+      })
       $child.on('click', function () {
+        if(!$('.industry-profile-post-cms-btn').hasClass('hidden')){
+          $('.industry-profile-post-cms-line').hide();
+          $('.industry-profile-post-cms-btn').hide().addClass('hidden');
+        }
         scrollToTop();
         $(this).toggleClass('active');
         const total = $child.length;
@@ -635,45 +650,138 @@ const mainScript = () => {
         $all.removeClass('active has-filter');
         if (checked === 0 || checked === total) {
           $all.addClass('active');
-          activeItem();
+          setTimeout(activeItem, 100)
           $('.industry-profile-post-item').show().addClass('active');
-        }  else {
+        } else {
           $all.addClass('has-filter');
           $('.industry-profile-post-item').hide().removeClass('active');
           $child.filter('.active').each(function () {
             const cat = $(this).data('category');
-            activeItem();
+            setTimeout(activeItem, 100)
             $('.industry-profile-post-item[data-category="' + cat + '"]').show().addClass('active');
           });
         }
         $(".filter-total-show").text($('.industry-profile-post-item.active').length);
+        filterTextMob();
       });
+
       $all.on('click', function () {
         if(!$(this)) return;
+        if(!$('.industry-profile-post-cms-btn').hasClass('hidden')){
+          $('.industry-profile-post-cms-line').hide();
+          $('.industry-profile-post-cms-btn').hide().addClass('hidden');
+        }
         scrollToTop();
+        $('.industry-profile-post-item').show().addClass('active');       
         if($(this).hasClass('active') || $(this).hasClass('has-filter')){
           $child.removeClass('active');
           $all.removeClass('has-filter').removeClass('active');
           setTimeout(activeItem, 100)
-          $('.industry-profile-post-item').show().addClass('active');
         }
         else {
           $child.addClass('active');
           $all.addClass('active');
           setTimeout(activeItem, 100)
-          $('.industry-profile-post-item').show().addClass('active');
         }
         $(".filter-total-show").text($('.industry-profile-post-item.active').length);
+        filterTextMob();
       });
+      $('.industry-profile-filter-result-ic').on('click', function() {
+        $('.industry-profile-filter').toggleClass('active');
+      })
+      function filterTextMob(){
+        let textString;
+        if($('.industry-profile-filter-item-ic.active[data-filter-item="child"]').length > 0){
+          textString = $('.industry-profile-filter-item-ic.active[data-filter-item="child"]')
+            .map(function () {
+              return $(this).next('.industry-profile-filter-item-title-wrap').find('.industry-profile-filter-item-title').text().trim();
+            })
+            .get()
+            .join(', ');
+
+        }
+        else {
+          textString= 'All';
+        }
+        $('.industry-profile-filter-result-txt').text(textString)
+      }
       function scrollToTop() {
         let heightHeader = parseFloat($('.header').height())*-1;
-        lenis.scrollTo('.industry-profile-filter-inner', {
+        lenis.scrollTo('.industry-profile-filter-wrap', {
           duration: .6,
           offset: heightHeader,
         })
       }
       function activeItem() {
         gsap.fromTo('.industry-profile-post-item', {autoAlpha: 0, y: 30}, {autoAlpha: 1, y: 0, duration: .6, stagger: .03})
+      }
+      if(viewport.w < 992){
+        $('.industry-profile-post-item-tag-list').each(function () {
+          const $list = $(this);
+          const $items = $list.children('.industry-profile-post-item-tag-item').toArray();
+          const lineHeight = $($items[0]).outerHeight(true) || 30;
+          const maxHeight = lineHeight * 2 + parseRem(10);
+        
+          $list.empty(); // clear list
+        
+          // Tạo nút more sẵn
+          const $more = $(`
+            <div class="industry-profile-post-item-tag-item more">
+              <div class="txt txt-14 industry-profile-post-item-tag-item-txt">0+</div>
+            </div>
+          `);
+          $list.append($more);
+        
+          let hiddenCount = 0;
+        
+          $items.forEach(item => {
+            $more.before(item); // luôn chèn item trước more
+        
+            if ($list.height() > maxHeight) {
+              $(item).hide();
+              hiddenCount++;
+            }
+          });
+        
+          if (hiddenCount > 0) {
+            $more.find('.industry-profile-post-item-tag-item-txt').text(`${hiddenCount}+`);
+          } else {
+            $more.remove(); 
+          }
+        });
+        let tagClone = $('.industry-popup-tag-item').clone();
+        let locaClone = $('.industry-popup-location-item').eq(0).clone();
+        let locaWrap = $('.industry-popup-location-list');
+        let tagWrap = $('.industry-popup-tag-wrap');
+        $('.industry-profile-post-item-plus').on('click', function(){
+          tagWrap.empty();
+          locaWrap.empty();
+          let parent = $(this).closest('.industry-profile-post-item');
+          let label = parent.find('.label-txt').text();
+          let role = parent.find('.industry-profile-post-item-role').text();
+          let title = parent.find('.industry-profile-post-item-title').text();
+          let sub = parent.find('.industry-profile-post-item-sub').text();
+          $('.industry-popup-label .label-txt').text(label);
+          $('.industry-popup-role').text(role);
+          $('.industry-popup-title').text(title);
+          $('.industry-popup-sub').text(sub);
+          parent.find('.industry-profile-post-item-tag-item:not(.more').each((idx, item) => {
+            let itemClone = tagClone.clone();
+            itemClone.find('.industry-popup-tag-item-txt').text($(item).find('.industry-profile-post-item-tag-item-txt').text());
+            tagWrap.append(itemClone);
+          })
+          parent.find('.industry-profile-post-item-loca-item').each((idx, item) => {
+            let itemClone = locaClone.clone();
+            console.log(itemClone)
+            console.log($(item).find('.txt').text())
+            itemClone.text($(item).find('.txt').text());
+            locaWrap.append(itemClone);
+          })
+          $('.industry-popup-wrap').addClass('active')
+        })
+        $('.industry-popup-close').on('click', function() {
+          $('.industry-popup-wrap').removeClass('active')
+        })
       }
     }
   }
