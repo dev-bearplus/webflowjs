@@ -799,14 +799,15 @@ const mainScript = () => {
     setup() {
       this.initContentPopup();
       $(window).on('scroll', (e)=> {
-        this.itemContentActiveCheck('.sp-content-main-richtext h2');
+        this.itemContentActiveCheck('.sp-content-main-richtext h3');
       })
       $('.sp-content-table-item-list').on('click', '.sp-content-table-item-wrap', function(e) {
         e.preventDefault();
+        if($(this).hasClass('active')) return;
         $('.sp-content-table-item-wrap').removeClass('active');
         $(this).addClass('active');
         let dataHeader = $(this).attr('data-title');
-        var scrollTop =  $('.sp-content-main-richtext').scrollTop() - $('.sp-content-main-richtext').offset().top + $(`.sp-content-main-richtext h2[data-title="${dataHeader}"]`).offset().top ;
+        var scrollTop =  $('.sp-content-main-richtext').scrollTop() - $('.sp-content-main-richtext').offset().top + $(`.sp-content-main-richtext h3[data-title="${dataHeader}"]`).offset().top ;
         console.log(scrollTop )
         lenis.scrollTo(scrollTop, {
           duration: 1
@@ -826,7 +827,7 @@ const mainScript = () => {
     initContentPopup() {
       let titleLeft = $('.sp-content-table-item-wrap').eq(0).clone();
       $('.sp-content-table-item-wrap').remove();
-      $('.sp-content-main-richtext h2').each((i, el) => {
+      $('.sp-content-main-richtext h3').each((i, el) => {
           $(el).attr('data-title', `toch-${i}`);
           let titleLeftClone = titleLeft.clone();
           if(i == 0) {
