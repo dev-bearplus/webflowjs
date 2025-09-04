@@ -864,7 +864,6 @@ const mainScript = () => {
           topSticky+= heightItem;
           console.log(heightItem)
         }
-        lastTopSticky= 
         $(item).css('top', topSticky)
       })
     }
