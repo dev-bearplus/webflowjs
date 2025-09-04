@@ -856,8 +856,17 @@ const mainScript = () => {
       this.interact();
     }
     setup() {
-      let topSticky = $('.how-principles-head-wrap').outerHeight() + parseInt($('.how-principles-head-wrap').css('top'));
-      let dynamicTopSticky = (viewport.w/viewport.h)<2;
+      let topSticky = $('.header').height() - parseRem(1);
+      if(viewport.w > 767){
+        $('.how-principles-head-wrap').outerHeight() + parseInt($('.how-principles-head-wrap').css('top'))
+      }
+      let dynamicTopSticky;
+      if(viewport.w > 991){
+        dynamicTopSticky = (viewport.w/viewport.h)<2;
+      }
+      else {
+        dynamicTopSticky = false;
+      }
       let paddingBottom = 0;
       let lastItempaddingBottom = 0;
       let lengthContentWrap = $('.how-principles-content-wrap').length;
