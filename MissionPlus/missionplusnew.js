@@ -858,7 +858,7 @@ const mainScript = () => {
     setup() {
       let topSticky = $('.header').height() - parseRem(1);
       if(viewport.w > 767){
-        $('.how-principles-head-wrap').outerHeight() + parseInt($('.how-principles-head-wrap').css('top'))
+        topSticky = $('.how-principles-head-wrap').outerHeight() + parseInt($('.how-principles-head-wrap').css('top'))
       }
       let dynamicTopSticky;
       if(viewport.w > 991){
@@ -891,7 +891,7 @@ const mainScript = () => {
           }
         }
         else if(dynamicTopSticky){
-          paddingBottom += parseInt($('.how-principles-content-wrap').eq(idx).find('.how-principles-content-decs-wrap').css('padding-top'));
+          paddingBottom += parseInt(20);
         }
         $(item).css('top', topSticky);
         $(item).css('padding-bottom', paddingBottom);
