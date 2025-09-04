@@ -856,16 +856,41 @@ const mainScript = () => {
       this.interact();
     }
     setup() {
-      let topSticky = $('.how-principles-head').outerHeight() + parseInt($('.how-principles-head').css('top'));
-      let lastTopSticky = 0;
-      $('.how-principles-content').each((idx, item) => {
-        if(idx != 0) {
-          let heightItem = $('.how-principles-content').eq(idx - 1).find('.how-principles-content-head').height() + parseInt($('.how-principles-content').eq(idx - 1).css('padding-top')) + parseInt($('.how-principles-content').eq(idx - 1).css('padding-bottom')) - parseRem(20);
-          topSticky+= heightItem;
-          console.log(heightItem)
+      let topSticky = $('.how-principles-head-wrap').outerHeight() + parseInt($('.how-principles-head-wrap').css('top'));
+      let dynamicTopSticky = (viewport.w/viewport.h)<2;
+      let paddingBottom = 0;
+      let lastItempaddingBottom = 0;
+      let lengthContentWrap = $('.how-principles-content-wrap').length;
+      if(!dynamicTopSticky){
+        let heightLastItemContent = $('.how-principles-content-wrap').eq(lengthContentWrap -1 ).height();
+        $('.how-principles-head-wrap').css('padding-bottom',heightLastItemContent);
+        $('.how-principles-content-main').css('margin-top', heightLastItemContent*-1)
+      }
+      $('.how-principles-content-wrap').each((idx, item) => {
+        if(dynamicTopSticky){
+          for(let i= idx +1; i< lengthContentWrap; i++){
+            paddingBottom += $('.how-principles-content-wrap').eq(i).find('.how-principles-content-head').height() + parseInt($('.how-principles-content-wrap').eq(i).find('.how-principles-content').css('padding-top')) + parseInt($('.how-principles-content-wrap').eq(i).find('.how-principles-content-decs-wrap').css('padding-top'));  
+          }
         }
-        $(item).css('top', topSticky)
+        else {
+          paddingBottom = Math.abs($(item).height() - $('.how-principles-content-wrap').eq(lengthContentWrap-1).height());
+        }
+        if(idx != 0) {
+          let heightItem = $('.how-principles-content-wrap').eq(idx - 1).find('.how-principles-content-head').height() + parseInt($('.how-principles-content-wrap').eq(idx - 1).find('.how-principles-content').css('padding-top')) + parseInt($('.how-principles-content-wrap').eq(idx - 1).find('.how-principles-content-decs-wrap').css('padding-top'));  
+          if(dynamicTopSticky){
+            topSticky+= heightItem;
+          }
+        }
+        else if(dynamicTopSticky){
+          paddingBottom += parseInt($('.how-principles-content-wrap').eq(idx).find('.how-principles-content-decs-wrap').css('padding-top'));
+        }
+        $(item).css('top', topSticky);
+        $(item).css('padding-bottom', paddingBottom);
+        $(item).css('margin-top', lastItempaddingBottom*-1);
+        lastItempaddingBottom = paddingBottom;
+        paddingBottom=0;
       })
+      
     }
     interact() {
       
