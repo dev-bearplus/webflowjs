@@ -846,6 +846,87 @@ const mainScript = () => {
     }
   }
   const subpageHero = new SubpageHero();
+  class HowPrinciples extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+      this.swiperTesti;
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      let topSticky = $('.how-principles-head').outerHeight() + parseInt($('.how-principles-head').css('top'));
+      let lastTopSticky = 0;
+      $('.how-principles-content').each((idx, item) => {
+        if(idx != 0) {
+          let heightItem = $('.how-principles-content').eq(idx - 1).find('.how-principles-content-head').height() + parseInt($('.how-principles-content').eq(idx - 1).css('padding-top')) + parseInt($('.how-principles-content').eq(idx - 1).css('padding-bottom')) - parseRem(20);
+          topSticky+= heightItem;
+          console.log(heightItem)
+        }
+        lastTopSticky= 
+        $(item).css('top', topSticky)
+      })
+    }
+    interact() {
+      
+    }
+  }
+  const howPrinciples = new HowPrinciples('.how-principles');
+  class HowTesti extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+      this.swiperTesti;
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      this.swiperTesti = new Swiper(".how-testi-cms", {
+        slidesPerView: 'auto',
+        speed: 600,
+        longSwipesRatio : 0,
+        threshold: 10,
+        navigation: {
+          prevEl: ".how-testi-control-item-prev",
+          nextEl: ".how-testi-control-item-next",
+        },
+       
+        pagination: {
+          el: '.how-testi-control-pagi',
+          bulletClass: 'how-testi-control-pagi-item',
+          bulletActiveClass: 'active',
+          clickable: true,  
+        },
+        breakpoints: {
+          991: {
+            slidesPerView: 2,
+              spaceBetween: parseRem(0),
+              pagination: {
+                el: '.how-testi-control-number',
+                type: "fraction",
+                renderFraction: function (currentClass, totalClass) {
+                  return '<span class="' + currentClass + '"></span>' +
+                         ' / ' +
+                         '<span class="' + totalClass + '"></span>';
+                },
+                formatFractionCurrent: function (number) {
+                  return number+1; // ở đây bạn có thể -1 hoặc +0 nếu Swiper đang lệch
+                },
+                formatFractionTotal: function (number) {
+                  return number+1; // có thể chỉnh nếu tổng bị lệch
+                }
+              },
+          }
+        }
+      });
+    }
+    interact() {
+      
+    }
+  }
+  const howTesti = new HowTesti('.how-testi');
   class Header extends TriggerSetupHero {
     constructor() {
       super();
@@ -972,6 +1053,11 @@ const mainScript = () => {
     },
     subpageScript: () => {
       subpageHero.trigger();
+    },
+    hiwScript: () => {
+      howPrinciples.trigger();
+      howTesti.trigger();
+      
     }
   };
   const initGlobal = () => {
