@@ -643,6 +643,12 @@ const mainScript = () => {
       })
       $(".industry-profile-filter-all").find('.label-txt').text(toggleProfile);
       $(".filter-total-show").text(toggleProfile);
+      if(toggleProfile <= 1){
+        $('.txt-profile-more').addClass('hidden')
+      }
+      else {
+        $('.txt-profile-more').removeClass('hidden')
+      }
     }
     interact() {
       const $all = $('[data-filter-item="all"]');
@@ -658,7 +664,7 @@ const mainScript = () => {
         $('.industry-profile-post-cms-line').hide();
         $('.industry-profile-post-cms-btn').hide().addClass('hidden');
         setTimeout(scrollToTop, 100)
-        setTimeout(activeItem, 100)
+        setTimeout(activeItem, 10)
       })
       $child.on('click', function () {
         if(!$('.industry-profile-post-cms-btn').hasClass('hidden')){
@@ -672,18 +678,24 @@ const mainScript = () => {
         $all.removeClass('active has-filter');
         if (checked === 0 || checked === total) {
           $all.addClass('active');
-          setTimeout(activeItem, 100)
+          setTimeout(activeItem, 10)
           $('.industry-profile-post-item').show().addClass('active');
         } else {
           $all.addClass('has-filter');
           $('.industry-profile-post-item').hide().removeClass('active');
           $child.filter('.active').each(function () {
             const cat = $(this).data('category');
-            setTimeout(activeItem, 100)
+            setTimeout(activeItem, 10)
             $('.industry-profile-post-item[data-category="' + cat + '"]').show().addClass('active');
           });
         }
         $(".filter-total-show").text($('.industry-profile-post-item.active').length);
+        if($('.industry-profile-post-item.active').length <= 1){
+          $('.txt-profile-more').addClass('hidden')
+        }
+        else {
+          $('.txt-profile-more').removeClass('hidden')
+        }
         filterTextMob();
       });
 
@@ -698,14 +710,20 @@ const mainScript = () => {
         if($(this).hasClass('active') || $(this).hasClass('has-filter')){
           $child.removeClass('active');
           $all.removeClass('has-filter').removeClass('active');
-          setTimeout(activeItem, 100)
+          setTimeout(activeItem, 10)
         }
         else {
           $child.addClass('active');
           $all.addClass('active');
-          setTimeout(activeItem, 100)
+          setTimeout(activeItem, 10)
         }
         $(".filter-total-show").text($('.industry-profile-post-item.active').length);
+        if($('.industry-profile-post-item.active').length <= 1){
+          $('.txt-profile-more').addClass('hidden')
+        }
+        else {
+          $('.txt-profile-more').removeClass('hidden')
+        }
         filterTextMob();
       });
       $('.industry-profile-filter-result-ic').on('click', function() {
@@ -727,12 +745,19 @@ const mainScript = () => {
         }
         $('.industry-profile-filter-result-txt').text(textString)
       }
+      let heightHeader = -$('.header').outerHeight(); 
       function scrollToTop() {
-        let heightHeader = parseFloat($('.header').height())*-1;
-        lenis.scrollTo('.industry-profile-filter-wrap', {
-          duration: .6,
-          offset: heightHeader,
-        })
+        let elem = $('.industry-profile-filter-wrap');
+        if (elem.length) {
+          let elemTop = elem.offset().top;
+          let scrollTop = $(window).scrollTop();
+          if (elemTop - scrollTop <= Math.abs(heightHeader)) {
+            lenis.scrollTo('.industry-profile-filter-wrap', {
+              duration: 0.6,
+              offset: heightHeader,
+            });
+          }
+        }
       }
       function activeItem() {
         gsap.fromTo('.industry-profile-post-item', {autoAlpha: 0, y: 30}, {autoAlpha: 1, y: 0, duration: .6, stagger: .03})
