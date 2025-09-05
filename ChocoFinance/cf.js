@@ -3014,7 +3014,7 @@ const mainScript = () => {
                 }
             });
         }
-        getCEOProfiles();
+        // getCEOProfiles();
 
         //aboutClimateHanlde();
         function aboutGetFaq() {
