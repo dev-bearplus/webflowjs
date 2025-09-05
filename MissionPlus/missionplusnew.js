@@ -820,6 +820,10 @@ const mainScript = () => {
     }
     setup() {
       this.initContentPopup();
+      if($('.sp-content-table-inner').outerHeight() >= viewport.h){
+        $('.sp-content-table-inner').attr('data-lenis-prevent', 'true');
+      }
+      console.log(viewport.h)
       $(window).on('scroll', (e)=> {
         this.itemContentActiveCheck('.sp-content-main-richtext h3');
       })
@@ -830,7 +834,6 @@ const mainScript = () => {
         $(this).addClass('active');
         let dataHeader = $(this).attr('data-title');
         var scrollTop =  $('.sp-content-main-richtext').scrollTop() - $('.sp-content-main-richtext').offset().top + $(`.sp-content-main-richtext h3[data-title="${dataHeader}"]`).offset().top ;
-        console.log(scrollTop )
         lenis.scrollTo(scrollTop, {
           duration: 1
         })
@@ -839,7 +842,6 @@ const mainScript = () => {
     itemContentActiveCheck(el) {
       for (let i = 0; i < $(el).length; i++) {
           let top = $(el).eq(i).get(0).getBoundingClientRect().top;
-          console.log(top)
           if (top > 0 && top - $(el).eq(i).height()   < ($(window).height()/2)) {
               $('.sp-content-table-item-wrap').removeClass('active');
               $('.sp-content-table-item-wrap').eq(i).addClass('active');
