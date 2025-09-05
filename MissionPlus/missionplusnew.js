@@ -596,7 +596,7 @@ const mainScript = () => {
     setup() {
       if(viewport.w > 991){
         let topSticky = (viewport.h - $('.industry-support-title-inner').height() + $('.header').height())/2;
-        $('.industry-support-title-inner').css('top', topSticky)
+        $('.industry-support-title-inner').css('padding-top', topSticky)
       }
       else {
         $('.industry-support-cms').addClass('swiper')
