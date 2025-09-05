@@ -355,7 +355,7 @@ const mainScript = () => {
               );
             }
             if ($("[data-cursor]:hover").attr("data-cursor-txtLink-trans")) {
-              $('[data-cursor]:hover[data-cursor-txtLink-trans] .txt').css('transform', `translateX(4px)`)
+              $('[data-cursor]:hover[data-cursor-txtLink-trans] .txt').css('transform', `translateX(8px)`)
             }
             this.targetX =
               targetEl.get(0).getBoundingClientRect().left -
@@ -630,6 +630,10 @@ const mainScript = () => {
     }
     setup() {
       let toggleProfile = 0;
+      $('.industry-profile-filter-item-title').each((idx, item) => {
+        let widthItem = $(item).width();
+        $(item).parent().width(widthItem);
+      })
       $('.industry-profile-filter-item').each((idx, item) => {
         let category = $(item).find('.industry-profile-filter-item-ic').attr('data-category');
         let toggleItem =$(`.industry-profile-post-item[data-category=${category}]`).length;
