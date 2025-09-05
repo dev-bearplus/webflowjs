@@ -442,6 +442,29 @@ const mainScript = () => {
     }
   }
   const homeHero = new HomeHero();
+  class HomeProduct extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      let tlImg = gsap.timeline({
+        scrollTrigger: {
+          trigger: '.home-product-img-inner',
+          start: "top-=20% center",
+          end: "bottom+=20% center",
+          scrub: 1,
+        },
+      });
+      tlImg.fromTo('.home-product-img-inner img', {objectPosition:'0% 0%' }, {objectPosition: '0 100%', duration: .4, ease: 'none'});
+    }
+    interact() {
+    }
+  }
+  let homeProduct = new HomeProduct('.home-product')
   class HomeService extends TriggerSetup {
     constructor(triggerEl) {
       super(triggerEl);
@@ -910,16 +933,12 @@ const mainScript = () => {
     }
     setup() {
       let topSticky = $('.header').height() - parseRem(1);
-      if(viewport.w > 767){
+      console.log($('.how-principles .container').eq(0).outerWidth()/viewport.h)
+      if(viewport.w > 767 && viewport.w/viewport.h > 1.8){
         topSticky = $('.how-principles-head-wrap').outerHeight() + parseInt($('.how-principles-head-wrap').css('top'))
+        console.log('khanh')
       }
-      let dynamicTopSticky;
-      if(viewport.w > 991){
-        dynamicTopSticky = (viewport.w/viewport.h)<2;
-      }
-      else {
-        dynamicTopSticky = false;
-      }
+      let dynamicTopSticky =viewport.w > 991;
       let paddingBottom = 0;
       let lastItempaddingBottom = 0;
       let lengthContentWrap = $('.how-principles-content-wrap').length;
@@ -1132,6 +1151,7 @@ const mainScript = () => {
   const SCRIPT = {
     homeScript: () => {
       homeHero.trigger();
+      homeProduct.trigger();
       homeService.trigger();
       homeIndustry.trigger();
       homeTesti.trigger();
