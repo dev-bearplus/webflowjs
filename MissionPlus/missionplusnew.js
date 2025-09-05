@@ -1145,6 +1145,15 @@ const mainScript = () => {
           $('.footer-form-input-submit').removeClass('active');
         }
       })
+      $('.footer-form-inner').on('keypress', function (e) {
+        if (e.which === 13 && !isValidEmail($('.footer-form-input').val())) { 
+          e.preventDefault(); 
+          $('.footer-form-input-group').addClass('error');
+        }
+        else {
+          $('.footer-form-input-group').removeClass('error');
+        }
+      });
     }
   }
   const footer = new Footer(".footer-wrap");
