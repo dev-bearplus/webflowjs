@@ -459,7 +459,7 @@ const mainScript = () => {
           scrub: 1,
         },
       });
-      tlImg.fromTo('.home-product-img-inner img', {objectPosition:'0% 0%' }, {objectPosition: '0 100%', duration: .4, ease: 'none'});
+      viewport.w > 991 && tlImg.fromTo('.home-product-img-inner img', {objectPosition:'0% 0%' }, {objectPosition: '0 100%', duration: .4, ease: 'none'});
     }
     interact() {
     }
