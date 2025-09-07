@@ -618,8 +618,8 @@ const mainScript = () => {
     }
     setup() {
       if(viewport.w > 991){
-        let topSticky = (viewport.h - $('.industry-support-title-inner').height() + $('.header').height())/2;
-        $('.industry-support-title-inner').css('padding-top', topSticky)
+        let topSticky = (viewport.h - $('.industry-support-title-inner').outerHeight() + $('.header').height())/2;
+        $('.industry-support-title-inner').css('top', topSticky)
       }
       else {
         $('.industry-support-cms').addClass('swiper')
@@ -654,7 +654,8 @@ const mainScript = () => {
     setup() {
       let toggleProfile = 0;
       $('.industry-profile-filter-item-title').each((idx, item) => {
-        let widthItem = $(item).width();
+        let widthItem = $(item).width() + 2;
+        console.log(widthItem)
         $(item).parent().width(widthItem);
       })
       $('.industry-profile-filter-item').each((idx, item) => {
