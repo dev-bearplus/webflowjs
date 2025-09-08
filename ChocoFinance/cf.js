@@ -4726,36 +4726,6 @@ const mainScript = () => {
         let textUnitInit = $('.unit-init').text();
         let textUnitWillChange = $('.unit-will-change').text();
         let flagChangeSgdToUsd = true;
-        function guaranteeFee() {
-            $('.guarantee-fee-form-input').on('input', function () {
-                let sgdValue = $(this).val();
-                // clean all text
-                let cleanedFee = validInputUsd(sgdValue);
-                $('.guarantee-fee-form-input-val').text(cleanedFee);
-                let usdConvertTotal = (Math.floor(cleanedFee * sgdToUsd * 100)/100).toFixed(2);
-                let usdConvertFinal =(Math.floor((usdConvertTotal - usdConvertTotal * feeSgdToUsd)*100)/100).toFixed(2);
-                let feeConvert = (usdConvertTotal - usdConvertFinal).toFixed(2);
-                console.log(usdConvertFinal)
-                $('.sgd-to-usd-total').text(usdConvertTotal);
-                $('.sgd-to-usd-fee').text(feeConvert);
-                $('.guarantee-fee-form-input-result').text(usdConvertFinal);
-            });
-            $('.guarantee-fee-convert-ic').on('click', function () {
-                if (flagChangeSgdToUsd) {
-                    $('.unit-init').text(textUnitWillChange);
-                    $('.unit-will-change').text(textUnitInit);
-                    $('.sgd-to-usd').text(usdToSgd)
-                    flagChangeSgdToUsd = false;
-                }
-                else {
-                    $('.unit-init').text(textUnitInit);
-                    $('.unit-will-change').text(textUnitWillChange);
-                    $('.sgd-to-usd').text(sgdToUsd)
-                    flagChangeSgdToUsd = true;
-                }
-            })
-        }
-        guaranteeFee();
         function validInputUsd(sgdValue) {
             let cleanedSgdValue = sgdValue.replace(/[^\d.,]/g, '');
             const lastComma = cleanedSgdValue.lastIndexOf(',');
@@ -4786,6 +4756,38 @@ const mainScript = () => {
             }
             return sgdValue;
         }
+        function guaranteeFee() {
+            $('.guarantee-fee-form-input').on('input', function () {
+                let sgdValue = $(this).val();
+                // clean all text
+                let cleanedFee = validInputUsd(sgdValue);
+                $('.guarantee-fee-form-input-val').text(cleanedFee);
+                $('.guarantee-fee-form-input').val(cleanedFee);
+                let usdConvertTotal = (Math.floor(cleanedFee * sgdToUsd * 100)/100).toFixed(2);
+                let usdConvertFinal =(Math.floor((usdConvertTotal - usdConvertTotal * feeSgdToUsd)*100)/100).toFixed(2);
+                let feeConvert = (usdConvertTotal - usdConvertFinal).toFixed(2);
+                console.log(usdConvertFinal)
+                $('.sgd-to-usd-total').text(usdConvertTotal);
+                $('.sgd-to-usd-fee').text(feeConvert);
+                $('.guarantee-fee-form-input-result').text(usdConvertFinal);
+            });
+            $('.guarantee-fee-convert-ic').on('click', function () {
+                if (flagChangeSgdToUsd) {
+                    $('.unit-init').text(textUnitWillChange);
+                    $('.unit-will-change').text(textUnitInit);
+                    $('.sgd-to-usd').text(usdToSgd)
+                    flagChangeSgdToUsd = false;
+                }
+                else {
+                    $('.unit-init').text(textUnitInit);
+                    $('.unit-will-change').text(textUnitWillChange);
+                    $('.sgd-to-usd').text(sgdToUsd)
+                    flagChangeSgdToUsd = true;
+                }
+            })
+        }
+        guaranteeFee();
+        
         function usdSecu(){
             let textCir;
             textCir = new CircleType(document.querySelector('.mod-circletext.usd-secu-rate-txt'));
