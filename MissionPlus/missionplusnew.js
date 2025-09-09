@@ -697,7 +697,6 @@ const mainScript = () => {
       $child.on('click', function () {
         if(!$('.industry-profile-post-cms-btn').hasClass('hidden')){
           $('.industry-profile-post-cms-line').hide();
-          $('.industry-profile-post-cms-btn').hide().addClass('hidden');
         }
         scrollToTop();
         $(this).toggleClass('active');
@@ -861,6 +860,106 @@ const mainScript = () => {
     }
   }
   const industryProfile = new IndustryProfile('.industry-profile');
+  class InsightHero extends TriggerSetupHero {
+    constructor() {
+      super();
+      this.tl = null;
+    }
+    trigger() {
+      this.setup();
+      this.interact();
+      super.init(this.play.bind(this));
+    }
+    setup() {
+      
+    }
+    interact() {
+      const $all = $('[data-filter-item="all"]');
+      const $child = $('[data-filter-item="child"]');
+      if($('.insight-blog-item').length < 8) $('.insight-blog-viewmore').hide();
+      $('.insight-blog-item').each((idx, item) => {
+        if(idx > 6){
+          $(item).addClass('view-more');
+        }
+      })
+      $('.insight-blog-viewmore').on('click', function(){
+        $('.insight-blog-item').removeClass('view-more')
+        $(this).hide().addClass('hidden');
+        setTimeout(scrollToTop, 100)
+        setTimeout(activeItem, 10)
+      })
+      $child.on('click', function () {
+        $('.insight-blog-viewmore').hide();
+        $('.insight-blog-item').removeClass('first-item')
+        scrollToTop();
+        $child.removeClass('active')
+        $(this).toggleClass('active');
+        const checked = $child.filter('.active').length;
+        $all.removeClass('active ');
+        if (checked === 0 ) {
+          $all.addClass('active');
+          setTimeout(activeItem, 10)
+          $('.insight-blog-item').show().addClass('active');
+        } 
+        $('.insight-blog-item').hide().removeClass('active');
+        $child.filter('.active').each( (idx, item) => {
+          const cat = $(item).data('category');
+          setTimeout(activeItem, 10)
+          $('.insight-blog-item[data-category="' + cat + '"]').show().addClass('active');
+        });
+        $('.insight-blog-item.active').eq(0).addClass('first-item')
+        filterTextMob();
+      });
+
+      $all.on('click', function () {
+        if(!$(this)) return;
+        $('.insight-blog-viewmore').hide();
+        if(!$('.industry-profile-post-cms-btn').hasClass('hidden')){
+          $('.industry-profile-post-cms-line').hide();
+          $('.industry-profile-post-cms-btn').hide().addClass('hidden');
+        }
+        scrollToTop();
+        $('.insight-blog-item').removeClass('first-item').show().addClass('active');       
+        $child.removeClass('active');
+        $all.addClass('active');
+        setTimeout(activeItem, 10)
+        filterTextMob();
+      });
+      if(viewport.w < 768){
+        $('.insight-blog-filter-mob-ic').on('click', function() {
+          $('.insight-blog-filter-mob').toggleClass('active')
+        })
+      }
+      function filterTextMob(){
+        if(viewport.w > 767) return;
+        let textString;
+        textString = $('.insight-blog-filter-item.active .insight-blog-filter-item-txt').text();
+        $('.insight-blog-filter-mob-txt').text(textString)
+        $('.insight-blog-filter-mob').removeClass('active')
+      }
+      let heightHeader = -$('.header').outerHeight() + parseRem(1)*3; 
+      function scrollToTop() {
+        let elem = $('.insight-blog');
+        if (elem.length) {
+          let elemTop = elem.offset().top;
+          let scrollTop = $(window).scrollTop();
+          if (elemTop - scrollTop <= Math.abs(heightHeader)) {
+            lenis.scrollTo('.insight-blog', {
+              duration: 0.6,
+              offset: heightHeader,
+            });
+          }
+        }
+      }
+      function activeItem() {
+        gsap.fromTo('.insight-blog-item-inner', {autoAlpha: 0, y: 30}, {autoAlpha: 1, y: 0, duration: .6, stagger: .03})
+      }
+    }
+    play() {
+      this.tl.play();
+    }
+  }
+  const insightHero = new InsightHero();
   class SubpageHero extends TriggerSetupHero {
     constructor() {
       super();
@@ -1172,6 +1271,9 @@ const mainScript = () => {
     },
     contactScript: () => {
       
+    },
+    insightScript: () => {
+      insightHero.trigger();
     },
     subpageScript: () => {
       subpageHero.trigger();
