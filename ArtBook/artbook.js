@@ -67,6 +67,41 @@ const script = () => {
     const childSelect = (parent) => {
         return (child) => child ? $(parent).find(child) : parent;
     }
+    const isInViewport = (el, orientation = 'vertical') => {
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        if (orientation == 'horizontal') {
+            return (
+                rect.left <= (window.innerWidth) &&
+                rect.right >= 0
+            );
+        } else {
+            return (
+                rect.top <= (window.innerHeight) &&
+                rect.bottom >= 0
+            );
+        }
+    }
+    const parallaxImage = ({ el, scaleOffset = 0.3 }) => {
+        gsap.set(el, { 'overflow': 'hidden' });
+        gsap.set($(el).find('img'), { height: '120%' });
+        const updateOnScroll = (dist, total) => {
+            if ($(el).find('img') && isInViewport(el)) {
+                let percent = el.getBoundingClientRect().bottom / total;
+
+                ySetter($(el).find('img'))(-dist * percent * 1.2);
+                gsap.set($(el).find('img'), { scale: 1 + (percent * scaleOffset) });
+            }
+        };
+
+        let dist = $(el).find('img').get(0).offsetHeight - el.offsetHeight;
+        let total = el.getBoundingClientRect().height + window.innerHeight;
+
+        updateOnScroll(dist, total);
+        lenis.on('scroll', () => {
+            updateOnScroll(dist, total);
+        });
+    };
 
     const marqueeGS = (data) => {
         const { parent, duration, start, stopWhenScroll } = data;
@@ -1896,7 +1931,15 @@ const script = () => {
 
                 gsap.set('.home__hero-showcase-item', { autoAlpha: 0, yPercent: 40, xPercent: 30, rotate: -2 });
 
-                const homeHeroTl = gsap.timeline({ delay: 0.5 });
+                const homeHeroTl = gsap.timeline({
+                    delay: 0.5,
+                    onStart: () => {
+                        document.querySelectorAll('.home__hero-showcase-item-img').forEach(el => {
+                            parallaxImage({ el, scaleOffset: .15 })
+                        })
+                        lenis.scrollTo(1);
+                    }
+                });
                 homeHeroTl
                     .to(homeHeroTitle.words, {
                         yPercent: 0, duration: .8, stagger: .04, ease: 'power2.out',
@@ -2109,6 +2152,8 @@ const script = () => {
                     nav: true
                 })
             }
+
+            parallaxImage({ el: document.querySelector('.home__interest-img .parallax-img--inner'), scaleOffset: .2 })
             if (viewport.width > 991) {
                 productAnim();
                 interestThumb()
@@ -2124,6 +2169,10 @@ const script = () => {
                 marqueeCSS({ parent: childSelect('.home__exper-marquee'), duration: 30 })
             }
             initMarquees();
+
+            document.querySelectorAll('.home__exper-img').forEach(el => {
+                parallaxImage({ el })
+            })
         }
 
         HOME.News = () => {
