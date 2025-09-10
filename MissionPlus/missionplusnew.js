@@ -348,7 +348,7 @@ const mainScript = () => {
               targetEl = $("[data-cursor]:hover");
             }
 
-            let targetGap = 8;
+            let targetGap = parseRem(8);
             if ($("[data-cursor]:hover").attr("data-cursor-txtLink-gap")) {
               targetGap = $("[data-cursor]:hover").attr(
                 "data-cursor-txtLink-gap"
@@ -798,7 +798,7 @@ const mainScript = () => {
         
           $list.empty(); // clear list
         
-          // Tạo nút more sẵn
+          
           const $more = $(`
             <div class="industry-profile-post-item-tag-item more">
               <div class="txt txt-14 industry-profile-post-item-tag-item-txt">0+</div>
@@ -809,7 +809,7 @@ const mainScript = () => {
           let hiddenCount = 0;
         
           $items.forEach(item => {
-            $more.before(item); // luôn chèn item trước more
+            $more.before(item); 
         
             if ($list.height() > maxHeight) {
               $(item).hide();
@@ -1022,6 +1022,287 @@ const mainScript = () => {
     }
   }
   const subpageHero = new SubpageHero();
+  class CaseStudyHero extends TriggerSetupHero {
+    constructor() {
+      super();
+      this.tl = null;
+    }
+    trigger() {
+      this.setup();
+      this.interact();
+      super.init(this.play.bind(this));
+      
+    }
+    setup() {
+      let toggleProfile = 0;
+      $('.casestudy-profile-filter-item-title').each((idx, item) => {
+        let widthItem = $(item).width() + 2;
+        console.log(widthItem)
+        $(item).parent().width(widthItem);
+      })
+      $('.casestudy-profile-filter-item').each((idx, item) => {
+        let category = $(item).find('.casestudy-profile-filter-item-ic').attr('data-category');
+        let toggleItem =$(`.casestudy-profile-post-item[data-category=${category}]`).length;
+        if(toggleItem>0){
+          $(item).find('.label-txt').text(toggleItem);
+        }
+        else {
+          $(item).hide();
+        }
+        toggleProfile+=toggleItem;
+      })
+      $(".casestudy-profile-filter-all").find('.label-txt').text(toggleProfile);
+      $(".filter-total-show").text(toggleProfile);
+      if(toggleProfile <= 1){
+        $('.txt-profile-more').addClass('hidden')
+      }
+      else {
+        $('.txt-profile-more').removeClass('hidden')
+      }
+      $('.casestudy-profile-post-item-tag-list').each(function () {
+        const $list = $(this);
+        console.log($list)
+        const $items = $list.children('.casestudy-profile-post-item-tag-item').toArray();
+        const lineHeight = $($items[0]).outerHeight(true) || 30;
+        const maxHeight = lineHeight  + parseRem(10);
+        $list.empty(); 
+        const $more = $(`
+          <div class="casestudy-profile-post-item-tag-item more">
+            <div class="txt txt-14 casestudy-profile-post-item-tag-item-txt">0+</div>
+          </div>
+        `);
+        $list.append($more);
+      
+        let hiddenCount = 0;
+      
+        $items.forEach(item => {
+          $more.before(item); 
+      
+          if ($list.height() > maxHeight) {
+            $(item).hide();
+            hiddenCount++;
+          }
+        });
+      
+        if (hiddenCount > 0) {
+          $more.find('.casestudy-profile-post-item-tag-item-txt').text(`${hiddenCount}+`);
+        } else {
+          $more.remove(); 
+        }
+      });
+    }
+    interact() {
+      const $all = $('[data-filter-item="all"]');
+      const $child = $('[data-filter-item="child"]');
+      // Click child
+      $('.casestudy-profile-post-item').each((idx, item) => {
+        if(idx > 5){
+          $(item).addClass('view-more');
+        }
+      })
+      $('.casestudy-profile-post-cms-btn').on('click', function(){
+        $('.casestudy-profile-post-item').removeClass('view-more')
+        $('.casestudy-profile-post-cms-line').hide();
+        $('.casestudy-profile-post-cms-btn').hide().addClass('hidden');
+        setTimeout(scrollToTop, 100)
+        setTimeout(activeItem, 10)
+      })
+      $child.on('click', function () {
+        if(!$('.casestudy-profile-post-cms-btn').hasClass('hidden')){
+          $('.casestudy-profile-post-cms-line').hide();
+        }
+        scrollToTop();
+        $(this).toggleClass('active');
+        const total = $child.length;
+        const checked = $child.filter('.active').length;
+        $all.removeClass('active has-filter');
+        if (checked === 0 || checked === total) {
+          $all.addClass('active');
+          setTimeout(activeItem, 10)
+          $('.casestudy-profile-post-item').show().addClass('active');
+        } else {
+          $all.addClass('has-filter');
+          $('.casestudy-profile-post-item').hide().removeClass('active');
+          $child.filter('.active').each(function () {
+            const cat = $(this).data('category');
+            setTimeout(activeItem, 10)
+            $('.casestudy-profile-post-item[data-category="' + cat + '"]').show().addClass('active');
+          });
+        }
+        $(".filter-total-show").text($('.casestudy-profile-post-item.active').length);
+        if($('.casestudy-profile-post-item.active').length <= 1){
+          $('.txt-profile-more').addClass('hidden')
+        }
+        else {
+          $('.txt-profile-more').removeClass('hidden')
+        }
+        filterTextMob();
+      });
+
+      $all.on('click', function () {
+        if(!$(this)) return;
+        if(!$('.casestudy-profile-post-cms-btn').hasClass('hidden')){
+          $('.casestudy-profile-post-cms-line').hide();
+          $('.casestudy-profile-post-cms-btn').hide().addClass('hidden');
+        }
+        scrollToTop();
+        $('.casestudy-profile-post-item').show().addClass('active');       
+        if($(this).hasClass('active') || $(this).hasClass('has-filter')){
+          $child.removeClass('active');
+          $all.removeClass('has-filter').removeClass('active');
+          setTimeout(activeItem, 10)
+        }
+        else {
+          $child.addClass('active');
+          $all.addClass('active');
+          setTimeout(activeItem, 10)
+        }
+        $(".filter-total-show").text($('.casestudy-profile-post-item.active').length);
+        if($('.casestudy-profile-post-item.active').length <= 1){
+          $('.txt-profile-more').addClass('hidden')
+        }
+        else {
+          $('.txt-profile-more').removeClass('hidden')
+        }
+        filterTextMob();
+      });
+      $('.casestudy-profile-filter-result-ic').on('click', function() {
+        $('.casestudy-profile-filter').toggleClass('active');
+      })
+      function filterTextMob(){
+        let textString;
+        if($('.casestudy-profile-filter-item-ic.active[data-filter-item="child"]').length > 0){
+          textString = $('.casestudy-profile-filter-item-ic.active[data-filter-item="child"]')
+            .map(function () {
+              return $(this).next('.casestudy-profile-filter-item-title-wrap').find('.casestudy-profile-filter-item-title').text().trim();
+            })
+            .get()
+            .join(', ');
+
+        }
+        else {
+          textString= 'All';
+        }
+        $('.casestudy-profile-filter-result-txt').text(textString)
+      }
+      let heightHeader = -$('.header').outerHeight(); 
+      function scrollToTop() {
+        let elem = $('.casestudy-profile-filter-wrap');
+        if (elem.length) {
+          let elemTop = elem.offset().top;
+          let scrollTop = $(window).scrollTop();
+          if (elemTop - scrollTop <= Math.abs(heightHeader)) {
+            lenis.scrollTo('.casestudy-profile-filter-wrap', {
+              duration: 0.6,
+              offset: heightHeader,
+            });
+          }
+        }
+      }
+      function activeItem() {
+        gsap.fromTo('.casestudy-profile-post-item', {autoAlpha: 0, y: 30}, {autoAlpha: 1, y: 0, duration: .6, stagger: .03})
+      }
+      
+    }
+    play() {
+      this.tl.play();
+    }
+  }
+  const caseStudyHero = new CaseStudyHero();
+  class InsightDetailHero extends TriggerSetupHero {
+    constructor() {
+      super();
+      this.tl = null;
+    }
+    trigger() {
+      this.setup();
+      super.init(this.play.bind(this));
+      
+    }
+    setup() {
+      this.initContentPopup();
+      if($('.tp-insight-content-table-inner').outerHeight() >= viewport.h){
+        $('.tp-insight-content-table-inner').attr('data-lenis-prevent', 'true');
+      }
+      console.log(viewport.h)
+      $(window).on('scroll', (e)=> {
+        this.itemContentActiveCheck('.tp-insight-content-main-richtext h3');
+      })
+      $('.tp-insight-content-table-item-list').on('click', '.tp-insight-content-table-item-wrap', function(e) {
+        e.preventDefault();
+        if($(this).hasClass('active')) return;
+        $('.tp-insight-content-table-item-wrap').removeClass('active');
+        $(this).addClass('active');
+        let dataHeader = $(this).attr('data-title');
+        var scrollTop =  $('.tp-insight-content-main-richtext').scrollTop() - $('.tp-insight-content-main-richtext').offset().top + $(`.tp-insight-content-main-richtext h3[data-title="${dataHeader}"]`).offset().top ;
+        lenis.scrollTo(scrollTop, {
+          duration: 1
+        })
+      })
+    }
+    itemContentActiveCheck(el) {
+      for (let i = 0; i < $(el).length; i++) {
+          let top = $(el).eq(i).get(0).getBoundingClientRect().top;
+          if (top > 0 && top - $(el).eq(i).height()   < ($(window).height()/2)) {
+              $('.tp-insight-content-table-item-wrap').removeClass('active');
+              $('.tp-insight-content-table-item-wrap').eq(i).addClass('active');
+          }
+          }
+    }
+    initContentPopup() {
+      let titleLeft = $('.tp-insight-content-table-item-wrap').eq(0).clone();
+      $('.tp-insight-content-table-item-wrap').remove();
+      $('.tp-insight-content-main-richtext h3').each((i, el) => {
+          $(el).attr('data-title', `toch-${i}`);
+          let titleLeftClone = titleLeft.clone();
+          if(i == 0) {
+              titleLeftClone.addClass('active');
+          }
+          let index = i+1<=9 ?`0${i+1}` : i+1;
+          let cleanText = $(el).text().replace(/^\d+\.\s*/, '');
+          titleLeftClone.find('.tp-insight-content-table-item-title').text(cleanText);
+          titleLeftClone.find('.label-txt').text(index);
+          titleLeftClone.attr('data-title', `toch-${i}`);
+          $('.tp-insight-content-table-item-list').append(titleLeftClone);
+      })
+  }
+    play() {
+      this.tl.play();
+    }
+  }
+  const insightDetailHero = new InsightDetailHero();
+  class InsightDetailBlog extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+      this.swiperTesti;
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      console.log('khanh')
+      if(viewport.w < 992){
+        $('.tp-insight-blog-main').addClass('swiper')
+        $('.tp-insight-blog-list').addClass('swiper-wrapper')
+        $('.tp-insight-blog-item').addClass('swiper-slide')
+        let swiperService = new Swiper(".tp-insight-blog-main", {
+          slidesPerView: 'auto',
+          speed: 600,
+          pagination: {
+            el: '.tp-insight-blog-pagi',
+            bulletClass: 'tp-insight-blog-pagi-item',
+            bulletActiveClass: 'active',
+            clickable: true,
+          },
+        });
+      }
+    }
+    interact() {
+      
+    }
+  }
+  const insightDetailBlog = new InsightDetailBlog('.tp-insight-blog');
   class HowPrinciples extends TriggerSetup {
     constructor(triggerEl) {
       super(triggerEl);
@@ -1281,7 +1562,13 @@ const mainScript = () => {
     hiwScript: () => {
       howPrinciples.trigger();
       howTesti.trigger();
-      
+    },
+    insightDetailScript: () => {
+      insightDetailHero.trigger();
+      insightDetailBlog.trigger();
+    },
+    caseStudyScript: () => {
+      caseStudyHero.trigger();
     }
   };
   const initGlobal = () => {
