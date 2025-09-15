@@ -1209,6 +1209,68 @@ const mainScript = () => {
     }
   }
   const caseStudyHero = new CaseStudyHero();
+   class CsDetailHero extends TriggerSetupHero {
+    constructor() {
+      super();
+      this.tl = null;
+    }
+    trigger() {
+      this.setup();
+      super.init(this.play.bind(this));
+      
+    }
+    setup(){
+        this.initContent();
+    }
+    initContent() {
+        const $root = $('.cs-detail-hero-richtext-inner');
+        const out = [];
+        console.log($root.find('h6'))
+        $root.find('h6').each(function () {
+          const $h6 = $(this);
+
+          // Lấy tất cả node giữa h6 hiện tại và h6 kế tiếp (không bao gồm h6 kế tiếp)
+          const $block = $h6.nextUntil('h6');
+
+          // Tìm h3 đầu tiên trong khối làm "title"
+          const $h3 = $block.filter('h3').first();
+          const titleText = $h3.length ? $.trim($h3.text()) : '';
+
+          // "body" là toàn bộ HTML còn lại trong khối, trừ h3 (nếu có)
+          const $bodyNodes = $block.not($h3);
+
+          // Ghép outerHTML của từng node lại thành một chuỗi HTML
+          const bodyHTML = $bodyNodes
+            .map(function () {
+              // outerHTML có trên hầu hết browser hiện đại
+              return this.outerHTML || $('<div>').append($(this).clone()).html();
+            })
+            .get()
+            .join('');
+
+          out.push({
+            label: $.trim($h6.text()),
+            title: titleText,
+            body: bodyHTML
+          });
+        });
+        $root.hide();
+        let contentItem = $('.cs-detail-hero-content').clone();
+        $('.cs-detail-hero-content').remove();
+        out.forEach((item, idx) => {
+          let contentItemClone = contentItem.clone();
+          contentItemClone.find('.label-txt').text(item.label);
+          contentItemClone.find('.cs-detail-hero-content-left-title').text(item.title);
+          contentItemClone.find('.cs-detail-hero-content-right-inner').html(item.body);
+          $root.after(contentItemClone);
+        });
+
+    }
+    play() {
+      this.tl.play();
+    }
+  }
+  const csDetailHero = new CsDetailHero();
   class InsightDetailHero extends TriggerSetupHero {
     constructor() {
       super();
@@ -1569,6 +1631,9 @@ const mainScript = () => {
     },
     caseStudyScript: () => {
       caseStudyHero.trigger();
+    },
+     csDetailScript: () => {
+      csDetailHero.trigger();
     }
   };
   const initGlobal = () => {
