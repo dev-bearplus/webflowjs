@@ -907,8 +907,15 @@ const mainScript = () => {
         initLang();
     }
     activeLanguage();
+    function checkFirstPathIsHK() {
+        var segments = window.location.pathname.split("/").filter(function(s) {
+            return s.length > 0;
+        });
+        return segments.length > 0 && segments[0].toLowerCase() === "hk-en";
+    }
+    console.log(checkFirstPathIsHK())
     let firstLoad = sessionStorage.getItem('firstLoad');
-    if(!firstLoad){
+    if(!firstLoad && !checkFirstPathIsHK()){
         let currentLang = $('html').attr('lang');
         let suggestedLanguage = suggestLanguage();
         if(currentLang != suggestedLanguage){
