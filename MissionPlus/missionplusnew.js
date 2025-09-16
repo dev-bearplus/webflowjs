@@ -987,17 +987,18 @@ const mainScript = () => {
       super.init(this.play.bind(this));
     }
     setup() {
-      
-    }
-    interact() {
-      const $all = $('[data-filter-item="all"]');
-      const $child = $('[data-filter-item="child"]');
+      console.log($('.insight-blog-item').length)
       if($('.insight-blog-item').length < 8) $('.insight-blog-viewmore').hide();
       $('.insight-blog-item').each((idx, item) => {
         if(idx > 6){
           $(item).addClass('view-more');
         }
       })
+    }
+    interact() {
+      const $all = $('[data-filter-item="all"]');
+      const $child = $('[data-filter-item="child"]');
+      
       $('.insight-blog-viewmore').on('click', function(){
         $('.insight-blog-item').removeClass('view-more')
         $(this).hide().addClass('hidden');
@@ -1206,6 +1207,14 @@ const mainScript = () => {
           $more.remove(); 
         }
       });
+      if($('.casestudy-profile-post-item').length <7){
+        $('.casestudy-profile-post-cms-btn').hide().addClass('hidden');
+      }
+      $('.casestudy-profile-post-item').each((idx, item) => {
+        if(idx > 5){
+          $(item).addClass('view-more');
+        }
+      })
     }
     interact() {
       const $all = $('[data-filter-item="all"]');
@@ -1215,14 +1224,6 @@ const mainScript = () => {
         window.location.href = link;
       })
       // Click child
-      if($('.casestudy-profile-post-item').length <4){
-        $('.casestudy-profile-post-cms-btn').hide().addClass('hidden');
-      }
-      $('.casestudy-profile-post-item').each((idx, item) => {
-        if(idx > 2){
-          $(item).addClass('view-more');
-        }
-      })
       $('.casestudy-profile-post-cms-btn').on('click', function(){
         $('.casestudy-profile-post-item').removeClass('view-more')
         
@@ -1348,21 +1349,12 @@ const mainScript = () => {
         console.log($root.find('h6'))
         $root.find('h6').each(function () {
           const $h6 = $(this);
-
-          // Lấy tất cả node giữa h6 hiện tại và h6 kế tiếp (không bao gồm h6 kế tiếp)
           const $block = $h6.nextUntil('h6');
-
-          // Tìm h3 đầu tiên trong khối làm "title"
           const $h3 = $block.filter('h3').first();
           const titleText = $h3.length ? $.trim($h3.text()) : '';
-
-          // "body" là toàn bộ HTML còn lại trong khối, trừ h3 (nếu có)
           const $bodyNodes = $block.not($h3);
-
-          // Ghép outerHTML của từng node lại thành một chuỗi HTML
           const bodyHTML = $bodyNodes
             .map(function () {
-              // outerHTML có trên hầu hết browser hiện đại
               return this.outerHTML || $('<div>').append($(this).clone()).html();
             })
             .get()
@@ -1391,6 +1383,53 @@ const mainScript = () => {
     }
   }
   const csDetailHero = new CsDetailHero();
+  class CsDetailBlog extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+      this.swiperTesti;
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      $('.cs-detail-blog-item-tag-list').each(function () {
+        const $list = $(this);
+        console.log($list)
+        const $items = $list.children('.cs-detail-blog-item-tag-item').toArray();
+        const lineHeight = $($items[0]).outerHeight(true) || 30;
+        const maxHeight = lineHeight  + parseRem(10);
+        $list.empty(); 
+        const $more = $(`
+          <div class="cs-detail-blog-item-tag-item more">
+            <div class="txt txt-14 cs-detail-blog-item-tag-item-txt">0+</div>
+          </div>
+        `);
+        $list.append($more);
+      
+        let hiddenCount = 0;
+      
+        $items.forEach(item => {
+          $more.before(item); 
+      
+          if ($list.height() > maxHeight) {
+            $(item).hide();
+            hiddenCount++;
+          }
+        });
+      
+        if (hiddenCount > 0) {
+          $more.find('.cs-detail-blog-item-tag-item-txt').text(`${hiddenCount}+`);
+        } else {
+          $more.remove(); 
+        }
+      });
+    }
+    interact() {
+      
+    }
+  }
+  const csDetailBlog = new CsDetailBlog('.cs-detail-blog');
   class InsightDetailHero extends TriggerSetupHero {
     constructor() {
       super();
@@ -1756,6 +1795,7 @@ const mainScript = () => {
     },
      csDetailScript: () => {
       csDetailHero.trigger();
+      csDetailBlog.trigger();
     }
   };
   const initGlobal = () => {
