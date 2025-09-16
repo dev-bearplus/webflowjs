@@ -582,6 +582,37 @@ const mainScript = () => {
     }
   }
   const homeTesti = new HomeTesti('.home-testi');
+  class HomeInsight extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+      this.swiperTesti;
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      if(viewport.w < 992) {
+        $('.home-insight-cms').addClass('swiper')
+        $('.home-insight-list').addClass('swiper-wrapper')
+        $('.home-insight-item').addClass('swiper-slide')
+        this.swiperTesti = new Swiper(".home-insight-cms", {
+          slidesPerView: 'auto',
+          speed: 600,
+          pagination: {
+            el: '.home-insight-pagi',
+            bulletClass: 'home-insight-pagi-item',
+            bulletActiveClass: 'active',
+            clickable: true,  
+          }
+        });
+      }
+    }
+    interact() {
+      
+    }
+  }
+  const homeInsight = new HomeInsight('.home-insight');
   class HomeCta extends TriggerSetup {
     constructor(triggerEl) {
       super(triggerEl);
@@ -642,6 +673,91 @@ const mainScript = () => {
     }
   }
   const industrySupport = new IndustrySupport('.industry-support');
+  class IndustryCasestudy extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+      this.swiperTesti;
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      $('.industry-casestudy-item .industry-casestudy-tag-list').each(function () {
+        const $list = $(this)
+        const $items = $list.children('.industry-casestudy-tag-item').toArray();
+        const maxWidth = $(this).closest('.industry-casestudy-tag-cms').width();;
+        console.log(maxWidth)
+        $list.empty(); // clear list
+      
+        
+        const $more = $(`
+          <div class="industry-casestudy-tag-item more">
+            <div class="txt txt-font-plex txt-14 industry-casestudy-tag-item-txt">0+</div>
+          </div>
+        `);
+        $list.append($more);
+        let hiddenCount = 0;
+      
+        $items.forEach(item => {
+          $more.before(item); 
+          console.log($list.width());
+          if ($list.width() >= maxWidth) {
+            $(item).hide();
+            hiddenCount++;
+          }
+        });
+      
+        if (hiddenCount > 0) {
+          $more.find('.industry-profile-post-item-tag-item-txt').text(`${hiddenCount}+`);
+        } else {
+          $more.remove(); 
+        }
+      });
+      this.swiperTesti = new Swiper(".industry-casestudy-cms", {
+        slidesPerView: 'auto',
+        speed: 600,
+        longSwipesRatio : 0,
+        threshold: 10,
+        navigation: {
+          prevEl: ".industry-casestudy-control-item-prev",
+          nextEl: ".industry-casestudy-control-item-next",
+        },
+       
+        pagination: {
+          el: '.industry-casestudy-control-pagi',
+          bulletClass: 'industry-casestudy-control-pagi-item',
+          bulletActiveClass: 'active',
+          clickable: true,  
+        },
+        breakpoints: {
+          991: {
+            slidesPerView: 2,
+              spaceBetween: parseRem(0),
+              pagination: {
+                el: '.industry-casestudy-control-number',
+                type: "fraction",
+                renderFraction: function (currentClass, totalClass) {
+                  return '<span class="' + currentClass + '"></span>' +
+                         ' / ' +
+                         '<span class="' + totalClass + '"></span>';
+                },
+                formatFractionCurrent: function (number) {
+                  return number+1; // ở đây bạn có thể -1 hoặc +0 nếu Swiper đang lệch
+                },
+                formatFractionTotal: function (number) {
+                  return number+1; // có thể chỉnh nếu tổng bị lệch
+                }
+              },
+          }
+        }
+      });
+    }
+    interact() {
+      
+    }
+  }
+  const industryCasestudy = new IndustryCasestudy('.industry-casestudy');
   class IndustryProfile extends TriggerSetup {
     constructor(triggerEl) {
       super(triggerEl);
@@ -1094,22 +1210,29 @@ const mainScript = () => {
     interact() {
       const $all = $('[data-filter-item="all"]');
       const $child = $('[data-filter-item="child"]');
+      $('.casestudy-profile-post-item').on('click', function(){
+        let link = $(this).find('.casestudy-profile-post-item-link').attr('href');
+        window.location.href = link;
+      })
       // Click child
+      if($('.casestudy-profile-post-item').length <4){
+        $('.casestudy-profile-post-cms-btn').hide().addClass('hidden');
+      }
       $('.casestudy-profile-post-item').each((idx, item) => {
-        if(idx > 5){
+        if(idx > 2){
           $(item).addClass('view-more');
         }
       })
       $('.casestudy-profile-post-cms-btn').on('click', function(){
         $('.casestudy-profile-post-item').removeClass('view-more')
-        $('.casestudy-profile-post-cms-line').hide();
+        
         $('.casestudy-profile-post-cms-btn').hide().addClass('hidden');
         setTimeout(scrollToTop, 100)
         setTimeout(activeItem, 10)
       })
       $child.on('click', function () {
         if(!$('.casestudy-profile-post-cms-btn').hasClass('hidden')){
-          $('.casestudy-profile-post-cms-line').hide();
+          $('.casestudy-profile-post-cms-btn').hide().addClass('hidden');
         }
         scrollToTop();
         $(this).toggleClass('active');
@@ -1138,11 +1261,9 @@ const mainScript = () => {
         }
         filterTextMob();
       });
-
       $all.on('click', function () {
         if(!$(this)) return;
         if(!$('.casestudy-profile-post-cms-btn').hasClass('hidden')){
-          $('.casestudy-profile-post-cms-line').hide();
           $('.casestudy-profile-post-cms-btn').hide().addClass('hidden');
         }
         scrollToTop();
@@ -1178,7 +1299,6 @@ const mainScript = () => {
             })
             .get()
             .join(', ');
-
         }
         else {
           textString= 'All';
@@ -1200,7 +1320,7 @@ const mainScript = () => {
         }
       }
       function activeItem() {
-        gsap.fromTo('.casestudy-profile-post-item', {autoAlpha: 0, y: 30}, {autoAlpha: 1, y: 0, duration: .6, stagger: .03})
+        gsap.fromTo('.casestudy-profile-post-item-inner', {autoAlpha: 0, y: 30}, {autoAlpha: 1, y: 0, duration: .6, stagger: .03})
       }
       
     }
@@ -1606,10 +1726,12 @@ const mainScript = () => {
       homeProduct.trigger();
       homeService.trigger();
       homeIndustry.trigger();
+      homeInsight.trigger();
       homeTesti.trigger();
     },
     industryScript: () => {
       industryProfile.trigger();
+      industryCasestudy.trigger();
       industrySupport.trigger();
     },
     contactScript: () => {
