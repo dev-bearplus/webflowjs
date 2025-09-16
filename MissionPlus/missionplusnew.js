@@ -1359,21 +1359,28 @@ const mainScript = () => {
             })
             .get()
             .join('');
-
+          const $lastNode = $bodyNodes.last();
+          const isImgLast = $lastNode.hasClass("w-richtext-figure-type-image");  
+          console.log($lastNode)
           out.push({
             label: $.trim($h6.text()),
             title: titleText,
-            body: bodyHTML
+            body: bodyHTML, 
+            isImgLast: isImgLast
           });
         });
         $root.hide();
         let contentItem = $('.cs-detail-hero-content').clone();
         $('.cs-detail-hero-content').remove();
+        out.reverse();
         out.forEach((item, idx) => {
           let contentItemClone = contentItem.clone();
           contentItemClone.find('.label-txt').text(item.label);
           contentItemClone.find('.cs-detail-hero-content-left-title').text(item.title);
           contentItemClone.find('.cs-detail-hero-content-right-inner').html(item.body);
+          if(viewport.w < 992 && item.isImgLast) {
+            contentItemClone.addClass('is-img-last')
+          }
           $root.after(contentItemClone);
         });
 
