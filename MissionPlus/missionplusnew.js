@@ -1431,6 +1431,21 @@ const mainScript = () => {
           $more.remove(); 
         }
       });
+      if(viewport.w < 992) {
+        $('.cs-detail-blog-cms').addClass('swiper')
+        $('.cs-detail-blog-list').addClass('swiper-wrapper')
+        $('.cs-detail-blog-item').addClass('swiper-slide')
+        let swiperBlog = new Swiper(".cs-detail-blog-cms", {
+          slidesPerView: 'auto',
+          speed: 600,
+          pagination: {
+            el: '.cs-detail-blog-pagi',
+            bulletClass: 'cs-detail-blog-pagi-item',
+            bulletActiveClass: 'active',
+            clickable: true,
+          },
+        });
+      }
     }
     interact() {
       
