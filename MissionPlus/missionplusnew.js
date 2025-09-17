@@ -1739,6 +1739,9 @@ const mainScript = () => {
       });
     }
     toggleColorMode = (color) => {
+      if ($('.header').hasClass('active')){
+        $('.header').removeClass('active')
+      }
       let elArr = Array.from($(`[data-section="${color}"]`));
       if (
         elArr.some(function (el) {
