@@ -1346,7 +1346,6 @@ const mainScript = () => {
     initContent() {
         const $root = $('.cs-detail-hero-richtext-inner');
         const out = [];
-        console.log($root.find('h6'))
         $root.find('h6').each(function () {
           const $h6 = $(this);
           const $block = $h6.nextUntil('h6');
@@ -1452,6 +1451,37 @@ const mainScript = () => {
     }
   }
   const csDetailBlog = new CsDetailBlog('.cs-detail-blog');
+  class CohostHow extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+      this.swiperTesti;
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      if(viewport.w < 992) {
+        $('.cohost-how-content-cms').addClass('swiper')
+        $('.cohost-how-content-list').addClass('swiper-wrapper')
+        $('.cohost-how-content-item').addClass('swiper-slide')
+        let swiperBlog = new Swiper(".cohost-how-content-cms", {
+          slidesPerView: 'auto',
+          speed: 600,
+          pagination: {
+            el: '.cohost-how-pagi',
+            bulletClass: 'cohost-how-pagi-item',
+            bulletActiveClass: 'active',
+            clickable: true,
+          },
+        });
+      }
+    }
+    interact() {
+      
+    }
+  }
+  const cohostHow = new CohostHow('.cohost-how');
   class InsightDetailHero extends TriggerSetupHero {
     constructor() {
       super();
@@ -1818,6 +1848,9 @@ const mainScript = () => {
      csDetailScript: () => {
       csDetailHero.trigger();
       csDetailBlog.trigger();
+    },
+    cohostScript: () => {
+      cohostHow.trigger();
     }
   };
   const initGlobal = () => {
