@@ -308,10 +308,12 @@ const script = () => {
             updateShowMore();
             checkEmpty();
         })
-        $('.subnav-link').each((_, link) => {
-            // if ($(`section#${$(link).attr('href').substring(1)}`).length === 0) {
-            //     $(link).addClass('w-condition-invisible');
-            // }
+        requestAnimationFrame(() => {
+            $('.subnav-link').each((_, link) => {
+                if ($(`section#${$(link).attr('href').substring(1)}`).hasClass('w-condition-invisible') || $(`section#${$(link).attr('href').substring(1)}`).length === 0) {
+                    $(link).addClass('w-condition-invisible');
+                }
+            })
         })
     }
     const pageName = $('main.main').attr('data-namespace');
