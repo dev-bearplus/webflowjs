@@ -4250,10 +4250,10 @@ const mainScript = () => {
             function updateSerProjUrl(data) {
                 let thisPage = $(data.next.container).find('[data-thumb-page]').attr('data-thumb-page')
                 let scIdx;
-                if (thisPage == 'branding') {scIdx = 1}
-                else if (thisPage == 'design-system') {scIdx = 2}
-                else if (thisPage == 'product-design') {scIdx = 3}
-                else if (thisPage == 'website-design') {scIdx = 4}
+                if (thisPage == 'branding') {scIdx = 3}
+                else if (thisPage == 'design-system') {scIdx = 5}
+                else if (thisPage == 'product-design') {scIdx = 6}
+                else if (thisPage == 'website-design') {scIdx = 7}
                 console.log(scIdx)
                 let allProjLinks = $(data.next.container).find('[data-change-url]')
                 allProjLinks.each((idx, el) => {
