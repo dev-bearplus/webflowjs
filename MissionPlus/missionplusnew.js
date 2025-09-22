@@ -1225,10 +1225,10 @@ const mainScript = () => {
     interact() {
       const $all = $('[data-filter-item="all"]');
       const $child = $('[data-filter-item="child"]');
-      $('.casestudy-profile-post-item').on('click', function(){
-        let link = $(this).find('.casestudy-profile-post-item-link').attr('href');
-        window.location.href = link;
-      })
+      // $('.casestudy-profile-post-item').on('click', function(){
+      //   let link = $(this).find('.casestudy-profile-post-item-link').attr('href');
+      //   window.location.href = link;
+      // })
       // Click child
       $('.casestudy-profile-post-cms-btn').on('click', function(){
         $('.casestudy-profile-post-item').removeClass('view-more')
