@@ -994,6 +994,12 @@ const mainScript = () => {
           $(item).addClass('view-more');
         }
       })
+      $('.insight-blog-filter-item[data-filter-item="child"]').each((idx, item) => {
+        let category = $(item).attr('data-category');
+        if($(`.insight-blog-item[data-category = ${category}]`).length == 0) {
+          $(item).hide();
+        }
+      })
     }
     interact() {
       const $all = $('[data-filter-item="all"]');
@@ -1739,9 +1745,6 @@ const mainScript = () => {
       });
     }
     toggleColorMode = (color) => {
-      if ($('.header').hasClass('active')){
-        $('.header').removeClass('active')
-      }
       let elArr = Array.from($(`[data-section="${color}"]`));
       if (
         elArr.some(function (el) {
