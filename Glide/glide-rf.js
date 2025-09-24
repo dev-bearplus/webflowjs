@@ -24,6 +24,9 @@ const script = () => {
     $('.bp-popup-close').on('click', function() {
         $('.bp-popup').removeClass('active')
     })
+    $('.form-filter').on('submit', function(e) {
+        e.preventDefault();
+    })
     const fetchProduct = (id) => {
         let data = [];
         return new Promise(async (resolve, reject) => {
