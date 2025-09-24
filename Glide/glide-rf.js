@@ -33,7 +33,7 @@ const script = () => {
                     const tempDiv = $('<div>').html(response).find('.main');
                     const itemInfo = {
                         slug: id,
-                        country: tempDiv.find('.for-nested-country').text().length > 0 ? [tempDiv.find('.for-nested-country').text()] : [],
+                        country: tempDiv.find('.for-nested-countries a').map(function() { return $(this).text().trim(); }).get(),
                         region: tempDiv.find('.for-nested-regions a').map(function() { return $(this).text().trim(); }).get(),
                         budget: tempDiv.find('.for-nested-budgets a').map(function() { return $(this).text().trim(); }).get(),
                         services: tempDiv.find('.for-nested-services a').map(function() { return $(this).text().trim(); }).get(),
@@ -224,9 +224,7 @@ const script = () => {
                     // Hide products that don't match ALL selected filters
                     products.forEach((product) => {
                         let productWrap = $(product).parent();
-                        // console.log(productWrap.find('.filter-data'))
                         let data = JSON.parse(productWrap.find('.filter-data').text());
-                        console.log(data)
                         let selectedValues = [...checkedCheckboxes].map(checkbox => $(checkbox).parent().find('span').text());
 
                         // Check if product has at least one match with selected filters
