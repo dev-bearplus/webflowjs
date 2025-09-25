@@ -102,8 +102,20 @@ const mainScript = () => {
   function isInHeaderCheck(el) {
     const rect = $(el).get(0).getBoundingClientRect();
     const headerRect = $(".header").get(0).getBoundingClientRect();
-    return rect.bottom >= 0 && rect.top - headerRect.height <= 0;
+    return rect.bottom >= headerRect.height && rect.top - headerRect.height <= 0;
   }
+  function isInMenuCheck(el) {
+    const rect = $(el).get(0).getBoundingClientRect();
+    const $joinMenu = $(".join-menu-wrap");
+    const joinMenu = $(".join-menu-wrap").get(0).getBoundingClientRect();
+    const joinMenuCssTop = parseFloat($joinMenu.css("top")) || 0 + 4;
+    const joinMenuPassed = joinMenu.top >= joinMenuCssTop ;
+    console.log(joinMenu.top)
+    if (joinMenuPassed) return true;
+
+    return rect.bottom >= joinMenu.height + joinMenuCssTop && rect.top - joinMenu.height <= 0;
+  }
+
   const distance = (x1, y1, x2, y2) => {
     return Math.hypot(x2 - x1, y2 - y1);
   };
@@ -350,9 +362,7 @@ const mainScript = () => {
 
             let targetGap = parseRem(8);
             if ($("[data-cursor]:hover").attr("data-cursor-txtLink-gap")) {
-              targetGap = $("[data-cursor]:hover").attr(
-                "data-cursor-txtLink-gap"
-              );
+              targetGap = $("[data-cursor]:hover").attr("data-cursor-txtLink-gap");
             }
             if ($("[data-cursor]:hover").attr("data-cursor-txtLink-trans")) {
               $('[data-cursor]:hover[data-cursor-txtLink-trans] .txt').css('transform', `translateX(8px)`)
@@ -1692,6 +1702,72 @@ const mainScript = () => {
     }
   }
   const howTesti = new HowTesti('.how-testi');
+  class JointMissionMenu extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+      this.swiperTesti;
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      
+    }
+    interact() {
+      $('.join-menu-item').on('click', function() {
+        $('.join-menu-item').removeClass('active');
+        $(this).addClass('active');
+        let idScroll = '#' + $(this).attr('data-scroll');
+        console.log($(idScroll))
+        scrollItem(idScroll)
+      })
+      function scrollItem(el) {
+      lenis.scrollTo(el, {
+        duration: 1, 
+        offset: parseRem(72)
+      })
+    }
+    }
+    toggleColorMode = (color) => {
+      let elArr = Array.from($(`[data-section="${color}"]`));
+      console.log(elArr.some(function (el) {
+          return isInMenuCheck(el);
+        }))
+      if (
+        elArr.some(function (el) {
+          return isInMenuCheck(el);
+        })
+      ) {
+        $(".join-menu-wrap").addClass(`on-${color}`);
+      } else {
+        $(".join-menu-wrap").removeClass(`on-${color}`);
+
+      }
+    }
+    
+  }
+  const jointMissionMenu = new JointMissionMenu('.join-menu');
+  class JointMissionWork extends TriggerSetup {
+    constructor(triggerEl) {
+      super(triggerEl);
+      this.swiperTesti;
+    }
+    trigger() {
+      super.setTrigger(this.setup.bind(this));
+      this.interact();
+    }
+    setup() {
+      
+    }
+    interact() {
+      $('.join-work-body-item').on('click', function() {
+        $(this).toggleClass('active');
+        $(this).find('.join-work-body-item-body').slideToggle();
+      })
+    }
+  }
+  const jointMissionWork = new JointMissionWork('.join-work');
   class Header extends TriggerSetupHero {
     constructor() {
       super();
@@ -1857,6 +1933,10 @@ const mainScript = () => {
     },
     cohostScript: () => {
       cohostHow.trigger();
+    }, 
+    joinMissionScript: () => {
+      jointMissionWork.trigger();
+      jointMissionMenu.trigger();
     }
   };
   const initGlobal = () => {
@@ -1868,14 +1948,14 @@ const mainScript = () => {
     if (pageName) {
       SCRIPT[`${pageName}Script`]();
     }
-    // header.toggleOnScroll(lenis);
-    // header.toggleColorMode('white');
+    let isHasMenuSticky = $('.main').attr('hasMenuSticky');
+    let menuSticky = $('[menuStickyMain]');
     header.toggleColorMode("blue");
     lenis.on("scroll", function (inst) {
       header.toggleColorMode("blue");
-      // header.toggleHide(inst);
-      // header.toggleOnScroll(lenis);
-      // header.toggleOnHide(inst);
+      if(pageName == 'joinMission') {
+        jointMissionMenu.toggleColorMode('blue')
+      }
     });
   };
   if (window.scrollY > 0) {
