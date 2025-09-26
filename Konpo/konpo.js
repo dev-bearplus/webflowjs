@@ -1665,6 +1665,7 @@ const mainScript = () => {
         }
     }
     function loaderDefault(data, animationSettings) {
+        console.log('loader default')
         let counter3 = $('.loader-counter-3');
         for (let i = 0; i < 2; i++) {
             for (let j = 0; j < 10; j++) {
@@ -1701,7 +1702,7 @@ const mainScript = () => {
             let lastImages;
             allClientCard.each((idx, card) => {
                 if ($(window).width() >= 768) {
-                    if (isStaging) {
+                    if (true) {
                         lastImages = $('.home-hero-client-item-inner').eq(allClientCard.length - 1).find('img').attr('src')
                         if (idx != 0) {
                             let leftRect = card.getBoundingClientRect().left - $('.home-hero-client-inner').get(0).getBoundingClientRect().left
@@ -1762,7 +1763,7 @@ const mainScript = () => {
                 let scaleFactor, distanceX, distanceY;
                 if ($(window).width() > 991) {
                     scaleFactor = $(window).height() / $('.loader-img-inner').height();
-                    if (isStaging) {
+                    if (true) {
                         distanceX = ($(window).width() - $('.loader-img-inner').width() - parseRem(40) - parseRem(80)) * -1;
                     } else {
                         distanceX = $(window).width() - $('.loader-img-inner').width() - parseRem(40);
@@ -1770,7 +1771,7 @@ const mainScript = () => {
                     distanceY = $(window).height() - $('.loader-img-inner').height() - parseRem(40);
                 } else if ($(window).width() > 767) {
                     scaleFactor = ($(window).width() / $('.loader-img-inner').width()) * 1.5;
-                    if (isStaging) {
+                    if (true) {
                         distanceX = ($(window).width() - $('.loader-img-inner').width() - parseRem(40)) * -1;
                     } else {
                         distanceX = $(window).width() - $('.loader-img-inner').width() - parseRem(40);
@@ -2393,7 +2394,7 @@ const mainScript = () => {
                         tl
                         .set('.home-hero-title, .home-hero-sub', {opacity: 1})
                         .to(homeHeroTitle.words, {yPercent: 0, duration: .6, stagger: .03})
-                        .to('.home-hero-client-item', {'transition-property': 'none', clearProps: 'transition-property', x: 0, duration: .88, stagger: isStaging ? -.08 : $(window).width() >= 768 ? .08 : -.08, ease: 'power2.out'}, 0)
+                        .to('.home-hero-client-item', {'transition-property': 'none', clearProps: 'transition-property', x: 0, duration: .88, stagger: true ? -.08 : $(window).width() >= 768 ? .08 : -.08, ease: 'power2.out'}, 0)
                         .to('.home-hero-client-item-label', {autoAlpha: 1, duration: .6, stagger: .03}, '<=0.2')
                         .to('.home-hero-client-item-title', {autoAlpha: 1, duration: .6, stagger: .03, onComplete: () => {
                             gsap.set('.home-hero-client-inner', {clearProps: 'all'})
@@ -2470,7 +2471,7 @@ const mainScript = () => {
             function homeHeroClient() {
                 if ($(window).width() >= 768) {
                     let maxHeight; 
-                    if (isStaging) {
+                    if (true) {
                         maxHeight = $('.home-hero-client-cms-wrap').outerHeight()
                     } else {
                         maxHeight = $('.home-hero-client-cms').outerHeight()
@@ -2484,7 +2485,7 @@ const mainScript = () => {
                             scrub: true
                         }
                     })
-                    if (isStaging) {
+                    if (true) {
                         tl
                         .to('.home-hero-client-cms', {y: parseRem(45), height: maxHeight, ease: 'none'})
                         $('.home-hero-client-cms').addClass('swiper')
