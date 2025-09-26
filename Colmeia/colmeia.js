@@ -1509,7 +1509,7 @@ const mainScript = () => {
                     let videoId = iframeSrc.pathname.split('/').pop();
                     let nameVideo = $('.home-hero-thumb-vid-inner').attr('data-name-video');
                     let demoPlayerState = null;
-                    $('.home-hero-thumb-btn a').on('click', function(e) {
+                    $('.home-hero-thumb-vid').on('click', function(e) {
                         e.preventDefault();
                         if (!homePlayer) {
                             homePlayer = new YT.Player($('.home-hero-thumb-vid-inner').get(0), {
@@ -1530,8 +1530,8 @@ const mainScript = () => {
                                     gsap.to('.home-hero-thumb-overlay, .home-hero-thumb-btn', {
                                         autoAlpha: 0,
                                         onComplete: () => {
-                                        $('.home-hero-thumb-overlay').remove();
-                                        $('.home-hero-thumb-btn').remove();
+                                            $('.home-hero-thumb-overlay').remove();
+                                            $('.home-hero-thumb-btn').remove();
                                         }
                                     });
                                 },
@@ -1555,12 +1555,11 @@ const mainScript = () => {
                             gsap.to('.home-hero-thumb-overlay, .home-hero-thumb-btn', {
                                 autoAlpha: 0,
                                 onComplete: () => {
-                                $('.home-hero-thumb-overlay').remove();
-                                $('.home-hero-thumb-btn').remove();
+                                    $('.home-hero-thumb-overlay').remove();
+                                    $('.home-hero-thumb-btn').remove();
                                 }
                             });
                         }
-
                     });
                 }
                 scHero();
@@ -2342,7 +2341,7 @@ const mainScript = () => {
                     let prodPlayer;
                     let demoPlayerState = null;
                     let nameVideo = $('.prod-hero-thumb-vid-inner').attr('data-name-video');
-                    $('.prod-hero-thumb-btn a').on('click', function (e) {
+                    $('.prod-hero-thumb-vid').on('click', function (e) {
                         e.preventDefault();
                         const iframeId = $('.prod-hero-thumb-vid-inner').attr('data-iframe-id');
                         if (!prodPlayer) {
@@ -2364,8 +2363,8 @@ const mainScript = () => {
                                     gsap.to('.prod-hero-thumb-overlay, .prod-hero-thumb-btn', {
                                         autoAlpha: 0,
                                         onComplete: () => {
-                                        $('.prod-hero-thumb-overlay').remove();
-                                        $('.prod-hero-thumb-btn').remove();
+                                            $('.prod-hero-thumb-overlay').remove();
+                                            $('.prod-hero-thumb-btn').remove();
                                         }
                                     });
                                 },
@@ -2387,10 +2386,10 @@ const mainScript = () => {
                             gsap.to('.prod-hero-thumb-overlay, .prod-hero-thumb-btn', {
                                 autoAlpha: 0,
                                 onComplete: () => {
-                                $('.prod-hero-thumb-overlay').remove();
-                                $('.prod-hero-thumb-btn').remove();
-                            }
-                        });
+                                    $('.prod-hero-thumb-overlay').remove();
+                                    $('.prod-hero-thumb-btn').remove();
+                                }
+                            });
                         }
                     });
 
