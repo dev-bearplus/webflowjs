@@ -189,9 +189,6 @@ const mainScript = () => {
         $('.header-logo').width($('.header-reg').width())
         requestAnimationFrame(updateHeaderStatusWidth)
     }
-    function isStagging() {
-        return window.location.href.indexOf('webflow') > -1 ? true : false
-    }
     updateTime();
     updateHello()
     updateHeaderMobile()
@@ -725,6 +722,7 @@ const mainScript = () => {
                 let cursorX = xGetter('.cursor')
                 let cursorY = yGetter('.cursor')
                 updateIdle(cursorX)
+                handleCursor.reset()
                 if ($('[data-cursor]:hover').length) {
                     let type = $('[data-cursor]:hover').attr('data-cursor')
                         switch (type) {
@@ -889,7 +887,6 @@ const mainScript = () => {
                             break;
                         }
                 } else {
-                    handleCursor.reset()
                     gotBtnSize = false;
                 }
 
@@ -940,46 +937,10 @@ const mainScript = () => {
             $('.cursor-wrap').addClass('hidden')
         },
         reset: () => {
-            if ($('.cursor-inner').hasClass('on-hover')) {
-                //Social + Ext + Expand
-                $('.cursor-inner').removeClass('on-hover')
-                if ($('.cursor-inner .cursor-ic').hasClass('active')) {
-                    $('.cursor-inner .cursor-ic').removeClass('active')
-                }
-                $('.cursor-inner .cursor-video').find('.cursor-txt-case').removeClass('active')
-                $('.cursor-inner .cursor-video').find('.cursor-txt-close').removeClass('active')
-                //Drag
-                $('.cursor-inner .cursor-video').find('.cursor-txt-drag').removeClass('active')
-            } else if ($('.cursor-inner').hasClass('on-hover-sm')) {
-                //txtLink
-                $('.cursor-inner').removeClass('on-hover-sm')
-            } else if ($('.cursor-inner').hasClass('on-hover-md')) {
-                // ProjDtl-Expand
-                if ($('[data-cursor="expand-md"]').hasClass('active')) {
-                } else {
-                    $('.cursor-inner .cursor-ic').removeClass('active')
-                    $('.cursor-inner').removeClass('on-hover-md')
-                }
-            } else if ($('.cursor-inner').hasClass('on-hover-md-sm')) {
-                // Comming Project Summary Thumb
-                $('.cursor-inner .cursor-ic').removeClass('active').removeClass('mod-20')
-                $('.cursor-inner').removeClass('on-hover-md-sm')
-            } else if ($('.cursor-inner').hasClass('on-hidden')) {
-                //hidden
-                $('.cursor-inner').removeClass('on-hidden')
-            } else if ($('.cursor-inner').hasClass('on-hover-btn')) {
-                $('.cursor-inner').removeClass('on-hover-btn')
-            } else if ($('.cursor-inner').hasClass('on-hover-video')) {
-                $('.cursor-inner').removeClass('on-hover-video')
-                $('.cursor-inner .cursor-video').find('.cursor-video-play, .cursor-video-pause').removeClass('active')
-            } else if ($('.cursor-inner').hasClass('on-hover-soon')) {
-                $('.cursor-inner').removeClass('on-hover-soon')
-                $('.cursor-inner .cursor-video').find('.cursor-txt-soon').removeClass('active')
-            } else if ($('.cursor-inner').hasClass('on-hover-img')) {
-                $('.cursor-inner').removeClass('on-hover-img')
-                $('.cursor-inner').removeClass('on-hidden');
-                $('.cursor-img').removeClass('active')
-            }
+            $('.cursor-inner').removeClass('on-hover on-hover-sm on-hover-md on-hover-md-sm on-hidden on-hover-btn on-hover-video on-hover-soon on-hover-img')
+            $('.cursor-inner .cursor-ic').removeClass('active mod-20')
+            $('.cursor-inner .cursor-video').find('.cursor-txt-case, .cursor-txt-close, .cursor-txt-drag, .cursor-video-play, .cursor-video-pause, .cursor-txt-soon').removeClass('active')
+            $('.cursor-img').removeClass('active')
         }
     }
     if ($(window).width() > 767 && !isTouchDevice()) {
@@ -1693,37 +1654,34 @@ const mainScript = () => {
         }
         let videoRefEl;
         let allClientCard;
+        let startElement = $('.loader-imgs-wrap')
+        let targetElement = $('.home-hero-client-item-inner').eq(1);
+        if ($(window).width() < 767) {
+            targetElement = $('.home-hero-client-item-inner').eq(0)
+        }
         if ($('.home-hero-thumb').length > 0) {
             videoRefEl = $('.home-hero-thumb')
         } else {
             $('.home-hero-client-inner').css('pointer-events', 'none')
-            allClientCard = $('.home-hero-client-item')
+            allClientCard = $('.home-hero-client-item-inner')
             videoRefEl = $('.home-hero-client-item-inner').eq(allClientCard.length - 1)
             let lastImages;
             allClientCard.each((idx, card) => {
-                if ($(window).width() >= 768) {
-                    if (true) {
-                        lastImages = $('.home-hero-client-item-inner').eq(allClientCard.length - 1).find('img').attr('src')
-                        if (idx != 0) {
-                            let leftRect = card.getBoundingClientRect().left - $('.home-hero-client-inner').get(0).getBoundingClientRect().left
-                            gsap.set(card, {x: leftRect * -1})
-                        }
-                    } else {
-                        lastImages = $('.home-hero-client-item-inner').eq(0).find('img').attr('src')
-                        $(card).css('z-index', allClientCard.length - idx)
-                        if (idx != (allClientCard.length - 1)) {
-                            let rightRect = $(window).width() - card.getBoundingClientRect().right - parseRem(20)
-                            console.log(rightRect)
-                            gsap.set(card, {x: rightRect})
-                        }
-                    }
+                if ($(window).width() >= 767) {
+                    // Pre-arrage cards positions
+                    lastImages = targetElement.find('img').attr('src')
+                    if (idx == 1) {
+                        gsap.set(card.closest('.home-hero-client-item'), {zIndex: 10})
+                    } 
+                    let startPosition = targetElement.get(0).getBoundingClientRect().left - card.getBoundingClientRect().left
+                    gsap.set(card, {x: startPosition })
                 } else {
                     lastImages = $('.home-hero-client-item-inner').eq(allClientCard.length - 1).find('img').attr('src')
-                    if (idx != 0) {
-                        let leftRect = card.getBoundingClientRect().left - parseRem(20)
-                        console.log(leftRect)
-                        gsap.set(card, {x: leftRect * -1})
-                    }
+                    if (idx == allClientCard.length - 1) {
+                        gsap.set(card.closest('.home-hero-client-item'), {zIndex: 10})
+                    } 
+                    let startPosition = targetElement.get(0).getBoundingClientRect().left - card.getBoundingClientRect().left
+                    gsap.set(card, {x: startPosition })
                 }
             })
             $('.loader-img-inner').eq($('.loader-img-inner').length - 1).find('img').attr('src', lastImages).attr('srcset', lastImages)
@@ -1763,25 +1721,14 @@ const mainScript = () => {
                 let scaleFactor, distanceX, distanceY;
                 if ($(window).width() > 991) {
                     scaleFactor = $(window).height() / $('.loader-img-inner').height();
-                    if (true) {
-                        distanceX = ($(window).width() - $('.loader-img-inner').width() - parseRem(40) - parseRem(80)) * -1;
-                    } else {
-                        distanceX = $(window).width() - $('.loader-img-inner').width() - parseRem(40);
-                    }
-                    distanceY = $(window).height() - $('.loader-img-inner').height() - parseRem(40);
                 } else if ($(window).width() > 767) {
                     scaleFactor = ($(window).width() / $('.loader-img-inner').width()) * 1.5;
-                    if (true) {
-                        distanceX = ($(window).width() - $('.loader-img-inner').width() - parseRem(40)) * -1;
-                    } else {
-                        distanceX = $(window).width() - $('.loader-img-inner').width() - parseRem(40);
-                    }
-                    distanceY = $(window).height() - $('.loader-img-inner').height() - parseRem(40);
                 } else {
                     scaleFactor = ($(window).width() / $('.loader-img-inner').width()) * 2;
-                    distanceX = 0;
-                    distanceY = videoRefEl.get(0).getBoundingClientRect().top - parseRem(20);
                 }
+                
+                distanceX = targetElement.get(0).getBoundingClientRect().left - startElement.get(0).getBoundingClientRect().left
+                distanceY = targetElement.get(0).getBoundingClientRect().top - startElement.get(0).getBoundingClientRect().top
                 $('.loader-img-inner').each((idx, el) => {
                     let childTl = gsap.timeline({
                         onComplete: () => {
@@ -1799,9 +1746,9 @@ const mainScript = () => {
                         },
                     })
                     childTl
-                    .to($(el), {scale: scaleFactor / 2, duration: animationSettings.duration/2, ease: 'power4.in',
-                        x: distanceX / 2,
-                        y: distanceY / 2
+                    .to($(el), {scale: scaleFactor * .5, duration: animationSettings.duration/2, ease: 'power4.in',
+                        x: distanceX * .5,
+                        y: distanceY * .5
                     }, animationSettings.itemDelay * idx)
                     .to($(el), {scale: 1, duration: animationSettings.duration/2 , ease: 'power4',
                         x: distanceX,
@@ -2356,11 +2303,9 @@ const mainScript = () => {
                 const homeHeroTitle = new SplitText('.home-hero-title', typeOpts.words)
                 const homeHeroSub = new SplitText('.home-hero-sub', typeOpts.words)
                 const homeHeroCap = new SplitText('.home-hero-cap', typeOpts.words)
-                const homeHeroLabel = new SplitText('.home-hero-label', typeOpts.words)
                 gsap.set(homeHeroTitle.words, {yPercent: 100})
-                gsap.set(homeHeroLabel.words, {yPercent: 100})
                 gsap.set(homeHeroSub.words, {yPercent: 100})
-                gsap.set(homeHeroCap.words, {yPercent: 100})
+
                 gsap.set('.home-hero-client-item-label, .home-hero-client-item-title', {autoAlpha: 0})
                 function checkToStart() {
                     if (allowAnim) {
@@ -2394,15 +2339,18 @@ const mainScript = () => {
                         tl
                         .set('.home-hero-title, .home-hero-sub', {opacity: 1})
                         .to(homeHeroTitle.words, {yPercent: 0, duration: .6, stagger: .03})
-                        .to('.home-hero-client-item', {'transition-property': 'none', clearProps: 'transition-property', x: 0, duration: .88, stagger: true ? -.08 : $(window).width() >= 768 ? .08 : -.08, ease: 'power2.out'}, 0)
+                        .fromTo('.home-hero-title .txt-disable', {'--line-scaleX': 0 }, {'--line-scaleX': 1, duration: 1 }, "<=.3")
+
+                        .to('.home-hero-client-item-inner', {'transition-property': 'none', clearProps: 'transition-property', x: 0, duration: .88, ease: 'power2.out'}, 0)
                         .to('.home-hero-client-item-label', {autoAlpha: 1, duration: .6, stagger: .03}, '<=0.2')
                         .to('.home-hero-client-item-title', {autoAlpha: 1, duration: .6, stagger: .03, onComplete: () => {
                             gsap.set('.home-hero-client-inner', {clearProps: 'all'})
                         }}, '<=0.2')
+
                         .to(homeHeroSub.words, {yPercent: 0, duration: .6, stagger: .03}, '<=.2')
-                        .from('.home-hero-sub-wrap .line', {scaleX: 0, transformOrigin: 'left', duration: .6, clearProps: 'all'}, '<=.2')
-                        .from('.home-hero-award svg path', {autoAlpha: 0, drawSVG: '50% 50%', duration: .6, stagger: .1}, '<=0')
-                        .to(homeHeroCap.words, {yPercent: 0, duration: .4, stagger: .02}, '<=.2')
+                        .from('.home-hero-sub-wrap svg path', {autoAlpha: 0, drawSVG: '50% 50%', duration: .6, stagger: .1}, '<=0')
+                        .from('.home-hero-sub .hover-un', {'--line-width': '0%', duration: 1 }, "<=.5")
+
 
                         if (!comingToHome) {
                             tl
@@ -2417,8 +2365,6 @@ const mainScript = () => {
                         }
 
                         tl
-                        .to(homeHeroLabel.words, {yPercent: 0, duration: .6, stagger: .1}, '0')
-                        .from('.home-hero-label-wrap .line', {scaleX: 0, transformOrigin: 'left', duration: 1.1, clearProps: 'all'}, '<=0')
                         .from('.bg-dots.home-vid-dots', {autoAlpha: 0, duration: .6}, "<=0")
                         //.from('.home-hero-thumb img', {scale: 1.2, duration: .6, clearProps: 'all'}, "<=0")
                     } else {
@@ -2469,13 +2415,47 @@ const mainScript = () => {
             }
             
             function homeHeroClient() {
-                if ($(window).width() >= 768) {
-                    let maxHeight; 
-                    if (true) {
-                        maxHeight = $('.home-hero-client-cms-wrap').outerHeight()
-                    } else {
-                        maxHeight = $('.home-hero-client-cms').outerHeight()
+                // Setup
+                $('.home-hero-client-item-inner').each((index, el) => {
+                    let elUrl = $(el).attr('href');
+                    let hasDetail = elUrl != '#' && elUrl != '' || elUrl.includes('work')
+                    if (!hasDetail) {
+                        let newUrl = $(el).attr('data-url-ext')
+                        console.log(newUrl)
+                        if (newUrl != '#' && newUrl != '') {
+                            $(el).attr('href', newUrl)
+                            $(el).attr('target','_blank')
+                            $(el).attr('data-cursor', 'ext')
+                        } else {
+                            $(el).attr('data-cursor', 'soon')
+                        }
                     }
+                })
+                $('.client-news-info-list').each((index, el) => {
+                    let tempHtml = $(el).find('.client-news-info-item').clone()
+                    let temp = tempHtml.clone()
+                    $(el).find('.client-news-info-item').remove()
+                    let dataList = $(el).find('.client-news-info-list-data li')
+                    console.log($(el))
+                    if (!dataList || dataList.length == 0) {
+                        $(el).remove()
+                    } else {
+                        dataList.each((index, data) => {
+                            let dataItem = temp.clone()
+                            let names = data.innerHTML.split('-')
+                            $(dataItem).find('.client-news-info-item-label').html(names[0].trim())
+                            $(dataItem).find('.client-news-info-item-txt').html(names[1].trim())
+                            if ($(dataItem).find('a').length > 0) {
+                                $(dataItem).find('a').addClass('hover-un').attr('data-cursor', 'txtLink')
+                            }
+                            $(dataItem).appendTo($(el))
+                        })
+                    }
+                })
+                // Anim on Scroll
+                if ($(window).width() >= 767) {
+                    let maxHeight; 
+                    maxHeight = $('.home-hero-client-cms-wrap').get(0).getBoundingClientRect().height
                     let tl = gsap.timeline({
                         scrollTrigger: {
                             trigger: '.home-hero',
@@ -2485,35 +2465,29 @@ const mainScript = () => {
                             scrub: true
                         }
                     })
-                    if (true) {
-                        tl
-                        .to('.home-hero-client-cms', {y: parseRem(45), height: maxHeight, ease: 'none'})
-                        $('.home-hero-client-cms').addClass('swiper')
-                        $('.home-hero-client-inner').addClass('swiper-wrapper')
-                        $('.home-hero-client-item').addClass('swiper-slide')
-                        let swiper = new Swiper('.home-hero-client-cms', {
-                            slidesPerView: 'auto',
-                            watchSlidesProgress: true,
-                        })
-                    } else {
-                        tl
-                        .to('.home-hero-client-inner', {y: parseRem(45), height: maxHeight, ease: 'none'})
-                    }
+                    tl
+                    .to('.home-hero-client-item', { width: 100/3+'%', ease: 'none', duration: 1})
+                    .to('.home-hero-client-cms', {y: 0, height: maxHeight, ease: 'none', duration: 1}, 0)
+                    .fromTo('.home-hero-client-item-content-inner', { scale: 1 }, { scale: 1.5, duration: 1, ease: 'none' }, 0)
+                    .fromTo('.home-hero-client-item-logo', { autoAlpha: 0 }, { autoAlpha: 1, duration: .6, ease: 'none' }, .4)
                 }
-                if ($(window).width() >= 768) {
+                // Interaction
+                $('.home-hero-client-item-inner').on('click', function(e) {
+                    openModal(e, this)
+                })
+                $('.client-news-overlay').on('click', function(e) {
+                    e.preventDefault();
+                    closeModal()
+                })
+                $('.client-news-label-hide').on('click', function(e) {
+                    e.preventDefault();
+                    closeModal()
+                })
+                if ($(window).width() >= 767) {
                     if (isTouchDevice()) {
-                        $('.home-hero-client-item').on('click', function(e) {
-                            e.preventDefault();
-                            let video = $(this).find('video').get(0);
-                            if (video.querySelector('source').getAttribute('src') != '' & video.paused) {
-                                // Pause all videos first
-                                $('.home-hero-client-item video').each(function() {
-                                    this.pause();
-                                });
-                                video.currentTime = 0;
-                                video.play();
-                            }
-                        });
+                        // $('.home-hero-client-item').on('click', function(e) {
+                        //     openModal(e, this);
+                        // });
                     } else {
                         $('.home-hero-client-item').on('mouseenter', function(e) {
                             e.preventDefault();
@@ -2541,6 +2515,25 @@ const mainScript = () => {
                         video.currentTime = 0
                         video.play()
                     })
+                }
+                function closeModal() {
+                    $('.client-news-wrap').removeClass('active')
+                    lenis.start()
+                }
+                function openModal(e ,el) {
+                    let elUrl = $(el).attr('href');
+                    let hasDetail = elUrl != '#' && elUrl != '' || elUrl.includes('work')
+                    let hasExternalLink = elUrl.includes('http')
+                    if (hasExternalLink) { return }
+                    if (hasDetail) { return }
+                    e.preventDefault();
+                    let index = $(el).closest('.home-hero-client-item').index()
+                    let modalEl = $('.client-news-wrap').eq(index)
+                    console.log(modalEl)
+                    if (modalEl.length > 0 && !modalEl.hasClass('active')) {
+                        lenis.stop()
+                        modalEl.addClass('active')
+                    }
                 }
             }
             if ($('.home-hero-client-cms').length > 0) {
@@ -2575,9 +2568,7 @@ const mainScript = () => {
                     
                     const homeAbtLabel = new SplitText('.home-abt-label', typeOpts.words)
                     const homeAbtSubTxt = new SplitText('.home-abt-sub-wrap-p', typeOpts.words)
-                    if (isStagging()) {
-                        gsap.set(allLinksLine, {'--line-width': '0%'})    
-                    }
+                    gsap.set(allLinksLine, {'--line-width': '0%'})    
                     
                     gsap.set(homeAbtSubTxt.lines, {overflow: 'hidden'})
                     let tlAbt = gsap.timeline({
@@ -2589,15 +2580,10 @@ const mainScript = () => {
                             ease: gOpts.ease
                         },
                         onComplete: () => {
-                            if (isStagging()) {
-                                gsap.to(allLinksLine, {'--line-width': '100%', duration: .6, clearProps: 'all', onComplete: () => {
-                                    homeAbtLabel.revert()
-                                    homeAbtSubTxt.revert()
-                                }})
-                            } else {
+                            gsap.to(allLinksLine, {'--line-width': '100%', duration: .6, clearProps: 'all', onComplete: () => {
                                 homeAbtLabel.revert()
                                 homeAbtSubTxt.revert()
-                            }
+                            }})
                         }
                     })
                     tlAbt
@@ -2814,150 +2800,98 @@ const mainScript = () => {
                     once: true,
                     onEnter: () => {
                         if ($(window).width() > 991) {
-                            if (isStagging()) {
-                                let startIdx = 0;
-                                gsap.set('.home-testi-item', {paddingBottom: 0})
-                                gsap.set($('.home-testi-item').eq(startIdx), {paddingBottom: '3.2rem'})
-                                gsap.set('.home-testi-item-body', {height: 0})
-                                gsap.set($('.home-testi-item-body').eq(startIdx), {height: 'auto'})
-                                // gsap.set('.home-testi-bg', {autoAlpha: 0})
-                                // gsap.set($('.home-testi-bg').eq(startIdx), {autoAlpha: 1})
-                                gsap.set('.home-testi-item-body-inner-bg', {yPercent: -20})
-                                gsap.set($('.home-testi-item-body-inner-bg').eq(0), {yPercent: 0})
-                                gsap.set('.home-testi-item-content', {yPercent: 10})
-                                gsap.set($('.home-testi-item-content').eq(0), {yPercent: 0})
-                                // gsap.set('.home-testi-item-head', {height: '8.16rem', paddingBottom: '2rem'})
-                                // gsap.set($('.home-testi-item-head').eq(startIdx), {height: '2rem', paddingBottom: '0'})
-                                // gsap.set('.home-testi-item-title', {autoAlpha: 1, scale: 1, y: 0, transformOrigin: 'left top'})
-                                // gsap.set($('.home-testi-item-title').eq(startIdx), {autoAlpha: 0, scale: .8, y: '2rem'})
-                                // gsap.set('.home-testi-item-job', {autoAlpha: 1, scale: 1, y: 0, transformOrigin: 'right top'})
-                                // gsap.set($('.home-testi-item-job').eq(startIdx), {autoAlpha: 0, scale: .8, y: '2rem'})
-                                let tlScrub = gsap.timeline({
-                                    scrollTrigger: {
-                                        trigger: '.home-testi',
-                                        start: 'top top',
-                                        end: 'bottom bottom',
-                                        scrub: .2,
-                                        snap: {
-                                            // To update exact position and check directional
-                                            snapTo: [0.07, .3, .6, .91],
-                                            duration: { min: 0.1, max: 1 },
-                                            delay: 0.01,
-                                        },
-                                        onUpdate: (self) => {
-                                        }
+                            let startIdx = 0;
+                            gsap.set('.home-testi-item', {paddingBottom: 0})
+                            gsap.set($('.home-testi-item').eq(startIdx), {paddingBottom: '3.2rem'})
+                            gsap.set('.home-testi-item-body', {height: 0})
+                            gsap.set($('.home-testi-item-body').eq(startIdx), {height: 'auto'})
+                            // gsap.set('.home-testi-bg', {autoAlpha: 0})
+                            // gsap.set($('.home-testi-bg').eq(startIdx), {autoAlpha: 1})
+                            gsap.set('.home-testi-item-body-inner-bg', {yPercent: -20})
+                            gsap.set($('.home-testi-item-body-inner-bg').eq(0), {yPercent: 0})
+                            gsap.set('.home-testi-item-content', {yPercent: 10})
+                            gsap.set($('.home-testi-item-content').eq(0), {yPercent: 0})
+                            // gsap.set('.home-testi-item-head', {height: '8.16rem', paddingBottom: '2rem'})
+                            // gsap.set($('.home-testi-item-head').eq(startIdx), {height: '2rem', paddingBottom: '0'})
+                            // gsap.set('.home-testi-item-title', {autoAlpha: 1, scale: 1, y: 0, transformOrigin: 'left top'})
+                            // gsap.set($('.home-testi-item-title').eq(startIdx), {autoAlpha: 0, scale: .8, y: '2rem'})
+                            // gsap.set('.home-testi-item-job', {autoAlpha: 1, scale: 1, y: 0, transformOrigin: 'right top'})
+                            // gsap.set($('.home-testi-item-job').eq(startIdx), {autoAlpha: 0, scale: .8, y: '2rem'})
+                            let tlScrub = gsap.timeline({
+                                scrollTrigger: {
+                                    trigger: '.home-testi',
+                                    start: 'top top',
+                                    end: 'bottom bottom',
+                                    scrub: .2,
+                                    snap: {
+                                        // To update exact position and check directional
+                                        snapTo: [0.07, .3, .6, .91],
+                                        duration: { min: 0.1, max: 1 },
+                                        delay: 0.01,
                                     },
-                                    defaults: {
-                                        ease: 'power3.inOut'
+                                    onUpdate: (self) => {
                                     }
-                                })
-                                tlScrub
-                                .to($('.home-testi-item-body').eq(0), {height: '0', paddingBottom: '0', duration: 1}, '.25')
-                                .to($('.home-testi-item').eq(0), {paddingBottom: '0', duration: 1}, '<=0')
-                                .to($('.home-testi-item-body-inner-bg').eq(0), {yPercent: -20, duration: 1}, '<=0')
-                                .to($('.home-testi-item-content').eq(0), {yPercent: 10, duration: 1}, '<=0')
-                                // .to($('.home-testi-item-head').eq(0), {height: '8.16rem', paddingBottom: '2rem', duration: 1}, '<=0')
-                                // .to($('.home-testi-item-title').eq(0), {autoAlpha: 1, scale: 1, y: 0, duration: 1}, '<=0')
-                                // .to($('.home-testi-item-job').eq(0), {autoAlpha: 1, scale: 1, y: 0, duration: 1}, '<=0')
-                                // .to($('.home-testi-bg').eq(0), {y: '-20vh', autoAlpha: 0, duration: 1, ease: 'power1.inOut'}, '<=0')
-    
-                                .to($('.home-testi-item-body').eq(1), {height: 'auto', duration: 1}, '<=0')
-                                .to($('.home-testi-item').eq(1), {paddingBottom: '3.2rem', duration: 1}, '<=0')
-                                .to($('.home-testi-item-body-inner-bg').eq(1), {yPercent: 0, duration: 1}, '<=0')
-                                .to($('.home-testi-item-content').eq(1), {yPercent: 0, duration: 1}, '<=0')
-                                // .to($('.home-testi-item-head').eq(1), {height: '2rem', paddingBottom: '0', duration: 1}, '<=0')
-                                // .to($('.home-testi-item-title').eq(1), {autoAlpha: 0, scale: .8, y: '2rem', duration: 1}, '<=0')
-                                // .to($('.home-testi-item-job').eq(1), {autoAlpha: 0, scale: .8, y: '2rem', duration: 1}, '<=0')
-                                // .to($('.home-testi-bg').eq(1), {y: '-20vh', autoAlpha: 1, duration: 1, ease: 'power1.inOut'}, '<=0')
-    
-                                .to($('.home-testi-item-body').eq(1), {height: '0', paddingBottom: '0', duration: 1}, '>=.25')
-                                .to($('.home-testi-item').eq(1), {paddingBottom: '0', duration: 1}, '<=0')
-                                .to($('.home-testi-item-body-inner-bg').eq(1), {yPercent: -20, duration: 1}, '<=0')
-                                .to($('.home-testi-item-content').eq(1), {yPercent: 10, duration: 1}, '<=0')
-                                // .to($('.home-testi-item-head').eq(1), {height: '8.16rem', paddingBottom: '2rem', duration: 1}, '<=0')
-                                // .to($('.home-testi-item-title').eq(1), {autoAlpha: 1, scale: 1, y: 0, duration: 1}, '<=0')
-                                // .to($('.home-testi-item-job').eq(1), {autoAlpha: 1, scale: 1, y: 0, duration: 1}, '<=0')
-                                // .to($('.home-testi-bg').eq(1), {y: '-20vh', autoAlpha: 0, duration: 1, ease: 'power1.inOut'}, '<=0')
-    
-                                .to($('.home-testi-item-body').eq(2), {height: 'auto', duration: 1}, '<=0')
-                                .to($('.home-testi-item').eq(2), {paddingBottom: '3.2rem', duration: 1}, '<=0')
-                                .to($('.home-testi-item-body-inner-bg').eq(2), {yPercent: 0, duration: 1}, '<=0')
-                                .to($('.home-testi-item-content').eq(2), {yPercent: 0, duration: 1}, '<=0')
-                                // .to($('.home-testi-item-head').eq(2), {height: '2rem', paddingBottom: '0', duration: 1}, '<=0')
-                                // .to($('.home-testi-item-title').eq(2), {autoAlpha: 0, scale: .8, y: '2rem', duration: 1}, '<=0')
-                                // .to($('.home-testi-item-job').eq(2), {autoAlpha: 0, scale: .8, y: '2rem', duration: 1}, '<=0')
-                                // .to($('.home-testi-bg').eq(2), {y: '-20vh', autoAlpha: 1, duration: 1, ease: 'power1.inOut'}, '<=0')
-    
-                                .to($('.home-testi-item-body').eq(2), {height: '0', paddingBottom: '0', duration: 1}, '>=.25')
-                                .to($('.home-testi-item').eq(2), {paddingBottom: '0', duration: 1}, '<=0')
-                                .to($('.home-testi-item-body-inner-bg').eq(2), {yPercent: -20, duration: 1}, '<=0')
-                                .to($('.home-testi-item-content').eq(2), {yPercent: 10, duration: 1}, '<=0')
-                                // .to($('.home-testi-item-head').eq(2), {height: '8.16rem', paddingBottom: '2rem', duration: 1}, '<=0')
-                                // .to($('.home-testi-item-title').eq(2), {autoAlpha: 1, scale: 1, y: 0, duration: 1}, '<=0')
-                                // .to($('.home-testi-item-job').eq(2), {autoAlpha: 1, scale: 1, y: 0, duration: 1}, '<=0')
-                                // .to($('.home-testi-bg').eq(2), {y: '-20vh', autoAlpha: 0, duration: 1, ease: 'power1.inOut'}, '<=0')
-    
-                                .to($('.home-testi-item-body').eq(3), {height: 'auto', duration: 1}, '<=0')
-                                .to($('.home-testi-item').eq(3), {paddingBottom: '3.2rem', duration: 1}, '<=0')
-                                .to($('.home-testi-item-body-inner-bg').eq(3), {yPercent: 0, duration: 1}, '<=0')
-                                .to($('.home-testi-item-content').eq(3), {yPercent: 0, duration: 1}, '<=0')
-                                // .to($('.home-testi-item-head').eq(3), {height: '2rem', paddingBottom: '0', duration: 1}, '<=0')
-                                // .to($('.home-testi-item-title').eq(3), {autoAlpha: 0, scale: .8, y: '2rem', duration: 1}, '<=0')
-                                // .to($('.home-testi-item-job').eq(3), {autoAlpha: 0, scale: .8, y: '2rem', duration: 1}, '<=0')
-                                // .to($('.home-testi-bg').eq(3), {y: '-20vh', autoAlpha: 1, duration: 1, ease: 'power1.inOut'}, '<=0')
-    
-                                .to($('.home-testi-item-body').eq(3), {height: 'auto', duration: .25}, '>=0')
-                            } else {
-                                gsap.set('.home-testi-item', {paddingBottom: 0})
-                                gsap.set($('.home-testi-item').eq(0), {paddingBottom: '3.2rem'})
-                                gsap.set('.home-testi-item-body', {height: 0})
-                                gsap.set($('.home-testi-item-body').eq(0), {height: 'auto'})
-                                gsap.set('.home-testi-bg', {autoAlpha: 0})
-                                gsap.set($('.home-testi-bg').eq(0), {autoAlpha: 1})
-                                let tlScrub = gsap.timeline({
-                                    scrollTrigger: {
-                                        trigger: '.home-testi',
-                                        start: 'top top',
-                                        end: 'bottom bottom',
-                                        scrub: .2,
-                                        snap: {
-                                            // To update exact position and check directional
-                                            snapTo: [0.07, .3, .6, .91],
-                                            duration: { min: 0.1, max: 1 },
-                                            delay: 0.01,
-                                        },
-                                        onUpdate: (self) => {
-                                        }
-                                    },
-                                    defaults: {
-                                        ease: 'power3.inOut'
-                                    }
-                                })
-                                tlScrub
-                                .to($('.home-testi-item-body').eq(0), {height: '0', paddingBottom: '0', duration: 1}, '.25')
+                                },
+                                defaults: {
+                                    ease: 'power3.inOut'
+                                }
+                            })
+                            tlScrub
+                            .to($('.home-testi-item-body').eq(0), {height: '0', paddingBottom: '0', duration: 1}, '.25')
+                            .to($('.home-testi-item').eq(0), {paddingBottom: '0', duration: 1}, '<=0')
+                            .to($('.home-testi-item-body-inner-bg').eq(0), {yPercent: -20, duration: 1}, '<=0')
+                            .to($('.home-testi-item-content').eq(0), {yPercent: 10, duration: 1}, '<=0')
+                            // .to($('.home-testi-item-head').eq(0), {height: '8.16rem', paddingBottom: '2rem', duration: 1}, '<=0')
+                            // .to($('.home-testi-item-title').eq(0), {autoAlpha: 1, scale: 1, y: 0, duration: 1}, '<=0')
+                            // .to($('.home-testi-item-job').eq(0), {autoAlpha: 1, scale: 1, y: 0, duration: 1}, '<=0')
+                            // .to($('.home-testi-bg').eq(0), {y: '-20vh', autoAlpha: 0, duration: 1, ease: 'power1.inOut'}, '<=0')
 
-                                .to($('.home-testi-item').eq(0), {paddingBottom: '0', duration: 1}, '<=0')
-                                .to($('.home-testi-bg').eq(0), {y: '-20vh', autoAlpha: 0, duration: 1, ease: 'power1.inOut'}, '<=0')
-                                .to($('.home-testi-item-body').eq(1), {height: 'auto', duration: 1}, '<=0')
-                                .to($('.home-testi-item').eq(1), {paddingBottom: '3.2rem', duration: 1}, '<=0')
-                                .to($('.home-testi-bg').eq(1), {y: '-20vh', autoAlpha: 1, duration: 1, ease: 'power1.inOut'}, '<=0')
+                            .to($('.home-testi-item-body').eq(1), {height: 'auto', duration: 1}, '<=0')
+                            .to($('.home-testi-item').eq(1), {paddingBottom: '3.2rem', duration: 1}, '<=0')
+                            .to($('.home-testi-item-body-inner-bg').eq(1), {yPercent: 0, duration: 1}, '<=0')
+                            .to($('.home-testi-item-content').eq(1), {yPercent: 0, duration: 1}, '<=0')
+                            // .to($('.home-testi-item-head').eq(1), {height: '2rem', paddingBottom: '0', duration: 1}, '<=0')
+                            // .to($('.home-testi-item-title').eq(1), {autoAlpha: 0, scale: .8, y: '2rem', duration: 1}, '<=0')
+                            // .to($('.home-testi-item-job').eq(1), {autoAlpha: 0, scale: .8, y: '2rem', duration: 1}, '<=0')
+                            // .to($('.home-testi-bg').eq(1), {y: '-20vh', autoAlpha: 1, duration: 1, ease: 'power1.inOut'}, '<=0')
 
-                                .to($('.home-testi-item-body').eq(1), {height: '0', paddingBottom: '0', duration: 1}, '>=.25')
-                                .to($('.home-testi-item').eq(1), {paddingBottom: '0', duration: 1}, '<=0')
-                                .to($('.home-testi-bg').eq(1), {y: '-20vh', autoAlpha: 0, duration: 1, ease: 'power1.inOut'}, '<=0')
-                                .to($('.home-testi-item-body').eq(2), {height: 'auto', duration: 1}, '<=0')
-                                .to($('.home-testi-item').eq(2), {paddingBottom: '3.2rem', duration: 1}, '<=0')
-                                .to($('.home-testi-bg').eq(2), {y: '-20vh', autoAlpha: 1, duration: 1, ease: 'power1.inOut'}, '<=0')
+                            .to($('.home-testi-item-body').eq(1), {height: '0', paddingBottom: '0', duration: 1}, '>=.25')
+                            .to($('.home-testi-item').eq(1), {paddingBottom: '0', duration: 1}, '<=0')
+                            .to($('.home-testi-item-body-inner-bg').eq(1), {yPercent: -20, duration: 1}, '<=0')
+                            .to($('.home-testi-item-content').eq(1), {yPercent: 10, duration: 1}, '<=0')
+                            // .to($('.home-testi-item-head').eq(1), {height: '8.16rem', paddingBottom: '2rem', duration: 1}, '<=0')
+                            // .to($('.home-testi-item-title').eq(1), {autoAlpha: 1, scale: 1, y: 0, duration: 1}, '<=0')
+                            // .to($('.home-testi-item-job').eq(1), {autoAlpha: 1, scale: 1, y: 0, duration: 1}, '<=0')
+                            // .to($('.home-testi-bg').eq(1), {y: '-20vh', autoAlpha: 0, duration: 1, ease: 'power1.inOut'}, '<=0')
 
-                                .to($('.home-testi-item-body').eq(2), {height: '0', paddingBottom: '0', duration: 1}, '>=.25')
-                                .to($('.home-testi-item').eq(2), {paddingBottom: '0', duration: 1}, '<=0')
-                                .to($('.home-testi-bg').eq(2), {y: '-20vh', autoAlpha: 0, duration: 1, ease: 'power1.inOut'}, '<=0')
-                                .to($('.home-testi-item-body').eq(3), {height: 'auto', duration: 1}, '<=0')
-                                .to($('.home-testi-item').eq(3), {paddingBottom: '3.2rem', duration: 1}, '<=0')
-                                .to($('.home-testi-bg').eq(3), {y: '-20vh', autoAlpha: 1, duration: 1, ease: 'power1.inOut'}, '<=0')
+                            .to($('.home-testi-item-body').eq(2), {height: 'auto', duration: 1}, '<=0')
+                            .to($('.home-testi-item').eq(2), {paddingBottom: '3.2rem', duration: 1}, '<=0')
+                            .to($('.home-testi-item-body-inner-bg').eq(2), {yPercent: 0, duration: 1}, '<=0')
+                            .to($('.home-testi-item-content').eq(2), {yPercent: 0, duration: 1}, '<=0')
+                            // .to($('.home-testi-item-head').eq(2), {height: '2rem', paddingBottom: '0', duration: 1}, '<=0')
+                            // .to($('.home-testi-item-title').eq(2), {autoAlpha: 0, scale: .8, y: '2rem', duration: 1}, '<=0')
+                            // .to($('.home-testi-item-job').eq(2), {autoAlpha: 0, scale: .8, y: '2rem', duration: 1}, '<=0')
+                            // .to($('.home-testi-bg').eq(2), {y: '-20vh', autoAlpha: 1, duration: 1, ease: 'power1.inOut'}, '<=0')
 
-                                .to($('.home-testi-item-body').eq(3), {height: 'auto', duration: .25}, '>=0')
-                            }
+                            .to($('.home-testi-item-body').eq(2), {height: '0', paddingBottom: '0', duration: 1}, '>=.25')
+                            .to($('.home-testi-item').eq(2), {paddingBottom: '0', duration: 1}, '<=0')
+                            .to($('.home-testi-item-body-inner-bg').eq(2), {yPercent: -20, duration: 1}, '<=0')
+                            .to($('.home-testi-item-content').eq(2), {yPercent: 10, duration: 1}, '<=0')
+                            // .to($('.home-testi-item-head').eq(2), {height: '8.16rem', paddingBottom: '2rem', duration: 1}, '<=0')
+                            // .to($('.home-testi-item-title').eq(2), {autoAlpha: 1, scale: 1, y: 0, duration: 1}, '<=0')
+                            // .to($('.home-testi-item-job').eq(2), {autoAlpha: 1, scale: 1, y: 0, duration: 1}, '<=0')
+                            // .to($('.home-testi-bg').eq(2), {y: '-20vh', autoAlpha: 0, duration: 1, ease: 'power1.inOut'}, '<=0')
+
+                            .to($('.home-testi-item-body').eq(3), {height: 'auto', duration: 1}, '<=0')
+                            .to($('.home-testi-item').eq(3), {paddingBottom: '3.2rem', duration: 1}, '<=0')
+                            .to($('.home-testi-item-body-inner-bg').eq(3), {yPercent: 0, duration: 1}, '<=0')
+                            .to($('.home-testi-item-content').eq(3), {yPercent: 0, duration: 1}, '<=0')
+                            // .to($('.home-testi-item-head').eq(3), {height: '2rem', paddingBottom: '0', duration: 1}, '<=0')
+                            // .to($('.home-testi-item-title').eq(3), {autoAlpha: 0, scale: .8, y: '2rem', duration: 1}, '<=0')
+                            // .to($('.home-testi-item-job').eq(3), {autoAlpha: 0, scale: .8, y: '2rem', duration: 1}, '<=0')
+                            // .to($('.home-testi-bg').eq(3), {y: '-20vh', autoAlpha: 1, duration: 1, ease: 'power1.inOut'}, '<=0')
+
+                            .to($('.home-testi-item-body').eq(3), {height: 'auto', duration: .25}, '>=0')
                             
                         } else {
                             $('.home-testi-item').eq(0).addClass('active')
