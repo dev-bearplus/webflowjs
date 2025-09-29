@@ -105,8 +105,10 @@ const script = () => {
 
     }
     SCRIPT.subpageScript = () => {
-        $('.form-block').each(async(_, block) => {
-            const products = [...$(block).find('.products-card')];
+        $('.form-block').each(async (_, block) => {
+            let productMain = $(block).find('.products-main:not(.w-condition-invisible)');
+            const products = [...productMain.find('.products-card')];
+            if (products.length === 0) return;
             const filter = {
                 country: $(block).find('[data-filter="country"]'),
                 region: $(block).find('[data-filter="region"]'),
@@ -262,7 +264,7 @@ const script = () => {
 
             $(block).find('.button-m').off('click').on('click', function (e) {
                 e.preventDefault();
-                let hiddenItems = $(block).find('.products-item.hide-show-more');
+                let hiddenItems = productMain.find('.products-item.hide-show-more');
                 let hiddenItemsLength = hiddenItems.length;
                 let showItems = hiddenItemsLength >= LIMIT ? LIMIT : hiddenItemsLength;
                 hiddenItems.each((index, item) => {
@@ -276,9 +278,9 @@ const script = () => {
             });
 
             const updateShowMore = (filterID) => {
-                $(block).find('.products-item.loaded').removeClass('loaded');
-                $(block).find('.products-item.hide-show-more').removeClass('hide-show-more');
-                $(block).find('.products-item:not([class*="hidden-"])').each((index, item) => {
+                productMain.find('.products-item.loaded').removeClass('loaded');
+                productMain.find('.products-item.hide-show-more').removeClass('hide-show-more');
+                productMain.find('.products-item:not([class*="hidden-"])').each((index, item) => {
                     if (index >= LIMIT && !$(item).hasClass('loaded')) {
                         $(item).addClass('hide-show-more');
                     }
@@ -288,10 +290,10 @@ const script = () => {
                     }
                 });
 
-                const totalItems = filterID ? $(block).find('.products-item:not([class*="hidden-"])') : $(block).find('.products-item');
-                const loadedItems = filterID ? $(block).find(`.products-item.loaded:not([class*="hidden-"])`) : $(block).find('.products-item.loaded');
+                const totalItems = filterID ? productMain.find('.products-item:not([class*="hidden-"])') : productMain.find('.products-item');
+                const loadedItems = filterID ? productMain.find(`.products-item.loaded:not([class*="hidden-"])`) : productMain.find('.products-item.loaded');
 
-                if ($(block).find('.hide-show-more').length === 0 || totalItems.length <= LIMIT || loadedItems.length >= totalItems.length) {
+                if (productMain.find('.hide-show-more').length === 0 || totalItems.length <= LIMIT || loadedItems.length >= totalItems.length) {
                     $(block).find('.button-m').hide();
                 } else {
                     $(block).find('.button-m').show();
