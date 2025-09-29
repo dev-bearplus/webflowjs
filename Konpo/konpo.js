@@ -2415,43 +2415,46 @@ const mainScript = () => {
             }
             
             function homeHeroClient() {
+                console.log('hello')
                 // Setup
-                $('.home-hero-client-item-inner').each((index, el) => {
+                $('.home-hero-client-item-inner').each((itemIndex, el) => {
                     let elUrl = $(el).attr('href');
                     let hasDetail = elUrl != '#' && elUrl != '' || elUrl.includes('work')
                     if (!hasDetail) {
                         let newUrl = $(el).attr('data-url-ext')
-                        console.log(newUrl)
-                        if (newUrl != '#' && newUrl != '') {
+                        if (newUrl == '#' || newUrl == '') {
+                            $(el).attr('data-cursor', 'soon')
+                            updateDeetsDetail(itemIndex)
+                        } else {
                             $(el).attr('href', newUrl)
                             $(el).attr('target','_blank')
                             $(el).attr('data-cursor', 'ext')
-                        } else {
-                            $(el).attr('data-cursor', 'soon')
                         }
                     }
                 })
-                $('.client-news-info-list').each((index, el) => {
-                    let tempHtml = $(el).find('.client-news-info-item').clone()
+                function updateDeetsDetail(itemIndex) {;
+                    console.log('trigger')
+                    let tempHtml = $('.client-news-popup-item').eq(itemIndex).find('.client-news-info-item').clone()
                     let temp = tempHtml.clone()
-                    $(el).find('.client-news-info-item').remove()
-                    let dataList = $(el).find('.client-news-info-list-data li')
-                    console.log($(el))
+                    $('.client-news-popup-item').eq(itemIndex).find('.client-news-info-item').remove()
+                    let dataList = $('.client-news-popup-item').eq(itemIndex).find('.client-news-info-list-data li')
                     if (!dataList || dataList.length == 0) {
-                        $(el).remove()
+                        $('.client-news-info-list').eq(itemIndex).remove()
                     } else {
                         dataList.each((index, data) => {
                             let dataItem = temp.clone()
                             let names = data.innerHTML.split('-')
                             $(dataItem).find('.client-news-info-item-label').html(names[0].trim())
                             $(dataItem).find('.client-news-info-item-txt').html(names[1].trim())
-                            if ($(dataItem).find('a').length > 0) {
-                                $(dataItem).find('a').addClass('hover-un').attr('data-cursor', 'txtLink')
-                            }
-                            $(dataItem).appendTo($(el))
+                            $(dataItem).appendTo($('.client-news-popup-item').eq(itemIndex).find('.client-news-info-list'))
                         })
                     }
-                })
+                    if ($('.client-news-popup-item').eq(itemIndex).find('.client-news-block-rictxt a').length >= 1) {
+                        $('.client-news-popup-item').eq(itemIndex).find('.client-news-block-rictxt a').each((idx, element) => {
+                            $(element).addClass('hover-un').attr('data-cursor', 'txtLink')
+                        })
+                    }
+                }
                 // Anim on Scroll
                 if ($(window).width() >= 767) {
                     let maxHeight; 
