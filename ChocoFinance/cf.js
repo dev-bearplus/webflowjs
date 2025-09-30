@@ -31,7 +31,7 @@ const mainScript = () => {
     const schemaFAQParentAttrs = {
         itemscope: true,
         itemtype: 'https://schema.org/FAQPage'
-    };
+    };   
     // Variables and Ultilities
     let unit;
     let slideUpDownTime = 400;
@@ -3909,61 +3909,59 @@ const mainScript = () => {
     SCRIPT.contactUsScript = () => {
         const formSubmitEvent = (function () {
             const init = ({
-            onlyWorkOnThisFormName,
-            onSuccess,
-            onFail,
-            onStart
-            }) => {
-            $(document).ajaxStart(function () {
-              // onStart?.();
-              const valInputCheck=$('form[data-name="contactUs"] .bp-trap').val();
-              console.log(valInputCheck)
-              if(valInputCheck=='' || valInputCheck== undefined){
-                onStart?.();
-              } else {
-                $(document).ajaxSend(function(event, jqxhr, settings) {
-                    jqxhr.abort();
-                });
-              }
-            });
-            $(document).ajaxComplete(function (event, xhr, settings) {
-                if (settings.url.includes("https://webflow.com/api/v1/form/")) {
-                const isSuccessful = xhr.status === 200
-                const isWorkOnAllForm = onlyWorkOnThisFormName == undefined
-                const isCorrectForm = !isWorkOnAllForm && settings.data.includes(getSanitizedFormName(onlyWorkOnThisFormName));
-
-                if (isWorkOnAllForm) {
-                    if (isSuccessful) {
-                    onSuccess?.()
-                    } else {
-                    onFail?.()
-                    }
-                } else if (isCorrectForm) {
-                    if (isSuccessful) {
-                    onSuccess?.()
-                    } else {
-                    onFail?.()
-                    }
-                }
-                }
-            });
+                onlyWorkOnThisFormName,
+                onStart,
+                onSuccess,
+                onFail
+                }) => {
+                    $(document).on('ajaxSend', function (event, xhr, settings) {
+                        // onStart?.();
+                        console.log('start send .....');
+                        if (settings.url.includes("https://webflow.com/api/v1/form/")) {
+                            const valInputCheck=$('form[data-name="contactUs"] .bp-trap').val();
+                            console.log(valInputCheck)
+                            if(valInputCheck=='' || valInputCheck== undefined){
+                                onStart?.();
+                            } 
+                        }
+                    });
+                    $(document).on('ajaxComplete', function (event, xhr, settings) {
+                        if (settings.url.includes("https://webflow.com/api/v1/form/")) {
+                            const isSuccessful = xhr.status === 200
+                            const isWorkOnAllForm = onlyWorkOnThisFormName == undefined
+                            const isCorrectForm = !isWorkOnAllForm && settings.data.includes(getSanitizedFormName(onlyWorkOnThisFormName));
+                            if (isWorkOnAllForm) {
+                                if (isSuccessful) {
+                                onSuccess?.()
+                                } else {
+                                onFail?.()
+                                }
+                            } else if (isCorrectForm) {
+                                if (isSuccessful) {
+                                onSuccess?.()
+                                } else {
+                                onFail?.()
+                                }
+                            }
+                        }
+                    });
             }
             function getSanitizedFormName(name) {
-            return name.replaceAll(" ", "+")
+                return name.replaceAll(" ", "+")
             }
             return {
-            init
+                init
             }
-        })()
+        })();
         formSubmitEvent.init({
             onlyWorkOnThisFormName: "contactUs",
-            onStart: function () {
+            onStart:  () =>{
                 $('form.ctc-form [data-form="submit"]').val('Please wait...')
             },
             onSuccess: () => {
                 triggerFormSuccess('contact', 'contactUs');
-                $('form.ctc-form [data-form="submit"]').val('Submit')
-                $(this).trigger('reset')
+                $('form.ctc-form [data-form="submit"]').val('Submit');
+                $('form.ctc-form').trigger('reset')
             },
             onFail: () => {
                 console.log('fail')
