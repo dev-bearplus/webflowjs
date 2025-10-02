@@ -2294,6 +2294,65 @@ const mainScript = () => {
         }
         requestAnimationFrame(animloop)
     }
+    function updateImgGrid(data, richtextEl, desEl = null) {
+        desEl = desEl;
+        let gridWrap = $(data.next.container).find(richtextEl);
+        if (gridWrap.length >= 1) {
+            gridWrap.each((idx, el) => {
+                let imgWraps = $(el).find('figure');
+                if (imgWraps.length >= 1) {
+                    imgWraps.each((idx, el) => {
+                        let altText = $(el).find('img').attr('alt')
+                        if (altText != '') {
+                            let cols = altText.split('}')[0].replace('{', '')
+                            if ($(window).width() > 991) {
+                                $(el).css('grid-column', `span ${cols}`)
+                            } else {
+                                $(el).css('grid-column', `1 / -1`)
+                            }
+                            $(el).css('max-width', `100%`)
+                        } else {
+                            $(el).css('grid-column', `1 / -1`)
+                            $(el).css('max-width', `100%`)
+                        }
+                        if (desEl) {
+                            if ($(el).find('figcaption').length) {
+                                let captionEl = desEl.clone();
+                                captionEl.find('.txt.txt-16').text($(el).find('figcaption').text())
+                                captionEl.appendTo($(el))
+                                $(el).find('figcaption').remove()
+                            }
+                        }
+                    })
+                }
+                let videoWraps = $(el).find('.w-embed')
+                if (videoWraps.length >= 1) {
+                    videoWraps.each((idx, el) => {
+                        let cols = $(el).find('video').attr('data-grid-span');
+                        if (cols) {
+                            if ($(window).width() > 991) {
+                                $(el).css('grid-column', `span ${cols}`)
+                            } else {
+                                $(el).css('grid-column', `1 / -1`)
+                            }
+                        } else {
+                            $(el).css('grid-column', `1 / -1`)
+                        }
+                        if (desEl) {
+                            if ($(el).find('video').attr('data-des') != '') {
+                                let captionEl = desEl.clone();
+                                captionEl.find('.txt.txt-16').text($(el).find('video').attr('data-des'))
+                                captionEl.appendTo($(el))
+                            }
+                        }
+                    })
+                }
+            })
+        }
+        setTimeout(() => {
+            resetScroll(data)
+        }, 300);
+    }
 
     const SCRIPT = {};
     SCRIPT.homeScript = {
@@ -2455,6 +2514,7 @@ const mainScript = () => {
                         })
                     }
                 }
+                updateImgGrid(data, '.client-news-block-rictxt-imgs')
                 // Anim on Scroll
                 if ($(window).width() >= 767) {
                     let maxHeight; 
@@ -2487,25 +2547,25 @@ const mainScript = () => {
                     closeModal()
                 })
                 if ($(window).width() >= 767) {
-                    if (isTouchDevice()) {
-                        // $('.home-hero-client-item').on('click', function(e) {
-                        //     openModal(e, this);
-                        // });
-                    } else {
-                        $('.home-hero-client-item').on('mouseenter', function(e) {
-                            e.preventDefault();
-                            let video = $(this).find('video').get(0)
-                            if (video.querySelector('source').getAttribute('src') == '') return;
-                            video.currentTime = 0
-                            video.play()
-                        })
-                        $('.home-hero-client-item').on('mouseleave', function(e) {
-                            e.preventDefault();
-                            let video = $(this).find('video').get(0)
-                            if (video.querySelector('source').getAttribute('src') == '') return;
-                            video.pause()
-                        })
-                    }
+                    // if (isTouchDevice()) {
+                    //     // $('.home-hero-client-item').on('click', function(e) {
+                    //     //     openModal(e, this);
+                    //     // });
+                    // } else {
+                    //     $('.home-hero-client-item').on('mouseenter', function(e) {
+                    //         e.preventDefault();
+                    //         let video = $(this).find('video').get(0)
+                    //         if (video.querySelector('source').getAttribute('src') == '') return;
+                    //         video.currentTime = 0
+                    //         video.play()
+                    //     })
+                    //     $('.home-hero-client-item').on('mouseleave', function(e) {
+                    //         e.preventDefault();
+                    //         let video = $(this).find('video').get(0)
+                    //         if (video.querySelector('source').getAttribute('src') == '') return;
+                    //         video.pause()
+                    //     })
+                    // }
                 } else {
                     $('.home-hero-client-cms').addClass('swiper')
                     $('.home-hero-client-inner').addClass('swiper-wrapper')
@@ -2513,11 +2573,11 @@ const mainScript = () => {
                     let swiper = new Swiper('.home-hero-client-cms', {
                         slidesPerView: 1,
                     })
-                    swiper.on('slideChange', function() {
-                        let video = $('.home-hero-client-item-inner').eq(swiper.activeIndex).find('video').get(0)
-                        video.currentTime = 0
-                        video.play()
-                    })
+                    // swiper.on('slideChange', function() {
+                    //     let video = $('.home-hero-client-item-inner').eq(swiper.activeIndex).find('video').get(0)
+                    //     video.currentTime = 0
+                    //     video.play()
+                    // })
                 }
                 function closeModal() {
                     $('.client-news-wrap').removeClass('active')
@@ -3808,62 +3868,7 @@ const mainScript = () => {
             }
             projdtlIntro(data)
 
-            function projDtlUpdateImgGrid(data) {
-                let desEl = $(data.next.container).find('.hidden-el').find('.projdtl-brand-img-info').eq(0).clone();
-                let gridWrap = $(data.next.container).find('.projdtl-brand-img-grid');
-                if (gridWrap.length >= 1) {
-                    gridWrap.each((idx, el) => {
-                        let imgWraps = $(el).find('figure');
-                        if (imgWraps.length >= 1) {
-                            imgWraps.each((idx, el) => {
-                                let altText = $(el).find('img').attr('alt')
-                                if (altText != '') {
-                                    let cols = altText.split('}')[0].replace('{', '')
-                                    if ($(window).width() > 991) {
-                                        $(el).css('grid-column', `span ${cols}`)
-                                    } else {
-                                        $(el).css('grid-column', `1 / -1`)
-                                    }
-                                    $(el).css('max-width', `100%`)
-                                } else {
-                                    $(el).css('grid-column', `1 / -1`)
-                                    $(el).css('max-width', `100%`)
-                                }
-                                if ($(el).find('figcaption').length) {
-                                    let captionEl = desEl.clone();
-                                    captionEl.find('.txt.txt-16').text($(el).find('figcaption').text())
-                                    captionEl.appendTo($(el))
-                                    $(el).find('figcaption').remove()
-                                }
-                            })
-                        }
-                        let videoWraps = $(el).find('.w-embed')
-                        if (videoWraps.length >= 1) {
-                            videoWraps.each((idx, el) => {
-                                let cols = $(el).find('video').attr('data-grid-span');
-                                if (cols) {
-                                    if ($(window).width() > 991) {
-                                        $(el).css('grid-column', `span ${cols}`)
-                                    } else {
-                                        $(el).css('grid-column', `1 / -1`)
-                                    }
-                                } else {
-                                    $(el).css('grid-column', `1 / -1`)
-                                }
-                                if ($(el).find('video').attr('data-des') != '') {
-                                    let captionEl = desEl.clone();
-                                    captionEl.find('.txt.txt-16').text($(el).find('video').attr('data-des'))
-                                    captionEl.appendTo($(el))
-                                }
-                            })
-                        }
-                    })
-                }
-                setTimeout(() => {
-                    resetScroll(data)
-                }, 300);
-            }
-            projDtlUpdateImgGrid(data)
+            updateImgGrid(data, '.projdtl-brand-img-grid', $(data.next.container).find('.hidden-el').find('.projdtl-brand-img-info').eq(0).clone())
 
             function projdtlBrand(data) {
                 const projdtlTxt =  $(data.next.container).find('.projdtl-brand');
