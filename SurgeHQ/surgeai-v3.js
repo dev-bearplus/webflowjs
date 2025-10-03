@@ -1,4 +1,27 @@
 const script = () => {
+    const isInViewport = (el, orientation = 'vertical') => {
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        if (orientation == 'horizontal') {
+            return (
+                rect.left <= (window.innerWidth) &&
+                rect.right >= 0
+            );
+        } else {
+            return (
+                rect.top <= (window.innerHeight) &&
+                rect.bottom >= 0
+            );
+        }
+    }
+    const debounce = (func, timeout = 300) => {
+        let timer
+
+        return (...args) => {
+            clearTimeout(timer)
+            timer = setTimeout(() => { func.apply(this, args) }, timeout)
+        }
+    }
     function scrollTop() {
         if ('scrollRestoration' in history) {
             history.scrollRestoration = 'manual';
@@ -48,20 +71,100 @@ const script = () => {
 
                 tocWrap.append(link);
             })
+            $('.post-content-toc').addClass('active');
+            $('.post-content-stick').css('margin-top', (($('.post-hero').outerHeight() + $('.header').height() + $('.post-content-toc').offset().left + 10) > $(window).height() ? ($('.post-hero').outerHeight() + $('.header').height() + $('.post-content-toc').offset().left + 10) : $(window).height()) * -1);
+            setInterval(() => {
+                $('.post-content-toc-list').slideDown('slow');
+            }, 500);
+
+            let currentActiveId = null;
+
             $(window).on('scroll', function (e) {
-                const scrollTop = document.documentElement.scrollTop || window.scrollY
+                const scrollTop = document.documentElement.scrollTop || window.scrollY;
+                const threshold = $(window).height() * 0.5;
+
+                // Tìm heading cuối cùng đã vượt qua ngưỡng (từ dưới lên)
+                let activeHeading = null;
                 headings.each((idx, heading) => {
-                    if (scrollTop > $(heading).offset().top - ($(window).height() * .5)) {
-                        $(`.post-content-toc-item[href="#${$(heading).attr('id')}"]`).addClass('w--current');
-                        $(`.post-content-toc-item[href="#${$(heading).attr('id')}"]`).siblings().removeClass('w--current');
+                    if (scrollTop > $(heading).offset().top - threshold) {
+                        activeHeading = heading;
                     }
-                })
-            })
+                });
+
+                // Chỉ update khi có sự thay đổi
+                if (activeHeading) {
+                    const activeId = $(activeHeading).attr('id');
+
+                    if (activeId !== currentActiveId) {
+                        currentActiveId = activeId;
+                        $('.post-content-toc-item').removeClass('w--current');
+                        $(`.post-content-toc-item[href="#${activeId}"]`).addClass('w--current');
+                    }
+                }
+            });
 
             const currToc = window.location.hash;
             if ($(currToc).length) {
-                setTimeout(() => $(`.post-content-toc-item[href="${currToc}"]`).trigger('click'), 400);
-                setTimeout(() => $(`.post-content-toc-item[href="${currToc}"]`).trigger('click'), 800);
+                // setTimeout(() => $(`.post-content-toc-item[href="${currToc}"]`).trigger('click'), 400);
+                // setTimeout(() => $(`.post-content-toc-item[href="${currToc}"]`).trigger('click'), 800);
+            }
+        }
+    }
+    SCRIPT.legalScript = () => {
+        if ($(window).width() > 991) {
+            let headings = $('.legal-content-richtext h2');
+            let tocWrap = $('.legal-content-toc-list');
+
+            let tocClone = $('.legal-content-toc-item').eq(0).clone();
+            tocWrap.html('');
+            headings.each(function (idx, heading) {
+                let text = $(heading).text().replace(/^\d+\.\s*/, '').replace(/\s*\([^)]*\)/g, '');
+                let id = text.toLowerCase().trim().replace(/[\s\W-]+/g, '-').replace(/^-+|-+$/g, '');
+                let link = tocClone.clone();
+
+                $(heading).attr('id', id);
+                link.attr('href', `#${id}`);
+                link.find('.txt').text(text);
+                idx === 0 && link.addClass('w--current');
+
+                tocWrap.append(link);
+            })
+            $('.legal-content-toc').addClass('active');
+            $('.legal-content-stick').css('margin-top', $(window).height() * -1);
+            setInterval(() => {
+                $('.legal-content-toc-list').slideDown('slow');
+            }, 500);
+
+            let currentActiveId = null;
+
+            $(window).on('scroll', function (e) {
+                const scrollTop = document.documentElement.scrollTop || window.scrollY;
+                const threshold = $(window).height() * 0.5;
+
+                // Tìm heading cuối cùng đã vượt qua ngưỡng (từ dưới lên)
+                let activeHeading = null;
+                headings.each((idx, heading) => {
+                    if (scrollTop > $(heading).offset().top - threshold) {
+                        activeHeading = heading;
+                    }
+                });
+
+                // Chỉ update khi có sự thay đổi
+                if (activeHeading) {
+                    const activeId = $(activeHeading).attr('id');
+
+                    if (activeId !== currentActiveId) {
+                        currentActiveId = activeId;
+                        $('.legal-content-toc-item').removeClass('w--current');
+                        $(`.legal-content-toc-item[href="#${activeId}"]`).addClass('w--current');
+                    }
+                }
+            });
+
+            const currToc = window.location.hash;
+            if ($(currToc).length) {
+                // setTimeout(() => $(`.post-content-toc-item[href="${currToc}"]`).trigger('click'), 400);
+                // setTimeout(() => $(`.post-content-toc-item[href="${currToc}"]`).trigger('click'), 800);
             }
         }
     }

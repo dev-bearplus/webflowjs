@@ -112,4 +112,4 @@ class MainScript {
 }
 
 const mainScript = new MainScript();
-window.onload = () => mainScript.init();  
+window.onload = () => mainScript.init();
