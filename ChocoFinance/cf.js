@@ -2834,33 +2834,30 @@ const mainScript = () => {
         homeWithDraw();
     }
     SCRIPT.howItWorksScript = () => {
-        // if ($(window).width() < 767) {
-            const howWorkSwiper = new Swiper('.how-work-main-wrap', {
-                slidesPerView: 1,
-                spaceBetween: 4 * unit,
-                scrollbar: {
-                    el: '.how-work-progress-bar'
+        const howWorkSwiper = new Swiper('.how-work-main-wrap', {
+            slidesPerView: 1,
+            spaceBetween: 4 * unit,
+            scrollbar: {
+                el: '.how-work-progress-bar'
+            },
+            breakpoints: {
+                767: {
+                    slidesPerView: 2,
+                    spaceBetween: parseRem(40),
                 },
-                breakpoints: {
-                    767: {
-                      slidesPerView: 2,
-                      spaceBetween: parseRem(40),
+                991: {
+                    slidesPerView: 4,
+                    spaceBetween: parseRem(40),
                     },
-                    991: {
-                        slidesPerView: 4,
-                        spaceBetween: parseRem(40),
-                      },
-                }
+            }
 
-            });
-        // }
+        });
         function homeGetFaq() {
             animateFaq();
             scrollToFaq();
             
         }
         homeGetFaq();
-
         function howTriggerIconAnim() {
             let howHigherReturnVid
             if ($(window).width() > 768) {
@@ -2978,6 +2975,54 @@ const mainScript = () => {
             }
         }
         howExpect()
+        function howDraw() {
+            
+            if(viewport.w > 991) {
+                let widthItem = $('.sc-home-withdraw-item-avai.active').width();
+                let widthItemTitle = $('.sc-home-withdraw-item-avai.active .sc-home-withdraw-item-avai-title-wrap').width();
+                let widhtItemSubInner  = widthItem - widthItemTitle - parseFloat($('.sc-home-withdraw-item-avai-sub-wrap').css('padding-left'));
+                $('.sc-home-withdraw-item-avai-sub-inner').css('width', widhtItemSubInner);
+            }
+            else {
+                $('.sc-home-withdraw-item-avai').eq(0).find('.sc-home-withdraw-item-avai-sub-wrap').show();
+                let indexActiveTab = $('.sc-home-withdraw-tab-item.active').index();
+                $('.sc-home-withdraw-item-wrap').eq(indexActiveTab).show();
+            }
+            $('.sc-home-withdraw-tab-item').on('click', function(){
+                if($(this).hasClass('active')) return;
+                $('.sc-home-withdraw-tab-item').removeClass('active');
+                $(this).addClass('active');
+                let index = $(this).index();
+                $('.sc-home-withdraw-item-wrap').removeClass('active');
+                $('.sc-home-withdraw-item-wrap').eq(index).addClass('active');
+                if(viewport.w < 992){
+                    $('.sc-home-withdraw-item-wrap').slideUp(400);
+                    $('.sc-home-withdraw-item-wrap').eq(index).slideDown(400);
+                }
+            })
+            $(".sc-home-withdraw-item-avai").on('click', function(){
+                if(viewport.w > 991){
+                    if($(this).hasClass('active')) return;
+                    $(".sc-home-withdraw-item-avai").removeClass('active')
+                    $(this).addClass('active')
+                }
+                else {
+                    $(this).toggleClass('active')
+                }
+                if(viewport.w < 992){
+                    $(this).find('.sc-home-withdraw-item-avai-sub-wrap').slideToggle(400);
+                }
+            })
+            $(".sc-home-withdraw-item").on('click', function(){
+                if(viewport.w < 992){
+                    $(this).toggleClass('active')
+                    $(this).find('.sc-home-withdraw-item-sub-wrap').slideToggle(400);
+                }
+            })
+        }
+        if(isStagging()){
+            howDraw();
+        }
     }
     SCRIPT.whyUsScript = () => {
         function aboutClimateHanlde() {
