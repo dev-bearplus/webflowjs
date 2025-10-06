@@ -73,8 +73,8 @@ const script = () => {
             })
             $('.post-content-toc').addClass('active');
             $('.post-content-stick').css('margin-top', (($('.post-hero').outerHeight() + $('.header').height() + $('.post-content-toc').offset().left + 10) > $(window).height() ? ($('.post-hero').outerHeight() + $('.header').height() + $('.post-content-toc').offset().left + 10) : $(window).height()) * -1);
-            setInterval(() => {
-                $('.post-content-toc-list').slideDown('slow');
+            setTimeout(() => {
+                $('.post-content-toc-list-wrap').slideDown('slow');
             }, 500);
 
             let currentActiveId = null;
@@ -131,8 +131,8 @@ const script = () => {
             })
             $('.legal-content-toc').addClass('active');
             $('.legal-content-stick').css('margin-top', $(window).height() * -1);
-            setInterval(() => {
-                $('.legal-content-toc-list').slideDown('slow');
+            setTimeout(() => {
+                $('.legal-content-toc-list-wrap').slideDown('slow');
             }, 500);
 
             let currentActiveId = null;
@@ -163,8 +163,8 @@ const script = () => {
 
             const currToc = window.location.hash;
             if ($(currToc).length) {
-                // setTimeout(() => $(`.post-content-toc-item[href="${currToc}"]`).trigger('click'), 400);
-                // setTimeout(() => $(`.post-content-toc-item[href="${currToc}"]`).trigger('click'), 800);
+                setTimeout(() => $(`.legal-content-toc-item[href="${currToc}"]`).trigger('click'), 400);
+                setTimeout(() => $(`.legal-content-toc-item[href="${currToc}"]`).trigger('click'), 800);
             }
         }
     }
