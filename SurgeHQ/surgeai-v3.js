@@ -53,7 +53,6 @@ const script = () => {
     }
 
     SCRIPT.postScript = () => {
-        $('.post-content-nav-cms-list').length === 1 && $('.post-content-nav-cms-list').parents('.post-content-nav-item').siblings().remove();
         if ($(window).width() > 991) {
             let headings = $('.post-content-richtext h2');
             let tocWrap = $('.post-content-toc-list');
