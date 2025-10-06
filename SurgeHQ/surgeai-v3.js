@@ -53,10 +53,18 @@ const script = () => {
     }
 
     SCRIPT.postScript = () => {
+        if ($('.post-content-nav-cms-list').length === 1 && $(window).width() > 767) {
+            $('.post-content-nav-cms-list').parents('.post-content-nav-item').siblings().remove();
+            $('.post-content-nav').css('display', 'block');
+            $('.post-content-nav-item').css({ width: '50%', margin: '0 auto' });
+        }
         if ($(window).width() > 991) {
             let headings = $('.post-content-richtext h2');
             let tocWrap = $('.post-content-toc-list');
-
+            if (headings.length <= 1) {
+                $('.post-content-stick').remove();
+                return;
+            }
             let tocClone = $('.post-content-toc-item').eq(0).clone();
             tocWrap.html('');
             headings.each(function (idx, heading) {
