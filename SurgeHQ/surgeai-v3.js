@@ -53,11 +53,7 @@ const script = () => {
     }
 
     SCRIPT.postScript = () => {
-        if ($('.post-content-nav-cms-list').length === 1 && $(window).width() > 767) {
-            $('.post-content-nav-cms-list').parents('.post-content-nav-item').siblings().remove();
-            $('.post-content-nav').css('display', 'block');
-            $('.post-content-nav-item').css({ width: '50%', margin: '0 auto' });
-        }
+        $('.post-content-nav-cms-list').length === 1 && $('.post-content-nav-cms-list').parents('.post-content-nav-item').siblings().remove();
         if ($(window).width() > 991) {
             let headings = $('.post-content-richtext h2');
             let tocWrap = $('.post-content-toc-list');
