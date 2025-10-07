@@ -2296,7 +2296,13 @@ const mainScript = () => {
     }
     function updateImgGrid(data, richtextEl, desEl = null) {
         desEl = desEl;
-        let gridWrap = $(data.next.container).find(richtextEl);
+        let wrapEl;
+        if (data == document) {
+            wrapEl = $(document)
+        } else {
+            wrapEl = $(data.next.container)
+        }
+        let gridWrap = wrapEl.find(richtextEl);
         if (gridWrap.length >= 1) {
             gridWrap.each((idx, el) => {
                 let imgWraps = $(el).find('figure');
@@ -2349,9 +2355,11 @@ const mainScript = () => {
                 }
             })
         }
-        setTimeout(() => {
-            resetScroll(data)
-        }, 300);
+        if (data !== document) {
+            setTimeout(() => {
+                resetScroll(data)
+            }, 300);
+        }
     }
 
     const SCRIPT = {};
@@ -2514,7 +2522,7 @@ const mainScript = () => {
                         })
                     }
                 }
-                updateImgGrid(data, '.client-news-block-rictxt-imgs')
+                
                 // Anim on Scroll
                 if ($(window).width() >= 767) {
                     let maxHeight; 
@@ -5114,6 +5122,7 @@ const mainScript = () => {
             name: 'opacity-transition',
             sync: true,
             once(data) {
+                updateImgGrid(document, '.client-news-block-rictxt-imgs')
                 if ($(window).width() > 767) {
                     initTitleMouseMove(data)
                 }
