@@ -50,6 +50,25 @@ const script = () => {
 
     SCRIPT.homeScript = () => {
         console.log("home");
+        const DOM = {
+            accordion: $('.home-who-item'),
+            accordionTitle: $('.home-who-item-title'),
+            accordionContent: $('.home-who-item-content')
+        }
+        DOM.accordionContent.hide();
+        function activeAccordion(index) {
+            DOM.accordionContent.eq(index).slideToggle("slow");
+            DOM.accordion.eq(index).toggleClass("active");
+
+            DOM.accordionContent.not(DOM.accordionContent.eq(index)).slideUp("slow");
+            DOM.accordion.not(DOM.accordion.eq(index)).removeClass("active");
+        };
+
+        DOM.accordionTitle.on("click", function () {
+            let index = $(this).closest('.home-who-item').index();
+            activeAccordion(index);
+        })
+        activeAccordion(0);
     }
 
     SCRIPT.postScript = () => {
