@@ -68,7 +68,6 @@ const script = () => {
             let index = $(this).closest('.home-who-item').index();
             activeAccordion(index);
         })
-        activeAccordion(0);
     }
 
     SCRIPT.postScript = () => {
