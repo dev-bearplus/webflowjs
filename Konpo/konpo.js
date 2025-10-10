@@ -1736,6 +1736,7 @@ const mainScript = () => {
                             allowAnim = true;
                             gsap.to('.header', {autoAlpha: 1, duration: .8, onComplete: () => {
                                 lenis.start()
+
                                 // $('.home-hero-vid-thumbnail').find('video').get(0).play()
                                 $('.home-hero-thumb-mobile-dot').addClass('active')
                                 if ($('.loader-24').length) {
@@ -1958,6 +1959,9 @@ const mainScript = () => {
     }
     let transGrid;
     function transitionOnce(data) {
+        // Active Client news popup
+        $('.client-news-popup-wrap').removeClass('loading')
+        
         const animationSettings = {
             duration: 1.6,
             itemDelay: 0.08
@@ -2402,7 +2406,9 @@ const mainScript = () => {
                             delay: comingToHome ? delayTime : $('.home-hero-thumb').length > 0 ? 0 : .8
                         })
 
-
+                        if ($(window).width() > 767) {
+                            tl.set('.home-hero-client-item-logo', {autoAlpha: 0})
+                        }
                         tl
                         .set('.home-hero-title, .home-hero-sub', {opacity: 1})
                         .to(homeHeroTitle.words, {yPercent: 0, duration: .6, stagger: .03})
@@ -2418,7 +2424,13 @@ const mainScript = () => {
                         .from('.home-hero-sub-wrap svg path', {autoAlpha: 0, drawSVG: '50% 50%', duration: .6, stagger: .1}, '<=0')
                         .from('.home-hero-sub .hover-un', {'--line-width': '0%', duration: 1 }, "<=.5")
 
-
+                        if ($(window).width() > 767) {
+                            // Expand Clien News card
+                            tl
+                            .to('.home-hero-client-item', { width: 100/3+'%', ease: 'none', duration: 1}, 0)
+                            .to('.home-hero-client-cms', {y: 0, height: $('.home-hero-client-cms-wrap').get(0).getBoundingClientRect().height, ease: 'none', duration: 1}, 0)
+                            .fromTo('.home-hero-client-item-logo', { autoAlpha: 0 }, { autoAlpha: 1, duration: .6, ease: 'none' }, .4)
+                        }
                         if (!comingToHome) {
                             tl
                             .from($('.header').find('.header-top-line'), {scaleX: 0, transformOrigin: 'left', duration: 1.1, clearProps: 'all'}, '0')
@@ -2525,22 +2537,22 @@ const mainScript = () => {
                 
                 // Anim on Scroll
                 if ($(window).width() >= 767) {
-                    let maxHeight; 
-                    maxHeight = $('.home-hero-client-cms-wrap').get(0).getBoundingClientRect().height
-                    let tl = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: '.home-hero',
-                            start: `top top`,
-                            endTrigger: '.home-hero',
-                            end: 'bottom bottom',
-                            scrub: true
-                        }
-                    })
-                    tl
-                    .to('.home-hero-client-item', { width: 100/3+'%', ease: 'none', duration: 1})
-                    .to('.home-hero-client-cms', {y: 0, height: maxHeight, ease: 'none', duration: 1}, 0)
-                    .fromTo('.home-hero-client-item-content-inner', { scale: 1 }, { scale: 1.5, duration: 1, ease: 'none' }, 0)
-                    .fromTo('.home-hero-client-item-logo', { autoAlpha: 0 }, { autoAlpha: 1, duration: .6, ease: 'none' }, .4)
+                    // let maxHeight; 
+                    // maxHeight = $('.home-hero-client-cms-wrap').get(0).getBoundingClientRect().height
+                    // let tl = gsap.timeline({
+                    //     scrollTrigger: {
+                    //         trigger: '.home-hero',
+                    //         start: `top top`,
+                    //         endTrigger: '.home-hero',
+                    //         end: 'bottom bottom',
+                    //         scrub: true
+                    //     }
+                    // })
+                    // tl
+                    // .to('.home-hero-client-item', { width: 100/3+'%', ease: 'none', duration: 1})
+                    // .to('.home-hero-client-cms', {y: 0, height: maxHeight, ease: 'none', duration: 1}, 0)
+                    // .fromTo('.home-hero-client-item-content-inner', { scale: 1 }, { scale: 1.5, duration: 1, ease: 'none' }, 0)
+                    // .fromTo('.home-hero-client-item-logo', { autoAlpha: 0 }, { autoAlpha: 1, duration: .6, ease: 'none' }, .4)
                 }
                 // Interaction
                 $('.home-hero-client-item-inner').on('click', function(e) {
@@ -2592,6 +2604,7 @@ const mainScript = () => {
                     lenis.start()
                 }
                 function openModal(e ,el) {
+                    
                     let elUrl = $(el).attr('href');
                     let hasDetail = elUrl != '#' && elUrl != '' || elUrl.includes('work')
                     let hasExternalLink = elUrl.includes('http')
@@ -2604,6 +2617,11 @@ const mainScript = () => {
                     if (modalEl.length > 0 && !modalEl.hasClass('active')) {
                         lenis.stop()
                         modalEl.addClass('active')
+                        // Find all video tags within modalEl and add autoplay
+                        modalEl.find('video').each(function() {
+                            $(this).attr('autoplay', true);
+                            this.play();
+                        });
                     }
                 }
             }
