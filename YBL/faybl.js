@@ -568,7 +568,7 @@ const mainScript = () => {
                 ]
             })
 
-            
+
             function toggleControl(realIndex) {
                 $('.home-why-control-btn').addClass('active');
                 let totalSlide;
@@ -586,7 +586,7 @@ const mainScript = () => {
                     $('.home-why-control-btn[target = prev]').removeClass('active');
                 }
             }
-            
+
         }
     }
     const homeWhy = new HomeWhy('.home-why-wrap');
@@ -642,6 +642,62 @@ const mainScript = () => {
         }
     }
     const homeTesti = new HomeTesti('.home-testi-wrap');
+
+    class HomeCase extends TriggerSetup {
+        constructor(triggerEl) {
+            super(triggerEl);
+            this.currentIndex = 0;
+            this.currentStepIndex = 0;
+        }
+        trigger() {
+            super.setTrigger(this.setup.bind(this));
+        }
+        setup() {
+            console.log('HomeCase setup')
+            let interval = null;
+
+            const activeTab = (reset = false) => {
+                this.currentStepIndex = 0;
+                let stepLength = $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').length;
+                $('.home-case-tab').eq(this.currentIndex).addClass('active').siblings().removeClass('active');
+                $('.home-case-content-tabs').eq(this.currentIndex).addClass('active').siblings().removeClass('active');
+
+                $('.home-case-content-tab-wrap').removeClass('active');
+                $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').eq(0).addClass('active');
+
+                $('.home-case-step').removeClass('active');
+                $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').eq(0).addClass('active');
+
+                if (interval) {
+                    clearInterval(interval);
+                }
+
+                interval = setInterval(() => {
+                    this.currentStepIndex++;
+                    if (this.currentStepIndex === stepLength) {
+                        this.currentStepIndex = 0;
+                        this.currentIndex = this.currentIndex + 1;
+                        activeTab(true);
+                    }
+                    else if (this.currentStepIndex === stepLength && this.currentIndex === $('.home-case-tab').length - 1) {
+                        clearInterval(interval);
+                    }
+                    else {
+                        $('.home-case-content-tab-wrap').eq(this.currentStepIndex).addClass('active');
+                        $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').eq(this.currentStepIndex).addClass('active');
+                        $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').eq(this.currentStepIndex).addClass('active');
+                    }
+                }, 3000);
+            }
+            $('.home-case-tab').on('click',  function () {
+                let index = $(this).index();
+                this.currentIndex = index;
+                activeTab();
+            })
+            activeTab();
+        }
+    }
+    const homeCase = new HomeCase('.home-case-wrap');
 
     class AboutHero extends TriggerSetupHero {
         constructor() {
@@ -1224,7 +1280,7 @@ const mainScript = () => {
             this.interact();
         }
         setup() {
-            
+
              this.tl = gsap.timeline({
                 onStart: () => {
                     $('[data-init-df]').removeAttr('data-init-df');
@@ -1503,6 +1559,7 @@ const mainScript = () => {
             homeFeature.trigger();
             homeWhy.trigger();
             homeTesti.trigger();
+            homeCase.trigger();
         },
         aboutScript: () => {
             aboutHero.trigger();
