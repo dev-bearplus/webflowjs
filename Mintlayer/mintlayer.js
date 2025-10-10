@@ -2058,52 +2058,42 @@ const mainScript = () => {
     }
     SCRIPT.mediaScript = () => {
         initAnimPath('.media-down-bg', { duration: 6, delay: 1.5, reverse: true });
-        if ($(window).width() > 767) {
-            // $('.media-main').each((idx, el) => {
-            //     const mediaSwiper = new Swiper($(el).find('.media-main-cms').get(0), {
-            //         slidesPerView: 3,
-            //         spaceBetween: parseRem(16),
-            //         slidesPerGroup: 3,
-            //         speed: 800,
-            //         // effect: "fade",
-            //         // fadeEffect: {
-            //         //     crossFade: true,
-            //         //   },
-            //         mousewheel: {
-            //             enabled: true,
-            //             forceToAxis: true,
-            //         },
-            //         pagination: {
-            //             el: $(el).find('.media-main-pagi').get(0),
-            //             renderBullet: function (index, className) {
-            //                 return '<span class="' + className + '">' + (index + 1) + "</span>";
-            //             },
-            //             clickable: true,
-            //         }
-            //     })
-            // })
-            // const mediaSwiperAll = new Swiper('.media-blogs-all .media-blog-all-cms', {
-            //     slidesPerView: 3,
-            //     spaceBetween: parseRem(16),
-            //     slidesPerGroup: 3,
-            //     speed: 800,
-            //     grid: {
-            //         rows: 2,
-            //       },
-            //     mousewheel: {
-            //         enabled: true,
-            //         forceToAxis: true,
-            //     },
-            //       loopFillGroupWithBlank: true,
-            //     pagination: {
-            //         el: $('.media-blogs-all .media-main-pagi ').get(0),
-            //         renderBullet: function (index, className) {
-            //          return '<span class="' + className + '">' + (index + 1) + "</span>";
-            //            },
-            //         clickable: true,
-            //     }
-            // })
-        }
+        let swiper = new Swiper(".media-blog-all-press", {
+            slidesPerView: 1,
+            spaceBetween: parseRem(16),
+            pagination: {
+                el: '.media-main-pagination-press',
+                bulletClass: 'media-main-pagination-item',
+                bulletActiveClass: 'active',
+                clickable: true,
+            },
+            breakpoints: {
+                767: {
+                    slidesPerView: 2,
+                },
+                991: {
+                    slidesPerView: 3,
+                }
+            },
+        });
+        let swiper2 = new Swiper(".media-blog-all-media", {
+            slidesPerView: 1,
+            spaceBetween: parseRem(16),
+            pagination: {
+                el: '.media-main-pagination',
+                bulletClass: 'media-main-pagination-item',
+                bulletActiveClass: 'active',
+                clickable: true,
+            },
+            breakpoints: {
+                767: {
+                    slidesPerView: 2,
+                },
+                991: {
+                    slidesPerView: 3,
+                }
+            },
+        });
     }
     SCRIPT.eventScript = () => {
         $('.event-main-table-body').each((idx, el) => {
