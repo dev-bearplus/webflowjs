@@ -678,12 +678,15 @@ const mainScript = () => {
                     $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').eq(this.currentStepIndex).addClass('done');
                     this.currentStepIndex++;
                     if (this.currentStepIndex === stepLength) {
-                        this.currentStepIndex = 0;
-                        this.currentIndex = this.currentIndex + 1;
-                        activeTab(true);
-                    }
-                    else if (this.currentStepIndex === stepLength && this.currentIndex === $('.home-case-tab').length - 1) {
-                        clearInterval(interval);
+                        if (this.currentIndex === $('.home-case-tab').length - 1) {
+                            clearInterval(interval);
+                        }
+                        else {
+                            this.currentStepIndex = 0;
+                            this.currentIndex = this.currentIndex + 1;
+                            activeTab(true);
+                            clearInterval(interval);
+                        }
                     }
                     else {
                         $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').eq(this.currentStepIndex).addClass('active');
