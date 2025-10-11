@@ -673,7 +673,7 @@ const mainScript = () => {
                 }
 
                 interval = setInterval(() => {
-                    $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').eq(this.currentStepIndex).addClass('done');
+                    $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').eq(this.currentStepIndex).removeClass('active').addClass('done');
                     this.currentStepIndex++;
                     if (this.currentStepIndex === stepLength) {
                         if (this.currentIndex === $('.home-case-tab').length - 1) {
@@ -694,12 +694,19 @@ const mainScript = () => {
             $('.home-case-tab').on('click',  (event) => {
                 let index = $(event.currentTarget).index();
                 this.currentIndex = index;
+                this.currentStepIndex = 0;
                 activeTab();
             })
             $('.home-case-content-tab').on('click', (event) => {
                 let index = $(event.currentTarget).parent().index();
                 this.currentStepIndex = index;
+                // clearInterval(interval);
                 activeTab();
+                $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').each((idx, item) => {
+                    if (idx < this.currentStepIndex) {
+                        $(item).addClass('done');
+                    }
+                })
             })
             activeTab();
         }
