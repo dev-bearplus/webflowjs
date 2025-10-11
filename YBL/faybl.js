@@ -689,7 +689,7 @@ const mainScript = () => {
                         $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').eq(this.currentStepIndex).addClass('active');
                         $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').eq(this.currentStepIndex).addClass('active');
                     }
-                }, 2400);
+                }, 3400);
             }
             $('.home-case-tab').on('click',  (event) => {
                 let index = $(event.currentTarget).index();
