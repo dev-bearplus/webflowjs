@@ -655,6 +655,8 @@ const mainScript = () => {
         setup() {
             console.log('HomeCase setup')
             let interval = null;
+            let widthItem = $('.home-case-content-tab').eq(0).width();
+            let maxItemInScreen = 4;
 
             const activeTab = () => {
                 let stepLength = $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').length;
@@ -667,13 +669,17 @@ const mainScript = () => {
                 $('.home-case-step').removeClass('active');
                 $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').eq(this.currentStepIndex).addClass('active');
 
+                if (stepLength > maxItemInScreen && this.currentStepIndex >= maxItemInScreen) {
+
+                }
+
                 if (interval) {
                     clearInterval(interval);
                     $('.home-case-content-tab-wrap').removeClass('done');
                 }
 
                 interval = setInterval(() => {
-                    $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').eq(this.currentStepIndex).removeClass('active').addClass('done');
+                    $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').eq(this.currentStepIndex).addClass('done');
                     this.currentStepIndex++;
                     if (this.currentStepIndex === stepLength) {
                         if (this.currentIndex === $('.home-case-tab').length - 1) {
@@ -700,11 +706,16 @@ const mainScript = () => {
             $('.home-case-content-tab').on('click', (event) => {
                 let index = $(event.currentTarget).parent().index();
                 this.currentStepIndex = index;
-                // clearInterval(interval);
                 activeTab();
                 $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').each((idx, item) => {
                     if (idx < this.currentStepIndex) {
                         $(item).addClass('done');
+                    }
+                })
+                $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').each((idx, item) => {
+                    if (idx < this.currentStepIndex) {
+                        console.log($(item))
+                        $(item).addClass('active');
                     }
                 })
             })
