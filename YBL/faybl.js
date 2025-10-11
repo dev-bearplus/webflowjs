@@ -709,22 +709,28 @@ const mainScript = () => {
                 this.currentStepIndex = index;
                 let stepLength = $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').length;
 
-                activeTab();
-                requestAnimationFrame(() => {
-                    if (stepLength > maxItemInScreen && this.currentStepIndex >= maxItemInScreen) {
-                        gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem(20)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
-                    }
-                    $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').each((idx, item) => {
-                        if (idx < this.currentStepIndex) {
-                            $(item).addClass('done');
+                // Force animation restart by removing and re-adding active class
+                $('.home-case-content-tab-wrap').removeClass('active');
+
+                // Use setTimeout to ensure class removal is processed before adding it back
+                setTimeout(() => {
+                    activeTab();
+                    requestAnimationFrame(() => {
+                        if (stepLength > maxItemInScreen && this.currentStepIndex >= maxItemInScreen) {
+                            gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem(20)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
                         }
-                    })
-                    $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').each((idx, item) => {
-                        if (idx < this.currentStepIndex) {
-                            $(item).addClass('active');
-                        }
-                    })
-                });
+                        $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').each((idx, item) => {
+                            if (idx < this.currentStepIndex) {
+                                $(item).addClass('done');
+                            }
+                        })
+                        $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').each((idx, item) => {
+                            if (idx < this.currentStepIndex) {
+                                $(item).addClass('active');
+                            }
+                        })
+                    });
+                }, 10);
             })
             activeTab();
         }
