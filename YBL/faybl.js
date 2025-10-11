@@ -658,6 +658,7 @@ const mainScript = () => {
 
             const activeTab = (reset = false) => {
                 this.currentStepIndex = 0;
+                console.log(this.currentIndex)
                 let stepLength = $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').length;
                 $('.home-case-tab').eq(this.currentIndex).addClass('active').siblings().removeClass('active');
                 $('.home-case-content-tabs').eq(this.currentIndex).addClass('active').siblings().removeClass('active');
@@ -670,9 +671,11 @@ const mainScript = () => {
 
                 if (interval) {
                     clearInterval(interval);
+                    $('.home-case-content-tab-wrap').removeClass('done');
                 }
 
                 interval = setInterval(() => {
+                    $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').eq(this.currentStepIndex).addClass('done');
                     this.currentStepIndex++;
                     if (this.currentStepIndex === stepLength) {
                         this.currentStepIndex = 0;
@@ -683,18 +686,17 @@ const mainScript = () => {
                         clearInterval(interval);
                     }
                     else {
-                        $('.home-case-content-tab-wrap').eq(this.currentStepIndex).addClass('active');
                         $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').eq(this.currentStepIndex).addClass('active');
                         $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').eq(this.currentStepIndex).addClass('active');
                     }
-                }, 3000);
+                }, 2400);
             }
-            $('.home-case-tab').on('click',  function () {
-                let index = $(this).index();
+            $('.home-case-tab').on('click',  (event) => {
+                let index = $(event.currentTarget).index();
                 this.currentIndex = index;
-                activeTab();
+                activeTab(true);
             })
-            activeTab();
+            activeTab(true);
         }
     }
     const homeCase = new HomeCase('.home-case-wrap');
