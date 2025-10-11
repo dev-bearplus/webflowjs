@@ -656,18 +656,16 @@ const mainScript = () => {
             console.log('HomeCase setup')
             let interval = null;
 
-            const activeTab = (reset = false) => {
-                this.currentStepIndex = 0;
-                console.log(this.currentIndex)
+            const activeTab = () => {
                 let stepLength = $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').length;
                 $('.home-case-tab').eq(this.currentIndex).addClass('active').siblings().removeClass('active');
                 $('.home-case-content-tabs').eq(this.currentIndex).addClass('active').siblings().removeClass('active');
 
                 $('.home-case-content-tab-wrap').removeClass('active');
-                $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').eq(0).addClass('active');
+                $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').eq(this.currentStepIndex).addClass('active');
 
                 $('.home-case-step').removeClass('active');
-                $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').eq(0).addClass('active');
+                $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').eq(this.currentStepIndex).addClass('active');
 
                 if (interval) {
                     clearInterval(interval);
@@ -684,8 +682,7 @@ const mainScript = () => {
                         else {
                             this.currentStepIndex = 0;
                             this.currentIndex = this.currentIndex + 1;
-                            activeTab(true);
-                            clearInterval(interval);
+                            activeTab();
                         }
                     }
                     else {
@@ -697,9 +694,14 @@ const mainScript = () => {
             $('.home-case-tab').on('click',  (event) => {
                 let index = $(event.currentTarget).index();
                 this.currentIndex = index;
-                activeTab(true);
+                activeTab();
             })
-            activeTab(true);
+            $('.home-case-content-tab').on('click', (event) => {
+                let index = $(event.currentTarget).parent().index();
+                this.currentStepIndex = index;
+                activeTab();
+            })
+            activeTab();
         }
     }
     const homeCase = new HomeCase('.home-case-wrap');
