@@ -1016,6 +1016,9 @@ const mainScript = () => {
                     console.log("start")
                     $('[data-init-df]').removeAttr('data-init-df');
                 },
+                onComplete: () => {
+                    this.interact();
+                },
                 paused: true
             });
             new MasterTimeline({
@@ -1023,25 +1026,26 @@ const mainScript = () => {
                 allowMobile: true,
                 tweenArr: [
                     new FadeSplitText({ el: $('.pricing-hero-title').get(0) }),
-                    new FadeSplitText({ el: $('.pricing-hero-sub').get(0), onMask: true, delay: "<=0.3" }),
-                    ...Array.from($('.pricing-hero-item')).flatMap((el, idx) => new FadeIn({ el }))
+                    new FadeSplitText({ el: $('.pricing-hero-sub').get(0), onMask: true, delay: "<=0.3" })
+                    // ...Array.from($('.pricing-hero-item')).flatMap((el, idx) => new FadeIn({ el }))
                 ]
             });
-            let tlSub = new gsap.timeline({
-                scrollTrigger: {
-                    trigger: '.pricing-hero-addition-wrap',
-                    start: 'top top+=75%',
-                }
+        }
+        interact() {
+            $('.pricing-hero-table-body .pricing-hero-table-col').on('mouseenter', function() {
+                let index = $(this).index();
+                $('.pricing-hero-table-hover-bg').eq(index).addClass('active');
+                $('.pricing-hero-table-col.head').eq(index).addClass('on-hover');
+
             })
-            new MasterTimeline({
-                timeline: tlSub,
-                tweenArr: [
-                    new FadeIn({ el: $('.pricing-hero-addition').get(0) }),
-                    new FadeSplitText({ el: $('.pricing-hero-addition-title').get(0), onMask: true }),
-                    new FadeSplitText({ el: $('.pricing-hero-addition-sub').get(0), onMask: true, delay: "<=.2" }),
-                    new FadeSplitText({ el: $('.pricing-hero-addition-price-title').get(0), onMask: true, delay: "<=-.2" }),
-                    new FadeSplitText({ el: $('.pricing-hero-addition-price-sub').get(0), onMask: true, delay: "<=.2" }),
-                ]
+            $('.pricing-hero-table-body .pricing-hero-table-col').on('mouseleave', function() {
+                let index = $(this).index();
+                $('.pricing-hero-table-hover-bg').eq(index).removeClass('active');
+                $('.pricing-hero-table-col.head').eq(index).removeClass('on-hover');
+            })
+            $('.pricing-hero-table-accor-content').slideUp();
+            $('.pricing-hero-table-accor-title').on('click', function() {
+                $(this).siblings('.pricing-hero-table-accor-content').slideToggle();
             })
         }
         play() {
@@ -1072,21 +1076,9 @@ const mainScript = () => {
                     new FadeIn({ el: $('.pricing-how-btn').get(0), delay: "<=.2" }),
                 ]
             })
-            let tlImg = new gsap.timeline({
-                scrollTrigger: {
-                    trigger: '.pricing-how-img-wrap',
-                    start: 'top top+=65%',
-                }
-            })
-            new MasterTimeline({
-                timeline: tlImg,
-                tweenArr: [
-                    new ScaleInset({ el: $('.pricing-how-img').get(0) })
-                ]
-            })
         }
     }
-    const pricingHow = new PricingHow('.about-contact-wrap');
+    const pricingHow = new PricingHow('.pricing-how-wrap');
 
     class ProductHero extends TriggerSetupHero {
         constructor() {
