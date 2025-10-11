@@ -656,7 +656,7 @@ const mainScript = () => {
             console.log('HomeCase setup')
             let interval = null;
             let widthItem = $('.home-case-content-tab').eq(0).width();
-            let maxItemInScreen = 3;
+            let maxItemInScreen = $(window).width() <= 767 ? 0 : $(window).width() <= 991 ? 1 : 3;
 
             const activeTab = () => {
                 let stepLength = $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').length;
@@ -686,6 +686,9 @@ const mainScript = () => {
                             this.currentStepIndex = 0;
                             this.currentIndex = this.currentIndex + 1;
                             activeTab();
+                            if ($(window).width() <= 767 && this.currentIndex > 0 && this.currentIndex < $('.home-case-tab').length - 1) {
+                                gsap.to($('.home-case-tabs'), { x: -this.currentIndex * ($('.home-case-tab').width() + parseRem(32)), duration: 0.6, ease: 'power1.inOut' });
+                            }
                         }
                     }
                     else {
@@ -693,7 +696,7 @@ const mainScript = () => {
                         $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').eq(this.currentStepIndex).addClass('active');
 
                         if (stepLength > maxItemInScreen && this.currentStepIndex >= maxItemInScreen) {
-                            gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem(20)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
+                            gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
                         }
                     }
                 }, 3400);
@@ -703,6 +706,12 @@ const mainScript = () => {
                 this.currentIndex = index;
                 this.currentStepIndex = 0;
                 activeTab();
+                requestAnimationFrame(() => {
+                    gsap.set($('.home-case-content-tabs'), { clearProps: "all" });
+                    if ($(window).width() <= 767 && this.currentIndex > 0 && this.currentIndex < $('.home-case-tab').length - 1) {
+                        gsap.to($('.home-case-tabs'), { x: -this.currentIndex * ($('.home-case-tab').width() + parseRem(32)), duration: 0.6, ease: 'power1.inOut' });
+                    }
+                })
             })
             $('.home-case-content-tab').on('click', (event) => {
                 let index = $(event.currentTarget).parent().index();
@@ -717,7 +726,7 @@ const mainScript = () => {
                     activeTab();
                     requestAnimationFrame(() => {
                         if (stepLength > maxItemInScreen && this.currentStepIndex >= maxItemInScreen) {
-                            gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem(20)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
+                            gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
                         }
                         $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').each((idx, item) => {
                             if (idx < this.currentStepIndex) {
