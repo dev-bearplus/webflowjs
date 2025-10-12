@@ -1009,15 +1009,13 @@ const mainScript = () => {
         trigger() {
             this.setup();
             super.init(this.play.bind(this));
+            this.interact();
         }
         setup() {
             this.tl = gsap.timeline({
                 onStart: () => {
                     console.log("start")
                     $('[data-init-df]').removeAttr('data-init-df');
-                },
-                onComplete: () => {
-                    this.interact();
                 },
                 paused: true
             });
@@ -1026,8 +1024,8 @@ const mainScript = () => {
                 allowMobile: true,
                 tweenArr: [
                     new FadeSplitText({ el: $('.pricing-hero-title').get(0) }),
-                    new FadeSplitText({ el: $('.pricing-hero-sub').get(0), onMask: true, delay: "<=0.3" })
-                    // ...Array.from($('.pricing-hero-item')).flatMap((el, idx) => new FadeIn({ el }))
+                    new FadeSplitText({ el: $('.pricing-hero-sub').get(0), onMask: true, delay: "<=0.3" }),
+                    ...Array.from($('.pricing-hero-table-row')).flatMap((el, idx) => new FadeIn({ el }))
                 ]
             });
         }
@@ -1046,6 +1044,7 @@ const mainScript = () => {
             $('.pricing-hero-table-accor-content').slideUp();
             $('.pricing-hero-table-accor-title').on('click', function() {
                 $(this).siblings('.pricing-hero-table-accor-content').slideToggle();
+                $(this).parent().toggleClass('active');
             })
         }
         play() {
