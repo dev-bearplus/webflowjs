@@ -95,6 +95,20 @@ const mainScript = () => {
             rect.top - headerRect.height / 2 <= 0
         );
     }
+    function setupMarquee(marqueeClass) {
+        marqueeClass.each(function (index, item) {
+            const width = $(item).find("[data-marquee = inner]").width();
+            const length = Math.floor($(item).width() / width) + 1;
+            const time = viewport.w > 767 ? $(item).find("[data-marquee = inner]").width() / 100 : $(item).find("[data-marquee = inner]").width() / 50;
+            for (var i = 0; i < length; i++) {
+                let $originalListLogo = $(item).find("[data-marquee = inner]").eq(0);
+                let $clonedListLogo = $originalListLogo.clone();
+                $(item).append($clonedListLogo);
+            }
+            $(item).find("[data-marquee = inner]").css("animation-duration", `${time}s`);
+            $(item).find("[data-marquee = inner]").addClass("anim");
+        });
+    }
     let currentSpaceName = $(".main").attr("data-barba-namespace");
     console.log(currentSpaceName)
     let ratioScrollHeader = viewport.w > 767 ? 1 : .5;
@@ -104,6 +118,8 @@ const mainScript = () => {
     $('.product-cta-close').on('click', function () {
         $('.product-cta').slideUp();
     })
+    viewport.w <= 767 && setupMarquee($('.product-cta-marquee'));
+
     const HEADER = {
         toggleHide: (inst) => {
             const scrollTop = document.documentElement.scrollTop || window.scrollY
@@ -152,21 +168,7 @@ const mainScript = () => {
             }
         },
     }
-    function setupMarquee(marqueeClass) {
-        marqueeClass.each(function (index, item) {
-            console.log($(item).find("[data-marquee = inner]").width())
-            const width = $(item).find("[data-marquee = inner]").width();
-            const length = Math.floor($(item).width() / width) + 1;
-            const time = viewport.w > 767 ? $(item).find("[data-marquee = inner]").width() / 100 : $(item).find("[data-marquee = inner]").width() / 50;
-            for (var i = 0; i < length; i++) {
-                let $originalListLogo = $(item).find("[data-marquee = inner]").eq(0);
-                let $clonedListLogo = $originalListLogo.clone();
-                $(item).append($clonedListLogo);
-            }
-            $(item).find("[data-marquee = inner]").css("animation-duration", `${time}s`);
-            $(item).find("[data-marquee = inner]").addClass("anim");
-        });
-    }
+
 
     const enterLeaveTransition = () => {
         $("a:not([data-link-prevent])").on('click', function (e) {
@@ -1261,7 +1263,6 @@ const mainScript = () => {
         setup() {
             this.tl = gsap.timeline({
                 onStart: () => {
-                    console.log("start")
                     $('[data-init-df]').removeAttr('data-init-df');
                 },
                 paused: true
@@ -1298,12 +1299,18 @@ const mainScript = () => {
                     })
                 }
                 let swiper = new Swiper('.pricing-hero-table-sticky .pricing-hero-table-row', {
-                    // slidesPerView: 1,
-                    slidesPerView: 'auto',
+                    slidesPerView: 1,
                     spaceBetween: parseRem(12),
                     centeredSlides: true,
+                    pagination: {
+                        el: '.pricing-hero-table-pagi',
+                        bulletClass: 'pricing-hero-table-pagi-item',
+                        bulletActiveClass: 'active',
+                        clickable: true,
+                    },
                     breakpoints: {
                         768: {
+                            slidesPerView: 'auto',
                             centeredSlides: false,
                         }
                     },
