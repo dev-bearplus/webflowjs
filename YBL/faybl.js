@@ -116,14 +116,14 @@ const mainScript = () => {
             debounceTimer = setTimeout(() => {
                 if (isScrollHeader) {
                     if (inst.direction >= 1) {
-                        $('.header').addClass('on-hide');
+                        // $('.header').addClass('on-hide');
                         $('.term-content-menu').addClass('on-top');
                     } else {
-                        $('.header').removeClass('on-hide');
+                        // $('.header').removeClass('on-hide');
                         $('.term-content-menu').removeClass('on-top');
                     }
                 } else {
-                    $('.header').removeClass('on-hide');
+                    // $('.header').removeClass('on-hide');
                     $('.term-content-menu').removeClass('on-top');
                 }
             }, 100);
@@ -696,12 +696,17 @@ const mainScript = () => {
                         $('.home-case-steps').eq(this.currentIndex).find('.home-case-step').eq(this.currentStepIndex).addClass('active');
 
                         if (stepLength > maxItemInScreen && this.currentStepIndex >= maxItemInScreen) {
-                            if (this.currentStepIndex < stepLength - 1) {
-                                gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
+                            if (viewport.w <= 767) {
+                                if (this.currentStepIndex < stepLength - 1) {
+                                    gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
+                                }
+                                else {
+                                    let lastDistance = $('.home-case-content-tabs-wrap').width() - widthItem - parseRem(45);
+                                    gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -((widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen) - lastDistance), duration: 0.6, ease: 'power1.inOut' });
+                                }
                             }
                             else {
-                                let lastDistance = $('.home-case-content-tabs-wrap').width() - widthItem - parseRem(45);
-                                gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -((widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen) - lastDistance), duration: 0.6, ease: 'power1.inOut' });
+                                gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
                             }
                         }
                     }
@@ -732,12 +737,17 @@ const mainScript = () => {
                     activeTab();
                     requestAnimationFrame(() => {
                         if (stepLength > maxItemInScreen && this.currentStepIndex >= maxItemInScreen) {
-                            if (this.currentStepIndex < stepLength - 1) {
-                                gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
+                            if (viewport.w <= 767) {
+                                if (this.currentStepIndex < stepLength - 1) {
+                                    gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
+                                }
+                                else {
+                                    let lastDistance = $('.home-case-content-tabs-wrap').width() - widthItem - parseRem(45);
+                                    gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -((widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen) - lastDistance), duration: 0.6, ease: 'power1.inOut' });
+                                }
                             }
                             else {
-                                let lastDistance = $('.home-case-content-tabs-wrap').width() - widthItem - parseRem(45);
-                                gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -((widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen) - lastDistance), duration: 0.6, ease: 'power1.inOut' });
+                                gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
                             }
                         }
                         $('.home-case-content-tabs').eq(this.currentIndex).find('.home-case-content-tab-wrap').each((idx, item) => {
