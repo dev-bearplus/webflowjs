@@ -876,6 +876,139 @@ const mainScript = () => {
         }
     }
     const aboutService = new AboutService('.about-service-wrap');
+    class AboutJoin extends TriggerSetup {
+        constructor(triggerEl) {
+            super(triggerEl);
+        }
+        trigger() {
+            super.setTrigger(this.setup.bind(this));
+        }
+        setup() {
+            this.tl = gsap.timeline({
+                onStart: () => {
+                    $('[data-init-df]').removeAttr('data-init-df');
+                },
+                paused: true
+            });
+            new MasterTimeline({
+                timeline: this.tl,
+                allowMobile: true,
+                tweenArr: [
+                    new FadeSplitText({ el: $('.about-join-title').get(0), onMask: true}),
+                    ...Array.from($('.schedule-hero-form-input-wrap')).flatMap((el, idx) => new FadeIn({ el:el, delay: "<=.1" })),
+                    new FadeIn({el: $('.about-join-form-submit').get(0)}),
+                    new FadeSplitText({ el: $('.schedule-hero-form-info-label').get(0), onMask: true, }),
+                    new FadeSplitText({ el: $('.schedule-hero-form-info-title .txt').get(0), onMask: true }),
+                ]
+            })
+        }
+        interact() {
+            $('.about-join-form-success-link').on('click', function(e) {
+                e.preventDefault();
+                $('.about-join-form-inner').addClass('active');
+                $('.about-join-form-success').removeClass('active');
+            })
+            $('.about-join-form-submit').on('click', function(e) {
+                e.preventDefault();
+                let originText = $('.about-join-form-submit').val();
+                let email = $('.schedule-hero-form-input[name="email"]');
+                let firstName = $('.schedule-hero-form-input[name="First-name"]');
+                let lastName = $('.schedule-hero-form-input[name="Last-name"]');
+                let linkedin = $('.schedule-hero-form-input[name="Linkedin-Profile"]');
+                let phone = $('.schedule-hero-form-input[name="Phone"]');
+                let flag = false;
+                if(firstName.val() == '') {
+                    firstName.closest('.schedule-hero-form-input-wrap').addClass('error');
+                    flag = true;
+                }
+                else {
+                    firstName.closest('.schedule-hero-form-input-wrap').removeClass('error');
+                }
+                if(lastName.val() == '') {
+                    lastName.closest('.schedule-hero-form-input-wrap').addClass('error');
+                    flag = true;
+                }
+                else {
+                    lastName.closest('.schedule-hero-form-input-wrap').removeClass('error');
+                }
+                if(phone.val() == '') {
+                    phone.closest('.schedule-hero-form-input-wrap').addClass('error');
+                    flag = true;
+                }
+                else {
+                    phone.closest('.schedule-hero-form-input-wrap').removeClass('error');
+                }
+                if(email.val() == '') {
+                    email.closest('.schedule-hero-form-input-wrap').removeClass('error-format').addClass('error-null');
+                    flag = true;
+                }
+                else if(!validateEmail(email.val())) {
+                    email.closest('.schedule-hero-form-input-wrap').removeClass('error-null').addClass('error-format');
+                    flag = true;
+                }
+                else {
+                    email.closest('.schedule-hero-form-input-wrap').removeClass('error-format, error-null');
+                }
+                // if(!flag) {
+                //     $('.about-join-form-submit').val(`${originText}...`);
+                //     var formData = {
+                //         fields: [
+                //         {
+                //             name: "email",
+                //             value: email.val()
+                //         },
+                //         {
+                //             name: "firstname",
+                //             value: firstName.val()
+                //             },
+                //         {
+                //             name: "phone",
+                //             value: phone.val()
+                //         },
+                //         {
+                //             name: "lastname",
+                //             value: lastName.val()
+                //         },
+                //         {
+                //             name: "linkedin",
+                //             value: linkedin.val()
+                //         },
+                //         ],
+                //         context: {
+                //         // Thông tin tracking (tùy chọn)
+                //         pageUri: window.location.href,
+                //         pageName: document.title
+                //         }
+                //     };
+                //     console.log(formData)
+                //     $.ajax({
+                //         url: "https://api.hsforms.com/submissions/v3/integration/submit/40167303/0ff7eeb5-33c6-41cb-9434-91d0496156de",
+                //         type: "POST",
+                //         contentType: "application/json",
+                //         data: JSON.stringify(formData),
+                //         success: function(response) {
+                //             $('.about-join-form-inner').removeClass('active');
+                //             $('.about-join-form-success').addClass('active');
+                //             $('.about-join-form-submit').val(originText);
+                //             email.val('');
+                //             firstName.val('');
+                //             lastName.val('');
+                //             linkedin.val('');
+                //             phone.val('');
+                //         },
+                //         error: function(xhr, status, error) {
+                //             $('.about-join-form-submit').text(originText);
+                //             console.error("Form submission error:", error);
+                //         }
+                //     });
+                // }
+            })
+        }
+        play() {
+            this.tl.play();
+        }
+    }
+    // let aboutJoin = new AboutJoin('.about-join-wrap');
     class AboutContact extends TriggerSetup {
         constructor(triggerEl) {
             super(triggerEl);
@@ -1030,22 +1163,61 @@ const mainScript = () => {
             });
         }
         interact() {
-            $('.pricing-hero-table-body .pricing-hero-table-col').on('mouseenter', function() {
-                let index = $(this).index();
-                $('.pricing-hero-table-hover-bg').eq(index).addClass('active');
-                $('.pricing-hero-table-col.head').eq(index).addClass('on-hover');
+            if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && $(window).width() > 767) {
+                $('.pricing-hero-table-body .pricing-hero-table-col').on('mouseenter', function() {
+                    let index = $(this).index();
+                    $('.pricing-hero-table-hover-bg').eq(index).addClass('active');
+                    $('.pricing-hero-table-col.head').eq(index).addClass('on-hover');
 
-            })
-            $('.pricing-hero-table-body .pricing-hero-table-col').on('mouseleave', function() {
-                let index = $(this).index();
-                $('.pricing-hero-table-hover-bg').eq(index).removeClass('active');
-                $('.pricing-hero-table-col.head').eq(index).removeClass('on-hover');
-            })
+                })
+                $('.pricing-hero-table-body .pricing-hero-table-col').on('mouseleave', function() {
+                    let index = $(this).index();
+                    $('.pricing-hero-table-hover-bg').eq(index).removeClass('active');
+                    $('.pricing-hero-table-col.head').eq(index).removeClass('on-hover');
+                })
+            }
             $('.pricing-hero-table-accor-content').slideUp();
             $('.pricing-hero-table-accor-title').on('click', function() {
                 $(this).siblings('.pricing-hero-table-accor-content').slideToggle();
                 $(this).parent().toggleClass('active');
             })
+
+            if (viewport.w <= 991) {
+                $('.pricing-hero-table-sticky .pricing-hero-table-row').addClass('swiper');
+                $('.pricing-hero-table-sticky .pricing-hero-table-body').addClass('swiper-wrapper');
+                $('.pricing-hero-table-sticky .pricing-hero-table-col.head').addClass('swiper-slide');
+                $('.pricing-hero-table-sticky .pricing-hero-table-body').css('grid-column-gap', '0');
+                const activeIndex = (index) => {
+                    $('.pricing-hero-table-sticky .pricing-hero-table-col.head').eq(index).addClass('on-hover');
+                    $('.pricing-hero-table-sticky .pricing-hero-table-col.head').eq(index).siblings().removeClass('on-hover');
+                    $('.pricing-hero-table-body.detail').each((_, item) => {
+                        $(item).find('.pricing-hero-table-col').eq(index).addClass('active');
+                        $(item).find('.pricing-hero-table-col').eq(index).siblings().removeClass('active');
+                    })
+                }
+                new Swiper('.pricing-hero-table-sticky .pricing-hero-table-row', {
+                    // slidesPerView: 1,
+                    slidesPerView: 'auto',
+                    spaceBetween: parseRem(12),
+                    centeredSlides: true,
+                    breakpoints: {
+                        768: {
+                            centeredSlides: false,
+                        }
+                    },
+                    on: {
+                        slideChange: (slide) => {
+                            let index = slide.activeIndex;
+                            activeIndex(index);
+                        }
+                    }
+                });
+                $('.pricing-hero-table-sticky .pricing-hero-table-col.head').on('click', function() {
+                    let index = $(this).index();
+                    activeIndex(index);
+                })
+                activeIndex(0);
+            }
         }
         play() {
             this.tl.play();
@@ -1318,8 +1490,7 @@ const mainScript = () => {
             this.interact();
         }
         setup() {
-
-             this.tl = gsap.timeline({
+            this.tl = gsap.timeline({
                 onStart: () => {
                     $('[data-init-df]').removeAttr('data-init-df');
                 },
