@@ -2990,32 +2990,42 @@ const mainScript = () => {
             }
             $('.sc-home-withdraw-tab-item').on('click', function(){
                 if($(this).hasClass('active')) return;
-                $('.sc-home-withdraw-tab-item').removeClass('active');
+                
+                let $parent = $(this).closest('.sc-home-withdraw');
+                
+                $parent.find('.sc-home-withdraw-tab-item').removeClass('active');
                 $(this).addClass('active');
+                
                 let index = $(this).index();
-                $('.sc-home-withdraw-item-wrap').removeClass('active');
-                $('.sc-home-withdraw-item-wrap').eq(index).addClass('active');
+                $parent.find('.sc-home-withdraw-item-wrap').removeClass('active');
+                $parent.find('.sc-home-withdraw-item-wrap').eq(index).addClass('active');
+                
                 if(viewport.w < 992){
-                    $('.sc-home-withdraw-item-wrap').slideUp(400);
-                    $('.sc-home-withdraw-item-wrap').eq(index).slideDown(400);
+                    $parent.find('.sc-home-withdraw-item-wrap').slideUp(400);
+                    $parent.find('.sc-home-withdraw-item-wrap').eq(index).slideDown(400);
                 }
             })
+            
             $(".sc-home-withdraw-item-avai").on('click', function(){
+                let $parent = $(this).closest('.sc-home-withdraw');
+                
                 if(viewport.w > 991){
                     if($(this).hasClass('active')) return;
-                    $(".sc-home-withdraw-item-avai").removeClass('active')
-                    $(this).addClass('active')
+                    $parent.find(".sc-home-withdraw-item-avai").removeClass('active');
+                    $(this).addClass('active');
                 }
                 else {
-                    $(this).toggleClass('active')
+                    $(this).toggleClass('active');
                 }
+                
                 if(viewport.w < 992){
                     $(this).find('.sc-home-withdraw-item-avai-sub-wrap').slideToggle(400);
                 }
             })
+            
             $(".sc-home-withdraw-item").on('click', function(){
                 if(viewport.w < 992){
-                    $(this).toggleClass('active')
+                    $(this).toggleClass('active');
                     $(this).find('.sc-home-withdraw-item-sub-wrap').slideToggle(400);
                 }
             })
