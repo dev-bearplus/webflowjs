@@ -638,7 +638,6 @@ const mainScript = () => {
                     })
                 ]
             })
-
         }
     }
     const homeTesti = new HomeTesti('.home-testi-wrap');
@@ -653,7 +652,25 @@ const mainScript = () => {
             super.setTrigger(this.setup.bind(this));
         }
         setup() {
-            console.log('HomeCase setup')
+            new MasterTimeline({
+                triggerInit: this.triggerEl,
+                scrollTrigger: { trigger: '.home-case-title-wrap' },
+                tweenArr: [
+                    new FadeIn({ el: $('.home-case-label').get(0) }),
+                    new FadeSplitText({ el: $('.home-case-title').get(0), onMask: true }),
+                ]
+            })
+            new MasterTimeline({
+                triggerInit: this.triggerEl,
+                scrollTrigger: { trigger: '.home-case-stick' },
+                tweenArr: [
+                    ...Array.from($('.home-case-tab')).flatMap((el, idx) => new FadeIn({ el })),
+                    new FadeIn({ el: $('.home-case-content').get(0) }),
+                    new FadeIn({ el: $('.home-case-btn').get(0) })
+                ]
+            })
+
+
             let interval = null;
             let widthItem = $('.home-case-content-tab').eq(0).width();
             let maxItemInScreen = $(window).width() <= 767 ? 0 : $(window).width() <= 991 ? 1 : 3;
@@ -907,10 +924,8 @@ const mainScript = () => {
         }
         setup() {
             new MasterTimeline({
-                scrollTrigger: {
-                    trigger: '.about-join',
-                    start: 'top top+=65%',
-                },
+                triggerInit: this.triggerEl,
+                scrollTrigger: { trigger: '.about-join' },
                 tweenArr: [
                     new FadeSplitText({ el: $('.about-join-title').get(0), onMask: true}),
                     new FadeSplitText({ el: $('.about-join-sub').get(0), onMask: true}),
@@ -1166,20 +1181,16 @@ const mainScript = () => {
         }
         setup() {
             new MasterTimeline({
-                scrollTrigger: {
-                    trigger: '.about-intro-text-wrap',
-                    start: 'top top+=65%',
-                },
+                triggerInit: this.triggerEl,
+                scrollTrigger: { trigger: '.about-intro-text-wrap' },
                 tweenArr: [
                     new FadeSplitText({ el: $('.about-intro-title').get(0), onMask: true, headingType: true }),
                     ...Array.from($('.about-intro-sub')).flatMap((el, idx) => new FadeSplitText({ el, onMask: true, delay: "<=.3" }))
                 ]
             })
             new MasterTimeline({
-                scrollTrigger: {
-                    trigger: '.about-intro-img',
-                    start: 'top top+=65%',
-                },
+                triggerInit: this.triggerEl,
+                scrollTrigger: { trigger: '.about-intro-img' },
                 tweenArr: [
                     new ScaleInset({ el: $('.about-intro-img-inner').get(0), delay: "<=0" })
                 ]
@@ -1198,7 +1209,7 @@ const mainScript = () => {
         setup() {
             new MasterTimeline({
                 triggerInit: this.triggerEl,
-                scrollTrigger: { trigger: '.about-quote', start: 'top 60%' },
+                scrollTrigger: { trigger: '.about-quote' },
                 tweenArr: [
                     new FadeIn({ el: $('.about-quote-content').get(0), from: { y: 50 } }),
                     new FadeIn({ el: $('.about-quote-thumb').get(0), from: { y: 50 } }),
@@ -1225,10 +1236,8 @@ const mainScript = () => {
             setupMarquee($('.about-indus-marquee'));
 
             new MasterTimeline({
-                scrollTrigger: {
-                    trigger: '.about-indus-wrap',
-                    start: 'top top+=65%',
-                },
+                triggerInit: this.triggerEl,
+                scrollTrigger: { trigger: '.about-indus-wrap' },
                 tweenArr: [
                     new FadeSplitText({ el: $('.about-indus-title').get(0), onMask: true, headingType: true }),
                     new FadeSplitText({ el: $('.about-indus-marquee-label .txt').get(0), onMask: true }),
@@ -1858,7 +1867,7 @@ const mainScript = () => {
     const SCRIPT = {
         homeScript: () => {
             homeHero.trigger();
-            homeUser.trigger();
+            // homeUser.trigger();
             homeFeature.trigger();
             homeWhy.trigger();
             homeTesti.trigger();
@@ -1870,7 +1879,7 @@ const mainScript = () => {
             aboutIntro.trigger();
             aboutQuote.trigger();
             aboutJoin.trigger();
-            aboutService.trigger();
+            // aboutService.trigger();
             aboutTeam.trigger();
             aboutIndustry.trigger();
             aboutContact.trigger();
