@@ -1881,33 +1881,12 @@ const mainScript = () => {
                 let cloneSwiper = $('.home-benef-main.swiper').clone().removeClass('mod-bot').addClass('mod-top');
                 $('.home-benef-main-wrap').append(cloneSwiper);
             }
-
-            let cloneImg = $('.home-benef-img-wrap img');
-            $('.home-benef-img-inner').append(cloneImg.clone());
-            // $('.home-benef-img-inner').append(cloneImg.clone());
-            // $('.home-benef-img-inner').append(cloneImg.clone());
+            let positionLeft = ($('.sc-home-benef').width() - $('.home-benef-img-wrap').eq(0).width()) / 2*-1;
+            $('.home-benef-img-wrap').eq(0).css('left', positionLeft);
+            $('.home-benef-img-wrap').eq(0).css('right', positionLeft);
         }
         homeBenefSetup();
         function homeBenefHanlde() {
-            // const ribbonTl = gsap.timeline({
-            // })
-            // ribbonTl.to(".home-benef-img-inner", {
-            //     duration: 30,
-            //     ease: 'none',
-            //     x: `+=${$('.home-benef-img-inner .img-basic').eq(0).width()}`,
-            //     repeat: -1,
-            // });
-
-            // const tlwrap = gsap.timeline({
-            //     scrollTrigger: {
-            //         trigger: $('.wrapper'),
-            //         onUpdate() {
-            //             let velo = gsap.utils.clamp(1, 4, Math.abs(lenis.velocity).toFixed(3));
-            //             gsap.set(ribbonTl, {timeScale: 1 * velo, overwrite: true});
-            //         }
-            //     }
-            // })
-
             let homeBenefCardsHigh = $('.home-benef-cards .home-benef-item-wrap.mod-high');
             let homeBenefCardsLow = $('.home-benef-cards .home-benef-item-wrap.mod-low');
             let homeBenefCardOffset = 7.6;
@@ -1939,10 +1918,6 @@ const mainScript = () => {
         }
         // homeBenefHanlde();
         function homeBenefHandleMobile() {
-            gsap.set(".home-benef-img-wrap .img-basic", {
-                x: (i) => (i - 1) * $('.home-benef-img-wrap .img-basic').eq(0).width()
-            });
-
             if ($(window).outerWidth() <= 991 && $(window).outerWidth() > 767) {
                 console.log('init swiper')
                 let homeBenefSwiper = new Swiper('.home-benef-main.mod-bot', {
@@ -1963,22 +1938,20 @@ const mainScript = () => {
                 });
             }
             if ($(window).outerWidth() <= 767) {
-                $('.home-benef-main-bar.mod-mb .home-benef-item-wrap').on('click', function (e) {
-                    let index = $(this).index();
+                $('.home-benef-item').on('click', function (e) {
                     if ($(this).hasClass('active')) {
                         $(this).removeClass('active');
-
-                        $(this).find('.home-benef-item-sub').slideUp("slow");
+                        $(this).find('.home-benef-item-sub').slideUp();
                     }
                     else {
-                        $('.home-benef-main-bar.mod-mb .home-benef-item-wrap').not($(this)).removeClass('active');
+                        $('.home-benef-item').not($(this)).removeClass('active');
                         $(this).addClass('active')
 
-                        $('.home-benef-main-bar.mod-mb .home-benef-item-wrap').not($(this)).find('.home-benef-item-sub').slideUp("slow");
-                        $(this).find('.home-benef-item-sub').slideDown("slow");
+                        $('.home-benef-item').not($(this)).find('.home-benef-item-sub').slideUp();
+                        $(this).find('.home-benef-item-sub').slideDown();
                     }
                 })
-                $('.home-benef-main-bar.mod-mb .home-benef-item-wrap').eq(0).trigger('click');
+                $('.home-benef-item').eq(0).trigger('click');
             }
         }
         homeBenefHandleMobile()
