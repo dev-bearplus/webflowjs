@@ -1882,8 +1882,8 @@ const mainScript = () => {
                 $('.home-benef-main-wrap').append(cloneSwiper);
             }
             let positionLeft = ($('.sc-home-benef').width() - $('.home-benef-img-wrap').eq(0).width()) / 2*-1;
-            $('.home-benef-img-wrap').eq(0).css('left', positionLeft);
-            $('.home-benef-img-wrap').eq(0).css('right', positionLeft);
+            // $('.home-benef-img-wrap').eq(0).css('left', positionLeft);
+            // $('.home-benef-img-wrap').eq(0).css('right', positionLeft);
         }
         homeBenefSetup();
         function homeBenefHanlde() {
