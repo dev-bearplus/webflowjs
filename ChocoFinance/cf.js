@@ -1882,8 +1882,10 @@ const mainScript = () => {
                 $('.home-benef-main-wrap').append(cloneSwiper);
             }
             let positionLeft = ($('.sc-home-benef').width() - $('.home-benef-img-wrap').eq(0).width()) / 2*-1;
-            // $('.home-benef-img-wrap').eq(0).css('left', positionLeft);
-            // $('.home-benef-img-wrap').eq(0).css('right', positionLeft);
+            if(isStagging()){
+                $('.home-benef-img-wrap').eq(0).css('left', positionLeft);
+                $('.home-benef-img-wrap').eq(0).css('right', positionLeft);
+            }   
         }
         homeBenefSetup();
         function homeBenefHanlde() {
@@ -2170,7 +2172,7 @@ const mainScript = () => {
                     homeChartInitTl.from('.chart-tip-box', {autoAlpha: 0, yPercent: 100, duration: .4, ease: 'Power1.easeInOut', stagger: 0.1, clearProps: 'all'})
                     // .from('.home-chart-txt-top', {autoAlpha: 0, yPercent: 60, duration: .6, ease: 'Power1.easeInOut', clearProps: 'all'}, 0)
                     // .from('.home-chart-txt-bot', {autoAlpha: 0, yPercent: 60, duration: .6, ease: 'Power1.easeInOut', clearProps: 'all'}, '<=.2')
-                    .from('.homt-chart-balance-start', {autoAlpha: 0, yPercent: 60, duration: .6, ease: 'Power1.easeInOut', clearProps: 'all'}, '<=.2')
+                    // .from('.homt-chart-balance-start', {autoAlpha: 0, yPercent: 60, duration: .6, ease: 'Power1.easeInOut', clearProps: 'all'}, '<=.2')
                 })
             })
 
@@ -2326,8 +2328,9 @@ const mainScript = () => {
                 let timeYear = Math.floor(timeVal / 12);
                 let timeMonth = timeVal % 12;
                 if ($(e.target).attr('id') == 'chartBalance') {
-                    balanceVal = 'S' + formatter($(e.target).val(), false)
-                    $('.homt-chart-balance-start').text(balanceVal)
+                    balanceVal = 'HK' + formatter($(e.target).val(), false)
+                    console.log(balanceVal)
+                    // $('.homt-chart-balance-start').text(balanceVal)
                     $(e.target).parent().parent().find('.home-chart-ctrl-number').text(balanceVal)
                 } else if ($(e.target).attr('id') == 'chartTime') {
                     timeVal = $(e.target).val()
@@ -2362,12 +2365,7 @@ const mainScript = () => {
                             unitExtra = "'"
                         }
                     }
-                    if (timeVal <= 244) {
-                        $('.homt-chart-balance-start').addClass('mod-lift')
-                    } else {
-                        $('.homt-chart-balance-start').removeClass('mod-lift')
-                    }
-                    $('.home-chart-time-txt').text(`${timeYear == 0 ? '' : timeYear + ' ' + yearUnit}${timeMonth == 0 ? '' : ' ' + timeMonth + ' ' + monthUnit}${unitExtra} time`)
+                    $('.home-chart-time-end').text(`${timeYear == 0 ? '' : timeYear + ' ' + yearUnit}${timeMonth == 0 ? '' : ' ' + timeMonth + ' ' + monthUnit}${unitExtra} time`)
                     //$(e.target).parent().parent().find('.home-chart-ctrl-number').text(`${timeVal} ${monthUnit}`)
                     $(e.target).parent().parent().find('.home-chart-ctrl-number').text(`${timeYear == 0 ? '' : timeYear + ' ' + yearUnit} ${timeMonth == 0 ? '' : timeMonth + ' ' + monthUnit}`)
                 }
@@ -2378,7 +2376,7 @@ const mainScript = () => {
 
             const homeChartTl = new gsap.timeline({
                 scrollTrigger: {
-                    trigger: '.sc-home-comp',
+                    trigger: '.sc-home-graph',
                     start: 'top bottom',
                     end: `top+=20% top`,
                     scrub: true,
@@ -2387,7 +2385,7 @@ const mainScript = () => {
             homeChartTl.fromTo('.home-benef-coin-wrap.mod-lg', {y: -4 * unit, ease: 'none'}, {y: 12 * unit})
             .fromTo('.home-benef-coin-wrap.mod-sm', {y: -3 * unit, ease: 'none'}, {y: 3 * unit}, '0')
         };
-        if ($('.home-comp').length >= 1) {
+        if (isStagging() && $('#myChart').length > 0) {
             homeChartHandle();
         }
         function getHomeTesti() {
@@ -2416,12 +2414,7 @@ const mainScript = () => {
                 }
             });
         }
-        // if(isStagging()){
             homeTestiHandleNew();
-        // }
-        // else {
-        //     getHomeTesti();
-        // }
         function homeTestiHandleNew() {
             console.log('init new testi')
             $('.home-testi-item').each(function(e) {
@@ -2620,7 +2613,31 @@ const mainScript = () => {
             })
         }
         homeGraphHandle();
-
+        function homeWork() {
+            let positionLeft = ($('.sc-home-work').width() - $('.home-work-bg-wrap').eq(0).width()) / 2*-1;
+            console.log('khanh' +positionLeft)
+            $('.home-work-bg-wrap').eq(0).css('left', positionLeft);
+            $('.home-work-bg-wrap').eq(0).css('right', positionLeft);
+            const homeWorkSwiper = new Swiper('.home-work-main-wrap', {
+                slidesPerView: 1,
+                spaceBetween:parseRem(20),
+                breakpoints: {
+                    767: {
+                        slidesPerView: 2,
+                        spaceBetween: parseRem(40),
+                    },
+                    991: {
+                        slidesPerView: 4,
+                        spaceBetween: parseRem(40),
+                        },
+                }
+    
+            });
+        }
+        if(isStagging() && $('.sc-home-work').length > 0){
+            homeWork();
+        }
+        console.log('khanh')
         function homeClimateHandle() {
             let vid = document.querySelector('.vid-home-climate');
 
