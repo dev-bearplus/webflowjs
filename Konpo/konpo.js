@@ -1,5 +1,8 @@
 const mainScript = () => {
     console.log('dev')
+    function isVideoPlaying(video) {
+        return video && !video.paused && !video.ended && video.currentTime > 0 && video.readyState > 2;
+    }
     dayjs.extend(window.dayjs_plugin_utc)
     dayjs.extend(window.dayjs_plugin_timezone)
 
@@ -2509,6 +2512,10 @@ const mainScript = () => {
                             $(el).attr('target','_blank')
                             $(el).attr('data-cursor', 'ext')
                         }
+                    }
+                    let video = $(el).find('video').get(0)
+                    if (!isVideoPlaying(video)) {
+                        $(el).find('.home-hero-client-item-vid').remove()
                     }
                 })
                 function updateDeetsDetail(itemIndex) {;
