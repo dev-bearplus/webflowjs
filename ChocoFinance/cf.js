@@ -1876,6 +1876,73 @@ const mainScript = () => {
             }
         }
         homeHeroHandle();
+        function homeRich() {
+            var TxtType = function (el, toRotate, period) {
+                this.toRotate = toRotate;
+                this.el = el;
+                this.loopNum = 0;
+                this.period = parseInt(period, 10) || 2000;
+                this.txt = "";
+                this.isDeleting = false;
+                this.tick();
+            };
+            
+            TxtType.prototype.tick = function () {
+                var i = this.loopNum % this.toRotate.length;
+                var fullTxt = this.toRotate[i];
+                
+                if (this.isDeleting) {
+                    this.txt = fullTxt.substring(0, this.txt.length - 1);
+                } else {
+                    this.txt = fullTxt.substring(0, this.txt.length + 1);
+                }
+                
+                // Tạo HTML với từng ký tự trong span và thêm cursor
+                var html = '';
+                for (var j = 0; j < this.txt.length; j++) {
+                    html += '<span class="char-typing">' + this.txt[j] + '</span>';
+                }
+                // Thêm cursor nháy
+                html += '<span class="typing-cursor"></span>';
+                
+                this.el.innerHTML = html;
+                
+                var that = this;
+                var delta = 100;
+                
+                if (this.isDeleting) {
+                    delta = 100;
+                }
+                
+                if (!this.isDeleting && this.txt === fullTxt) {
+                    delta = this.period;
+                    this.isDeleting = true;
+                } else if (this.isDeleting && this.txt === "") {
+                    this.isDeleting = false;
+                    this.loopNum++;
+                    delta = 700;
+                }
+                
+                setTimeout(function () {
+                    that.tick();
+                }, delta);
+            };
+            
+            $('.sc-home-rich-title.item-underline').each(function() {
+                var $element = $(this);
+                var dataText = $element.attr('data-text-typing');
+                var period = $element.attr('data-period') || 2000;
+                
+                if (dataText) {
+                    var toRotate = $.map(dataText.split(','), $.trim);
+                    new TxtType(this, toRotate, period);
+                }
+            });
+        }
+        
+        if(isStagging()){
+            homeRich();
+        }
         function homeBenefSetup() {
             if ($(window).outerWidth() > 991) {
                 let cloneSwiper = $('.home-benef-main.swiper').clone().removeClass('mod-bot').addClass('mod-top');
@@ -1973,13 +2040,24 @@ const mainScript = () => {
             }
 
             if ($(window).width() < 767) {
-                $('.home-secu-main-wrap').addClass('swiper')
-                $('.home-secu-main').addClass('swiper-wrapper')
-                $('.home-secu-item').addClass('swiper-slide')
-                const homeSecuSwiper = new Swiper('.swiper.home-secu-main-wrap', {
-                    slidesPerView: "auto",
-                    spaceBetween: 2.4 * unit,
-                })
+                if($('.home-secu-main-wrap').length > 0){
+                    $('.home-secu-main-wrap').addClass('swiper')
+                    $('.home-secu-main').addClass('swiper-wrapper')
+                    $('.home-secu-item').addClass('swiper-slide')
+                    const homeSecuSwiper = new Swiper('.swiper.home-secu-main-wrap', {
+                        slidesPerView: "auto",
+                        spaceBetween: 2.4 * unit,
+                    })
+                }
+                if($('.home-secu-hk-main-wrap').length > 0){
+                    $('.home-secu-hk-main-wrap').addClass('swiper')
+                    $('.home-secu-hk-main').addClass('swiper-wrapper')
+                    $('.home-secu-hk-item').addClass('swiper-slide')
+                    const homeSecuSwiper = new Swiper('.swiper.home-secu-hk-main-wrap', {
+                        slidesPerView: "auto",
+                        spaceBetween: 2.4 * unit,
+                    })
+                }
             }
 
             if ($(window).width() > 991) {
@@ -2043,7 +2121,7 @@ const mainScript = () => {
                     color: 'rgba(112, 29, 27, 1)'
                 },
                 fixed: {
-                    color: 'rgba(61, 25, 18, 1)'
+                    color: 'rgb(186, 137, 79)'
                 }
             }
             const data = {
@@ -2172,7 +2250,7 @@ const mainScript = () => {
                     homeChartInitTl.from('.chart-tip-box', {autoAlpha: 0, yPercent: 100, duration: .4, ease: 'Power1.easeInOut', stagger: 0.1, clearProps: 'all'})
                     // .from('.home-chart-txt-top', {autoAlpha: 0, yPercent: 60, duration: .6, ease: 'Power1.easeInOut', clearProps: 'all'}, 0)
                     // .from('.home-chart-txt-bot', {autoAlpha: 0, yPercent: 60, duration: .6, ease: 'Power1.easeInOut', clearProps: 'all'}, '<=.2')
-                    // .from('.homt-chart-balance-start', {autoAlpha: 0, yPercent: 60, duration: .6, ease: 'Power1.easeInOut', clearProps: 'all'}, '<=.2')
+                    .from('.homt-chart-balance-start', {autoAlpha: 0, yPercent: 60, duration: .6, ease: 'Power1.easeInOut', clearProps: 'all'}, '<=.2')
                 })
             })
 
@@ -2221,6 +2299,7 @@ const mainScript = () => {
 
             function updateChart(balance, time) {
                 fomularCf(balance,time)
+                console.log('update chart' +balance)
                 //c_Options.animation = false;
                 lineChart.data.labels = data.time;
                 lineChart.data.datasets[0].data = data.chocoFin;
@@ -2245,7 +2324,7 @@ const mainScript = () => {
                 // $('.chart-tip-amount.amount-fixed').text(` ${formatter(data_fixed)} `)
                 // $('.span-choco-white.re-total-other').text(` ${isFixed == true ? formatter(data_fixed) : formatter(data_other)} `)
                 let difference = data_Cf - data.chocoFin[0];
-                $('.span-txt-link.re-earn-cf').text(` S${formatter(difference)} `);
+                // $('.span-txt-link.re-earn-cf').text(` S${formatter(difference)} `);
 
                 if ($(window).width() > 991) {
                     let bottomOther = (data_other - data.chocoFin[0]) / (data_Cf - data.chocoFin[0]) * 100;
@@ -2330,7 +2409,7 @@ const mainScript = () => {
                 if ($(e.target).attr('id') == 'chartBalance') {
                     balanceVal = 'HK' + formatter($(e.target).val(), false)
                     console.log(balanceVal)
-                    // $('.homt-chart-balance-start').text(balanceVal)
+                    $('.homt-chart-balance-start').text(balanceVal)
                     $(e.target).parent().parent().find('.home-chart-ctrl-number').text(balanceVal)
                 } else if ($(e.target).attr('id') == 'chartTime') {
                     timeVal = $(e.target).val()
@@ -2382,11 +2461,29 @@ const mainScript = () => {
                     scrub: true,
                 }
             });
-            homeChartTl.fromTo('.home-benef-coin-wrap.mod-lg', {y: -4 * unit, ease: 'none'}, {y: 12 * unit})
-            .fromTo('.home-benef-coin-wrap.mod-sm', {y: -3 * unit, ease: 'none'}, {y: 3 * unit}, '0')
+            // homeChartTl.fromTo('.home-benef-coin-wrap.mod-lg', {y: -4 * unit, ease: 'none'}, {y: 12 * unit})
+            // .fromTo('.home-benef-coin-wrap.mod-sm', {y: -3 * unit, ease: 'none'}, {y: 3 * unit}, '0')
         };
         if (isStagging() && $('#myChart').length > 0) {
             homeChartHandle();
+        }
+        function homeVisa() {
+            var swiper = new Swiper(".home-visa-card-inner", {
+                direction: "vertical",
+                slidesPerView: 4,
+                spaceBetween: parseRem(20),
+                loop: true,
+                duration: 600,
+                autoplay: {
+                    delay: 2000, 
+                    disableOnInteraction: false, 
+                    reverseDirection: true,
+                },
+                allowTouchMove: false, 
+            });
+        }
+        if(isStagging()){
+            homeVisa();
         }
         function getHomeTesti() {
             getAllDataByType('testi').then((res) => {
@@ -2414,7 +2511,7 @@ const mainScript = () => {
                 }
             });
         }
-            homeTestiHandleNew();
+        homeTestiHandleNew();
         function homeTestiHandleNew() {
             console.log('init new testi')
             $('.home-testi-item').each(function(e) {
@@ -2603,14 +2700,28 @@ const mainScript = () => {
                 }
             });
             tl
-            .from('.home-graph-main-item', {autoAlpha: 0, yPercent: 50, stagger: .14, duration: .6})
-
+                .from('.home-graph-main-item', {autoAlpha: 0, yPercent: 50, stagger: .14, duration: .6})
+                .from('.home-graph-note', {autoAlpha: 0, yPercent: 50, stagger: .14, duration: .6}, '< =.2')
+            
             $('.home-graph-note-txt [href="#FAQs"]').on('click', function(e) {
                 let faqEl = $('.home-faq-item#what-is-the-chocolate-top-up-programme-and-its-qualifying-period');
                 if (!faqEl.hasClass('active')) {
                     faqEl.find('.home-faq-item-head').trigger('click')
                 }
             })
+            if($('.sc-home-graph-tab-item ').length > 0) {
+                $('.sc-home-graph-content').css('height', $('.sc-home-graph-item').eq(0).outerHeight())
+                $('.sc-home-graph-tab-item').on('click', function(e){
+                    e.preventDefault();
+                    let index = $(this).index();
+                    let heigthItem = $('.sc-home-graph-item').eq(index).outerHeight();
+                    $('.sc-home-graph-content').css('height', heigthItem)
+                    $('.sc-home-graph-tab-item').removeClass('active');
+                    $(this).addClass('active');
+                    $('.sc-home-graph-item').removeClass('active')
+                    $('.sc-home-graph-item').eq(index).addClass('active')
+                })
+            }
         }
         homeGraphHandle();
         function homeWork() {
