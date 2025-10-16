@@ -1941,8 +1941,25 @@ const mainScript = () => {
                 }
             });
         }
-        
+        function homeEnjoy() {
+            if($('.sc-home-enjoy').length == 0) return;
+            let tlScroll = gsap.timeline({
+                scrollTrigger: {
+                  trigger: '.sc-home-enjoy',
+                  start:  'top-=50% bottom' ,
+                  end:  'bottom top' ,
+                  scrub: 1,
+                }
+            });
+            let tlFirst = gsap.timeline({
+                onComplete: () => {
+                    tlScroll
+                        .fromTo('.sc-home-enjoy-deco', { yPercent: 20 }, { yPercent: -55 , ease: 'none'}, 0)
+                }
+            })
+        }
         if(isStagging()){
+            homeEnjoy();
             homeRich();
         }
         function homeBenefSetup() {
