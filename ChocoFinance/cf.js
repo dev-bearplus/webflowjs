@@ -2725,8 +2725,8 @@ const mainScript = () => {
         }
         homeGraphHandle();
         function homeWork() {
-            let positionLeft = ($('.sc-home-work').width() - $('.home-work-bg-wrap').eq(0).width()) / 2*-1;
-            console.log('khanh' +positionLeft)
+            let positionLeft = (parseFloat($('.sc-home-work .container').eq(0).css('margin-left')) + parseFloat($('.sc-home-work .container').eq(0).css('padding-left'))) *-1;
+            console.log('khanh left ' + positionLeft)
             $('.home-work-bg-wrap').eq(0).css('left', positionLeft);
             $('.home-work-bg-wrap').eq(0).css('right', positionLeft);
             const homeWorkSwiper = new Swiper('.home-work-main-wrap', {
