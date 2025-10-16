@@ -3102,8 +3102,8 @@ const mainScript = () => {
                 $parent.find('.sc-home-withdraw-item-wrap').eq(index).addClass('active');
                 
                 if(viewport.w < 992){
-                    $parent.find('.sc-home-withdraw-item-wrap').slideUp(400);
-                    $parent.find('.sc-home-withdraw-item-wrap').eq(index).slideDown(400);
+                    $parent.find('.sc-home-withdraw-item-wrap').hide();
+                    $parent.find('.sc-home-withdraw-item-wrap').eq(index).show();
                 }
             })
             
