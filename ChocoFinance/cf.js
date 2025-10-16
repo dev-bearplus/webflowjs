@@ -766,6 +766,9 @@ const mainScript = () => {
         $(function () {
             const langPaths = ['hk-zh-hans', 'hk-zh-hant', 'hk-en'];
             const pathname = window.location.pathname;
+            if (isStagging() && pathname.includes('/about-us')) {
+                return;
+            }
             langPaths.forEach(function (lang) {
               const regex = new RegExp(`^/${lang}/.+`);
               if (regex.test(pathname)) {
@@ -913,7 +916,6 @@ const mainScript = () => {
         });
         return segments.length > 0 && segments[0].toLowerCase() === "hk-en";
     }
-    console.log(checkFirstPathIsHK())
     let firstLoad = sessionStorage.getItem('firstLoad');
     if(!firstLoad && !checkFirstPathIsHK()){
         let currentLang = $('html').attr('lang');
@@ -3136,6 +3138,16 @@ const mainScript = () => {
         }
     }
     SCRIPT.whyUsScript = () => {
+        function aboutImpact() {
+            $('.sc-abt-impact-item').on('click', function(){
+                $(this).find('.sc-abt-impact-item-sub').slideToggle();
+                $(this).toggleClass('active');
+            })
+            $('.sc-abt-impact-item').eq(0).click();
+        }
+        if($('.sc-abt-impact').length > 0) {
+            aboutImpact();
+        }
         function aboutClimateHanlde() {
             const aboutClimateTl = new gsap.timeline({
                 scrollTrigger: {
