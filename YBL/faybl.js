@@ -960,24 +960,16 @@ const mainScript = () => {
                 e.preventDefault();
                 let originText = $('.about-join-form-submit').val();
                 let email = $('.schedule-hero-form-input[name="Email"]');
-                let firstName = $('.schedule-hero-form-input[name="First-name"]');
-                let lastName = $('.schedule-hero-form-input[name="Last-name"]');
+                let fullname = $('.schedule-hero-form-input[name="Full-name"]');
                 let linkedin = $('.schedule-hero-form-input[name="Linkedin-Profile"]');
                 let phone = $('.schedule-hero-form-input[name="Phone"]');
                 let flag = false;
-                if(firstName.val() == '') {
-                    firstName.closest('.schedule-hero-form-input-wrap').addClass('error');
+                if(fullname.val() == '') {
+                    fullname.closest('.schedule-hero-form-input-wrap').addClass('error');
                     flag = true;
                 }
                 else {
-                    firstName.closest('.schedule-hero-form-input-wrap').removeClass('error');
-                }
-                if(lastName.val() == '') {
-                    lastName.closest('.schedule-hero-form-input-wrap').addClass('error');
-                    flag = true;
-                }
-                else {
-                    lastName.closest('.schedule-hero-form-input-wrap').removeClass('error');
+                    fullname.closest('.schedule-hero-form-input-wrap').removeClass('error');
                 }
                 if(phone.val() == '') {
                     phone.closest('.schedule-hero-form-input-wrap').addClass('error');
@@ -1013,16 +1005,12 @@ const mainScript = () => {
                             value: email.val()
                         },
                         {
-                            name: "firstname",
-                            value: firstName.val()
+                            name: "lastname",
+                            value: fullname.val()
                             },
                         {
                             name: "phone",
                             value: phone.val()
-                        },
-                        {
-                            name: "lastname",
-                            value: lastName.val()
                         },
                         {
                             name: "hs_linkedin_url",
