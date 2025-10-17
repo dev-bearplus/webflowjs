@@ -1243,7 +1243,7 @@ const mainScript = () => {
                 triggerInit: this.triggerEl,
                 scrollTrigger: { trigger: '.about-indus-wrap' },
                 tweenArr: [
-                    new FadeSplitText({ el: $('.about-indus-title').get(0), onMask: true, headingType: true }),
+                    new FadeSplitText({ el: $('.about-indus-title').get(0), onMask: true }),
                     new FadeSplitText({ el: $('.about-indus-marquee-label .txt').get(0), onMask: true }),
                     new ScaleLine({ el: $('.about-indus-marquee-line').get(1), delay: '1'}),
                     new FadeIn({ el: $('.about-indus-marquee').get(0) }),
