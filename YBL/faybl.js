@@ -132,21 +132,25 @@ const mainScript = () => {
             debounceTimer = setTimeout(() => {
                 if (isScrollHeader) {
                     if (inst.direction >= 1) {
-                        // $('.header').addClass('on-hide');
+                        $('.header').addClass('on-hide');
                         $('.term-content-menu').addClass('on-top');
                     } else {
-                        // $('.header').removeClass('on-hide');
+                        $('.header').removeClass('on-hide');
                         $('.term-content-menu').removeClass('on-top');
                     }
                 } else {
-                    // $('.header').removeClass('on-hide');
+                    $('.header').removeClass('on-hide');
                     $('.term-content-menu').removeClass('on-top');
                 }
             }, 100);
         },
         toggleOnScroll: (inst) => {
             const scrollTop = document.documentElement.scrollTop || window.scrollY
-            const isScrollHeader = scrollTop > $('.header-container').height() * ratioScrollHeader
+            let isScrollHeader = scrollTop > $('.header-container').height() * ratioScrollHeader;
+            if($('.cta-top-wrap').length > 0) {
+                isScrollHeader = scrollTop > parseRem(5);
+                console.log(scrollTop)
+            }
             let debounceTimer;
             debounceTimer && clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
@@ -327,6 +331,7 @@ const mainScript = () => {
         }
         trigger() {
             this.setup();
+            this.interact();
             super.init(this.play.bind(this));
         }
         setup() {
@@ -343,7 +348,7 @@ const mainScript = () => {
                 allowMobile: true,
                 tweenArr: [
                     new FadeSplitText({ el: $('.home-hero-title').get(0), onMask: true, headingType: true }),
-                    new ScaleInset({ el: $('.home-hero-video').get(0) }),
+                    new FadeIn({ el: $('.home-hero-video').get(0) }),
                     new FadeSplitText({ el: $('.home-hero-sub').get(0), onMask: true, delay: '<=.2' }),
                     new FadeIn({ el: $('.home-hero-act-request').get(0), delay: "<=0" }),
                     new FadeIn({ el: $('.home-hero-act-key').get(0) }),
@@ -352,6 +357,12 @@ const mainScript = () => {
                     new FadeIn({ el: $('.home-hero-marquee').get(0) }),
                 ]
             });
+        }
+        interact() {
+            $('.home-hero-video-control').on('click', function() {
+                $('.home-hero-video-control-wrap').fadeOut();
+                $('.home-hero-video-inner').get(0).play();
+            })
         }
         play() {
             this.tl.play();
