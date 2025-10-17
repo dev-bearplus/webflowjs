@@ -1110,6 +1110,9 @@ const mainScript = () => {
         }
         setup() {
             if (viewport.w < 992) {
+                $('.about-team-person-item-toggle').on('click', function() {
+                    $(this).closest('.about-team-person-item').toggleClass('active');
+                })
                 $('.about-team-person-wrap').each((idx, item) => {
                     $(item).find('.about-team-person-inner').addClass('swiper');
                     $(item).find('.about-team-person').addClass('swiper-wrapper');
