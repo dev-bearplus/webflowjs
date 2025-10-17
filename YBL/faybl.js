@@ -724,7 +724,7 @@ const mainScript = () => {
                                     gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -((widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen) - lastDistance), duration: 0.6, ease: 'power1.inOut' });
                                 }
                             }
-                            else {
+                            else if(viewport.w <= 991 && viewport.w > 767){
                                 gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
                             }
                         }
@@ -765,7 +765,7 @@ const mainScript = () => {
                                     gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -((widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen) - lastDistance), duration: 0.6, ease: 'power1.inOut' });
                                 }
                             }
-                            else {
+                            else if(viewport.w <= 991 && viewport.w > 767){
                                 gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
                             }
                         }
