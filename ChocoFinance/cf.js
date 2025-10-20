@@ -738,6 +738,11 @@ const mainScript = () => {
     }
     // Scroll Events
     let header = $('.header');
+    if ($('.intro-wrap').length) {
+        // header.removeAttr('df-on-init')
+        $('.intro-wrap').addClass('loaded')
+        // setTimeout(() => $('.intro-wrap').addClass('loaded'), 50);
+    }
     function suggestLanguage() {
         const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone.toLowerCase();
         if (userTimeZone.includes('asia') && (userTimeZone.includes('hong_kong') || userTimeZone.includes('shanghai') || userTimeZone.includes('beijing') || userTimeZone.includes('macau'))) {
@@ -763,150 +768,123 @@ const mainScript = () => {
             }
     }
     function activeLanguage() {
-        $(function () {
-            const langPaths = ['hk-zh-hans', 'hk-zh-hant', 'hk-en'];
-            const pathname = window.location.pathname;
-            if (isStagging() && pathname.includes('/about-us')) {
+        const $headerLangBtn = $('.header-lang-btn');
+        const $headerLangMain = $('.header-lang-main');
+        const $headerLangNationItems = $('.header-lang-nation-item');
+        const $headerLangContentInner = $('.header-lang-content-inner');
+        const $headerLangContentLists = $('.header-lang-content-list');
+        const $headerLangContentItems = $('.header-lang-content-item');
+        const $html = $('html');
+        const $header = $('.header');
+
+        const langPaths = ['hk-zh-hans', 'hk-zh-hant', 'hk-en'];
+        const pathname = window.location.pathname;
+        const lastSegment = pathname.split('/').pop();
+        const pathnameAllow = ['about-us', 'app-terms-and-conditions', 'privacy-policy', 'faqs', 'contact-us', 'app-fund-documents'];
+
+        if (!(isStagging() && pathnameAllow.includes(lastSegment))) {
+            const matchedLang = langPaths.find(lang => new RegExp(`^/${lang}/.+`).test(pathname));
+            if (matchedLang) {
+                window.location.replace(`/${matchedLang}`);
                 return;
             }
-            langPaths.forEach(function (lang) {
-              const regex = new RegExp(`^/${lang}/.+`);
-              if (regex.test(pathname)) {
-                window.location.replace(`/${lang}`);
-              }
-            });
-        });
-          
-        $('.header-lang-btn').on('click', function(e) {
+        }
+
+        $headerLangBtn.on('click', function(e) {
             e.preventDefault();
             $(this).toggleClass('active');
-            $('.header-lang-main').toggleClass('active');
-        })
-        if(viewport.w > 991){
-            $('.header-lang-nation-item').hover(
-                function(e) {
-                    if($(this).hasClass('active')) return;
-                    let index = $(this).index();
-                    $('.header-lang-nation-item').removeClass('active');
-                    $(this).addClass('active')
-                    let heightCurrent = $('.header-lang-content-inner').height();
-                    let heightWillChange = $('.header-lang-content-list').eq(index).height();
-                    $('.header-lang-content-list').removeClass('active');
-                    if(heightCurrent > heightWillChange){
-                        $('.header-lang-content-list').eq(index).addClass('active');
-                        setTimeout(function() {
-                            $('.header-lang-content-inner').height(heightWillChange);
-                        }, 200)
-                    }
-                    else {
-                        $('.header-lang-content-inner').height(heightWillChange);
-                        setTimeout(function() {
-                            $('.header-lang-content-list').eq(index).addClass('active');
-                        }, 200)
-                    }
-                    
-                },
-                // function(){
-                //     if($(this).hasClass('active')) return;
-                //     let indexActive = $('.header-lang-nation-item.active').index();
-                //     let heightContent = $('.header-lang-content-list').eq(indexActive).height();
-                //     $('.header-lang-content-inner').height(heightContent);
-                //     $('.header-lang-content-list').removeClass('active');
-                //     setTimeout(function(){
-                //         $('.header-lang-content-list').eq(indexActive).addClass('active');
-                //     },200)
-                // }
-            )
-        }
-        else {
-            $('.header-lang-nation-item').on('click', function(e){
+            $headerLangMain.toggleClass('active');
+        });
+
+        const animateHeight = (index) => {
+            const $targetList = $headerLangContentLists.eq(index);
+            const heightCurrent = $headerLangContentInner.height();
+            const heightWillChange = $targetList.height();
+
+            $headerLangContentLists.removeClass('active');
+
+            if (heightCurrent > heightWillChange) {
+                $targetList.addClass('active');
+                setTimeout(() => $headerLangContentInner.height(heightWillChange), 200);
+            } else {
+                $headerLangContentInner.height(heightWillChange);
+                setTimeout(() => $targetList.addClass('active'), 200);
+            }
+        };
+
+        const handleNationItemInteraction = function() {
+            if ($(this).hasClass('active')) return;
+
+            const index = $(this).index();
+            $headerLangNationItems.removeClass('active');
+            $(this).addClass('active');
+            animateHeight(index);
+        };
+        if (viewport.w > 991) {
+            $headerLangNationItems.hover(handleNationItemInteraction);
+        } else {
+            $headerLangNationItems.on('click', function(e) {
                 e.preventDefault();
-                let index = $(this).index();
-                $('.header-lang-nation-item').removeClass('active');
-                $(this).addClass('active');
-                let heightCurrent = $('.header-lang-content-inner').height();
-                let heightWillChange = $('.header-lang-content-list').eq(index).height();
-                $('.header-lang-content-list').removeClass('active');
-                console.log($('.header-lang-content-list').eq(index))
-                if(heightCurrent > heightWillChange){
-                    $('.header-lang-content-list').eq(index).addClass('active');
-                    setTimeout(function() {
-                        $('.header-lang-content-inner').height(heightWillChange);
-                    }, 200)
-                }
-                else {
-                    $('.header-lang-content-inner').height(heightWillChange);
-                    setTimeout(function() {
-                        $('.header-lang-content-list').eq(index).addClass('active');
-                    }, 200)
-                }
-            })
+                handleNationItemInteraction.call(this, e);
+            });
         }
-        
-        function initLang() {
-            const langCodes = $('.header-lang-content-item').map(function () {
+
+        const initLang = () => {
+            const langCodes = $headerLangContentItems.map(function() {
                 return $(this).data('lang-subdomain');
             }).get().filter(Boolean);
-            
+
             const langPattern = new RegExp(`^/(${langCodes.join('|')})(/|$)`);
-            
-            $('.header-lang-content-item').each(function () {
-                const langSubDomain = $(this).data('lang-subdomain');
-                const isDefault = $(this).data('lang-default');
-                const baseUrl = window.location.origin;
-                let pathname = window.location.pathname.replace(langPattern, '');
-                let languageCodeItem = $(this).attr('data-lang-code');
-                pathname = pathname.replace(/^\/+/, '');
-            
-                const search = window.location.search || '';
-                const hash = window.location.hash || '';
-            
-                let newUrl = '';
-                if (langSubDomain !== '') {
-                    newUrl = `${baseUrl}/${langSubDomain}${pathname ? '/' + pathname : ''}${search}${hash}`;
-                } else {
-                    newUrl = `${baseUrl}/${pathname}${search}${hash}`;
+            const baseUrl = window.location.origin;
+            const search = window.location.search || '';
+            const hash = window.location.hash || '';
+            $headerLangContentItems.each(function() {
+                const $this = $(this);
+                const langSubDomain = $this.data('lang-subdomain');
+                const isDefault = $this.data('lang-default');
+                const languageCodeItem = $this.attr('data-lang-code');
+                let cleanPathname = pathname.replace(langPattern, '').replace(/^\/+/, '');
+
+                const newUrl = langSubDomain
+                    ? `${baseUrl}/${langSubDomain}${cleanPathname ? '/' + cleanPathname : ''}${search}${hash}`
+                    : `${baseUrl}/${cleanPathname}${search}${hash}`;
+
+                $this.attr('href', newUrl);
+
+                if (isDefault) {
+                    const indexParent = $this.closest('.header-lang-content-list').index();
+                    $headerLangNationItems.eq(indexParent)
+                        .attr('href', newUrl)
+                        .attr('data-lang-code', languageCodeItem);
                 }
-            
-                $(this).attr('href', newUrl);
-                if(isDefault == true) {
-                    let indexParent = $(this).closest('.header-lang-content-list').index();
-                    $('.header-lang-nation-item').eq(indexParent).attr('href', newUrl);
-                    $('.header-lang-nation-item').eq(indexParent).attr('data-lang-code', languageCodeItem);
-                }
-                $(this).on('click', function(e){
-                    if($(this).hasClass('active')){
+
+                $this.on('click', function(e) {
+                    if ($this.hasClass('active')) {
                         e.preventDefault();
-                        return; 
                     }
-                })
-            }); 
-            let currentLang = $('html').attr('lang');
-            if(currentLang) {
-                if(currentLang!='en-SG') {
-                    $('.header').addClass('dark-mode')
-                }
-                console.log(currentLang)
-                $('.header-lang-nation-item').each((idx, item) => {
-                    let nationName = $(item).attr('data-nation');
-                    $('.header-lang-content-item').each((langIdx, langItem) => {
-                        let langItemCode = $(langItem).attr('data-lang-code');
-                        
-                        if (langItemCode == currentLang) {
-                            $(langItem).addClass('active');
-                            let displayName = $(langItem).attr('data-lang-name');
-                            let flagUrl = $(langItem).attr('data-flag');
-                            $('.header-lang-txt').text(displayName);
-                            $('.header-lang-ic img').attr('src',flagUrl);
-                            let indexList = $(langItem).closest('.header-lang-content-list').index();
-                            $('.header-lang-content-inner').height($('.header-lang-content-list').eq(indexList).height());
-                            $('.header-lang-content-list').eq(indexList).addClass('active');
-                            $('.header-lang-nation-item').eq(indexList).addClass('active');
-                        }
-                    });                    
-                })
+                });
+            });
+
+            const currentLang = $html.attr('lang');
+            if (!currentLang) return;
+            if (currentLang !== 'en-SG' && $('.language-coming').length) {
+                $header.addClass('dark-mode');
             }
-        }
+            const $activeLangItem = $headerLangContentItems.filter(`[data-lang-code="${currentLang}"]`);
+            if (!$activeLangItem.length) return;
+
+            $activeLangItem.addClass('active');
+            const displayName = $activeLangItem.attr('data-lang-name');
+            const flagUrl = $activeLangItem.attr('data-flag');
+            const indexList = $activeLangItem.closest('.header-lang-content-list').index();
+
+            $('.header-lang-txt').text(displayName);
+            $('.header-lang-ic img').attr('src', flagUrl);
+            $headerLangContentInner.height($headerLangContentLists.eq(indexList).height());
+            $headerLangContentLists.eq(indexList).addClass('active');
+            $headerLangNationItems.eq(indexList).addClass('active');
+        };
+
         initLang();
     }
     activeLanguage();
@@ -925,21 +903,6 @@ const mainScript = () => {
         }
         sessionStorage.setItem('firstLoad', true)
     }
-    // const cachedLanguage = localStorage.getItem('selectedLanguage');
-    // let currentLang = $('html').attr('lang');
-    // if (!cachedLanguage){
-    //     let suggestedLanguage = suggestLanguage();
-    //     console.log(suggestLanguage);
-    //     setLanguage(suggestedLanguage);
-    //     if(currentLang != suggestedLanguage){
-    //         redirectCurrentLanguage(suggestedLanguage);
-    //     }
-    // } else if (cachedLanguage && cachedLanguage != currentLang) {
-    //     redirectCurrentLanguage(cachedLanguage);
-    // } 
-    // if (cachedLanguage && cachedLanguage != currentLang) {
-    //     redirectCurrentLanguage(cachedLanguage);
-    // } 
     function scrollDown() {
         header.addClass('on-hide')
         if($('.header-lang-main').length) {
@@ -1689,20 +1652,6 @@ const mainScript = () => {
         })
     }
     formSubscribeTrigger()
-
-    if ($('.intro-wrap').length) {
-        console.log('intro-wrap')
-        // Termporary code, to be removed
-        // if ( $('[data-barba-namespace="blogAuth"]').length) {
-        //     if (!window.location.href.includes('webflow.io')) {
-        //         handle404();
-        //         return;
-        //     }
-        // }
-        // End
-        setTimeout(() => $('.intro-wrap').addClass('loaded'), 50);
-    }
-
     function resetScroll() {
         let hash = window.location.hash;
         let param = window.location.search;
