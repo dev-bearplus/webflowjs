@@ -2723,6 +2723,12 @@ const mainScript = () => {
                             imgEl.attr('alt', $(el).attr('data-cursor-img-alt'))
                             imgEl.addClass('img-el')
                             $(el).append(imgEl)
+                            $(el).on('mouseenter', function() {
+                                $(this).find('.img-el').addClass('active')
+                            })
+                            $(el).on('mouseleave', function() {
+                                $(this).find('.img-el').removeClass('active')
+                            })
                         })
                     }
                 }
