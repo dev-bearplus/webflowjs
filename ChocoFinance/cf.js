@@ -1915,12 +1915,7 @@ const mainScript = () => {
             if ($(window).outerWidth() > 991) {
                 let cloneSwiper = $('.home-benef-main.swiper').clone().removeClass('mod-bot').addClass('mod-top');
                 $('.home-benef-main-wrap').append(cloneSwiper);
-            }
-            let positionLeft = ($('.sc-home-benef').width() - $('.home-benef-img-wrap').eq(0).width()) / 2*-1;
-            if(isStagging()){
-                $('.home-benef-img-wrap').eq(0).css('left', positionLeft);
-                $('.home-benef-img-wrap').eq(0).css('right', positionLeft);
-            }   
+            } 
         }
         homeBenefSetup();
         function homeBenefHanlde() {
@@ -2693,10 +2688,6 @@ const mainScript = () => {
         }
         homeGraphHandle();
         function homeWork() {
-            let positionLeft = (parseFloat($('.sc-home-work .container').eq(0).css('margin-left')) + parseFloat($('.sc-home-work .container').eq(0).css('padding-left'))) *-1;
-            console.log('khanh left ' + positionLeft)
-            $('.home-work-bg-wrap').eq(0).css('left', positionLeft);
-            $('.home-work-bg-wrap').eq(0).css('right', positionLeft);
             const homeWorkSwiper = new Swiper('.home-work-main-wrap', {
                 slidesPerView: 1,
                 spaceBetween:parseRem(20),
