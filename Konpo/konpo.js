@@ -2712,6 +2712,20 @@ const mainScript = () => {
                         }
                     })
                 }
+
+                if ($('.home-abt-sub-wrap').hasClass('hover-ready')) {
+                    if ($(window).width() < 991 && isTouchDevice()) {
+                        let allItems = $('.home-abt-sub-wrap-p .hover-un[data-cursor-img]')
+                        allItems.each((idx, el) => {
+                            console.log(el)
+                            let imgEl = $(document.createElement('img'))
+                            imgEl.attr('src', $(el).attr('data-cursor-img'))
+                            imgEl.attr('alt', $(el).attr('data-cursor-img-alt'))
+                            imgEl.addClass('img-el')
+                            $(el).append(imgEl)
+                        })
+                    }
+                }
             }
             homeAbt()
 
