@@ -356,19 +356,8 @@ const pageConfig = {
 let currentPageManager = null;
 let headerComponent = null;
 
-const initPage = (namespace) => {
-    // Destroy previous page manager
-    if (currentPageManager) {
-        currentPageManager.destroy();
-        currentPageManager = null;
-    }
-
-    // Initialize new page
-    if (pageConfig[namespace]) {
-        currentPageManager = new PageManager(pageConfig[namespace]);
-    }
-
-    // Update header
+// Update header component
+const updateHeader = (namespace) => {
     headerComponent = document.querySelector('header-component');
     if (headerComponent) {
         headerComponent.updatePage(namespace);
@@ -382,14 +371,67 @@ const initPage = (namespace) => {
     }
 };
 
-const initBarba = () => {
-    // Get loading element
-    const loadingElement = document.querySelector('loading-wrap');
+// Page managers for each view
+const homePageManager = {
+    init(data) {
+        if (pageConfig.home) {
+            currentPageManager = new PageManager(pageConfig.home);
+        }
+        updateHeader('home');
+    },
+    destroy(data) {
+        if (currentPageManager) {
+            currentPageManager.destroy();
+            currentPageManager = null;
+        }
+    }
+};
 
+const pricingPageManager = {
+    init(data) {
+        if (pageConfig.pricing) {
+            currentPageManager = new PageManager(pageConfig.pricing);
+        }
+        updateHeader('pricing');
+    },
+    destroy(data) {
+        if (currentPageManager) {
+            currentPageManager.destroy();
+            currentPageManager = null;
+        }
+    }
+};
+
+// SCRIPT object with Barba views
+const SCRIPT = {
+    home: {
+        namespace: 'home',
+        afterEnter(data) {
+            homePageManager.init(data);
+        },
+        beforeLeave(data) {
+            homePageManager.destroy(data);
+        }
+    },
+    pricing: {
+        namespace: 'pricing',
+        afterEnter(data) {
+            pricingPageManager.init(data);
+        },
+        beforeLeave(data) {
+            pricingPageManager.destroy(data);
+        }
+    }
+};
+
+const VIEWS = Object.values(SCRIPT);
+
+const initBarba = () => {
     barba.init({
         preventRunning: true,
         sync: false,
         timeout: 5000,
+        views: VIEWS,
 
         transitions: [{
             name: 'default-transition',
@@ -397,17 +439,17 @@ const initBarba = () => {
             // First page load
             once({ next }) {
                 updateCurrentNav(next.url.href);
-                // Loading animation handled by connectedCallback
                 return Promise.resolve();
             },
 
-            // Before leaving current page
             async leave({ current }) {
                 const done = this.async();
+
                 if (lenis) lenis.stop();
 
                 killAllScrollTriggers();
 
+                const loadingElement = document.querySelector('loading-wrap');
                 if (loadingElement) {
                     await loadingElement.show();
                 }
@@ -415,33 +457,32 @@ const initBarba = () => {
                 done();
             },
 
-            // After leave
             async afterLeave({ current }) {
-                if (currentPageManager) {
-                    currentPageManager.destroy();
-                }
                 current.container.remove();
             },
+
             async beforeEnter({ next }) {
                 scrollToTop();
-                const namespace = next.namespace;
-                initPage(namespace);
             },
 
-            // Enter new page
             async enter({ next }) {
                 if (lenis) lenis.start();
+
                 await delay(50);
 
+                const loadingElement = document.querySelector('loading-wrap');
                 if (loadingElement) {
                     await loadingElement.hide();
                 }
+
                 refreshScrollTriggers();
             },
 
             async after({ next }) {
                 updateCurrentNav(next.url.href);
+
                 reinitializeWebflow();
+
                 await delay(100);
                 refreshScrollTriggers();
             }
@@ -454,18 +495,9 @@ const initBarba = () => {
 // ============================================
 
 const init = () => {
-    // Initialize Lenis
     initLenis();
-
-    // Initialize GSAP
     initGSAP();
-
-    // Initialize Barba
     initBarba();
-
-    // Initialize first page
-    const initialNamespace = document.querySelector('[data-barba-namespace]')?.getAttribute('data-barba-namespace') || 'home';
-    initPage(initialNamespace);
 };
 
 // Run on load
