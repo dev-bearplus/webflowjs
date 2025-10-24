@@ -783,7 +783,7 @@ const mainScript = () => {
         // const pathnameAllow = ['about-us', 'app-terms-and-conditions', 'privacy-policy', 'faqs', 'contact-us', 'app-fund-documents', 'app-risk-disclosures'];
         const pathnameAllow = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents'];
 
-        if (!(isStagging() && pathnameAllow.includes(lastSegment) && pathname.includes('hk-en'))) {
+        if (!(isStagging() && pathnameAllow.includes(lastSegment) && pathname.includes('hk-en'))) { //liam bỏ isStagging() 
             const matchedLang = langPaths.find(lang => new RegExp(`^/${lang}/.+`).test(pathname));
             if (matchedLang) {
                 window.location.replace(`/${matchedLang}`);
@@ -1908,7 +1908,7 @@ const mainScript = () => {
                 }
             })
         }
-        if(isStagging()){
+        if(isStagging()){ //liam bỏ isStagging() 
             homeEnjoy();
             homeRich();
         }
@@ -2458,7 +2458,7 @@ const mainScript = () => {
                 });
             }
         }
-        if(isStagging()){
+        if(isStagging() && $('.sc-home-visa').length > 0){ //liam bỏ isStagging() 
             homeVisa();
         }
         function getHomeTesti() {
@@ -2717,7 +2717,7 @@ const mainScript = () => {
     
             });
         }
-        if(isStagging() && $('.sc-home-work').length > 0){
+        if(isStagging() && $('.sc-home-work').length > 0){ //liam bỏ isStagging() 
             homeWork();
         }
         console.log('khanh')
