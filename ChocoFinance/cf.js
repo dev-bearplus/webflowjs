@@ -780,9 +780,10 @@ const mainScript = () => {
         const langPaths = ['hk-zh-hans', 'hk-zh-hant', 'hk-en'];
         const pathname = window.location.pathname;
         const lastSegment = pathname.split('/').pop();
-        const pathnameAllow = ['about-us', 'app-terms-and-conditions', 'privacy-policy', 'faqs', 'contact-us', 'app-fund-documents'];
+        // const pathnameAllow = ['about-us', 'app-terms-and-conditions', 'privacy-policy', 'faqs', 'contact-us', 'app-fund-documents', 'app-risk-disclosures'];
+        const pathnameAllow = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents'];
 
-        if (!(isStagging() && pathnameAllow.includes(lastSegment))) {
+        if (!(isStagging() && pathnameAllow.includes(lastSegment) && pathname.includes('hk-en'))) {
             const matchedLang = langPaths.find(lang => new RegExp(`^/${lang}/.+`).test(pathname));
             if (matchedLang) {
                 window.location.replace(`/${matchedLang}`);
@@ -1862,7 +1863,7 @@ const mainScript = () => {
                 var delta = 100;
                 
                 if (this.isDeleting) {
-                    delta = 100;
+                    delta = 50;
                 }
                 
                 if (!this.isDeleting && this.txt === fullTxt) {
@@ -1871,7 +1872,7 @@ const mainScript = () => {
                 } else if (this.isDeleting && this.txt === "") {
                     this.isDeleting = false;
                     this.loopNum++;
-                    delta = 700;
+                    delta = 400;
                 }
                 
                 setTimeout(function () {
@@ -1969,7 +1970,7 @@ const mainScript = () => {
                     }
                 });
             }
-            if ($(window).outerWidth() <= 767) {
+            if ($(window).outerWidth() <= 480) {
                 $('.home-benef-item').on('click', function (e) {
                     if ($(this).hasClass('active')) {
                         $(this).removeClass('active');
@@ -2431,19 +2432,31 @@ const mainScript = () => {
             homeChartHandle();
         }
         function homeVisa() {
-            var swiper = new Swiper(".home-visa-card-inner", {
-                direction: "vertical",
-                slidesPerView: 4,
-                spaceBetween: parseRem(20),
-                loop: true,
-                duration: 600,
-                autoplay: {
-                    delay: 2000, 
-                    disableOnInteraction: false, 
-                    reverseDirection: true,
-                },
-                allowTouchMove: false, 
-            });
+            if(viewport.w > 480){
+                var swiper = new Swiper(".home-visa-card-inner", {
+                    direction: "vertical",
+                    slidesPerView: 4,
+                    spaceBetween: parseRem(20),
+                    loop: true,
+                    duration: 600,
+                    autoplay: {
+                        delay: 2000, 
+                        disableOnInteraction: false, 
+                        reverseDirection: true,
+                    },
+                    allowTouchMove: false, 
+                });
+            }
+            else {
+                var swiper = new Swiper(".home-visa-card-inner", {
+                    direction: "vertical",
+                    slidesPerView: 4,
+                    spaceBetween: parseRem(20),
+                    loop: true,
+                    duration: 600,
+                    allowTouchMove: false, 
+                });
+            }
         }
         if(isStagging()){
             homeVisa();
