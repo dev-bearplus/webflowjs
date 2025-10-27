@@ -2577,15 +2577,17 @@ const mainScript = () => {
 
                 $('.home-testi-col-wrapper .load-ske').removeClass('load-ske')
             }
-            // ScrollTrigger.create({
-            //     trigger: '.home-card-title',
-            //     start: 'center center',
-            //     end: 'center center',
-            //     once: true,
-            //     onEnter: () => {
-            //         homeCardHandle()
-            //     }
-            // })
+            if($('.home-card-title').length > 0){
+                ScrollTrigger.create({
+                    trigger: '.home-card-title',
+                    start: 'center center',
+                    end: 'center center',
+                    once: true,
+                    onEnter: () => {
+                        homeCardHandle()
+                    }
+                })
+            }
         }
         
         function homeTestiHanlde() {
