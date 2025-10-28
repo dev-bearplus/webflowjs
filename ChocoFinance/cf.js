@@ -927,7 +927,7 @@ const mainScript = () => {
             }
         }
         if ($(window).width() < 767) {
-            if ($('.term-page').length) {
+            if ($('.term-page').length ) {
                 $('.term-toc-wrap-overlay').removeClass('on-scroll')
             }
             if ($('.doc-page').length) {
@@ -956,7 +956,7 @@ const mainScript = () => {
             }
         }
         if ($(window).width() < 767) {
-            if ($('.term-page').length) {
+            if ($('.term-page').length && !$('.sc-term-sub-nav').hasClass('w-condition-invisible')) {
                 $('.term-toc-wrap-overlay').addClass('on-scroll')
             }
             if ($('.doc-page').length) {
@@ -3469,8 +3469,8 @@ const mainScript = () => {
         }
         updateURL();
 
-        let isAppTerm = !$('.sc-term-sub-nav').hasClass('w-condition-invisible');
-
+        let isAppTerm = !$('.sc-term-sub-nav').hasClass('w-condition-invisible') && $('.sc-term-sub-nav').length > 0;
+        console.log('isAppTerm' + isAppTerm)
         function createToc() {
             // Create toc items
             $('.term-main-richtxt').each((index, el) => {
