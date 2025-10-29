@@ -57,6 +57,7 @@ const script = () => {
     }
     const SCRIPT = {}
     SCRIPT.surfScript = () => {
+        console.log("run")
         window.fsAttributes.push(['cmsload', (listInstances) => {
             // window.fsAttributes.cmsfilter.init();
             window.fsAttributes.push(['cmsfilter', (filterInstances) => {
@@ -75,6 +76,7 @@ const script = () => {
                             const chText = ch.querySelector('span').textContent;
                             let attr = ch.querySelector('span').getAttribute('fs-cmsfilter-field');
                             const count = filter.listInstance.items.filter(item => {
+                                console.log(item.props)
                                 const elements = item.element.querySelectorAll(`[fs-cmsfilter-field='${attr}']`);
                                 return Array.from(elements).some(el => el.textContent === chText);
                             }).length;

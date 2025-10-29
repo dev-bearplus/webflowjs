@@ -808,6 +808,11 @@ const mainScript = () => {
                 ]
             }
         });
+        $('input[type="submit"]').on('pointerenter', function () {
+            if ($(this).prop('disabled')) {
+                $(this).prop('disabled', false);
+            }
+        });
     }
     const initAllPopup = () => {
         let demoPlayer;
