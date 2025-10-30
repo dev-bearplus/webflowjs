@@ -777,7 +777,7 @@ const mainScript = () => {
         const $html = $('html');
         const $header = $('.header');
 
-        const langPaths = ['hk-zh-hans', 'hk-zh-hant', 'hk-en'];
+        const langPaths = ['hk-zh-hant', 'hk-en'];
         const pathname = window.location.pathname;
         const lastSegment = pathname.split('/').pop();
         // const pathnameAllow = ['about-us', 'app-terms-and-conditions', 'privacy-policy', 'faqs', 'contact-us', 'app-fund-documents', 'app-risk-disclosures'];
