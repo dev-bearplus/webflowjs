@@ -784,7 +784,7 @@ const mainScript = () => {
         const pathnameAllow = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents'];
         //check pathname include /documents
         // Skip redirect nếu path có faqs, documents hoặc pathnameAllow trong hk-en
-        const shouldSkipRedirect = pathname.includes('hk-en') && (pathnameAllow.includes(lastSegment) || pathname.includes('/documents') ||  pathname.includes('/faqs') || ( isStagging() && pathname.includes('/about-us')));
+        const shouldSkipRedirect = pathname.includes('hk-en') && (pathnameAllow.includes(lastSegment) || pathname.includes('/documents') ||  pathname.includes('/faqs') || ( isStagging() && pathname.includes('/about-us')) || (isStagging() && pathname.includes('/waitlist')));
 
         if (!shouldSkipRedirect) {
             const matchedLang = langPaths.find(lang => new RegExp(`^/${lang}/.+`).test(pathname));
@@ -4460,7 +4460,10 @@ const mainScript = () => {
     }
 
     SCRIPT.waitlistScript = () => {
-
+        // check current url is /waitlist và language current is en-SG
+        if(window.location.pathname === '/waitlist' && $('html').attr('lang') === 'en-SG'){
+            window.location.href = '/404';
+        }
     }
     SCRIPT.referralRewardScript = () => {
 
