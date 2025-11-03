@@ -3933,7 +3933,9 @@ const mainScript = () => {
                 if ($(`#${param.id}`).length) {
                     let scrollOffset = $(window).height() * 2 / 10;
                     $(`#${param.id}`).find('.home-faq-item-head').trigger('click')
-                    lenis.scrollTo(`#${param.id}`, {offset: -scrollOffset})
+                    setTimeout(() => {
+                        lenis.scrollTo(`#${param.id}`, {offset: -scrollOffset})
+                    }, 300);
                 } else if ($(`#${param.category}`).length) {
                     lenis.scrollTo(`#${param.category}`);
                 } else {
