@@ -547,19 +547,19 @@ const mainScript = () => {
 			this.updateLink(data);
 		}
         updateLink(data) {
-            // if (data.next.namespace === "home") {
-            //     $('a').each(function (index, link) {
-            //         if ($(this).attr('href').startsWith('/notes/')) {
-            //             $(this).removeAttr('data-barba-prevent');
-            //         }
-            //     });
-            // } else if (data.next.namespace === "notes") {
-            // }
-            $('a').each(function (index, link) {
-                if ($(this).attr('href').startsWith('/notes/')) {
-                    $(this).attr('data-barba-prevent', '');
-                }
-            });
+            if (data.next.namespace === "home") {
+                $('a').each(function (index, link) {
+                    if ($(this).attr('href').startsWith('/notes/')) {
+                        $(this).removeAttr('data-barba-prevent');
+                    }
+                });
+            } else if (data.next.namespace === "notes") {
+                $('a').each(function (index, link) {
+                    if ($(this).attr('href').startsWith('/notes/')) {
+                        $(this).attr('data-barba-prevent', '');
+                    }
+                });
+            }
 			$("a").each(function (index, link) {
 				let href = $(this).attr("href").replace(/\/$/, "") || "/";
 
