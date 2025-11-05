@@ -777,14 +777,14 @@ const mainScript = () => {
         const $html = $('html');
         const $header = $('.header');
 
-        const langPaths = ['hk-zh-hans', 'hk-zh-hant', 'hk-en'];
+        const langPaths = ['hk-zh-hant', 'hk-en'];
         const pathname = window.location.pathname;
         const lastSegment = pathname.split('/').pop();
         // const pathnameAllow = ['about-us', 'app-terms-and-conditions', 'privacy-policy', 'faqs', 'contact-us', 'app-fund-documents', 'app-risk-disclosures'];
         const pathnameAllow = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents'];
         //check pathname include /documents
         // Skip redirect nếu path có faqs, documents hoặc pathnameAllow trong hk-en
-        const shouldSkipRedirect = pathname.includes('hk-en') && (pathnameAllow.includes(lastSegment) || pathname.includes('/documents') ||  pathname.includes('/faqs'));
+        const shouldSkipRedirect = pathname.includes('hk-en') && (pathnameAllow.includes(lastSegment) || pathname.includes('/documents') ||  pathname.includes('/faqs') ||  pathname.includes('/about-us') ||  pathname.includes('/waitlist'));
 
         if (!shouldSkipRedirect) {
             const matchedLang = langPaths.find(lang => new RegExp(`^/${lang}/.+`).test(pathname));
@@ -3933,7 +3933,9 @@ const mainScript = () => {
                 if ($(`#${param.id}`).length) {
                     let scrollOffset = $(window).height() * 2 / 10;
                     $(`#${param.id}`).find('.home-faq-item-head').trigger('click')
-                    lenis.scrollTo(`#${param.id}`, {offset: -scrollOffset})
+                    setTimeout(() => {
+                        lenis.scrollTo(`#${param.id}`, {offset: -scrollOffset})
+                    }, 410);
                 } else if ($(`#${param.category}`).length) {
                     lenis.scrollTo(`#${param.category}`);
                 } else {
@@ -4460,7 +4462,10 @@ const mainScript = () => {
     }
 
     SCRIPT.waitlistScript = () => {
-
+        // check current url is /waitlist và language current is en-SG
+        if(window.location.pathname === '/waitlist' && $('html').attr('lang') === 'en-SG'){
+            window.location.href = '/404';
+        }
     }
     SCRIPT.referralRewardScript = () => {
 
