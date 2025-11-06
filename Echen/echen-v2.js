@@ -706,15 +706,7 @@ const mainScript = () => {
 			this.tlLeave = gsap.timeline({
 				onStart: () => {
                     this.updateBeforeTrans.bind(this)(data);
-					nav.update(data);
-					$(nav.el).find('.nav-body-blog-main').css('pointer-events', 'none');
-					if (data.next.namespace === 'notes') {
-						gsap.to($(nav.el).find('.nav-body-blog-active-inner'), {
-							autoAlpha: checkSameNamespace('notes', data.current.namespace, data.next.namespace) ? 1 : 0,
-							duration: 0.2,
-							ease: "power2.out",
-						});
-					}
+					nav.leaveSetup(data);
 				},
 				onComplete: () => {
 					this.updateAfterTrans.bind(this)(data);
@@ -733,36 +725,7 @@ const mainScript = () => {
                     this.enterSetup(data);
 					setTimeout(() => {
 						this.enterPlay(data);
-						$(nav.el).find('.nav-body-blog-main').css('pointer-events', 'auto');
-						if (data.next.namespace === 'notes') {
-							let slug = $(data.next.container).attr('data-slug');
-							if (checkSameNamespace('notes', data.current.namespace, data.next.namespace)) {
-								gsap.to($(nav.el).find('.nav-body-blog-active-inner'), {
-									y: $(nav.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).offset().top - $(nav.el).find('.nav-body-blog-main').offset().top + $(nav.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).outerHeight() / 2,
-									autoAlpha: 1,
-									duration: 0.6,
-									ease: "power2.out",
-								});
-							} else {
-								gsap.set($(nav.el).find('.nav-body-blog-active-inner'), {
-									y: $(nav.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).offset().top - $(nav.el).find('.nav-body-blog-main').offset().top + $(nav.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).outerHeight() / 2
-								});
-								gsap.to($(nav.el).find('.nav-body-blog-active-inner'), {
-									autoAlpha: 1,
-									delay: .1,
-									duration: 0.2,
-									ease: "power2.out",
-								});
-							}
-						}
-						else {
-							gsap.to($(nav.el).find('.nav-body-blog-active-inner'), {
-								y: 0,
-								autoAlpha: 0.2,
-								duration: 0.6,
-								ease: "power2.out",
-							});
-						}
+						nav.enterSetup(data);
 					}, 100);
 				},
 			});
@@ -841,9 +804,49 @@ const mainScript = () => {
                 $(this.el).removeClass('active');
             } else if (data.next.namespace === "notes") {
 				$(this.el).addClass('active');
-				// setTimeout(() => {
-
-				// }, 1000);
+			}
+		}
+		leaveSetup(data) {
+			this.update(data);
+			$(this.el).find('.nav-body-blog-main').css('pointer-events', 'none');
+			if (data.next.namespace === 'notes') {
+				gsap.to($(this.el).find('.nav-body-blog-active-inner'), {
+					autoAlpha: checkSameNamespace('notes', data.current.namespace, data.next.namespace) ? 1 : 0,
+					duration: 0.2,
+					ease: "power2.out",
+				});
+			}
+		}
+		enterSetup(data) {
+			$(this.el).find('.nav-body-blog-main').css('pointer-events', 'auto');
+			if (data.next.namespace === 'notes') {
+				let slug = $(data.next.container).attr('data-slug');
+				if (checkSameNamespace('notes', data.current.namespace, data.next.namespace)) {
+					gsap.to($(this.el).find('.nav-body-blog-active-inner'), {
+						y: $(this.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).offset().top - $(this.el).find('.nav-body-blog-main').offset().top + $(this.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).outerHeight() / 2,
+						autoAlpha: 1,
+						duration: 0.6,
+						ease: "power2.out",
+					});
+				} else {
+					gsap.set($(this.el).find('.nav-body-blog-active-inner'), {
+						y: $(this.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).offset().top - $(this.el).find('.nav-body-blog-main').offset().top + $(this.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).outerHeight() / 2
+					});
+					gsap.to($(this.el).find('.nav-body-blog-active-inner'), {
+						autoAlpha: 1,
+						delay: .1,
+						duration: 0.2,
+						ease: "power2.out",
+					});
+				}
+			}
+			else {
+				gsap.to($(this.el).find('.nav-body-blog-active-inner'), {
+					y: 0,
+					autoAlpha: 0.2,
+					duration: 0.6,
+					ease: "power2.out",
+				});
 			}
 		}
 		interact() {
