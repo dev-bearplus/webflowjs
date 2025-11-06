@@ -80,6 +80,10 @@ const mainScript = () => {
 			}
 		});
 	};
+	const checkSameNamespace = (namespace, current, next) => {
+        let result = (current === next) && (current === namespace) && (next === namespace);
+        return result;
+    }
 	function documentHeightObserver(action, data, callback) {
 		let resizeObserver;
 		let debounceTimer;
@@ -117,19 +121,10 @@ const mainScript = () => {
 	function resetScroll(data) {
 		if (window.location.hash !== "") {
 			if ($(window.location.hash).length >= 1) {
-				$("html").animate(
-					{ scrollTop: $(window.location.hash).offset().top - 100 },
-					1200
-				);
+				$("html").animate({ scrollTop: $(window.location.hash).offset().top - 100 }, 1200);
 
 				setTimeout(() => {
-					$("html").animate(
-						{
-							scrollTop:
-								$(window.location.hash).offset().top - 100,
-						},
-						1200
-					);
+					$("html").animate({ scrollTop: $(window.location.hash).offset().top - 100 }, 1200);
 				}, 300);
 			} else {
 				scrollTop();
@@ -162,6 +157,24 @@ const mainScript = () => {
 			}
 		} else {
 			scrollTop();
+		}
+
+		if (data.next.namespace === 'notes') {
+			const currentScroll = smoothScroll.scroller.scrollX;
+			const targetScroll = $(`#${$(data.next.container).attr('data-slug')}`).offset().top;
+			const scrollHeight = smoothScroll.lenis.limit;
+			smoothScroll.lenis.scrollTo(currentScroll, { duration: 0.001 });
+			const distanceDown = (scrollHeight - currentScroll) + targetScroll;
+			const distanceUp = currentScroll - targetScroll;
+			if (distanceDown < distanceUp) {
+				requestAnimationFrame(() => {
+					smoothScroll.lenis.scrollTo(scrollHeight + targetScroll - 60);
+				});
+			} else {
+				requestAnimationFrame(() => {
+					smoothScroll.lenis.scrollTo(targetScroll - 60);
+				});
+			}
 		}
 	}
 	function scrollTop(onComplete) {
@@ -216,7 +229,7 @@ const mainScript = () => {
 				content: data.next.container,
 				wrapper: data.next.container,
 				smoothTouch: false,
-				infinite: false,
+				infinite: true
 			});
 			this.lenis.on("scroll", (e) => {
 				this.updateOnScroll(e);
@@ -331,22 +344,22 @@ const mainScript = () => {
             this.tlLoadMaster = null;
         }
         init(data) {
-           this.tlLoading = gsap.timeline({
-              paused: true
-           })
-           this.tlLoadMaster = gsap.timeline({
-              paused: true,
-              delay: this.isLoaded ? 0 : 1,
-              duration:1,
-              onStart: () => {
-                    this.onceSetup(data);
-              },
-              onComplete: () => {
-                    this.oncePlay(data);
-              }
-           })
-           this.tlLoadMaster
-              .to(this.tlLoading, { duration: this.tlLoading.totalDuration(), progress: 1, ease: 'none' })
+			this.tlLoading = gsap.timeline({
+				paused: true
+			})
+			this.tlLoadMaster = gsap.timeline({
+				paused: true,
+				delay: this.isLoaded ? 0 : 1,
+				duration:1,
+				onStart: () => {
+						this.onceSetup(data);
+				},
+				onComplete: () => {
+						this.oncePlay(data);
+				}
+			})
+			this.tlLoadMaster
+				.to(this.tlLoading, { duration: this.tlLoading.totalDuration(), progress: 1, ease: 'none' })
         }
         play(data) {
             // requestAnimationFrame(() => {
@@ -547,19 +560,6 @@ const mainScript = () => {
 			this.updateLink(data);
 		}
         updateLink(data) {
-            if (data.next.namespace === "home") {
-                $('a').each(function (index, link) {
-                    if ($(this).attr('href').startsWith('/notes/')) {
-                        $(this).removeAttr('data-barba-prevent');
-                    }
-                });
-            } else if (data.next.namespace === "notes") {
-                $('a').each(function (index, link) {
-                    if ($(this).attr('href').startsWith('/notes/')) {
-                        $(this).attr('data-barba-prevent', '');
-                    }
-                });
-            }
 			$("a").each(function (index, link) {
 				let href = $(this).attr("href").replace(/\/$/, "") || "/";
 
@@ -711,10 +711,9 @@ const mainScript = () => {
 					this.updateAfterTrans.bind(this)(data);
 				},
 			});
-			this.tlLeave.fromTo(
-				data.current.container,
+			this.tlLeave.fromTo(data.current.container,
 				{ opacity: 1 },
-				{ duration: 0.6, opacity: 1 }
+				{ duration: 0.6, opacity: checkSameNamespace('notes', data.current.namespace, data.next.namespace) ? 1 : 0 }
 			);
 
 			return this.tlLeave;
@@ -729,9 +728,8 @@ const mainScript = () => {
 				},
 			});
 
-			this.tlEnter.fromTo(
-				data.next.container,
-				{ opacity: 0 },
+			this.tlEnter.fromTo(data.next.container,
+				{ opacity: checkSameNamespace('notes', data.current.namespace, data.next.namespace) ? 1 : 0 },
 				{ duration: 0.6, opacity: 1, clearProps: "all" },
 				0
 			);
@@ -764,8 +762,7 @@ const mainScript = () => {
 		}
 		updateAfterTrans(data) {
 			smoothScroll.reInit(data);
-			scrollTop();
-			resetScroll();
+			// scrollTop();
 			smoothScroll.start();
 			globalChange.update(data);
 
@@ -774,6 +771,10 @@ const mainScript = () => {
 			if (data.current.container) {
 				data.current.container.remove();
 			}
+
+			$(data.next.container).find('.note-content-hero-title').attr('id', $(data.next.container).find('.note-content-item').eq(0).find('.note-content-item-inner').attr('id'));
+			$(data.next.container).find('.note-content-item').eq(0).find('.note-content-item-inner').removeAttr('id');
+			resetScroll(data);
 		}
 	}
 	const pageTrans = new PageTrans();
@@ -819,8 +820,27 @@ const mainScript = () => {
                 super.setTrigger(this.el, this.onTrigger.bind(this));
             }
             onTrigger() {
-                console.log("run")
-            }
+				this.setup();
+				this.scrollActive();
+			}
+			setup() {
+				$(this.el).find('.note-content-hero-title').attr('id', $(this.el).find('.note-content-item').eq(0).find('.note-content-item-inner').attr('id'));
+				$(this.el).find('.note-content-item').eq(0).find('.note-content-item-inner').removeAttr('id');
+			}
+			scrollActive() {
+				smoothScroll.lenis.on('scroll', (e) => {
+					let currScroll = e.scroll;
+					$(this.el).find('.note-content-item').each(function (index, section) {
+						let top = $(this).get(0).getBoundingClientRect().top;
+						let slug = $(this).attr('data-slug');
+						if (top > 0 && top < (viewport.h / 2)) {
+							$(nav.el).find(`.nav-body-blog-item-link[href="/notes/${slug}"]`).addClass('w--current');
+							$(nav.el).find('.nav-body-blog-item-link').not(`[href="/notes/${slug}"]`).removeClass('w--current');
+							barba.history.add(`/notes/${slug}`, 'barba', 'replace');
+						}
+					});
+				});
+			}
         },
 	};
 
@@ -953,7 +973,9 @@ const mainScript = () => {
                     nav.init(data);
                     // scrollTop();
                     PageManagerRegistry[namespace]?.initOnce?.(data)
-					resetScroll(data);
+					requestAnimationFrame(() => {
+						resetScroll(data);
+					});
 				},
 				async leave(data) {
 					await pageTrans.play(data);
