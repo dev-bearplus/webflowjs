@@ -163,7 +163,6 @@ const mainScript = () => {
 			const currentScroll = smoothScroll.scroller.scrollX;
 			const targetScroll = $(`#${$(data.next.container).attr('data-slug')}`).offset()?.top || 0;
 			const scrollHeight = smoothScroll.lenis.limit;
-			console.log(targetScroll)
 			smoothScroll.lenis.scrollTo(currentScroll, { duration: 0.001 });
 			const distanceDown = (scrollHeight - currentScroll) + targetScroll;
 			const distanceUp = currentScroll - targetScroll;
