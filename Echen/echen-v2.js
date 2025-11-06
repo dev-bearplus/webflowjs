@@ -897,6 +897,7 @@ const mainScript = () => {
 			}
 			interact() {
 				$('.note-content-item-link').on('click', function (e) {
+					let originText = $(this).find('.txt').text();
 					e.preventDefault();
 					let slug = $(this).attr('data-slug');
 					let textArea = document.createElement('textarea');
@@ -913,9 +914,14 @@ const mainScript = () => {
 						.catch((error) => {
 							console.error('Failed to copy text to clipboard:', error);
 						});
+					$(this).find('.txt').text('Copied');
+					setTimeout(() => {
+						$(this).find('.txt').text(originText);
+					}, 1000);
 					document.body.removeChild(textArea);
 				});
 				$('.note-content-hero-link').eq(1).on('click', function (e) {
+					let originText = $(this).find('.txt').text();
 					e.preventDefault();
 					console.log("click")
 					let textArea = document.createElement('textarea');
@@ -932,6 +938,10 @@ const mainScript = () => {
 						.catch((error) => {
 							console.error('Failed to copy text to clipboard:', error);
 						});
+					$(this).find('.txt').text('Copied');
+					setTimeout(() => {
+						$(this).find('.txt').text(originText);
+					}, 1000);
 					document.body.removeChild(textArea);
 				});
 				this.scrollActive();
