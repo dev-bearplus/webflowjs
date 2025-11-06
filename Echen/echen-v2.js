@@ -706,7 +706,15 @@ const mainScript = () => {
 			this.tlLeave = gsap.timeline({
 				onStart: () => {
                     this.updateBeforeTrans.bind(this)(data);
-                    nav.update(data);
+					nav.update(data);
+					if (data.next.namespace === 'notes') {
+						$(nav.el).find('.nav-body-blog-main').css('pointer-events', 'none');
+						gsap.to($(nav.el).find('.nav-body-blog-active-inner'), {
+							autoAlpha: checkSameNamespace('notes', data.current.namespace, data.next.namespace) ? 1 : 0,
+							duration: 0.2,
+							ease: "power2.out",
+						});
+					}
 				},
 				onComplete: () => {
 					this.updateAfterTrans.bind(this)(data);
@@ -725,6 +733,36 @@ const mainScript = () => {
                     this.enterSetup(data);
 					setTimeout(() => {
 						this.enterPlay(data);
+						if (data.next.namespace === 'notes') {
+							let slug = $(data.next.container).attr('data-slug');
+							$(nav.el).find('.nav-body-blog-main').css('pointer-events', 'auto');
+							if (checkSameNamespace('notes', data.current.namespace, data.next.namespace)) {
+								gsap.to($(nav.el).find('.nav-body-blog-active-inner'), {
+									y: $(nav.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).offset().top - $(nav.el).find('.nav-body-blog-main').offset().top + $(nav.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).outerHeight() / 2,
+									autoAlpha: 1,
+									duration: 0.6,
+									ease: "power2.out",
+								});
+							} else {
+								gsap.set($(nav.el).find('.nav-body-blog-active-inner'), {
+									y: $(nav.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).offset().top - $(nav.el).find('.nav-body-blog-main').offset().top + $(nav.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).outerHeight() / 2
+								});
+								gsap.to($(nav.el).find('.nav-body-blog-active-inner'), {
+									autoAlpha: 1,
+									delay: .1,
+									duration: 0.2,
+									ease: "power2.out",
+								});
+							}
+						}
+						else {
+							gsap.to($(nav.el).find('.nav-body-blog-active-inner'), {
+								y: 0,
+								autoAlpha: 0.2,
+								duration: 0.6,
+								ease: "power2.out",
+							});
+						}
 					}, 100);
 				},
 			});
@@ -802,25 +840,33 @@ const mainScript = () => {
             if (data.next.namespace === "home") {
                 $(this.el).removeClass('active');
             } else if (data.next.namespace === "notes") {
-                $(this.el).addClass('active');
+				$(this.el).addClass('active');
+				// setTimeout(() => {
+
+				// }, 1000);
 			}
 		}
 		interact() {
 			$('.nav-body-blog-item').on('mouseenter', (e) => {
-				gsap.to($(this.el).find('.nav-body-blog-active-inner'), {
-					y: $(e.currentTarget).offset().top - $(this.el).find('.nav-body-blog-main').offset().top + $(e.currentTarget).outerHeight() / 2,
-					autoAlpha: 1,
-					duration: 0.5,
-					ease: "power2.out",
-				})
+				if (!$('.nav').hasClass('active')) {
+					console.log("zo")
+					gsap.to($(this.el).find('.nav-body-blog-active-inner'), {
+						y: $(e.currentTarget).offset().top - $(this.el).find('.nav-body-blog-main').offset().top + $(e.currentTarget).outerHeight() / 2,
+						autoAlpha: 1,
+						duration: 0.5,
+						ease: "power2.out",
+					})
+				}
 			});
 			$('.nav-body-blog-list').on('mouseleave', (e) => {
-				gsap.to($(this.el).find('.nav-body-blog-active-inner'), {
-					y: 0,
-					autoAlpha: 0.2,
-					duration: 0.5,
-					ease: "power2.out",
-				})
+				if (!$('.nav').hasClass('active')) {
+					gsap.to($(this.el).find('.nav-body-blog-active-inner'), {
+						y: 0,
+						autoAlpha: 0.2,
+						duration: 0.5,
+						ease: "power2.out",
+					})
+				}
 			});
 		}
     }
@@ -896,6 +942,12 @@ const mainScript = () => {
 						if (top > 0 && top < (viewport.h / 2)) {
 							$(nav.el).find(`.nav-body-blog-item-link[href="/notes/${slug}"]`).addClass('w--current');
 							$(nav.el).find('.nav-body-blog-item-link').not(`[href="/notes/${slug}"]`).removeClass('w--current');
+							gsap.to($(nav.el).find('.nav-body-blog-active-inner'), {
+								y: $(nav.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).offset().top - $(nav.el).find('.nav-body-blog-main').offset().top + $(nav.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).outerHeight() / 2,
+								autoAlpha: 1,
+								duration: 0.6,
+								ease: "power2.out",
+							});
 							barba.history.add(`/notes/${slug}`, 'barba', 'replace');
 						}
 					});
@@ -1031,7 +1083,7 @@ const mainScript = () => {
                     loader.init(data);
                     loader.play(data);
                     nav.init(data);
-                    // scrollTop();
+					nav.update(data);
                     PageManagerRegistry[namespace]?.initOnce?.(data)
 					requestAnimationFrame(() => {
 						resetScroll(data);
