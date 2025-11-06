@@ -795,16 +795,34 @@ const mainScript = () => {
             this.isOpen = false;
         }
         init(data) {
-            this.el = document.querySelector('.nav');
+			this.el = document.querySelector('.nav');
+			this.interact();
         }
         update(data) {
             if (data.next.namespace === "home") {
-
                 $(this.el).removeClass('active');
             } else if (data.next.namespace === "notes") {
                 $(this.el).addClass('active');
-            }
-        }
+			}
+		}
+		interact() {
+			$('.nav-body-blog-item').on('mouseenter', (e) => {
+				gsap.to($(this.el).find('.nav-body-blog-active-inner'), {
+					y: $(e.currentTarget).offset().top - $(this.el).find('.nav-body-blog-main').offset().top + $(e.currentTarget).outerHeight() / 2,
+					autoAlpha: 1,
+					duration: 0.5,
+					ease: "power2.out",
+				})
+			});
+			$('.nav-body-blog-list').on('mouseleave', (e) => {
+				gsap.to($(this.el).find('.nav-body-blog-active-inner'), {
+					y: 0,
+					autoAlpha: 0.2,
+					duration: 0.5,
+					ease: "power2.out",
+				})
+			});
+		}
     }
     const nav = new Nav();
 
