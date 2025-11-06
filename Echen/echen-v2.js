@@ -707,8 +707,8 @@ const mainScript = () => {
 				onStart: () => {
                     this.updateBeforeTrans.bind(this)(data);
 					nav.update(data);
+					$(nav.el).find('.nav-body-blog-main').css('pointer-events', 'none');
 					if (data.next.namespace === 'notes') {
-						$(nav.el).find('.nav-body-blog-main').css('pointer-events', 'none');
 						gsap.to($(nav.el).find('.nav-body-blog-active-inner'), {
 							autoAlpha: checkSameNamespace('notes', data.current.namespace, data.next.namespace) ? 1 : 0,
 							duration: 0.2,
@@ -733,9 +733,9 @@ const mainScript = () => {
                     this.enterSetup(data);
 					setTimeout(() => {
 						this.enterPlay(data);
+						$(nav.el).find('.nav-body-blog-main').css('pointer-events', 'auto');
 						if (data.next.namespace === 'notes') {
 							let slug = $(data.next.container).attr('data-slug');
-							$(nav.el).find('.nav-body-blog-main').css('pointer-events', 'auto');
 							if (checkSameNamespace('notes', data.current.namespace, data.next.namespace)) {
 								gsap.to($(nav.el).find('.nav-body-blog-active-inner'), {
 									y: $(nav.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).offset().top - $(nav.el).find('.nav-body-blog-main').offset().top + $(nav.el).find(`.nav-body-blog-item[data-slug="${slug}"]`).outerHeight() / 2,
