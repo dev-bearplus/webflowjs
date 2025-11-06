@@ -161,18 +161,20 @@ const mainScript = () => {
 
 		if (data.next.namespace === 'notes') {
 			const currentScroll = smoothScroll.scroller.scrollX;
-			const targetScroll = $(`#${$(data.next.container).attr('data-slug')}`).offset().top;
+			const targetScroll = $(`#${$(data.next.container).attr('data-slug')}`).offset()?.top || 0;
 			const scrollHeight = smoothScroll.lenis.limit;
+			console.log(targetScroll)
 			smoothScroll.lenis.scrollTo(currentScroll, { duration: 0.001 });
 			const distanceDown = (scrollHeight - currentScroll) + targetScroll;
 			const distanceUp = currentScroll - targetScroll;
+			if (targetScroll <= 0) return;
 			if (distanceDown < distanceUp) {
 				requestAnimationFrame(() => {
-					smoothScroll.lenis.scrollTo(scrollHeight + targetScroll - 60);
+					smoothScroll.lenis.scrollTo(scrollHeight + targetScroll - cvUnit(60, 'rem'));
 				});
 			} else {
 				requestAnimationFrame(() => {
-					smoothScroll.lenis.scrollTo(targetScroll - 60);
+					smoothScroll.lenis.scrollTo(targetScroll - cvUnit(60, 'rem'));
 				});
 			}
 		}
@@ -810,22 +812,63 @@ const mainScript = () => {
 	const HomePage = {
 	};
     const NotesPage = {
-        Content: class extends TriggerSetup {
-            constructor() {
-                super();
-                this.el = null;
-            }
-            trigger(data) {
-                this.el = data.next.container.querySelector('.note-content-wrap');
-                super.setTrigger(this.el, this.onTrigger.bind(this));
-            }
-            onTrigger() {
+		Content: class extends TriggerSetup {
+			constructor() {
+				super();
+				this.el = null;
+			}
+			trigger(data) {
+				this.el = data.next.container.querySelector('.note-content-wrap');
+				super.setTrigger(this.el, this.onTrigger.bind(this));
+			}
+			onTrigger() {
 				this.setup();
-				this.scrollActive();
+				this.interact();
 			}
 			setup() {
 				$(this.el).find('.note-content-hero-title').attr('id', $(this.el).find('.note-content-item').eq(0).find('.note-content-item-inner').attr('id'));
 				$(this.el).find('.note-content-item').eq(0).find('.note-content-item-inner').removeAttr('id');
+			}
+			interact() {
+				$('.note-content-item-link').on('click', function (e) {
+					e.preventDefault();
+					let slug = $(this).attr('data-slug');
+					let textArea = document.createElement('textarea');
+					let text = `${window.location.origin}/notes/${slug}`;
+					textArea.style.display = 'none';
+					textArea.value = text;
+					document.body.appendChild(textArea);
+					textArea.select();
+					navigator.clipboard
+						.writeText(text)
+						.then(() => {
+							console.log('Text copied to clipboard');
+						})
+						.catch((error) => {
+							console.error('Failed to copy text to clipboard:', error);
+						});
+					document.body.removeChild(textArea);
+				});
+				$('.note-content-hero-link').eq(1).on('click', function (e) {
+					e.preventDefault();
+					console.log("click")
+					let textArea = document.createElement('textarea');
+					let text = `${window.location.origin}/notes`;
+					textArea.style.display = 'none';
+					textArea.value = text;
+					document.body.appendChild(textArea);
+					textArea.select();
+					navigator.clipboard
+						.writeText(text)
+						.then(() => {
+							console.log('Text copied to clipboard');
+						})
+						.catch((error) => {
+							console.error('Failed to copy text to clipboard:', error);
+						});
+					document.body.removeChild(textArea);
+				});
+				this.scrollActive();
 			}
 			scrollActive() {
 				smoothScroll.lenis.on('scroll', (e) => {
