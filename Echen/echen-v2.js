@@ -946,12 +946,26 @@ const mainScript = () => {
 					document.body.removeChild(textArea);
 				});
 				this.scrollActive();
-
+				let slug = $('.main-inner').attr('data-slug');
 				$(this.el).find('.note-header-list-toggle').on('click', () => {
 					$(this.el).find('.note-header').toggleClass('active');
+					$(this.el).find(`.note-header-cms-item`).removeClass('active');
+					$(this.el).find(`.note-header-cms-item[data-slug="${slug}"]`).addClass('active');
+					if (!$(this.el).find('.note-header').hasClass('active')) {
+					}
+					else {
+						gsap.set($(this.el).find('.note-header-active-inner'), { autoAlpha: 0 });
+						setTimeout(() => {
+							gsap.set($(this.el).find('.note-header-active-inner'), {
+								y: $(this.el).find(`.note-header-cms-item[data-slug="${slug}"]`).offset().top - $(this.el).find('.note-header-dropdown-inner').offset().top + $(this.el).find(`.note-header-cms-item[data-slug="${slug}"]`).outerHeight() / 2,
+								autoAlpha: 1,
+							});
+						}, 1000);
+					}
 				});
 			}
 			scrollActive() {
+				let el = $(this.el);
 				smoothScroll.lenis.on('scroll', (e) => {
 					let currScroll = e.scroll;
 					$(this.el).find('.note-content-item').each(function (index, section) {
@@ -966,6 +980,17 @@ const mainScript = () => {
 								duration: 0.6,
 								ease: "power2.out",
 							});
+
+							if (el.find('.note-header').hasClass('active')) {
+								gsap.to(el.find('.note-header-active-inner'), {
+									y: el.find(`.note-header-cms-item[data-slug="${slug}"]`).offset().top - el.find('.note-header-dropdown-inner').offset().top + el.find(`.note-header-cms-item[data-slug="${slug}"]`).outerHeight() / 2,
+									autoAlpha: 1,
+									duration: 0.6,
+									ease: "power2.out",
+								});
+								$(el).find(`.note-header-cms-item`).removeClass('active');
+							}
+
 							barba.history.add(`/notes/${slug}`, 'barba', 'replace');
 						}
 					});
