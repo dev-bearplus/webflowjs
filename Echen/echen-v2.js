@@ -897,7 +897,7 @@ const mainScript = () => {
 				$(this.el).find('.note-content-item').eq(0).find('.note-content-item-inner').removeAttr('id');
 			}
 			interact() {
-				$('.note-content-item-link').on('click', function (e) {
+				$(this.el).find('.note-content-item-link').on('click', function (e) {
 					let originText = $(this).find('.txt').text();
 					e.preventDefault();
 					let slug = $(this).attr('data-slug');
@@ -921,7 +921,7 @@ const mainScript = () => {
 					}, 1000);
 					document.body.removeChild(textArea);
 				});
-				$('.note-content-hero-link').eq(1).on('click', function (e) {
+				$(this.el).find('.note-content-hero-link').eq(1).on('click', function (e) {
 					let originText = $(this).find('.txt').text();
 					e.preventDefault();
 					console.log("click")
@@ -946,6 +946,10 @@ const mainScript = () => {
 					document.body.removeChild(textArea);
 				});
 				this.scrollActive();
+
+				$(this.el).find('.note-header-list-toggle').on('click', () => {
+					$(this.el).find('.note-header').toggleClass('active');
+				});
 			}
 			scrollActive() {
 				smoothScroll.lenis.on('scroll', (e) => {
