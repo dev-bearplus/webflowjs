@@ -230,7 +230,8 @@ const mainScript = () => {
 				content: data.next.container,
 				wrapper: data.next.container,
 				smoothTouch: false,
-				infinite: true
+				infinite: true,
+				syncTouch: true
 			});
 			this.lenis.on("scroll", (e) => {
 				this.updateOnScroll(e);
@@ -714,7 +715,7 @@ const mainScript = () => {
 			});
 			this.tlLeave.fromTo(data.current.container,
 				{ opacity: 1 },
-				{ duration: 0.6, opacity: checkSameNamespace('notes', data.current.namespace, data.next.namespace) ? 1 : 0 }
+				{ duration: 0.4, opacity: checkSameNamespace('notes', data.current.namespace, data.next.namespace) ? 1 : 0 }
 			);
 
 			return this.tlLeave;
@@ -732,7 +733,7 @@ const mainScript = () => {
 
 			this.tlEnter.fromTo(data.next.container,
 				{ opacity: checkSameNamespace('notes', data.current.namespace, data.next.namespace) ? 1 : 0 },
-				{ duration: 0.6, opacity: 1, clearProps: "all" },
+				{ duration: 0.4, opacity: 1, clearProps: "all" },
 				0
 			);
 			return this.tlEnter;

@@ -98,7 +98,6 @@ const script = () => {
             ]);
         // The callback passes a `listInstances` array with all the `CMSList` instances on the page.
         }]);
-
     }
     SCRIPT.subpageScript = () => {
         $('.form-block').each(async(_, block) => {
