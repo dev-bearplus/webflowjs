@@ -75,28 +75,18 @@ const script = () => {
             return false;
         }
 
-        const sections = document.querySelectorAll('section');
-        const checkSectionVisibility = () => {
-            sections.forEach(section => {
-                const rect = section.getBoundingClientRect();
-                const windowHeight = window.innerHeight;
-                const threshold = 170; // equivalent to rootMargin bottom offset
-
-                // Check if section is in viewport (accounting for the 170px bottom margin)
-                const isVisible = rect.top < (windowHeight - threshold) && rect.bottom > 0;
-
-                if (isVisible) {
-                    const el = $(`.subnav-link[href="#${section.id}"]`);
+        observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                const el = $(`.subnav-link[href="#${entry.target.id}"]`);
+                if (entry.isIntersecting) {
                     scrollToLink(el);
                 }
             });
-        };
+        }, { rootMargin: "0px 0px -170px 0px" });
 
-        // Check on scroll
-        window.addEventListener('scroll', checkSectionVisibility);
-
-        // Initial check
-        checkSectionVisibility();
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
     }
     const SCRIPT = {}
     SCRIPT.surfScript = () => {
