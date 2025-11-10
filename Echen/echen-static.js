@@ -221,7 +221,17 @@ const mainScript = () => {
                 });
                 $(this.el).find('.note-header-list-toggle').on('click', () => {
 					$(this.el).find('.note-header').toggleClass('active');
-				});
+                });
+
+                smoothScroll.lenis.on('scroll', (e) => {
+                    // gsap.set($(this.el).find('.note-content-links-totop'), { '--progress': `${e.progress * 100}%` })
+                    if (viewport.w <= 767) {
+                        gsap.set($(this.el).find('.note-header-cms-item-link.w--current').siblings('.line').find('.line-inner'), { scaleX: e.progress })
+                    }
+                    else {
+                        gsap.set($(this.el).find('.note-content-links-totop'), { '--progress': e.progress })
+                    }
+                });
 			}
         },
     }
