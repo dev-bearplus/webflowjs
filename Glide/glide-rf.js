@@ -55,6 +55,39 @@ const script = () => {
             }
         })
     }
+    const scrollToLinkHandler = () => {
+        function scrollToLink(el) {
+            if (el.length === 0) {
+                return;
+            }
+            const container = $(".subnav");
+            const elOffset = el.position().left;
+            const containerScroll = container.scrollLeft();
+            const containerWidth = container.width();
+
+            const scrollTo =
+                containerScroll +
+                elOffset -
+                containerWidth / 2 +
+                el.width() / 2;
+            console.log(scrollTo)
+            container.animate({ scrollLeft: scrollTo }, 500);
+            return false;
+        }
+
+        observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                const el = $(`.subnav-link[href="#${entry.target.id}"]`);
+                if (entry.isIntersecting) {
+                    scrollToLink(el);
+                }
+            });
+        }, { rootMargin: "0px 0px -170px 0px" });
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+    }
     const SCRIPT = {}
     SCRIPT.surfScript = () => {
         window.fsAttributes.push(['cmsload', (listInstances) => {
@@ -103,11 +136,7 @@ const script = () => {
             ]);
         // The callback passes a `listInstances` array with all the `CMSList` instances on the page.
         }]);
-        console.log("run")
-
-        $(window).on('scroll', function(e) {
-            console.log('scroll');
-        });
+        scrollToLinkHandler();
     }
     SCRIPT.subpageScript = () => {
         $('.form-block').each(async (_, block) => {
@@ -323,6 +352,10 @@ const script = () => {
                 }
             })
         })
+        scrollToLinkHandler();
+    }
+    SCRIPT.productScript = () => {
+        scrollToLinkHandler();
     }
     const pageName = $('main.main').attr('data-namespace');
     if (pageName) {
