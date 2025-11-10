@@ -218,6 +218,9 @@ const mainScript = () => {
 						$(this).find('.txt').text(originText);
 					}, 1000);
 					document.body.removeChild(textArea);
+                });
+                $(this.el).find('.note-header-list-toggle').on('click', () => {
+					$(this.el).find('.note-header').toggleClass('active');
 				});
 			}
         },
