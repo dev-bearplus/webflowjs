@@ -232,7 +232,7 @@ const mainScript = () => {
                     }
                 });
                 $(this.el).find('.note-content-links-totop').on('click', () => {
-                    smoothScroll.scrollTo(0);
+                    smoothScroll.scrollTo('top', { lock: true });
                 });
 			}
         },
