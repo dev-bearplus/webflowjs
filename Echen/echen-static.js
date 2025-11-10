@@ -231,6 +231,9 @@ const mainScript = () => {
                         gsap.set($(this.el).find('.note-content-links-totop'), { '--progress': e.progress })
                     }
                 });
+                $(this.el).find('.note-content-links-totop').on('click', () => {
+                    smoothScroll.scrollTo(0);
+                });
 			}
         },
     }
