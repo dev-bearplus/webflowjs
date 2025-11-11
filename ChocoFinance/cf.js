@@ -4873,20 +4873,17 @@ const mainScript = () => {
         thankGetFaq();
     }
     SCRIPT.guaranteeScript = () => {
-        console.log(!isStagging())
-        if (!isStagging()) return;
-        const sgdToUsd = parseFloat($('.sgd-to-usd').text());
-        const usdToSgd = (Math.floor((1/sgdToUsd)*100000)/100000).toFixed(5);
-        const feeSgdToUsd = 0.1;
-        let textUnitInit = $('.unit-init').text();
-        let textUnitWillChange = $('.unit-will-change').text();
-        let flagChangeSgdToUsd = true;
-        function validInputUsd(sgdValue) {
-            let cleanedSgdValue = sgdValue.replace(/[^\d.,]/g, '');
-            const lastComma = cleanedSgdValue.lastIndexOf(',');
-            const lastDot = cleanedSgdValue.lastIndexOf('.');
-            // function only get one dot or one comma
-            if (lastComma > -1 && lastDot > -1) {
+        
+        function guaranteeFee() {
+            let textUnitInit = $('.unit-init').text();
+            let textUnitWillChange = $('.unit-will-change').text();
+            let flagChangeSgdToUsd = true;
+            function validInputUsd(sgdValue) {
+                let cleanedSgdValue = sgdValue.replace(/[^\d.,]/g, '');
+                const lastComma = cleanedSgdValue.lastIndexOf(',');
+                const lastDot = cleanedSgdValue.lastIndexOf('.');
+                // function only get one dot or one comma
+                if (lastComma > -1 && lastDot > -1) {
                 if (lastComma > lastDot) {
                     cleanedSgdValue = cleanedSgdValue.replace(/\./g, ''); 
                     cleanedSgdValue = cleanedSgdValue.replace(/(,)(?=.*\,)/g, '');
@@ -4894,55 +4891,109 @@ const mainScript = () => {
                     cleanedSgdValue = cleanedSgdValue.replace(/\,/g, ''); 
                     cleanedSgdValue = cleanedSgdValue.replace(/(\.)(?=.*\.)/g, '');
                 }
-            } else {
+                } else {
                 cleanedSgdValue = cleanedSgdValue
                     .replace(/,/g, (match, offset) => offset === 0 ? '' : ',') 
                     .replace(/(,)(?=.*\,)/g, '') 
                     .replace(/\./g, (match, offset) => offset === 0 ? '' : '.') 
                     .replace(/(\.)(?=.*\.)/g, ''); 
-            }
-            if (cleanedSgdValue.startsWith(',') || cleanedSgdValue.startsWith('.')) {
+                }
+                if (cleanedSgdValue.startsWith(',') || cleanedSgdValue.startsWith('.')) {
                 cleanedSgdValue = cleanedSgdValue.substring(1);
-            }
-            // update value input
-            if (sgdValue !== cleanedSgdValue) {
+                }
+                // update value input
+                if (sgdValue !== cleanedSgdValue) {
                 $(this).val(cleanedSgdValue);
                 sgdValue = cleanedSgdValue;
+                }
+                return sgdValue;
             }
-            return sgdValue;
-        }
-        function guaranteeFee() {
-            $('.guarantee-fee-form-input').on('input', function () {
-                let sgdValue = $(this).val();
-                // clean all text
-                let cleanedFee = validInputUsd(sgdValue);
-                $('.guarantee-fee-form-input-val').text(cleanedFee);
-                $('.guarantee-fee-form-input').val(cleanedFee);
-                let usdConvertTotal = (Math.floor(cleanedFee * sgdToUsd * 100)/100).toFixed(2);
-                let usdConvertFinal =(Math.floor((usdConvertTotal - usdConvertTotal * feeSgdToUsd)*100)/100).toFixed(2);
-                let feeConvert = (usdConvertTotal - usdConvertFinal).toFixed(2);
-                console.log(usdConvertFinal)
-                $('.sgd-to-usd-total').text(usdConvertTotal);
-                $('.sgd-to-usd-fee').text(feeConvert);
-                $('.guarantee-fee-form-input-result').text(usdConvertFinal);
+            function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+            }
+        
+            const handleInput = debounce(function(sgdAmount) {
+            if (!sgdAmount || parseFloat(sgdAmount) <= 0) {
+                resetDisplay();
+                return;
+            }
+        
+            if (!currentRateData) {
+                return;
+            }
+        
+            convertAmount(sgdAmount);
+            }, 500);
+        
+            $('.guarantee-fee-form-input').on('input', function() {
+            let sgdAmount = $(this).val();
+            // sgdAmount = validInputUsd.call(this, sgdAmount);
+            let cleanedFee = validInputUsd(sgdAmount);
+            $('.guarantee-fee-form-input-val').text(cleanedFee);
+            handleInput(sgdAmount);
             });
+            function convertAmount(sgdAmount) {
+            $.ajax({
+                url: 'https://data.chocolate-technologies.io/api/fx/convert-amount-and-fee',
+                method: 'POST',
+                contentType: 'application/json',
+                headers: {
+                'cf-turnstile-response': turnstileToken
+                },
+                data: JSON.stringify({
+                offeredRate: currentRateData.rate,
+                amount: {
+                    currency: 'SGD',
+                    quantity: sgdAmount
+                },
+                action: 'buy',
+                pair: 'USD:SGD',
+                midMarketRate: currentRateData.midMarketRate.original
+                }),
+                success: function(data) {
+                updateDisplay(sgdAmount, data);
+                },
+                error: function(xhr, status, error) {
+                console.log('Lỗi: ' + error);
+                }
+            });
+            }
+            function updateDisplay(sgdAmount, data) {
+            $('.sgd-to-usd-total').text(parseFloat(data.totalAmount.quantity).toFixed(2));
+            $('.sgd-to-usd-fee').text(Math.abs(parseFloat(data.fee.quantity)).toFixed(2));
+            $('.guarantee-fee-form-input-result').text(parseFloat(data.convertedAmount.quantity).toFixed(2));
+            }
+            function resetDisplay() {
+            $('.sgd-to-usd-total').text('0');
+            $('.guarantee-fee-form-fee-value').text('0');
+            $('.guarantee-fee-form-input-result').text('0');
+            }
             $('.guarantee-fee-convert-ic').on('click', function () {
-                if (flagChangeSgdToUsd) {
-                    $('.unit-init').text(textUnitWillChange);
-                    $('.unit-will-change').text(textUnitInit);
-                    $('.sgd-to-usd').text(usdToSgd)
-                    flagChangeSgdToUsd = false;
-                }
-                else {
-                    $('.unit-init').text(textUnitInit);
-                    $('.unit-will-change').text(textUnitWillChange);
-                    $('.sgd-to-usd').text(sgdToUsd)
-                    flagChangeSgdToUsd = true;
-                }
+            if (flagChangeSgdToUsd) {
+                $('.unit-init').text(textUnitWillChange);
+                $('.unit-will-change').text(textUnitInit);
+                $('.sgd-to-usd').text(usdToSgd)
+                flagChangeSgdToUsd = false;
+            }
+            else {
+                $('.unit-init').text(textUnitInit);
+                $('.unit-will-change').text(textUnitWillChange);
+                $('.sgd-to-usd').text(sgdToUsd)
+                flagChangeSgdToUsd = true;
+            }
             })
         }
-        guaranteeFee();
-        
+        if(isStagging()){
+            guaranteeFee();
+        }
         function usdSecu(){
             let textCir;
             textCir = new CircleType(document.querySelector('.mod-circletext.usd-secu-rate-txt'));
