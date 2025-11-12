@@ -3,6 +3,10 @@ const script = () => {
     ScrollTrigger.defaults({
         invalidateOnRefresh: true
     });
+    const xGetter = (el) => gsap.getProperty(el, 'x');
+    const yGetter = (el) => gsap.getProperty(el, 'y');
+    const xSetter = (el) => gsap.quickSetter(el, 'x', `px`);
+    const ySetter = (el) => gsap.quickSetter(el, 'y', `px`);
 
     const cvUnit = (val, unit) => {
         let result;
@@ -188,12 +192,44 @@ const script = () => {
             animationScrub() {
             }
             interact() {
+
+                const updateLocationPopup = (slug) => {
+                    const updatePosition = () => {
+                        let rectWrap = $(this.el).find(`.home-state-map`).get(0).getBoundingClientRect();
+                        let dotRect = $(this.el).find(`.location-area[id="${slug}"] .location-dot`).get(0).getBoundingClientRect();
+                        let popupRect = $(this.el).find(`.location-infor`).get(0).getBoundingClientRect();
+                        let x = ((dotRect.left - rectWrap.left + dotRect.width) / rectWrap.width) * 100;
+                        let y = ((dotRect.top - rectWrap.top - popupRect.height) / rectWrap.height) * 100;
+                        gsap.set($(this.el).find(`.location-infor`), {
+                            left: `${x}%`,
+                            top: `${y}%`
+                        });
+                    }
+                    if ($(this.el).find(`.location-infor`).hasClass('active')) {
+                        $(this.el).find(`.location-infor`).removeClass('active');
+                        setTimeout(() => {
+                            $(this.el).find(`.location-infor [data-popup-state="name"]`).text($(this.el).find(`.home-state-btn-item[data-slug="${slug}"] [data-popup-state="name"]`).text());
+                            $(this.el).find(`.location-infor [data-popup-state="address"]`).text($(this.el).find(`.home-state-btn-item[data-slug="${slug}"] [data-popup-state="address"]`).text());
+                            $(this.el).find(`.location-infor [data-popup-state="image"]`).attr('src', $(this.el).find(`.home-state-btn-item[data-slug="${slug}"] [data-popup-state="image"]`).attr('src'));
+                            $(this.el).find(`.location-infor`).addClass('active');
+                            updatePosition();
+                        }, 400);
+                    }
+                    else {
+                        $(this.el).find(`.location-infor`).addClass('active');
+                        $(this.el).find(`.location-infor [data-popup-state="name"]`).text($(this.el).find(`.home-state-btn-item[data-slug="${slug}"] [data-popup-state="name"]`).text());
+                        $(this.el).find(`.location-infor [data-popup-state="address"]`).text($(this.el).find(`.home-state-btn-item[data-slug="${slug}"] [data-popup-state="address"]`).text());
+                        $(this.el).find(`.location-infor [data-popup-state="image"]`).attr('src', $(this.el).find(`.home-state-btn-item[data-slug="${slug}"] [data-popup-state="image"]`).attr('src'));
+                        updatePosition();
+                    }
+                }
                 $('.home-state-btn-item').on('click', (e) => {
                     e.preventDefault();
                     const slug = $(e.currentTarget).attr('data-slug');
                     $(e.target).addClass('active').siblings().removeClass('active');
                     $(this.el).find(`.location-area#${slug}`).addClass('active').siblings().removeClass('active');
                     $('.location-dot').removeClass('active');
+                    $(this.el).find(`.location-infor`).removeClass('active');
                 });
                 $('.location-area').on('click', (e) => {
                     e.preventDefault();
@@ -201,18 +237,16 @@ const script = () => {
                     if ($(e.target).closest('.location-dot').length > 0) {
                         return;
                     }
-                    console.log("run")
                     $(e.currentTarget).addClass('active').siblings().removeClass('active');
                     $(this.el).find(`.home-state-btn-item[data-slug="${slug}"]`).addClass('active').siblings().removeClass('active');
                     $('.location-dot').removeClass('active');
+                    $(this.el).find(`.location-infor`).removeClass('active');
                 });
                 $('.location-dot').on('click', (e) => {
                     e.preventDefault();
-                    console.log("click")
-                    // const slug = $(e.currentTarget).attr('id');
                     $(e.currentTarget).closest('.location-area').addClass('active').siblings().removeClass('active');
                     $(e.currentTarget).addClass('active').closest('.location-area').siblings().find('.location-dot').removeClass('active');
-                    // $(this.el).find(`.home-state-btn-item[data-slug="${slug}"]`).addClass('active').siblings().removeClass('active');
+                    updateLocationPopup($(e.currentTarget).closest('.location-area').attr('id'));
                 });
             }
             destroy() {
