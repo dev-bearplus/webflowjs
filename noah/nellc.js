@@ -53,6 +53,59 @@ const script = () => {
             }
         }));
     }
+    const getAllScrollTrigger = (fn) => {
+        let triggers = ScrollTrigger.getAll();
+        triggers.forEach(trigger => {
+            if (fn === "refresh") {
+                if (trigger.progress === 0) {
+                    trigger[fn]?.();
+                }
+            } else {
+                trigger[fn]?.();
+            }
+        });
+    };
+    function resetScroll() {
+        if (window.location.hash !== '') {
+            if ($(window.location.hash).length >= 1) {
+                $("html").animate({ scrollTop: $(window.location.hash).offset().top - 100 }, 1200);
+
+                setTimeout(() => {
+                    $("html").animate({ scrollTop: $(window.location.hash).offset().top - 100 }, 1200);
+                }, 300);
+            } else {
+                scrollTop()
+            }
+        } else if (window.location.search !== '') {
+            let searchObj = JSON.parse('{"' + decodeURI(location.search.substring(1)).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}')
+            if (searchObj.sc) {
+                if ($(`#${searchObj.sc}`).length >= 1) {
+                    let target = `#${searchObj.sc}`;
+                    setTimeout(() => {
+                        smoothScroll.scrollTo(`#${searchObj.sc}`, {
+                            offset: -100
+                        })
+                    }, 500);
+                } else {
+                    scrollTop()
+                }
+            }
+        } else {
+            scrollTop()
+        }
+    };
+    function scrollTop(onComplete) {
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+        smoothScroll.scrollToTop({
+            onComplete: () => {
+                onComplete?.();
+                getAllScrollTrigger("refresh");
+            }
+        });
+    }
     class SmoothScroll {
 		constructor() {
 			this.lenis = null;
@@ -139,14 +192,9 @@ const script = () => {
 		}
 
 		scrollToTop(options = {}) {
-			if (this.lenis) {
-				this.lenis.scrollTo("top", {
-					duration: 0.0001,
-					immediate: true,
-					lock: true,
-					...options,
-				});
-			}
+            if (this.lenis) {
+                this.lenis.scrollTo("top", { duration: .0001, immediate: true, lock: true, ...options });
+            }
 		}
 
 		destroy() {
@@ -163,6 +211,100 @@ const script = () => {
     smoothScroll.init();
 
     const HomePage = {
+        'home-hero-wrap': class extends HTMLElement {
+            constructor() {
+                super();
+                this.el = this;
+                this.tlTrigger = null;
+            }
+            connectedCallback() {
+                this.tlTrigger = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: this,
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => {
+                            this.onTrigger();
+                        }
+                    }
+                });
+            }
+            onTrigger() {
+
+                this.animationReveal();
+                this.interact();
+            }
+            animationReveal() {
+                new MasterTimeline({
+                    timeline: gsap.timeline({
+                        onStart: () => {
+                            $('[data-init-hidden]').removeAttr('data-init-hidden');
+                            requestAnimationFrame(() => {
+                                $('.body').css({
+                                    'overflow': 'initial',
+                                    'position': 'relative',
+                                    'max-height': 'none',
+                                    'inset': 'auto',
+                                    'overflow-y': 'initial'
+                                })
+                            })
+                            setTimeout(() => {
+                                this.animationScrub();
+                            }, 1000);
+                        }
+                    }),
+                    allowMobile: true,
+                    tweenArr: [
+                        new FadeSplitText({ el: $('.home-hero-front-title').get(0) }),
+                        new FadeIn({ el: $('.home-hero-front-main-img .home-hero-front-main-img-bg').get(0) }),
+                        new FadeIn({ el: $('.home-hero-front-sub-img.left .home-hero-front-sub-img-bg').get(0), type: 'left' }),
+                        new FadeIn({ el: $('.home-hero-front-sub-img.right .home-hero-front-sub-img-bg').get(0), type: 'right' }),
+                        new FadeIn({ el: $('.home-hero-front-cta').get(0), from: { y: 10 } })
+                    ]
+                });
+            }
+            animationScrub() {
+                this.tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '.home-hero',
+                        start: 'top-=1px top',
+                        end: 'bottom bottom+=5%',
+                        scrub: true
+                    }
+                })
+
+                let originalWidth = $('.home-hero-front-main-img').width();
+                gsap.set('.home-hero-front-main-img', { scale: 1, y: 0, width: originalWidth });
+                let middleOffsetTop = $('.home-hero-front-main-img-bg').get(0).getBoundingClientRect().top - $('.home-hero-front-title-flex').eq(0).get(0).getBoundingClientRect().top;
+
+                let offsetBottom = $(window).height() - $('.home-hero-front-main-img').get(0).getBoundingClientRect().bottom;
+                let scaleOffSet = $('.home-hero-main-img.full').height() / $('.home-hero-front-main-img-inner').height();
+                this.tl
+                    .fromTo('.home-hero-front-main-img', { y: 0, transformOrigin: 'center top' }, { y: -middleOffsetTop, ease: 'none', duration: 1 }, "<=0")
+                    .fromTo('.home-hero-front-cta', { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: 10, duration: .6, ease: 'none' }, 0)
+                    .to('.home-hero-front-sub-img.left', { xPercent: -20, yPercent: -20, autoAlpha: 0, duration: .6, ease: 'none' }, 0)
+                    .to('.home-hero-front-sub-img.right', { xPercent: 20, yPercent: -20, autoAlpha: 0, duration: .6, ease: 'none' }, 0)
+                    .to('.home-hero-front-title-flex:nth-child(3) .heading:nth-child(1)', { x: cvUnit(-250, 'rem'), scale: .9, autoAlpha: 0, duration: .6, ease: 'expo.inOut' }, "<=.1")
+                    .to('.home-hero-front-title-flex:nth-child(3) .heading:nth-child(2)', { x: cvUnit(285, 'rem'), scale: .9, autoAlpha: 0, duration: .6, ease: 'expo.inOut' }, '<=0')
+                    .to('.home-hero-front-title-flex:nth-child(2) .heading:nth-child(1)', { x: cvUnit(-340, 'rem'), scale: .9, autoAlpha: 0, duration: .6, ease: 'expo.inOut' }, "<=.3")
+                    .to('.home-hero-front-title-flex:nth-child(2) .heading:nth-child(2)', { x: cvUnit(250, 'rem'), scale: .9, autoAlpha: 0, duration: .6, ease: 'expo.inOut' }, '<=0')
+                    .to('.home-hero-front-title .heading:nth-child(1)', { y: -cvUnit(10, 'rem'), scale: .9, autoAlpha: 0, duration: .6, ease: 'power1.inOut' }, '<=0.1')
+                    .fromTo('.home-hero-front-main-img',
+                        { scale: 1, y: -middleOffsetTop, width: originalWidth, transformOrigin: `center bottom` },
+                        { scale: scaleOffSet, y: offsetBottom + (cvUnit(2, 'rem') * scaleOffSet), width: originalWidth * scaleOffSet, duration: 1,  ease: 'power1.inOut'
+                    }, "-=.1")
+                    .to('.home-hero-front-main-img-inner', { marginLeft: 0, duration: .7, ease: 'power1.inOut'  }, "<=0")
+                    .to('.home-hero-front-main-img-bg', { borderRadius: '0', duration: .8,  ease: 'power1.inOut' }, "<=0")
+                    .to('.home-hero-front', { autoAlpha: 0, duration: .8,  ease: 'power1.inOut'  }, "-=.3")
+                    .to('.home-hero-text-wrap', { y: 0, duration: 1, ease: 'power1.inOut' }, "<=0")
+            }
+            interact() {
+            }
+            destroy() {
+                this.tlTrigger.kill();
+            }
+        },
         'home-state-wrap': class extends HTMLElement {
             constructor() {
                 super();
@@ -192,7 +334,6 @@ const script = () => {
             animationScrub() {
             }
             interact() {
-
                 const updateLocationPopup = (slug) => {
                     const updatePosition = () => {
                         let rectWrap = $(this.el).find(`.home-state-map`).get(0).getBoundingClientRect();
@@ -229,7 +370,6 @@ const script = () => {
                     $(e.target).addClass('active').siblings().removeClass('active');
                     $(this.el).find(`.location-area#${slug}`).addClass('active').siblings().removeClass('active');
                     $('.location-dot').removeClass('active');
-                    $(this.el).find(`.location-infor`).removeClass('active');
                 });
                 $('.location-area').on('click', (e) => {
                     e.preventDefault();
@@ -240,14 +380,18 @@ const script = () => {
                     $(e.currentTarget).addClass('active').siblings().removeClass('active');
                     $(this.el).find(`.home-state-btn-item[data-slug="${slug}"]`).addClass('active').siblings().removeClass('active');
                     $('.location-dot').removeClass('active');
-                    $(this.el).find(`.location-infor`).removeClass('active');
                 });
-                $('.location-dot').on('click', (e) => {
-                    e.preventDefault();
-                    $(e.currentTarget).closest('.location-area').addClass('active').siblings().removeClass('active');
-                    $(e.currentTarget).addClass('active').closest('.location-area').siblings().find('.location-dot').removeClass('active');
-                    updateLocationPopup($(e.currentTarget).closest('.location-area').attr('id'));
-                });
+                // $('.location-dot').on('click', (e) => {
+                //     e.preventDefault();
+                //     $(e.currentTarget).closest('.location-area').addClass('active').siblings().removeClass('active');
+                //     $(e.currentTarget).addClass('active').closest('.location-area').siblings().find('.location-dot').removeClass('active');
+                //     updateLocationPopup($(e.currentTarget).closest('.location-area').attr('id'));
+                // });
+                // $(window).on('click', (e) => {
+                //     if (!e.target.closest('.location-dot')) {
+                //         $(this.el).find(`.location-infor`).removeClass('active');
+                //     }
+                // })
             }
             destroy() {
                 this.tlTrigger.kill();
@@ -299,7 +443,7 @@ const script = () => {
     };
     const registry = {};
     registry[pageName]?.destroy();
-    pageConfig[pageName] && (registry[pageName] = new PageManager(pageConfig[pageName]));
+    scrollTop(() => pageConfig[pageName] && (registry[pageName] = new PageManager(pageConfig[pageName])));
     refreshOnBreakpoint();
 }
 window.onload = script
