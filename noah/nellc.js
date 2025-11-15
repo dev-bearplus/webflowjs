@@ -269,8 +269,18 @@ const script = () => {
                     scrollTrigger: {
                         trigger: '.home-hero',
                         start: 'top-=1px top',
-                        end: 'bottom bottom+=5%',
-                        scrub: true
+                        end: 'bottom bottom+=10%',
+                        scrub: true,
+                        onToggle: (self) => {
+                            if (self.isActive) {
+                                $('.header').addClass('on-hide');
+                            }
+                            else {
+                                if (self.progress === 1) {
+                                    $('.header').removeClass('on-hide');
+                                }
+                            }
+                        }
                     }
                 })
 
