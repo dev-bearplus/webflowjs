@@ -41,6 +41,21 @@ const script = () => {
             timer = setTimeout(() => { func.apply(this, args) }, timeout)
         }
     }
+    const isInViewport = (el, orientation = 'vertical') => {
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        if (orientation == 'horizontal') {
+                return (
+                    rect.left <= (window.innerWidth) &&
+                    rect.right >= 0
+                );
+        } else {
+                return (
+                    rect.top <= (window.innerHeight) &&
+                    rect.bottom >= 0
+                );
+        }
+    }
     const refreshOnBreakpoint = () => {
         const breakpoints = Object.values(device).sort((a, b) => a - b);
         const initialViewportWidth = window.innerWidth || document.documentElement.clientWidth;
@@ -53,6 +68,38 @@ const script = () => {
             }
         }));
     }
+    const documentHeightObserver = (() => {
+        let previousHeight = document.documentElement.scrollHeight;
+        let resizeObserver;
+        let debounceTimer;
+
+        function refreshScrollTrigger() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                const currentHeight = document.documentElement.scrollHeight;
+
+                if (currentHeight !== previousHeight) {
+                    console.log("Document height changed. Refreshing ScrollTrigger...");
+                    ScrollTrigger.refresh();
+                    previousHeight = currentHeight;
+                }
+            }, 200); // Adjust the debounce delay as needed
+        }
+
+        return (action) => {
+            if (action === "init") {
+                console.log("Initializing document height observer...");
+                resizeObserver = new ResizeObserver(refreshScrollTrigger);
+                resizeObserver.observe(document.documentElement);
+            }
+            else if (action === "disconnect") {
+                console.log("Disconnecting document height observer...");
+                if (resizeObserver) {
+                    resizeObserver.disconnect();
+                }
+            }
+        };
+    })();
     const getAllScrollTrigger = (fn) => {
         let triggers = ScrollTrigger.getAll();
         triggers.forEach(trigger => {
@@ -105,6 +152,70 @@ const script = () => {
                 getAllScrollTrigger("refresh");
             }
         });
+    }
+    class ParallaxImage {
+        constructor({ el, scaleOffset = 0.1 }) {
+            this.el = el;
+            this.elWrap = null;
+            this.scaleOffset = scaleOffset;
+            this.init();
+        }
+        init() {
+            this.elWrap = this.el.parentElement;
+            this.setup();
+        }
+        setup() {
+            const scalePercent = 100 + 5 + ((this.scaleOffset - 0.1) * 100);
+            gsap.set(this.el, {
+                width: scalePercent + '%',
+                height: $(this.el).hasClass('img-fill') ? scalePercent + '%' : 'auto'
+            });
+            this.scrub();
+        }
+        scrub() {
+            let dist = this.el.offsetHeight - this.elWrap.offsetHeight;
+            let total = this.elWrap.getBoundingClientRect().height + window.innerHeight;
+            this.updateOnScroll(dist, total);
+            smoothScroll.lenis.on('scroll', () => {
+                this.updateOnScroll(dist, total);
+            });
+        }
+        updateOnScroll(dist, total) {
+            if (this.el) {
+                if (isInViewport(this.elWrap)) {
+                    let percent = this.elWrap.getBoundingClientRect().top / total;
+                    gsap.quickSetter(this.el, 'y', 'px')(-dist * percent * 1.2);
+                    gsap.set(this.el, { scale: 1 + (percent * this.scaleOffset) });
+                }
+            }
+        }
+    }
+    class CounterUp {
+        constructor(el, options = {}) {
+            this.el = el;
+            this.options = options;
+            this.init();
+        }
+        init() {
+            this.setup();
+        }
+        setup() {
+            if (this.el.dataset.counter == 'false') return;
+            let value = this.el.innerHTML;
+            let hasDecimal = value.includes('.') || value.includes(',');
+            let decimal = value.includes('.') ? '.' : value.includes(',') ? ',' : '';
+            let suffix = value.includes('%') ? '%' : '';
+            let counterTo = value.replace(/[,]/g, '.').replace(/[%]/g, '');
+            let decimalPlaces = hasDecimal && counterTo.length - value.indexOf(decimal) - 1;
+            const counter = new countUp.CountUp(this.el, counterTo, {
+                duration: .4,
+                decimalPlaces,
+                decimal,
+                suffix,
+                enableScrollSpy: true,
+                ...this.options
+            });
+        }
     }
     class SmoothScroll {
 		constructor() {
@@ -270,7 +381,7 @@ const script = () => {
                         trigger: '.home-hero',
                         start: 'top-=1px top',
                         end: 'bottom bottom+=10%',
-                        scrub: true,
+                        scrub: 1,
                         onToggle: (self) => {
                             if (self.isActive) {
                                 $('.header').addClass('on-hide');
@@ -307,7 +418,171 @@ const script = () => {
                     .to('.home-hero-front-main-img-inner', { marginLeft: 0, duration: .7, ease: 'power1.inOut'  }, "<=0")
                     .to('.home-hero-front-main-img-bg', { borderRadius: 0, borderWidth: 0, duration: .8,  ease: 'power1.inOut' }, "<=0")
                     .to('.home-hero-front', { autoAlpha: 0, duration: .8,  ease: 'power1.inOut'  }, "-=.25")
-                    .to('.home-hero-text-wrap', { y: 0, duration: 1, ease: 'power1.inOut' }, "<=0.1")
+                    .to('.home-hero-text-wrap', { y: 0, duration: 1, ease: 'power1.inOut' }, "<=0.2")
+            }
+            interact() {
+            }
+            destroy() {
+                this.tlTrigger.kill();
+            }
+        },
+        'home-intro-wrap': class extends HTMLElement {
+            constructor() {
+                super();
+                this.el = this;
+                this.tlTrigger = null;
+            }
+            connectedCallback() {
+                this.tlTrigger = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('section'),
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => {
+                            this.onTrigger();
+                        }
+                    }
+                });
+            }
+            onTrigger() {
+                this.animationScrub();
+                this.animationReveal();
+                this.interact();
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+                if (viewport.w > 991) {
+                    this.tl = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: '.home-intro-stick-wrap',
+                            start: 'top top',
+                            end: 'bottom bottom',
+                            endTrigger: '.home-intro',
+                            scrub: 1
+                        }
+                    })
+                    // let offsetTop = $('.home-intro-img.main').get(0).getBoundingClientRect().top - cvUnit(86, 'rem');
+                    let offsetLeft = $('.home-intro-thumb').get(0).getBoundingClientRect().left - $('.home-intro-img.main').get(0).getBoundingClientRect().left;
+                    let scaleOffset = $('.home-intro-thumb').width() / $('.home-intro-img.main').width();
+                    gsap.set('.home-intro-img.main', { scale: 1, x: $('.home-intro-img.clone').offset().left - $('.home-intro-img.main').offset().left + cvUnit(131, 'rem')  });
+                    this.tl
+                    .fromTo('.home-intro-img.main',
+                        { clipPath: `inset(0% 10% round ${cvUnit(16, 'rem')}px)`, transformOrigin: 'left 8%', scale: 1 },
+                        {  x: offsetLeft + cvUnit(131, 'rem'), scale: scaleOffset, clipPath: `inset(0% 0% round ${cvUnit(32/scaleOffset, 'rem')}px)`, duration: 1, ease: 'power2.inOut'})
+                    .fromTo('.home-intro-img.main .video-card-play',
+                        { scale: scaleOffset / 100 },
+                        { scale: 1 / scaleOffset, duration: 1, ease: 'power2.inOut' }, 0)
+                    .fromTo('.home-intro-title, .home-intro-desc',
+                        { autoAlpha: 1 },
+                        { autoAlpha: 0, duration: 1, ease: 'power2.inOut', stagger: 0.1 }, 0)
+                }
+            }
+            interact() {
+            }
+            destroy() {
+                this.tlTrigger.kill();
+            }
+        },
+        'home-path-wrap': class extends HTMLElement {
+            constructor() {
+                super();
+                this.el = this;
+                this.tlTrigger = null;
+            }
+            connectedCallback() {
+                this.tlTrigger = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('section'),
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => {
+                            this.onTrigger();
+                        }
+                    }
+                });
+            }
+            onTrigger() {
+                this.animationScrub();
+                this.animationReveal();
+                this.interact();
+            }
+            animationScrub() {
+                $('.home-path-item-img-inner').each((_, item) => new ParallaxImage({ el: $(item).find('img').get(0), scaleOffset: 0.2 }));
+            }
+            animationReveal() {
+            }
+            interact() {
+            }
+            destroy() {
+                this.tlTrigger.kill();
+            }
+        },
+        'home-stats-wrap': class extends HTMLElement {
+            constructor() {
+                super();
+                this.el = this;
+                this.tlTrigger = null;
+            }
+            connectedCallback() {
+                this.tlTrigger = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('section'),
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => {
+                            this.onTrigger();
+                        }
+                    }
+                });
+            }
+            onTrigger() {
+                this.animationScrub();
+                this.animationReveal();
+                this.interact();
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+                $('.home-stats-item-val [data-counter]').each((index, item) => new CounterUp(item, { scrollSpyDelay: index * 0.2}));
+            }
+            interact() {
+            }
+            destroy() {
+                this.tlTrigger.kill();
+            }
+        },
+        'home-val-wrap': class extends HTMLElement {
+            constructor() {
+                super();
+                this.el = this;
+                this.tlTrigger = null;
+            }
+            connectedCallback() {
+                this.tlTrigger = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('section'),
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => {
+                            this.onTrigger();
+                        }
+                    }
+                });
+            }
+            onTrigger() {
+                this.animationReveal();
+                this.animationScrub();
+                this.interact();
+            }
+            animationScrub() {
+                $('.home-val-item-img-inner img').each((_, item) => new ParallaxImage({ el: item, scaleOffset: 0.2 }));
+            }
+            animationReveal() {
             }
             interact() {
             }
@@ -324,7 +599,7 @@ const script = () => {
             connectedCallback() {
                 this.tlTrigger = gsap.timeline({
                     scrollTrigger: {
-                        trigger: this,
+                        trigger: $(this.el).find('section'),
                         start: 'top bottom+=50%',
                         end: 'bottom top-=50%',
                         once: true,
@@ -378,8 +653,10 @@ const script = () => {
                     e.preventDefault();
                     const slug = $(e.currentTarget).attr('data-slug');
                     $(e.target).addClass('active').siblings().removeClass('active');
-                    $(this.el).find(`.location-area#${slug}`).addClass('active').siblings().removeClass('active');
-                    $('.location-dot').removeClass('active');
+                    $(`.location-area#${slug}`).addClass('active').siblings().removeClass('active');
+                    $(`.location-dot`).removeClass('active');
+                    $(`.location-area#${slug} .location-dot`).addClass('active');
+                    smoothScroll.scrollTo(`.location-area[id="${slug}"]`, { offset: -150 });
                 });
                 $('.location-area').on('click', (e) => {
                     e.preventDefault();
@@ -402,6 +679,127 @@ const script = () => {
                 //         $(this.el).find(`.location-infor`).removeClass('active');
                 //     }
                 // })
+
+                $('.home-state-map-btn').on('click', () => {
+                    $('.home-state-map-list').toggleClass('active');
+                    $('.home-state-map-btn-item.active').removeClass('active').siblings().addClass('active');
+                });
+            }
+            destroy() {
+                this.tlTrigger.kill();
+            }
+        },
+        'home-process-wrap': class extends HTMLElement {
+            constructor() {
+                super();
+                this.el = this;
+                this.tlTrigger = null;
+            }
+            connectedCallback() {
+                this.tlTrigger = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('section'),
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => {
+                            this.onTrigger();
+                        }
+                    }
+                });
+            }
+            onTrigger() {
+                this.animationScrub();
+                this.animationReveal();
+                this.interact();
+            }
+            animationScrub() {
+                if (viewport.w > 767) {
+                    let defaultTop = parseFloat($('.home-process-item').eq(0).css('top'));
+                    $('.home-process-item').each((i, item) => {
+                        let scale, rotate = 0;
+                        if (i !== $('.home-process-item').length - 1) {
+                            scale = .9 + .025 * i;
+                            rotate = -10;
+                            new ParallaxImage({ el: $(item).find('.home-process-item-img-inner img').get(0) });
+                        }
+                        let tl = gsap.timeline({
+                            scrollTrigger: {
+                                trigger: item,
+                                start: 'top ' + (250 + 40 * i),
+                                end: 'bottom bottom',
+                                endTrigger: '.home-process-list',
+                                scrub: 1.5
+                            }
+                        })
+                        gsap.set(item, { top: defaultTop + 20 * i });
+                        tl.fromTo(item, { scale: 1, rotationX: 0 }, {
+                            scale,
+                            rotationX: rotate,
+                            transformOrigin: 'top center',
+                            ease: 'none',
+                            duration: 1,
+                            overwrite: true
+                        })
+                    })
+                }
+
+                // let tlProgress = gsap.timeline({
+                //     scrollTrigger: {
+                //         trigger: '.home-process-main',
+                //         start: 'top 50%',
+                //         end: 'bottom 50%',
+                //         scrub: 1.5
+                //     }
+                // })
+                // tlProgress.fromTo('.home-process-prog-inner', { scaleY: 0 }, { scaleY: 1, ease: 'none' });
+            }
+            animationReveal() {
+            }
+            interact() {
+            }
+            destroy() {
+                this.tlTrigger.kill();
+            }
+        },
+        'home-testi-wrap': class extends HTMLElement {
+            constructor() {
+                super();
+                this.el = this;
+                this.tlTrigger = null;
+            }
+            connectedCallback() {
+                this.tlTrigger = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('section'),
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => {
+                            this.onTrigger();
+                        }
+                    }
+                });
+            }
+            onTrigger() {
+                this.animationScrub();
+                this.animationReveal();
+                this.interact();
+            }
+            animationScrub() {
+            }
+            animationReveal() {
+            }
+            interact() {
+                $('.home-testi-cms').addClass('swiper');
+                $('.home-testi-list').addClass('swiper-wrapper');
+                $('.home-testi-card').addClass('swiper-slide');
+
+                $('.home-testi-list').css('gap', 0);
+                let swiper = new Swiper('.home-testi-cms', {
+                    slidesPerView: 'auto',
+                    spaceBetween: cvUnit(16, 'rem')
+                });
             }
             destroy() {
                 this.tlTrigger.kill();
@@ -454,6 +852,7 @@ const script = () => {
     const registry = {};
     registry[pageName]?.destroy();
     scrollTop(() => pageConfig[pageName] && (registry[pageName] = new PageManager(pageConfig[pageName])));
+    documentHeightObserver("init");
     refreshOnBreakpoint();
 }
 window.onload = script
