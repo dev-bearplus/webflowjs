@@ -4956,6 +4956,7 @@ const mainScript = () => {
             handleInput(sgdAmount);
             });
             function convertAmount(sgdAmount) {
+                console.log(sgdAmount);
                 if(sgdAmount <=0){
                     resetDisplay();
                     return;
@@ -4992,7 +4993,7 @@ const mainScript = () => {
             }
             function resetDisplay() {
             $('.sgd-to-usd-total').text('0');
-            $('.guarantee-fee-form-fee-value').text('0');
+            $('.sgd-to-usd-fee').text('0');
             $('.guarantee-fee-form-input-result').text('0');
             }
             $('.guarantee-fee-form-input').on('click focus', function() {
