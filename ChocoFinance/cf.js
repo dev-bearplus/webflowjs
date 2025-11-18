@@ -1118,7 +1118,7 @@ const mainScript = () => {
             $('.topbar .topbar-item .trigger').on('click', function(e) {
                 e.preventDefault();
                 $(this).css('display','none');
-                $(this).closest('.topbar-item').find('.topbar-body-inner').slideDown();
+                $(this).closest('.topbar-item').find('.topbar-body-inner').slideDown().addClass('active');
             })
         }
     }
@@ -4885,21 +4885,36 @@ const mainScript = () => {
                 // function only get one dot or one comma
                 if (lastComma > -1 && lastDot > -1) {
                 if (lastComma > lastDot) {
-                    cleanedSgdValue = cleanedSgdValue.replace(/\./g, ''); 
+                    cleanedSgdValue = cleanedSgdValue.replace(/\./g, '');
                     cleanedSgdValue = cleanedSgdValue.replace(/(,)(?=.*\,)/g, '');
                 } else {
-                    cleanedSgdValue = cleanedSgdValue.replace(/\,/g, ''); 
+                    cleanedSgdValue = cleanedSgdValue.replace(/\,/g, '');
                     cleanedSgdValue = cleanedSgdValue.replace(/(\.)(?=.*\.)/g, '');
                 }
                 } else {
                 cleanedSgdValue = cleanedSgdValue
-                    .replace(/,/g, (match, offset) => offset === 0 ? '' : ',') 
-                    .replace(/(,)(?=.*\,)/g, '') 
-                    .replace(/\./g, (match, offset) => offset === 0 ? '' : '.') 
-                    .replace(/(\.)(?=.*\.)/g, ''); 
+                    .replace(/,/g, (match, offset) => offset === 0 ? '' : ',')
+                    .replace(/(,)(?=.*\,)/g, '')
+                    .replace(/\./g, (match, offset) => offset === 0 ? '' : '.')
+                    .replace(/(\.)(?=.*\.)/g, '');
                 }
                 if (cleanedSgdValue.startsWith(',') || cleanedSgdValue.startsWith('.')) {
                 cleanedSgdValue = cleanedSgdValue.substring(1);
+                }
+                // Remove leading zeros, but keep '0' if value is just zeros or has decimal
+                if (cleanedSgdValue.length > 0) {
+                    const hasDecimal = cleanedSgdValue.includes('.') || cleanedSgdValue.includes(',');
+                    if (hasDecimal) {
+                        // For numbers with decimals, remove leading zeros before decimal point
+                        cleanedSgdValue = cleanedSgdValue.replace(/^0+(?=\d)/, '');
+                    } else {
+                        // For whole numbers, remove leading zeros but keep at least one digit
+                        cleanedSgdValue = cleanedSgdValue.replace(/^0+(?=\d)/, '');
+                    }
+                    // If all zeros were removed, keep at least '0'
+                    if (cleanedSgdValue === '' || cleanedSgdValue === '.' || cleanedSgdValue === ',') {
+                        cleanedSgdValue = '0';
+                    }
                 }
                 // update value input
                 if (sgdValue !== cleanedSgdValue) {
@@ -4941,30 +4956,34 @@ const mainScript = () => {
             handleInput(sgdAmount);
             });
             function convertAmount(sgdAmount) {
-            $.ajax({
-                url: 'https://data.chocolate-technologies.io/api/fx/convert-amount-and-fee',
-                method: 'POST',
-                contentType: 'application/json',
-                headers: {
-                'cf-turnstile-response': turnstileToken
-                },
-                data: JSON.stringify({
-                offeredRate: currentRateData.rate,
-                amount: {
-                    currency: 'SGD',
-                    quantity: sgdAmount
-                },
-                action: 'buy',
-                pair: 'USD:SGD',
-                midMarketRate: currentRateData.midMarketRate.original
-                }),
-                success: function(data) {
-                updateDisplay(sgdAmount, data);
-                },
-                error: function(xhr, status, error) {
-                console.log('Lỗi: ' + error);
+                if(sgdAmount <=0){
+                    resetDisplay();
+                    return;
                 }
-            });
+                $.ajax({
+                    url: 'https://data.chocolate-technologies.io/api/fx/convert-amount-and-fee',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    headers: {
+                    'cf-turnstile-response': turnstileToken
+                    },
+                    data: JSON.stringify({
+                    offeredRate: currentRateData.rate,
+                    amount: {
+                        currency: 'SGD',
+                        quantity: sgdAmount
+                    },
+                    action: 'buy',
+                    pair: 'USD:SGD',
+                    midMarketRate: currentRateData.midMarketRate.original
+                    }),
+                    success: function(data) {
+                    updateDisplay(sgdAmount, data);
+                    },
+                    error: function(xhr, status, error) {
+                    console.log('Lỗi: ' + error);
+                    }
+                });
             }
             function updateDisplay(sgdAmount, data) {
             $('.sgd-to-usd-total').text(parseFloat(data.totalAmount.quantity).toFixed(2));
