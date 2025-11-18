@@ -906,8 +906,8 @@ const script = () => {
                 this.tl = gsap.timeline({
                     scrollTrigger: {
                         trigger: '.about-mission-title',
-                        start: 'top 80%',
-                        end: 'bottom 60%',
+                        start: 'top 85%',
+                        end: 'bottom 55%',
                         scrub: 1
                     }
                 })
@@ -924,7 +924,14 @@ const script = () => {
                 $('.about-mission-slides-wrapper').css('gap', 0);
                 let swiper = new Swiper('.about-mission-slides', {
                     slidesPerView: 'auto',
-                    spaceBetween: cvUnit(32, 'rem')
+                    spaceBetween: cvUnit(16, 'rem'),
+                    centeredSlides: true,
+                    breakpoints: {
+                        767: {
+                            spaceBetween: cvUnit(32, 'rem'),
+                            centeredSlides: false
+                        }
+                    }
                 });
             }
             destroy() {
