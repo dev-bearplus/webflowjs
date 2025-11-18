@@ -217,6 +217,29 @@ const script = () => {
             });
         }
     }
+
+     class Marquee {
+        constructor(list, duration = 40) {
+            this.list = list;
+            this.duration = duration;
+        }
+        setup(isReverse) {
+            const cloneAmount = Math.ceil(viewport.w / this.list.width()) + 1;
+            let itemClone = this.list.find('[data-marquee="item"]').clone();
+            let itemWidth = this.list.find('[data-marquee="item"]').width();
+            this.list.html('');
+            new Array(cloneAmount).fill().forEach(() => {
+                let html = itemClone.clone()
+                html.css('animation-duration', `${Math.ceil(itemWidth / this.duration)}s`);
+                if (isReverse) {
+                    html.css('animation-direction', 'reverse');
+                }
+                html.addClass('anim-marquee');
+                this.list.append(html);
+            });
+        }
+    }
+
     class SmoothScroll {
 		constructor() {
 			this.lenis = null;
@@ -807,6 +830,109 @@ const script = () => {
         },
     }
 
+    const AboutPage = {
+        'about-hero-wrap': class extends HTMLElement {
+            constructor() {
+                super();
+                this.el = this;
+                this.tlTrigger = null;
+            }
+            connectedCallback() {
+                this.tlTrigger = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('section'),
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => {
+                            this.onTrigger();
+                            requestAnimationFrame(() => {
+                                $('.body').css({
+                                    'overflow': 'initial',
+                                    'position': 'relative',
+                                    'max-height': 'none',
+                                    'inset': 'auto',
+                                    'overflow-y': 'initial'
+                                })
+                            })
+                        }
+                    }
+                });
+            }
+            onTrigger() {
+                this.animationReveal();
+                this.animationScrub();
+                this.interact();
+            }
+            animationReveal() {
+
+            }
+            animationScrub() {
+                new Marquee($(this.el).find('.about-hero-title-inner'),40).setup();
+            }
+            interact() {
+            }
+            destroy() {
+                this.tlTrigger.kill();
+            }
+        },
+        'about-mission-wrap': class extends HTMLElement {
+            constructor() {
+                super();
+                this.el = this;
+                this.tlTrigger = null;
+            }
+            connectedCallback() {
+                this.tlTrigger = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('section'),
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => {
+                            this.onTrigger();
+                        }
+                    }
+                });
+            }
+            onTrigger() {
+                this.animationScrub();
+                this.animationReveal();
+                this.interact();
+            }
+            animationScrub() {
+            }
+            animationReveal() {
+                this.tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '.about-mission-title',
+                        start: 'top 80%',
+                        end: 'bottom 60%',
+                        scrub: 1
+                    }
+                })
+
+                let titleSplit = SplitText.create(".about-mission-title", { type: "chars" });
+                gsap.set(titleSplit.chars, { autoAlpha: 0.2 });
+                this.tl.fromTo(titleSplit.chars, { autoAlpha: 0.2 }, { autoAlpha: 1, duration: 1, ease: 'power2.inOut', stagger: 0.05 }, 0)
+            }
+            interact() {
+                $('.about-mission-slides').addClass('swiper');
+                $('.about-mission-slides-wrapper').addClass('swiper-wrapper');
+                $('.about-mission-slides-item').addClass('swiper-slide');
+
+                $('.about-mission-slides-wrapper').css('gap', 0);
+                let swiper = new Swiper('.about-mission-slides', {
+                    slidesPerView: 'auto',
+                    spaceBetween: cvUnit(32, 'rem')
+                });
+            }
+            destroy() {
+                this.tlTrigger.kill();
+            }
+        },
+    }
+
     class PageManager {
         constructor(page) {
             if (!page || typeof page !== 'object') {
@@ -847,7 +973,8 @@ const script = () => {
     }
     const pageName = $('.main-inner').attr('data-namespace');
     const pageConfig = {
-        home: HomePage
+        home: HomePage,
+        about: AboutPage
     };
     const registry = {};
     registry[pageName]?.destroy();
