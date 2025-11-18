@@ -4995,6 +4995,10 @@ const mainScript = () => {
             $('.guarantee-fee-form-fee-value').text('0');
             $('.guarantee-fee-form-input-result').text('0');
             }
+            $('.guarantee-fee-form-input').on('click focus', function() {
+                const length = $(this).val().length;
+                this.setSelectionRange(length, length);
+              });
             $('.guarantee-fee-convert-ic').on('click', function () {
             if (flagChangeSgdToUsd) {
                 $('.unit-init').text(textUnitWillChange);
