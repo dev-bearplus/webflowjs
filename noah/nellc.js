@@ -217,8 +217,7 @@ const script = () => {
             });
         }
     }
-
-     class Marquee {
+    class Marquee {
         constructor(list, duration = 40) {
             this.list = list;
             this.duration = duration;
@@ -239,7 +238,6 @@ const script = () => {
             });
         }
     }
-
     class SmoothScroll {
 		constructor() {
 			this.lenis = null;
@@ -302,7 +300,10 @@ const script = () => {
 			this.scroller.scrollX = e.scroll;
 			this.scroller.scrollY = e.scroll;
 			this.scroller.velocity = e.velocity;
-			this.scroller.direction = e.direction;
+            this.scroller.direction = e.direction;
+            if (header) {
+                header.updateOnScroll(this.lenis);
+            }
 		}
 
 		start() {
@@ -343,6 +344,67 @@ const script = () => {
 	}
 	const smoothScroll = new SmoothScroll();
     smoothScroll.init();
+
+    class Header {
+        constructor() {
+            this.el = null;
+            this.isOpen = false;
+        }
+        init(data) {
+            this.el = document.querySelector('.header');
+            console.log("run")
+            if (viewport.w <= 991) {
+                this.toggleNav();
+            }
+        }
+        updateOnScroll(inst) {
+            this.toggleHide(inst);
+            this.toggleScroll(inst);
+        }
+        toggleScroll(inst) {
+            if (inst.scroll > $(this.el).height() * 2) $(this.el).addClass("on-scroll");
+            else $(this.el).removeClass("on-scroll");
+        }
+        toggleHide(inst) {
+            if (inst.direction == 1) {
+                if (inst.scroll > ($(this.el).height() * 3)) {
+                    $(this.el).addClass('on-hide');
+                }
+            } else if (inst.direction == -1) {
+                if (inst.scroll > ($(this.el).height() * 3)) {
+                    $(this.el).addClass("on-hide");
+                    $(this.el).removeClass("on-hide");
+                }
+            }
+            else {
+                $(this.el).removeClass("on-hide");
+            }
+        }
+        toggleNav() {
+            $(this.el).find('.header-toggle').on('click', this.handleClick.bind(this));
+            $(this.el).find('.header-link, .header-logo, .header-btn').on('click', () => setTimeout(() => this.close(), 800));
+        }
+        handleClick(e) {
+            e.preventDefault();
+            this.isOpen ? this.close() : this.open();
+        }
+        open() {
+            if (this.isOpen) return;
+            $(this.el).addClass('on-open-nav');
+            $(this.el).find('.header-toggle').addClass('active');
+            this.isOpen = true;
+            smoothScroll.lenis.stop();
+        }
+        close() {
+            if (!this.isOpen) return;
+            $(this.el).removeClass('on-open-nav');
+            $(this.el).find('.header-toggle').removeClass('active');
+            this.isOpen = false;
+            smoothScroll.lenis.start();
+        }
+    }
+    const header = new Header();
+    header.init();
 
     const HomePage = {
         'home-hero-wrap': class extends HTMLElement {
@@ -407,11 +469,11 @@ const script = () => {
                         scrub: 1,
                         onToggle: (self) => {
                             if (self.isActive) {
-                                $('.header').addClass('on-hide');
+                                $(header.el).addClass('force-hide');
                             }
                             else {
                                 if (self.progress === 1) {
-                                    $('.header').removeClass('on-hide');
+                                    $(header.el).removeClass('force-hide');
                                 }
                             }
                         }
