@@ -345,6 +345,33 @@ const script = () => {
 	const smoothScroll = new SmoothScroll();
     smoothScroll.init();
 
+    class TriggerSetup extends HTMLElement {
+        constructor() {
+            super();
+            this.tlTrigger = null;
+            this.onTrigger = () => { };
+        }
+        connectedCallback() {
+            this.tlTrigger = gsap.timeline({
+                scrollTrigger: {
+                    trigger: $(this).find('section'),
+                    start: 'top bottom+=50%',
+                    end: 'bottom top-=50%',
+                    once: true,
+                    onEnter: () => {
+                        this.onTrigger?.();
+                    }
+                }
+            });
+        }
+        destroy() {
+            if (this.tlTrigger) {
+                this.tlTrigger.kill();
+                this.tlTrigger = null;
+            }
+        }
+    }
+
     class Header {
         constructor() {
             this.el = null;
@@ -407,29 +434,13 @@ const script = () => {
     header.init();
 
     const HomePage = {
-        'home-hero-wrap': class extends HTMLElement {
+        'home-hero-wrap': class extends TriggerSetup {
             constructor() {
                 super();
-                this.el = this;
-                this.tlTrigger = null;
-            }
-            connectedCallback() {
-                this.tlTrigger = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: this,
-                        start: 'top bottom+=50%',
-                        end: 'bottom top-=50%',
-                        once: true,
-                        onEnter: () => {
-                            this.onTrigger();
-                        }
-                    }
-                });
-            }
-            onTrigger() {
-
-                this.animationReveal();
-                this.interact();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.interact();
+                };
             }
             animationReveal() {
                 new MasterTimeline({
@@ -508,32 +519,17 @@ const script = () => {
             interact() {
             }
             destroy() {
-                this.tlTrigger.kill();
+                super.destroy();
             }
         },
-        'home-intro-wrap': class extends HTMLElement {
+        'home-intro-wrap': class extends TriggerSetup {
             constructor() {
                 super();
-                this.el = this;
-                this.tlTrigger = null;
-            }
-            connectedCallback() {
-                this.tlTrigger = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this.el).find('section'),
-                        start: 'top bottom+=50%',
-                        end: 'bottom top-=50%',
-                        once: true,
-                        onEnter: () => {
-                            this.onTrigger();
-                        }
-                    }
-                });
-            }
-            onTrigger() {
-                this.animationScrub();
-                this.animationReveal();
-                this.interact();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
             }
             animationReveal() {
             }
@@ -570,29 +566,14 @@ const script = () => {
                 this.tlTrigger.kill();
             }
         },
-        'home-path-wrap': class extends HTMLElement {
+        'home-path-wrap': class extends TriggerSetup {
             constructor() {
                 super();
-                this.el = this;
-                this.tlTrigger = null;
-            }
-            connectedCallback() {
-                this.tlTrigger = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this.el).find('section'),
-                        start: 'top bottom+=50%',
-                        end: 'bottom top-=50%',
-                        once: true,
-                        onEnter: () => {
-                            this.onTrigger();
-                        }
-                    }
-                });
-            }
-            onTrigger() {
-                this.animationScrub();
-                this.animationReveal();
-                this.interact();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
             }
             animationScrub() {
                 $('.home-path-item-img-inner').each((_, item) => new ParallaxImage({ el: $(item).find('img').get(0), scaleOffset: 0.2 }));
@@ -602,32 +583,17 @@ const script = () => {
             interact() {
             }
             destroy() {
-                this.tlTrigger.kill();
+                super.destroy();
             }
         },
-        'home-stats-wrap': class extends HTMLElement {
+        'home-stats-wrap': class extends TriggerSetup {
             constructor() {
                 super();
-                this.el = this;
-                this.tlTrigger = null;
-            }
-            connectedCallback() {
-                this.tlTrigger = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this.el).find('section'),
-                        start: 'top bottom+=50%',
-                        end: 'bottom top-=50%',
-                        once: true,
-                        onEnter: () => {
-                            this.onTrigger();
-                        }
-                    }
-                });
-            }
-            onTrigger() {
-                this.animationScrub();
-                this.animationReveal();
-                this.interact();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
             }
             animationReveal() {
             }
@@ -640,29 +606,14 @@ const script = () => {
                 this.tlTrigger.kill();
             }
         },
-        'home-val-wrap': class extends HTMLElement {
+        'home-val-wrap': class extends TriggerSetup {
             constructor() {
                 super();
-                this.el = this;
-                this.tlTrigger = null;
-            }
-            connectedCallback() {
-                this.tlTrigger = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this.el).find('section'),
-                        start: 'top bottom+=50%',
-                        end: 'bottom top-=50%',
-                        once: true,
-                        onEnter: () => {
-                            this.onTrigger();
-                        }
-                    }
-                });
-            }
-            onTrigger() {
-                this.animationReveal();
-                this.animationScrub();
-                this.interact();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
             }
             animationScrub() {
                 $('.home-val-item-img-inner img').each((_, item) => new ParallaxImage({ el: item, scaleOffset: 0.2 }));
@@ -672,32 +623,17 @@ const script = () => {
             interact() {
             }
             destroy() {
-                this.tlTrigger.kill();
+                super.destroy();
             }
         },
-        'home-state-wrap': class extends HTMLElement {
+        'home-state-wrap': class extends TriggerSetup {
             constructor() {
                 super();
-                this.el = this;
-                this.tlTrigger = null;
-            }
-            connectedCallback() {
-                this.tlTrigger = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this.el).find('section'),
-                        start: 'top bottom+=50%',
-                        end: 'bottom top-=50%',
-                        once: true,
-                        onEnter: () => {
-                            this.onTrigger();
-                        }
-                    }
-                });
-            }
-            onTrigger() {
-                this.animationScrub();
-                this.animationReveal();
-                this.interact();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
             }
             animationReveal() {
             }
@@ -771,32 +707,17 @@ const script = () => {
                 });
             }
             destroy() {
-                this.tlTrigger.kill();
+                super.destroy();
             }
         },
-        'home-process-wrap': class extends HTMLElement {
+        'home-process-wrap': class extends TriggerSetup {
             constructor() {
                 super();
-                this.el = this;
-                this.tlTrigger = null;
-            }
-            connectedCallback() {
-                this.tlTrigger = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this.el).find('section'),
-                        start: 'top bottom+=50%',
-                        end: 'bottom top-=50%',
-                        once: true,
-                        onEnter: () => {
-                            this.onTrigger();
-                        }
-                    }
-                });
-            }
-            onTrigger() {
-                this.animationScrub();
-                this.animationReveal();
-                this.interact();
+                this.onTrigger = () => {
+                    this.animationScrub();
+                    this.animationReveal();
+                    this.interact();
+                };
             }
             animationScrub() {
                 if (viewport.w > 767) {
@@ -844,32 +765,17 @@ const script = () => {
             interact() {
             }
             destroy() {
-                this.tlTrigger.kill();
+                super.destroy();
             }
         },
-        'home-testi-wrap': class extends HTMLElement {
+        'home-testi-wrap': class extends TriggerSetup {
             constructor() {
                 super();
-                this.el = this;
-                this.tlTrigger = null;
-            }
-            connectedCallback() {
-                this.tlTrigger = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this.el).find('section'),
-                        start: 'top bottom+=50%',
-                        end: 'bottom top-=50%',
-                        once: true,
-                        onEnter: () => {
-                            this.onTrigger();
-                        }
-                    }
-                });
-            }
-            onTrigger() {
-                this.animationScrub();
-                this.animationReveal();
-                this.interact();
+                this.onTrigger = () => {
+                    this.animationScrub();
+                    this.animationReveal();
+                    this.interact();
+                };
             }
             animationScrub() {
             }
@@ -887,81 +793,50 @@ const script = () => {
                 });
             }
             destroy() {
-                this.tlTrigger.kill();
+                super.destroy();
             }
         },
     }
 
     const AboutPage = {
-        'about-hero-wrap': class extends HTMLElement {
+        'about-hero-wrap': class extends TriggerSetup {
             constructor() {
                 super();
-                this.el = this;
-                this.tlTrigger = null;
-            }
-            connectedCallback() {
-                this.tlTrigger = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this.el).find('section'),
-                        start: 'top bottom+=50%',
-                        end: 'bottom top-=50%',
-                        once: true,
-                        onEnter: () => {
-                            this.onTrigger();
-                            requestAnimationFrame(() => {
-                                $('.body').css({
-                                    'overflow': 'initial',
-                                    'position': 'relative',
-                                    'max-height': 'none',
-                                    'inset': 'auto',
-                                    'overflow-y': 'initial'
-                                })
-                            })
-                        }
-                    }
-                });
-            }
-            onTrigger() {
-                this.animationReveal();
-                this.animationScrub();
-                this.interact();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
             }
             animationReveal() {
-
+                requestAnimationFrame(() => {
+                    $('.body').css({
+                        'overflow': 'initial',
+                        'position': 'relative',
+                        'max-height': 'none',
+                        'inset': 'auto',
+                        'overflow-y': 'initial'
+                    })
+                })
             }
             animationScrub() {
-                new Marquee($(this.el).find('.about-hero-title-inner'), 40).setup();
+                new Marquee($('.about-hero-title-inner'), 40).setup();
                 new ParallaxImage({ el: $('.about-hero-thumb-inner img').get(0) });
             }
             interact() {
             }
             destroy() {
-                this.tlTrigger.kill();
+                super.destroy();
             }
         },
-        'about-mission-wrap': class extends HTMLElement {
+        'about-mission-wrap': class extends TriggerSetup {
             constructor() {
                 super();
-                this.el = this;
-                this.tlTrigger = null;
-            }
-            connectedCallback() {
-                this.tlTrigger = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this.el).find('section'),
-                        start: 'top bottom+=50%',
-                        end: 'bottom top-=50%',
-                        once: true,
-                        onEnter: () => {
-                            this.onTrigger();
-                        }
-                    }
-                });
-            }
-            onTrigger() {
-                this.animationScrub();
-                this.animationReveal();
-                this.interact();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
             }
             animationScrub() {
             }
@@ -998,32 +873,17 @@ const script = () => {
                 });
             }
             destroy() {
-                this.tlTrigger.kill();
+                super.destroy();
             }
         },
-        'about-why-wrap': class extends HTMLElement {
+        'about-why-wrap': class extends TriggerSetup {
             constructor() {
                 super();
-                this.el = this;
-                this.tlTrigger = null;
-            }
-            connectedCallback() {
-                this.tlTrigger = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this.el).find('section'),
-                        start: 'top bottom+=50%',
-                        end: 'bottom top-=50%',
-                        once: true,
-                        onEnter: () => {
-                            this.onTrigger();
-                        }
-                    }
-                });
-            }
-            onTrigger() {
-                this.animationScrub();
-                this.animationReveal();
-                this.interact();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
             }
             animationScrub() {
                 $('.about-why-item-img-inner img').each((_, item) => new ParallaxImage({ el: item }));
@@ -1033,37 +893,53 @@ const script = () => {
             interact() {
             }
             destroy() {
-                this.tlTrigger.kill();
+                super.destroy();
             }
         },
-        'about-work-wrap': class extends HTMLElement {
+        'about-work-wrap': class extends TriggerSetup {
             constructor() {
                 super();
-                this.el = this;
-                this.tlTrigger = null;
-            }
-            connectedCallback() {
-                this.tlTrigger = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this.el).find('section'),
-                        start: 'top bottom+=50%',
-                        end: 'bottom top-=50%',
-                        once: true,
-                        onEnter: () => {
-                            this.onTrigger();
-                        }
-                    }
-                });
-            }
-            onTrigger() {
-                this.animationScrub();
-                this.animationReveal();
-                this.interact();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
             }
             animationScrub() {
                 new ParallaxImage({ el: $('.about-work-img-inner img').get(0) });
             }
             animationReveal() {
+            }
+            interact() {
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+    }
+
+    const TeamPage = {
+        'team-hero-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+                requestAnimationFrame(() => {
+                    $('.body').css({
+                        'overflow': 'initial',
+                        'position': 'relative',
+                        'max-height': 'none',
+                        'inset': 'auto',
+                        'overflow-y': 'initial'
+                    })
+                })
+            }
+            animationScrub() {
             }
             interact() {
             }
@@ -1114,7 +990,8 @@ const script = () => {
     const pageName = $('.main-inner').attr('data-namespace');
     const pageConfig = {
         home: HomePage,
-        about: AboutPage
+        about: AboutPage,
+        team: TeamPage
     };
     const registry = {};
     registry[pageName]?.destroy();
