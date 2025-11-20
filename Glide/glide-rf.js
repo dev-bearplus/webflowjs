@@ -89,6 +89,9 @@ const script = () => {
         });
     }
     const SCRIPT = {}
+    SCRIPT.homeScript = () => {
+        scrollToLinkHandler();
+    }
     SCRIPT.surfScript = () => {
         window.fsAttributes.push(['cmsload', (listInstances) => {
             // window.fsAttributes.cmsfilter.init();
