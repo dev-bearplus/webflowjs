@@ -930,7 +930,8 @@ const script = () => {
 
             }
             animationScrub() {
-                new Marquee($(this.el).find('.about-hero-title-inner'),40).setup();
+                new Marquee($(this.el).find('.about-hero-title-inner'), 40).setup();
+                new ParallaxImage({ el: $('.about-hero-thumb-inner img').get(0) });
             }
             interact() {
             }
@@ -995,6 +996,76 @@ const script = () => {
                         }
                     }
                 });
+            }
+            destroy() {
+                this.tlTrigger.kill();
+            }
+        },
+        'about-why-wrap': class extends HTMLElement {
+            constructor() {
+                super();
+                this.el = this;
+                this.tlTrigger = null;
+            }
+            connectedCallback() {
+                this.tlTrigger = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('section'),
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => {
+                            this.onTrigger();
+                        }
+                    }
+                });
+            }
+            onTrigger() {
+                this.animationScrub();
+                this.animationReveal();
+                this.interact();
+            }
+            animationScrub() {
+                $('.about-why-item-img-inner img').each((_, item) => new ParallaxImage({ el: item }));
+            }
+            animationReveal() {
+            }
+            interact() {
+            }
+            destroy() {
+                this.tlTrigger.kill();
+            }
+        },
+        'about-work-wrap': class extends HTMLElement {
+            constructor() {
+                super();
+                this.el = this;
+                this.tlTrigger = null;
+            }
+            connectedCallback() {
+                this.tlTrigger = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: $(this.el).find('section'),
+                        start: 'top bottom+=50%',
+                        end: 'bottom top-=50%',
+                        once: true,
+                        onEnter: () => {
+                            this.onTrigger();
+                        }
+                    }
+                });
+            }
+            onTrigger() {
+                this.animationScrub();
+                this.animationReveal();
+                this.interact();
+            }
+            animationScrub() {
+                new ParallaxImage({ el: $('.about-work-img-inner img').get(0) });
+            }
+            animationReveal() {
+            }
+            interact() {
             }
             destroy() {
                 this.tlTrigger.kill();
