@@ -362,7 +362,7 @@ const script = () => {
     }
     const pageName = $('main.main').attr('data-namespace');
     if (pageName) {
-        SCRIPT[`${pageName}Script`]();
+        SCRIPT[`${pageName}Script`]?.();
     }
 };
 window.onload = script;
