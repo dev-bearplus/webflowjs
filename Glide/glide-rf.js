@@ -70,7 +70,6 @@ const script = () => {
                 elOffset -
                 containerWidth / 2 +
                 el.width() / 2;
-            console.log(scrollTo)
             container.animate({ scrollLeft: scrollTo }, 500);
             return false;
         }
@@ -111,7 +110,6 @@ const script = () => {
                             const chText = ch.querySelector('span').textContent;
                             let attr = ch.querySelector('span').getAttribute('fs-cmsfilter-field');
                             const count = filter.listInstance.items.filter(item => {
-                                console.log(item.props)
                                 const elements = item.element.querySelectorAll(`[fs-cmsfilter-field='${attr}']`);
                                 return Array.from(elements).some(el => el.textContent === chText);
                             }).length;
