@@ -218,22 +218,31 @@ const script = () => {
         }
     }
     class Marquee {
-        constructor(list, duration = 40) {
+        constructor({ list, duration = 40, direction = 'hor', isReverse = false }) {
             this.list = list;
             this.duration = duration;
+            this.direction = direction;
+            this.isReverse = isReverse;
         }
         setup(isReverse) {
-            const cloneAmount = Math.ceil(viewport.w / this.list.width()) + 1;
+            let cloneAmount = 1;
             let itemClone = this.list.find('[data-marquee="item"]').clone();
-            let itemWidth = this.list.find('[data-marquee="item"]').width();
+            let itemWidth = 0;
+            if (this.direction !== 'hor') {
+                cloneAmount = cloneAmount + Math.ceil(viewport.h / this.list.height());
+                itemWidth = this.list.find('[data-marquee="item"]').height();
+            } else {
+                cloneAmount = cloneAmount + Math.ceil(viewport.w / this.list.width());
+                itemWidth = this.list.find('[data-marquee="item"]').width();
+            }
             this.list.html('');
             new Array(cloneAmount).fill().forEach(() => {
                 let html = itemClone.clone()
                 html.css('animation-duration', `${Math.ceil(itemWidth / this.duration)}s`);
-                if (isReverse) {
+                if (this.isReverse) {
                     html.css('animation-direction', 'reverse');
                 }
-                html.addClass('anim-marquee');
+                html.addClass(`anim-marquee-${this.direction}`);
                 this.list.append(html);
             });
         }
@@ -820,7 +829,7 @@ const script = () => {
                 })
             }
             animationScrub() {
-                new Marquee($('.about-hero-title-inner'), 40).setup();
+                new Marquee({ list: $('.about-hero-title-inner'), duration: 40 }).setup();
                 new ParallaxImage({ el: $('.about-hero-thumb-inner img').get(0) });
             }
             interact() {
@@ -940,6 +949,7 @@ const script = () => {
                 })
             }
             animationScrub() {
+                $('.team-hero-cms').each((_, item) => new Marquee({ list: $(item), duration: 40, direction: 'ver' }).setup());
             }
             interact() {
             }
