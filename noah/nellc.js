@@ -204,11 +204,11 @@ const script = () => {
             let value = this.el.innerHTML;
             let hasDecimal = value.includes('.') || value.includes(',');
             let decimal = value.includes('.') ? '.' : value.includes(',') ? ',' : '';
-            let suffix = value.includes('%') ? '%' : '';
-            let counterTo = value.replace(/[,]/g, '.').replace(/[%]/g, '');
+            let suffix = value.includes('+') ? '+' : '';
+            let counterTo = value.replace(/[,]/g, '.').replace(/[+]/g, '').replace(/[+]/g, '');
             let decimalPlaces = hasDecimal && counterTo.length - value.indexOf(decimal) - 1;
             const counter = new countUp.CountUp(this.el, counterTo, {
-                duration: .4,
+                duration: 1,
                 decimalPlaces,
                 decimal,
                 suffix,
@@ -507,19 +507,18 @@ const script = () => {
                 let offsetBottom = $(window).height() - $('.home-hero-front-main-img').get(0).getBoundingClientRect().bottom;
                 let scaleOffSet = $('.home-hero-main-img.full').height() / $('.home-hero-front-main-img-inner').height();
                 this.tl
-                    .fromTo('.home-hero-front-main-img', { y: 0, transformOrigin: 'center top' }, { y: -middleOffsetTop, ease: 'none', duration: 1 }, "<=0")
-                    .fromTo('.home-hero-front-cta', { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: 10, duration: .6, ease: 'none' }, 0)
-                    .to('.home-hero-front-sub-img.left', { xPercent: -20, yPercent: -20, autoAlpha: 0, duration: .6, ease: 'none' }, 0)
-                    .to('.home-hero-front-sub-img.right', { xPercent: 20, yPercent: -20, autoAlpha: 0, duration: .6, ease: 'none' }, 0)
+                    .to('.home-hero-front-sub-img.left', { rotation: 0, x: 0, y: 0, duration: .6, ease: 'none' }, 0)
+                    .to('.home-hero-front-sub-img.right', { rotation: 0, x: 0, y: 0, duration: .6, ease: 'none' }, 0)
+                    .fromTo('.home-hero-front-main-img', { y: 0 }, { y: -middleOffsetTop, transformOrigin: 'center top', ease: 'none', duration: 1 })
+                    .set('.home-hero-front-sub-img', { autoAlpha: 0, duration: 0 }, "<=0")
+                    .fromTo('.home-hero-front-cta', { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: 10, duration: .6, ease: 'none' }, "<=0")
                     .to('.home-hero-front-title-flex:nth-child(3) .heading:nth-child(1)', { x: cvUnit(-250, 'rem'), y: -cvUnit(15, 'rem'), scale: .9, autoAlpha: 0, duration: .6, ease: 'power2.inOut' }, "<=.1")
                     .to('.home-hero-front-title-flex:nth-child(3) .heading:nth-child(2)', { x: cvUnit(285, 'rem'), y: -cvUnit(15, 'rem'), scale: .9, autoAlpha: 0, duration: .6, ease: 'power2.inOut' }, '<=0')
                     .to('.home-hero-front-title-flex:nth-child(2) .heading:nth-child(1)', { x: cvUnit(-340, 'rem'), y: -cvUnit(15, 'rem'), scale: .9, autoAlpha: 0, duration: .6, ease: 'power2.inOut' }, "<=.3")
                     .to('.home-hero-front-title-flex:nth-child(2) .heading:nth-child(2)', { x: cvUnit(250, 'rem'), y: -cvUnit(15, 'rem'), scale: .9, autoAlpha: 0, duration: .6, ease: 'power2.inOut' }, '<=0')
                     .to('.home-hero-front-title .heading:nth-child(1)', { y: -cvUnit(15, 'rem'), scale: .9, autoAlpha: 0, duration: .6, ease: 'power2.inOut' }, '<=0.1')
-                    .fromTo('.home-hero-front-main-img',
-                        { scale: 1, y: -middleOffsetTop, width: originalWidth, transformOrigin: `center bottom` },
-                        { scale: scaleOffSet, y: offsetBottom, width: originalWidth * scaleOffSet, duration: 1,  ease: 'power1.inOut'
-                    }, "-=.1")
+                    .set('.home-hero-front-main-img', { scale: 1, y: -middleOffsetTop, width: originalWidth, transformOrigin: `center bottom`, duration: 0 }, "-=.1")
+                    .to('.home-hero-front-main-img', { scale: scaleOffSet, y: offsetBottom, width: originalWidth * scaleOffSet, duration: 1,  ease: 'power1.inOut'}, "<=0")
                     .to('.home-hero-front-main-img-inner', { marginLeft: 0, duration: .7, ease: 'power1.inOut'  }, "<=0")
                     .to('.home-hero-front-main-img-bg', { borderRadius: 0, borderWidth: 0, duration: .8,  ease: 'power1.inOut' }, "<=0")
                     .to('.home-hero-front', { autoAlpha: 0, duration: .8,  ease: 'power1.inOut'  }, "-=.25")
