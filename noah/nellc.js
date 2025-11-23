@@ -958,6 +958,86 @@ const script = () => {
         },
     }
 
+    const LoanPage = {
+        'loan-hero-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+                requestAnimationFrame(() => {
+                    $('.body').css({
+                        'overflow': 'initial',
+                        'position': 'relative',
+                        'max-height': 'none',
+                        'inset': 'auto',
+                        'overflow-y': 'initial'
+                    })
+                })
+            }
+            animationScrub() {
+            }
+            interact() {
+            }
+            destroy() {
+                this.tlTrigger.kill();
+            }
+        },
+        'loan-hiw-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+                console.log("run")
+                if (viewport.w > 767) {
+                    let defaultTop = parseFloat($('.loan-hiw-main-item').eq(0).css('top'));
+                    $('.loan-hiw-main-item').each((i, item) => {
+                        let scale, rotate = 0;
+                        if (i !== $('.loan-hiw-main-item').length - 1) {
+                            scale = .9 + .025 * i;
+                            rotate = -10;
+                            new ParallaxImage({ el: $(item).find('.loan-hiw-main-item-img-inner img').get(0) });
+                        }
+                        let tl = gsap.timeline({
+                            scrollTrigger: {
+                                trigger: item,
+                                start: 'top ' + (250 + 40 * i),
+                                end: 'bottom bottom',
+                                endTrigger: '.loan-hiw-main-list',
+                                scrub: 1.5
+                            }
+                        })
+                        gsap.set(item, { top: defaultTop + 20 * i });
+                        tl.fromTo(item, { scale: 1, rotationX: 0 }, {
+                            scale,
+                            rotationX: rotate,
+                            transformOrigin: 'top center',
+                            ease: 'none',
+                            duration: 1,
+                            overwrite: true
+                        })
+                    })
+                }
+            }
+            interact() {
+            }
+            destroy() {
+                super.destroy();
+            }
+        }
+    }
+
     class PageManager {
         constructor(page) {
             if (!page || typeof page !== 'object') {
@@ -1000,7 +1080,8 @@ const script = () => {
     const pageConfig = {
         home: HomePage,
         about: AboutPage,
-        team: TeamPage
+        team: TeamPage,
+        loan: LoanPage
     };
     const registry = {};
     registry[pageName]?.destroy();
