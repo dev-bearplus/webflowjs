@@ -999,7 +999,6 @@ const script = () => {
             animationReveal() {
             }
             animationScrub() {
-                console.log("run")
                 if (viewport.w > 767) {
                     let defaultTop = parseFloat($('.loan-hiw-main-item').eq(0).css('top'));
                     $('.loan-hiw-main-item').each((i, item) => {
@@ -1029,6 +1028,42 @@ const script = () => {
                         })
                     })
                 }
+            }
+            interact() {
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+        'loan-goal-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+                $('.loan-goal-main').addClass('swiper');
+                $('.loan-goal-list').addClass('swiper-wrapper');
+                $('.loan-goal-item').addClass('swiper-slide');
+
+                $('.loan-goal-list').css('gap', 0);
+                let swiper = new Swiper('.loan-goal-main', {
+                    slidesPerView: 1,
+                    spaceBetween: cvUnit(20, 'rem'),
+                    centeredSlides: true,
+                    pagination: {
+                        el: '.loan-goal-pagin',
+                        type: 'bullets',
+                        bulletClass: 'loan-goal-pagin-dot',
+                        bulletActiveClass: 'active',
+                        clickable: true
+                    }
+                });
             }
             interact() {
             }
