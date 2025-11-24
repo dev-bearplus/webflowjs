@@ -183,12 +183,10 @@ const mainScript = () => {
 			}
 		}
 		interact() {
-			if (viewport.w > 767) {
-				$(this.el).find('.nav-bot-archived-btn, .nav-archived-btn').on('click', function () {
-					$(this).toggleClass('active');
-					$('.nav-archived-blog-main').slideToggle();
-				});
-			}
+			$(this.el).find('.nav-bot-archived-btn, .nav-archived-btn').on('click', function () {
+				$(this).toggleClass('active');
+				$('.nav-archived-blog-main').slideToggle();
+			});
 		}
     }
 	const nav = new Nav();
