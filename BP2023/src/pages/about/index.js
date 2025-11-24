@@ -423,7 +423,7 @@ const about = {
 								if (subMesh) {
 									subMesh.rotation.z += (Math.PI / 720) * Math.cos(time * 0.001) * dir;
 								}
-								
+
 							} else if (index == 2) {
 								mainMesh.rotation.x += (Math.PI / 1440) * Math.sin(time * 0.001);
 								mainMesh.rotation.y += (Math.PI / 2880) * Math.cos(time * 0.001) * dir;
@@ -483,8 +483,23 @@ const about = {
 				})
 			}
 		}
+		const scMap = {
+			interactMap: () => {
+				console.log($('.about-map-content-item'))
+				$('.about-map-content-item').mouseenter(function () {
+					let index = $(this).index();
+					$('.about-map-content-img-item').eq(index).addClass('active').siblings().removeClass('active');
+				})
+				$('.about-map-content-item').mouseleave(function() {
+					$('.about-map-content-img-item').eq(0).addClass('active').siblings().removeClass('active');
+				})
+			}
+		}
 
 		const initAllSection = () => {
+			console.log("run")
+			scMap.interactMap();
+
 			viewportBreak({
 				desktop: () => {
 					//scHero.scrollEffect();
