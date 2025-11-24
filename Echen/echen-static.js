@@ -1,4 +1,6 @@
 const mainScript = () => {
+    const pageName = $('.main-inner').attr('data-barba-namespace');
+
     gsap.registerPlugin(ScrollTrigger)
     ScrollTrigger.defaults({
         invalidateOnRefresh: true,
@@ -170,18 +172,27 @@ const mainScript = () => {
         }
         init(data) {
 			this.el = document.querySelector('.nav');
+			this.interact();
         }
-        update(data) {
+		update(data) {
+			console.log("run")
             if (data.next.namespace === "home") {
                 $(this.el).removeClass('active');
             } else if (data.next.namespace === "notes") {
 				$(this.el).addClass('active');
 			}
 		}
+		interact() {
+			if (viewport.w > 767) {
+				$(this.el).find('.nav-bot-archived-btn, .nav-archived-btn').on('click', function () {
+					$(this).toggleClass('active');
+					$('.nav-archived-blog-main').slideToggle();
+				});
+			}
+		}
     }
-    const nav = new Nav();
-
-    const pageName = $('.main-inner').attr('data-barba-namespace');
+	const nav = new Nav();
+	nav.init();
 
     const NotePage = {
         'note-content-wrap': class extends HTMLElement {
@@ -233,7 +244,16 @@ const mainScript = () => {
                 });
                 $(this.el).find('.note-content-links-totop').on('click', () => {
                     smoothScroll.scrollTo('top', { lock: true });
-                });
+				});
+
+				$(this.el).find('.note-header-cms-archived-title').on('click', function () {
+					$(this).toggleClass('active');
+					$('.note-header-cms-archived-content').slideToggle();
+				});
+				$(window).on('click', () =>{
+					if (!$('.note-header:hover').length)
+						$(this.el).find('.note-header').removeClass('active');
+				});
 			}
         },
     }
