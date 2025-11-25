@@ -650,11 +650,19 @@ const script = () => {
             interact() {
                 const updateLocationPopup = (slug) => {
                     const updatePosition = () => {
-                        console.log($(`.home-state-map`).get(0))
                         let rectWrap = $(`.home-state-map`).get(0).getBoundingClientRect();
                         let dotRect = $(`.location-area[id="${slug}"] .location-dot`).get(0).getBoundingClientRect();
                         let popupRect = $(`.location-infor`).get(0).getBoundingClientRect();
                         let x = ((dotRect.left - rectWrap.left + dotRect.width - 5) / rectWrap.width) * 100;
+
+                        let actualLeft = rectWrap.left + (x / 100) * rectWrap.width;
+                        let popupRight = actualLeft + popupRect.width;
+                        let screenWidth = window.innerWidth;
+
+                        if (popupRight > screenWidth) {
+                            x = ((dotRect.left - rectWrap.left - popupRect.width + 5) / rectWrap.width) * 100;
+                        }
+
                         let y = ((dotRect.top - rectWrap.top - popupRect.height + 5) / rectWrap.height) * 100;
                         gsap.set($(`.location-infor`), {
                             left: `${x}%`,
@@ -670,7 +678,7 @@ const script = () => {
                         }, 400);
                     }
                     else {
-                        $(`.location-infor`).addClass('active');
+                        $('.location-infor').addClass('active');
                         $(`.location-infor [data-popup-state="name"]`).text($(`.home-state-btn-item[data-slug="${slug}"] [data-popup-state="name"]`).text());
                         updatePosition();
                     }
@@ -702,9 +710,9 @@ const script = () => {
                     updateLocationPopup($(e.currentTarget).closest('.location-area').attr('id'));
                 });
                 $(window).on('click', (e) => {
-                    if (!e.target.closest('.location-dot')) {
-                        $(`.location-infor`).removeClass('active');
-                    }
+                    if (!e.target.closest('.location-dot'))
+                        if (!e.target.closest('.home-state-btn-item'))
+                            $('.location-infor').removeClass('active');
                 })
 
                 $('.home-state-map-btn').on('click', () => {
