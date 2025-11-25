@@ -650,31 +650,28 @@ const script = () => {
             interact() {
                 const updateLocationPopup = (slug) => {
                     const updatePosition = () => {
-                        let rectWrap = $(this.el).find(`.home-state-map`).get(0).getBoundingClientRect();
-                        let dotRect = $(this.el).find(`.location-area[id="${slug}"] .location-dot`).get(0).getBoundingClientRect();
-                        let popupRect = $(this.el).find(`.location-infor`).get(0).getBoundingClientRect();
-                        let x = ((dotRect.left - rectWrap.left + dotRect.width) / rectWrap.width) * 100;
-                        let y = ((dotRect.top - rectWrap.top - popupRect.height) / rectWrap.height) * 100;
-                        gsap.set($(this.el).find(`.location-infor`), {
+                        console.log($(`.home-state-map`).get(0))
+                        let rectWrap = $(`.home-state-map`).get(0).getBoundingClientRect();
+                        let dotRect = $(`.location-area[id="${slug}"] .location-dot`).get(0).getBoundingClientRect();
+                        let popupRect = $(`.location-infor`).get(0).getBoundingClientRect();
+                        let x = ((dotRect.left - rectWrap.left + dotRect.width - 5) / rectWrap.width) * 100;
+                        let y = ((dotRect.top - rectWrap.top - popupRect.height + 5) / rectWrap.height) * 100;
+                        gsap.set($(`.location-infor`), {
                             left: `${x}%`,
                             top: `${y}%`
                         });
                     }
-                    if ($(this.el).find(`.location-infor`).hasClass('active')) {
-                        $(this.el).find(`.location-infor`).removeClass('active');
+                    if ($(`.location-infor`).hasClass('active')) {
+                        $(`.location-infor`).removeClass('active');
                         setTimeout(() => {
-                            $(this.el).find(`.location-infor [data-popup-state="name"]`).text($(this.el).find(`.home-state-btn-item[data-slug="${slug}"] [data-popup-state="name"]`).text());
-                            $(this.el).find(`.location-infor [data-popup-state="address"]`).text($(this.el).find(`.home-state-btn-item[data-slug="${slug}"] [data-popup-state="address"]`).text());
-                            $(this.el).find(`.location-infor [data-popup-state="image"]`).attr('src', $(this.el).find(`.home-state-btn-item[data-slug="${slug}"] [data-popup-state="image"]`).attr('src'));
-                            $(this.el).find(`.location-infor`).addClass('active');
+                            $(`.location-infor [data-popup-state="name"]`).text($(`.home-state-btn-item[data-slug="${slug}"] [data-popup-state="name"]`).text());
+                            $(`.location-infor`).addClass('active');
                             updatePosition();
                         }, 400);
                     }
                     else {
-                        $(this.el).find(`.location-infor`).addClass('active');
-                        $(this.el).find(`.location-infor [data-popup-state="name"]`).text($(this.el).find(`.home-state-btn-item[data-slug="${slug}"] [data-popup-state="name"]`).text());
-                        $(this.el).find(`.location-infor [data-popup-state="address"]`).text($(this.el).find(`.home-state-btn-item[data-slug="${slug}"] [data-popup-state="address"]`).text());
-                        $(this.el).find(`.location-infor [data-popup-state="image"]`).attr('src', $(this.el).find(`.home-state-btn-item[data-slug="${slug}"] [data-popup-state="image"]`).attr('src'));
+                        $(`.location-infor`).addClass('active');
+                        $(`.location-infor [data-popup-state="name"]`).text($(`.home-state-btn-item[data-slug="${slug}"] [data-popup-state="name"]`).text());
                         updatePosition();
                     }
                 }
@@ -685,6 +682,7 @@ const script = () => {
                     $(`.location-area#${slug}`).addClass('active').siblings().removeClass('active');
                     $(`.location-dot`).removeClass('active');
                     $(`.location-area#${slug} .location-dot`).addClass('active');
+                    updateLocationPopup(slug);
                     smoothScroll.scrollTo(`.location-area[id="${slug}"]`, { offset: -150 });
                 });
                 $('.location-area').on('click', (e) => {
@@ -694,20 +692,20 @@ const script = () => {
                         return;
                     }
                     $(e.currentTarget).addClass('active').siblings().removeClass('active');
-                    $(this.el).find(`.home-state-btn-item[data-slug="${slug}"]`).addClass('active').siblings().removeClass('active');
+                    $(`.home-state-btn-item[data-slug="${slug}"]`).addClass('active').siblings().removeClass('active');
                     $('.location-dot').removeClass('active');
                 });
-                // $('.location-dot').on('click', (e) => {
-                //     e.preventDefault();
-                //     $(e.currentTarget).closest('.location-area').addClass('active').siblings().removeClass('active');
-                //     $(e.currentTarget).addClass('active').closest('.location-area').siblings().find('.location-dot').removeClass('active');
-                //     updateLocationPopup($(e.currentTarget).closest('.location-area').attr('id'));
-                // });
-                // $(window).on('click', (e) => {
-                //     if (!e.target.closest('.location-dot')) {
-                //         $(this.el).find(`.location-infor`).removeClass('active');
-                //     }
-                // })
+                $('.location-dot').on('click', (e) => {
+                    e.preventDefault();
+                    $(e.currentTarget).closest('.location-area').addClass('active').siblings().removeClass('active');
+                    $(e.currentTarget).addClass('active').closest('.location-area').siblings().find('.location-dot').removeClass('active');
+                    updateLocationPopup($(e.currentTarget).closest('.location-area').attr('id'));
+                });
+                $(window).on('click', (e) => {
+                    if (!e.target.closest('.location-dot')) {
+                        $(`.location-infor`).removeClass('active');
+                    }
+                })
 
                 $('.home-state-map-btn').on('click', () => {
                     $('.home-state-map-list').toggleClass('active');
@@ -1047,23 +1045,25 @@ const script = () => {
             animationReveal() {
             }
             animationScrub() {
-                $('.loan-goal-main').addClass('swiper');
-                $('.loan-goal-list').addClass('swiper-wrapper');
-                $('.loan-goal-item').addClass('swiper-slide');
+                if (viewport.w <= 767) {
+                    $('.loan-goal-main').addClass('swiper');
+                    $('.loan-goal-list').addClass('swiper-wrapper');
+                    $('.loan-goal-item').addClass('swiper-slide');
 
-                $('.loan-goal-list').css('gap', 0);
-                let swiper = new Swiper('.loan-goal-main', {
-                    slidesPerView: 1,
-                    spaceBetween: cvUnit(20, 'rem'),
-                    centeredSlides: true,
-                    pagination: {
-                        el: '.loan-goal-pagin',
-                        type: 'bullets',
-                        bulletClass: 'loan-goal-pagin-dot',
-                        bulletActiveClass: 'active',
-                        clickable: true
-                    }
-                });
+                    $('.loan-goal-list').css('gap', 0);
+                    let swiper = new Swiper('.loan-goal-main', {
+                        slidesPerView: 1,
+                        spaceBetween: cvUnit(20, 'rem'),
+                        centeredSlides: true,
+                        pagination: {
+                            el: '.loan-goal-pagin',
+                            type: 'bullets',
+                            bulletClass: 'loan-goal-pagin-dot',
+                            bulletActiveClass: 'active',
+                            clickable: true
+                        }
+                    });
+                }
             }
             interact() {
             }
