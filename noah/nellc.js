@@ -693,7 +693,7 @@ const script = () => {
                     updateLocationPopup(slug);
                     smoothScroll.scrollTo(`.location-area[id="${slug}"]`, { offset: -150 });
                 });
-                $('.location-area').on('click', (e) => {
+                $('.location-area').on('mouseenter', (e) => {
                     e.preventDefault();
                     const slug = $(e.currentTarget).attr('id');
                     if ($(e.target).closest('.location-dot').length > 0) {
@@ -702,6 +702,17 @@ const script = () => {
                     $(e.currentTarget).addClass('active').siblings().removeClass('active');
                     $(`.home-state-btn-item[data-slug="${slug}"]`).addClass('active').siblings().removeClass('active');
                     $('.location-dot').removeClass('active');
+                    debounce(() => updateLocationPopup(slug), 100)();
+                });
+                $('.location-area').on('mouseleave', (e) => {
+                    e.preventDefault();
+                    if (!$('.location-infor').hasClass('active')) {
+                        return;
+                    }
+                    $('.location-infor').removeClass('active');
+                    $('.location-dot').removeClass('active');
+                    $('.home-state-btn-item').removeClass('active');
+                    $('.location-area').removeClass('active');
                 });
                 $('.location-dot').on('click', (e) => {
                     e.preventDefault();
