@@ -719,13 +719,22 @@ const mainScript = () => {
         html.find('[data-testi="date"]').text(testi.data.date ? `${toDateFormat(testi.data.date).replace(',','')}` : '');
         return html;
     }
+    let isScrolling = false;
     function openFaqItem() {
         $('[data-faq-open]').on('click', function(e) {
             e.preventDefault();
             let targetId = $(this).attr('data-faq-open');
+            console.log('openFaqItem', $(`#${targetId}`));
             $(`#${targetId}`).find('.home-faq-item-head').trigger('click');
             setTimeout(() => {
-                lenis.scrollTo(`#${targetId}`, {offset: -20 * unit})
+                isScrolling = true;
+                lenis.start();
+                lenis.scrollTo(`#${targetId}`, {
+                    offset: -20 * unit,
+                    onComplete: () => {
+                        isScrolling = false;
+                    }
+                })
             }, 200);
         })
     }
@@ -1123,7 +1132,6 @@ const mainScript = () => {
         }
     }
     topbar();
-
     if (isTouchDevice()) {
         let lastScrollTop = 0;
         $(window).on('scroll', function(e) {
@@ -2512,10 +2520,14 @@ const mainScript = () => {
             })
             if ($(window).width() > 991) {
                 $('.home-testi-main').on('mouseenter', function(e) {
-                    lenis.stop();
+                    if (!isScrolling) {
+                        lenis.stop();
+                    }
                 })
                 $('.home-testi-main').on('mouseleave', function(e) {
-                    lenis.start();
+                    if (!isScrolling) {
+                        lenis.start();
+                    }
                 })
 
                 let distanceVal;
