@@ -653,17 +653,17 @@ const script = () => {
                         let rectWrap = $(`.home-state-map`).get(0).getBoundingClientRect();
                         let dotRect = $(`.location-area[id="${slug}"] .location-dot`).get(0).getBoundingClientRect();
                         let popupRect = $(`.location-infor`).get(0).getBoundingClientRect();
-                        let x = ((dotRect.left - rectWrap.left + dotRect.width - 5) / rectWrap.width) * 100;
+                        let x = ((dotRect.left - rectWrap.left + dotRect.width - cvUnit(viewport.w > 767 ? 5 : 0, 'rem')) / rectWrap.width) * 100;
 
                         let actualLeft = rectWrap.left + (x / 100) * rectWrap.width;
                         let popupRight = actualLeft + popupRect.width;
                         let screenWidth = window.innerWidth;
 
                         if (popupRight > screenWidth) {
-                            x = ((dotRect.left - rectWrap.left - popupRect.width + 5) / rectWrap.width) * 100;
+                            x = ((dotRect.left - rectWrap.left - popupRect.width + cvUnit(viewport.w > 767 ? 5 : 0, 'rem')) / rectWrap.width) * 100;
                         }
 
-                        let y = ((dotRect.top - rectWrap.top - popupRect.height + 5) / rectWrap.height) * 100;
+                        let y = ((dotRect.top - rectWrap.top - popupRect.height + cvUnit(viewport.w > 767 ? 5 : 0, 'rem')) / rectWrap.height) * 100;
                         gsap.set($(`.location-infor`), {
                             left: `${x}%`,
                             top: `${y}%`
