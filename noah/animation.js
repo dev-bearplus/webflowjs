@@ -246,6 +246,7 @@ class FadeSplitText {
                         yPercent: 0,
                         stagger: this.splitType === 'words' ? 0.02 : 0.1,
                         duration: .8,
+                        willChange: 'transform, opacity',
                         ease: 'power2.out',
                         onComplete: () => {
                             if (!isDisableRevert) {
