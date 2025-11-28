@@ -2009,6 +2009,25 @@ const mainScript = () => {
                     $('.loader').remove()
                     resetScroll(data)
                 }})
+            } else if (window.location.search.includes('?news')) {
+                $('.main-grid').addClass('loaded')
+                allowAnim = true;
+                gsap.to('.header', {autoAlpha: 1, duration: .8, onComplete: () => {
+                    lenis.start()
+                    if ($('.loader-24').length) {
+                        $('.loader-24').remove()
+                    }
+                    $('.loader').remove()
+                    let newsId = window.location.search.split('?news=')[1]
+                    if (newsId) {
+                        let newsEl = $(`[data-news-id="${newsId}"]`)
+                        if (newsEl.length > 0) {
+                            newsEl.trigger('click')
+                        }
+                    } else {
+                        history.replaceState({},'', window.location.pathname)
+                    }
+                }})
             } else {
                 if ($('.loader24').length) {
                     loader24(data, animationSettings)
@@ -2607,11 +2626,15 @@ const mainScript = () => {
                     // })
                 }
                 function closeModal() {
+                    history.replaceState({},'',window.location.pathname)
                     $('.client-news-wrap').removeClass('active')
                     lenis.start()
                 }
                 function openModal(e ,el) {
-                    
+                    let elId = $(el).attr('data-news-id');
+                    if (elId) {
+                        history.replaceState({},'',`?news=${elId}`)
+                    }
                     let elUrl = $(el).attr('href');
                     let hasDetail = elUrl != '#' && elUrl != '' || elUrl.includes('work')
                     let hasExternalLink = elUrl.includes('http')
