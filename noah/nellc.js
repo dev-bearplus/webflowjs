@@ -743,11 +743,12 @@ const script = () => {
                     $('.home-state-btn-item').removeClass('active');
                     $('.location-area').removeClass('active');
                 });
-                $('.location-dot').on('click', (e) => {
+                $('.location-dot').on('pointerenter', (e) => {
                     e.preventDefault();
+                    let slug = $(e.currentTarget).closest('.location-area').attr('id');
                     $(e.currentTarget).closest('.location-area').addClass('active').siblings().removeClass('active');
                     $(e.currentTarget).addClass('active').closest('.location-area').siblings().find('.location-dot').removeClass('active');
-                    updateLocationPopup($(e.currentTarget).closest('.location-area').attr('id'));
+                    debounce(() => updateLocationPopup(slug), 100)();
                 });
                 $(window).on('click', (e) => {
                     if (!e.target.closest('.location-dot'))
