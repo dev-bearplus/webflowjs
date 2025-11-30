@@ -452,6 +452,7 @@ const script = () => {
                     $('.header-nav-item').eq(parent.index()).addClass('active').siblings().removeClass('active');
                     $('.header-nav-item').eq(parent.index()).find('.header-nav-link-cate .header-nav-link').eq(index).addClass('active').siblings().removeClass('active');
                     $('.header-nav-item').eq(parent.index()).find('.header-nav-link-child .header-nav-dropdown').eq(index).addClass('active').siblings().removeClass('active');
+                    $('.header-nav-item').eq(parent.index()).find('.header-nav-img .header-nav-img-inner').eq(index).addClass('active').siblings().removeClass('active');
                 }, 300);
             })
             $('.header-nav-link-back').on('click', function (e) {
