@@ -1,8 +1,15 @@
 const script = () => {
     gsap.registerPlugin(ScrollTrigger);
-    ScrollTrigger.defaults({
-        invalidateOnRefresh: true
-    });
+    if (window.innerWidth > 767) {
+        ScrollTrigger.defaults({
+            invalidateOnRefresh: true
+        });
+    }
+    else {
+        ScrollTrigger.defaults({
+            scroller: '.body-inner',
+        });
+    }
     const xGetter = (el) => gsap.getProperty(el, 'x');
     const yGetter = (el) => gsap.getProperty(el, 'y');
     const xSetter = (el) => gsap.quickSetter(el, 'x', `px`);
@@ -283,7 +290,13 @@ const script = () => {
 			if (this.lenis) {
 				this.lenis.destroy();
 			}
-			this.lenis = new Lenis();
+            this.lenis = new Lenis({
+                content:
+                    viewport.w > 767 ? document.documentElement : document.querySelector('.main'),
+                wrapper:
+                    viewport.w > 767 ? document.documentElement : document.querySelector('.body-inner'),
+                smoothTouch: false
+            })
 			this.lenis.on("scroll", (e) => {
 				this.updateOnScroll(e);
 				ScrollTrigger.update();
@@ -1174,6 +1187,188 @@ const script = () => {
         }
     }
 
+    const VeteranPage = {
+        'vc-hero-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+                requestAnimationFrame(() => {
+                    $('.body').css({
+                        'overflow': 'initial',
+                        'position': 'relative',
+                        'max-height': 'none',
+                        'inset': 'auto',
+                        'overflow-y': 'initial'
+                    })
+                })
+            }
+            animationScrub() {
+            }
+            interact() {
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+        'vc-type-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+                $('.vc-type-main').addClass('swiper');
+                $('.vc-type-list').addClass('swiper-wrapper');
+                $('.vc-type-item').addClass('swiper-slide');
+
+                $('.vc-type-list').css('gap', 0);
+                let swiper = new Swiper('.vc-type-main', {
+                    slidesPerView: 'auto',
+                    spaceBetween: cvUnit(20, 'rem'),
+                    centeredSlides: true,
+                    pagination: {
+                        el: '.vc-type-pagin',
+                        type: 'bullets',
+                        bulletClass: 'vc-type-pagin-dot',
+                        bulletActiveClass: 'active'
+                    }
+                });
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+        'loan-hiw-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+                if (viewport.w > 767) {
+                    let defaultTop = parseFloat($('.loan-hiw-main-item').eq(0).css('top'));
+                    $('.loan-hiw-main-item').each((i, item) => {
+                        let scale, rotate = 0;
+                        if (i !== $('.loan-hiw-main-item').length - 1) {
+                            scale = .9 + .025 * i;
+                            rotate = -10;
+                            new ParallaxImage({ el: $(item).find('.loan-hiw-main-item-img-inner img').get(0) });
+                        }
+                        let tl = gsap.timeline({
+                            scrollTrigger: {
+                                trigger: item,
+                                start: 'top ' + (250 + 40 * i),
+                                end: 'bottom bottom',
+                                endTrigger: '.loan-hiw-main-list',
+                                scrub: 1.5
+                            }
+                        })
+                        gsap.set(item, { top: defaultTop + 20 * i });
+                        tl.fromTo(item, { scale: 1, rotationX: 0 }, {
+                            scale,
+                            rotationX: rotate,
+                            transformOrigin: 'top center',
+                            ease: 'none',
+                            duration: 1,
+                            overwrite: true
+                        })
+                    })
+                }
+            }
+            interact() {
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+        'vc-learn-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+                if (viewport.w <= 767) {
+                    $('.vc-learn-main-sample').addClass('swiper');
+                    $('.vc-learn-main-sample-list').addClass('swiper-wrapper');
+                    $('.vc-learn-main-sample-item').addClass('swiper-slide');
+
+                    $('.vc-learn-main-sample-list').css('gap', 0);
+                    let swiper = new Swiper('.vc-learn-main-sample', {
+                        slidesPerView: 1.1,
+                        spaceBetween: cvUnit(20, 'rem'),
+                        navigation: {
+                            nextEl: '.vc-learn-main-ctrl-arr.next',
+                            prevEl: '.vc-learn-main-ctrl-arr.prev',
+                            disabledClass: 'disabled',
+                        }
+                    });
+                }
+            }
+            interact() {
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+        'vc-tool-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+                $('.vc-tool-news-cms').addClass('swiper');
+                $('.vc-tool-news-list').addClass('swiper-wrapper');
+                $('.vc-tool-news-item').addClass('swiper-slide');
+
+                $('.vc-tool-news-list').css('gap', 0);
+                let swiper = new Swiper('.vc-tool-news-cms', {
+                    slidesPerView: 'auto',
+                    spaceBetween: cvUnit(viewport.w > 991 ? 32 : 22, 'rem'),
+                    navigation: {
+                        nextEl: '.vc-tool-news-ctrl-arr.next',
+                        prevEl: '.vc-tool-news-ctrl-arr.prev',
+                        disabledClass: 'disabled',
+                    }
+                });
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+    }
+
     class PageManager {
         constructor(page) {
             if (!page || typeof page !== 'object') {
@@ -1217,7 +1412,8 @@ const script = () => {
         home: HomePage,
         about: AboutPage,
         team: TeamPage,
-        loan: LoanPage
+        loan: LoanPage,
+        veteran: VeteranPage
     };
     const registry = {};
     registry[pageName]?.destroy();
