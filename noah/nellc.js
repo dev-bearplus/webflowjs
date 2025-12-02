@@ -454,6 +454,7 @@ const script = () => {
                     $('.header-link-grp').slideUp();
                     $('.header').removeClass('force-show');
                     $('.header-menu .header-link').removeClass('active');
+                    $('.header').removeClass('on-active-nav');
                     header.isOpen = false;
                 }
             });
@@ -477,7 +478,6 @@ const script = () => {
                 }, 100);
             })
             if (viewport.w <= 767) {
-                console.log("run")
                 $('.header-link-grp').attr('data-lenis-prevent', true);
             }
             // $(this.el).find('.header-link, .header-logo, .header-btn').on('click', () => setTimeout(() => this.close(), 800));
@@ -1184,7 +1184,67 @@ const script = () => {
             destroy() {
                 super.destroy();
             }
-        }
+        },
+        'loan-story-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+                if (viewport.w <= 767) {
+                    $('.loan-story-main').addClass('swiper');
+                    $('.loan-story-main-list').addClass('swiper-wrapper');
+                    $('.loan-story-main-item').addClass('swiper-slide');
+
+                    $('.loan-story-main-list').css('gap', 0);
+                    let swiper = new Swiper('.loan-story-main', {
+                        slidesPerView: 'auto',
+                        spaceBetween: cvUnit(20, 'rem'),
+                        centeredSlides: true,
+                        pagination: {
+                            el: '.loan-story-pagin',
+                            type: 'bullets',
+                            bulletClass: 'loan-story-pagin-dot',
+                            bulletActiveClass: 'active'
+                        }
+                    });
+                }
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+        'loan-faq-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+                $('.loan-faq-item-title').on('click', function(e) {
+                    $(this).parent().toggleClass('active');
+                    $(this).parent().find('.loan-faq-item-desc').slideToggle();
+                });
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
     }
 
     const VeteranPage = {
