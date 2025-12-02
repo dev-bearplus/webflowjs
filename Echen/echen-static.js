@@ -51,7 +51,43 @@ const mainScript = () => {
                 location.reload();
             }
         }));
-    }
+	}
+    const documentHeightObserver = (action, callback) => {
+        let resizeObserver;
+        let debounceTimer;
+        let observerEl = document.querySelector('.main-content');
+
+        let previousHeight = observerEl?.getBoundingClientRect().height;
+        function onRefresh() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                const currentHeight = observerEl.getBoundingClientRect().height;
+
+				if (currentHeight !== previousHeight) {
+					console.log("Document height changed. Refreshing ScrollTrigger...");
+
+                    if (smoothScroll.lenis) {
+                        smoothScroll.lenis.resize();
+                        ScrollTrigger.refresh();
+                    }
+                    if (callback) {
+                        callback();
+                    }
+                    previousHeight = currentHeight;
+                }
+            }, 200);
+        }
+
+        if (action === "init") {
+            if (!observerEl) return;
+            resizeObserver = new ResizeObserver(onRefresh);
+            resizeObserver.observe(observerEl);
+        } else if (action === "disconnect") {
+            if (resizeObserver) {
+                resizeObserver.disconnect();
+            }
+        }
+    };
 
     class SmoothScroll {
 		constructor() {
@@ -300,6 +336,7 @@ const mainScript = () => {
     const registry = {};
     registry[pageName]?.destroy();
     pageConfig[pageName] && (registry[pageName] = new PageManager(pageConfig[pageName]));
+	documentHeightObserver("init");
     refreshOnBreakpoint();
 }
 window.onload = mainScript
