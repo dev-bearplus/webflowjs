@@ -1367,6 +1367,43 @@ const script = () => {
                 super.destroy();
             }
         },
+        'vc-commit-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+                if (viewport.w <= 767) {
+                    $('.vc-commit-main').addClass('swiper');
+                    $('.vc-commit-main-list').addClass('swiper-wrapper');
+                    $('.vc-commit-main-item').addClass('swiper-slide');
+
+                    $('.vc-commit-main-list').css('gap', 0);
+                    let swiper = new Swiper('.vc-commit-main', {
+                        slidesPerView: 'auto',
+                        spaceBetween: cvUnit(20, 'rem'),
+                        centeredSlides: true,
+                        pagination: {
+                            el: '.vc-commit-pagin',
+                            type: 'bullets',
+                            bulletClass: 'vc-commit-pagin-dot',
+                            bulletActiveClass: 'active'
+                        }
+                    });
+                }
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
     }
 
     class PageManager {
