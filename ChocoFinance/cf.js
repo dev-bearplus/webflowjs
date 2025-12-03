@@ -789,12 +789,10 @@ const mainScript = () => {
         const langPaths = ['hk-zh-hant', 'hk-en'];
         const pathname = window.location.pathname;
         const lastSegment = pathname.split('/').pop();
-        // const pathnameAllow = ['about-us', 'app-terms-and-conditions', 'privacy-policy', 'faqs', 'contact-us', 'app-fund-documents', 'app-risk-disclosures'];
-        const pathnameAllow = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents'];
-        //check pathname include /documents
-        // Skip redirect nếu path có faqs, documents hoặc pathnameAllow trong hk-en
-        const shouldSkipRedirect = pathname.includes('hk-en') && (pathnameAllow.includes(lastSegment) || pathname.includes('/documents') ||  pathname.includes('/faqs') ||  pathname.includes('/about-us') ||  pathname.includes('/waitlist'));
-
+        const allowedRoutesLive = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist'];
+        const allowedRoutesStagging = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'how-it-works'];
+        const allowedRoutes = isStagging() ? allowedRoutesStagging : allowedRoutesLive;
+        const shouldSkipRedirect = pathname.includes('hk-en') && allowedRoutes.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
         if (!shouldSkipRedirect) {
             const matchedLang = langPaths.find(lang => new RegExp(`^/${lang}/.+`).test(pathname));
             if (matchedLang) {
