@@ -345,7 +345,6 @@ const script = () => {
                             start: 'center center',
                             end: 'center center',
                             scrub: true,
-                            markers: true,
                             onEnter: () => {
                                 swiperVal.slideTo(1);
                             },
