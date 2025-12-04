@@ -1089,8 +1089,14 @@ const script = () => {
                     }
                     else {
                         $(item).find('.team-listing-btn').on('click', () => {
-                            $(item).find('.team-listing-cms-item-inner.w-condition-invisible').removeClass('w-condition-invisible');
-                            $(item).find('.team-listing-btn').remove();
+                            if ($(item).find('.team-listing-cms-item-inner.w-condition-invisible').length <= 0) {
+                                hideItem.addClass('w-condition-invisible');
+                                $(item).find('.team-listing-btn .txt').text('View more');
+                            }
+                            else {
+                                hideItem.removeClass('w-condition-invisible');
+                                $(item).find('.team-listing-btn .txt').text('View less');
+                            }
                         });
                     }
                 });
