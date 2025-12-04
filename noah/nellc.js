@@ -1658,6 +1658,13 @@ const script = () => {
                     $('.calc-learn-main-cms-list').css('gap', 0);
                     let swiper = new Swiper('.calc-learn-main-cms', {
                         slidesPerView: 'auto',
+                        spaceBetween: cvUnit(18, 'rem'),
+                        pagination: {
+                            el: '.calc-learn-pagin',
+                            type: 'bullets',
+                            bulletClass: 'calc-learn-pagin-dot',
+                            bulletActiveClass: 'active'
+                        }
                     });
                 }
             }
