@@ -1060,7 +1060,7 @@ const script = () => {
                 })
             }
             animationScrub() {
-                $('.team-hero-cms').each((_, item) => new Marquee({ list: $(item), duration: 40, direction: 'ver' }).setup());
+                $('.team-hero-cms').each((idx, item) => new Marquee({ list: $(item), duration: 40, isReverse: idx }).setup());
             }
             interact() {
             }
