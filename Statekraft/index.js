@@ -338,17 +338,23 @@ const script = () => {
                     slidesPerView: 'auto',
                     spaceBetween: cvUnit(24, 'rem'),
                 })
-                // let tl = gsap.timeline({
-                //     scrollTrigger: {
-                //         trigger: $(this).find('section').find('.home-val-main'),
-                //         start: 'bottom+=50% bottom',
-                //         end: 'top-=50% top',
-                //         scrub: true,
-                //         onEnter: () => {
-                //             swiperVal.autoplay.start();
-                //         }
-                //     }
-                // })
+                if ($(window).width() > 991) {
+                    let tl = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: $(this).find('section').find('.home-val-main'),
+                            start: 'center center',
+                            end: 'center center',
+                            scrub: true,
+                            markers: true,
+                            onEnter: () => {
+                                swiperVal.slideTo(1);
+                            },
+                            onEnterBack: () => {
+                                swiperVal.slideTo(0);
+                            }
+                        }
+                    })
+                }
             }
             interact() {
             }
