@@ -216,6 +216,7 @@ const mainScript = () => {
                 $(this.el).removeClass('active');
             } else if (data.next.namespace === "notes") {
 				$(this.el).addClass('active');
+				
 			}
 		}
 		interact() {
@@ -238,7 +239,16 @@ const mainScript = () => {
                 this.onTrigger();
             }
             onTrigger() {
+				this.setup();
 				this.interact();
+			}
+			setup() {
+				let currentUrl = window.location.pathname;
+				console.log(currentUrl)
+				if(currentUrl.includes('/archived-blog/')) {
+					$('.nav-archived-btn').toggleClass('active');
+					$('.nav-archived-blog-main').slideDown();
+				}
 			}
 			interact() {
 				$(this.el).find('.note-content-hero-link[data-slug]').on('click', function (e) {
