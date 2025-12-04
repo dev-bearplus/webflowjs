@@ -1673,7 +1673,105 @@ const script = () => {
             }
         },
     }
+    const HubPage = {
+        'hub-hero-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                    requestAnimationFrame(() => {
+                        $('.body').css({
+                            'overflow': 'initial',
+                            'position': 'relative',
+                            'max-height': 'none',
+                            'inset': 'auto',
+                            'overflow-y': 'initial'
+                        })
+                    })
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+                $('.hub-hero-cate-item').on('click', function(e) {
+                    let slug = $(this).attr('data-slug');
+                    $('.hub-hero-cate-item').removeClass('active');
+                    $(this).addClass('active');
+                    $('.hub-hero-main-inner').hide();
+                    if (slug) {
+                        $('.hub-hero-main-inner[data-slug="' + slug + '"]').show();
+                    } else {
+                        $('.hub-hero-main-inner').show();
+                    }
+                });
+                if (viewport.w <= 767) {
+                    $('.hub-hero-main-cms').addClass('swiper');
+                    $('.hub-hero-main-cms-list').addClass('swiper-wrapper');
+                    $('.hub-hero-main-cms-item').addClass('swiper-slide');
 
+                    $('.hub-hero-main-cms-list').css('gap', 0);
+                    let swiper = new Swiper('.hub-hero-main-cms', {
+                        slidesPerView: 'auto',
+                        spaceBetween: cvUnit(18, 'rem'),
+                        pagination: {
+                            el: '.hub-hero-pagin',
+                            type: 'bullets',
+                            bulletClass: 'hub-hero-pagin-dot',
+                            bulletActiveClass: 'active'
+                        }
+                    });
+                }
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+    }
+    const ArticlePage = {
+        'article-hero-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                    requestAnimationFrame(() => {
+                        $('.body').css({
+                            'overflow': 'initial',
+                            'position': 'relative',
+                            'max-height': 'none',
+                            'inset': 'auto',
+                            'overflow-y': 'initial'
+                        })
+                    })
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+                $('.article-hero-tab').on('click', function(e) {
+                    let index = $(this).index();
+                    $(this).addClass('active').siblings().removeClass('active');
+                    if (index === 0) {
+                        $('.article-hero-other-item').show();
+                        $('.article-hero-main').show();
+                    } else {
+                        $('.article-hero-main').hide();
+                        $('.article-hero-other-item').eq(index - 1).show().siblings().hide();
+                    }
+                });
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+    }
     class PageManager {
         constructor(page) {
             if (!page || typeof page !== 'object') {
@@ -1719,7 +1817,9 @@ const script = () => {
         team: TeamPage,
         loan: LoanPage,
         veteran: VeteranPage,
-        calculators: CalculatorPage
+        calculators: CalculatorPage,
+        hub: HubPage,
+        articles: ArticlePage
     };
     const registry = {};
     registry[pageName]?.destroy();
