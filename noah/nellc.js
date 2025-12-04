@@ -536,6 +536,52 @@ const script = () => {
     const header = new Header();
     header.init();
 
+    class Popup {
+        constructor() {
+            this.init();
+        }
+        init() {
+            this.popup = $('.popup');
+            this.popupVid = $('.popup-vid-wrap');
+            this.popupVidClose = $('.popup-close');
+            this.popupVidClose.on('click', () => {
+                this.closePopupVid();
+            });
+        }
+        createIframe(videoId) {
+            let iframe = $('.popup-vid-wrap iframe').length > 0 ? $('.popup-vid-wrap iframe'): $('<iframe></iframe>');
+            let iframeSrc = new URL(`https://www.youtube.com/embed/${videoId}?origin=${window.location.origin}&autoplay=1`);
+            iframe.attr({
+                'src': iframeSrc,
+                'allow': 'autoplay',
+                'allowfullscreen': '',
+                'width': '100%',
+                'height': '100%',
+                'frameborder': 0,
+                'allow': 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+                'referrerpolicy': 'strict-origin-when-cross-origin'
+            });
+            return iframe;
+        }
+        destroyIframe() {
+            $('.popup-vid-wrap iframe').remove();
+        }
+        openPopupVid(videoId) {
+            this.popupVid.addClass('is-short');
+            this.popupVid.append(this.createIframe(videoId));
+            $('.popup').addClass('active');
+        }
+        closePopupVid() {
+            this.popup.removeClass('active');
+            setTimeout(() => {
+                this.popupVid.removeClass('is-short');
+                this.destroyIframe();
+            }, 500);
+        }
+    }
+    const popup = new Popup();
+    popup.init();
+
     const HomePage = {
         'home-hero-wrap': class extends TriggerSetup {
             constructor() {
@@ -1503,6 +1549,110 @@ const script = () => {
         },
     }
 
+    const CalculatorPage = {
+        'calc-hero-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                    requestAnimationFrame(() => {
+                        $('.body').css({
+                            'overflow': 'initial',
+                            'position': 'relative',
+                            'max-height': 'none',
+                            'inset': 'auto',
+                            'overflow-y': 'initial'
+                        })
+                    })
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+        'calc-main-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                    requestAnimationFrame(() => {
+                        $('.body').css({
+                            'overflow': 'initial',
+                            'position': 'relative',
+                            'max-height': 'none',
+                            'inset': 'auto',
+                            'overflow-y': 'initial'
+                        })
+                    })
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+        'calc-learn-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+                $('.video-card').on('click', function(e) {
+                    popup.openPopupVid($(this).attr('data-youtube-id'));
+                });
+                // $('.video-card').on('click', function(e) {
+                //     e.preventDefault();
+                //     if (!$(this).find('.check-vid-type').hasClass('w-condition-invisible')) {
+                //         $('.popup-vid-wrap').addClass('is-short');
+                //     }
+                //     let videoId = $(this).attr('data-youtube-id');
+                //     let iframe = $('.popup-vid-wrap iframe').length > 0 ? $('.popup-vid-wrap iframe'): $('<iframe></iframe>');
+                //     let iframeSrc = new URL(`https://www.youtube.com/embed/${videoId}?origin=${window.location.origin}&autoplay=1`);
+                //     iframe.attr({
+                //         'src': iframeSrc,
+                //         'allow': 'autoplay',
+                //         // 'title': 'COLMEIA - Job Architecture Made Easy!',
+                //         'allowfullscreen': '',
+                //         'width': '100%',
+                //         'height': '100%',
+                //         'frameborder': 0,
+                //         'allow': 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+                //         'referrerpolicy': 'strict-origin-when-cross-origin'
+                //     });
+                //     iframe.appendTo('.popup-vid-wrap');
+                //     $('.popup').addClass('active');
+                //     smoothScroll.stop();
+                // });
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+    }
+
     class PageManager {
         constructor(page) {
             if (!page || typeof page !== 'object') {
@@ -1547,7 +1697,8 @@ const script = () => {
         about: AboutPage,
         team: TeamPage,
         loan: LoanPage,
-        veteran: VeteranPage
+        veteran: VeteranPage,
+        calculators: CalculatorPage
     };
     const registry = {};
     registry[pageName]?.destroy();
