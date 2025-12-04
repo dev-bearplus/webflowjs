@@ -543,9 +543,26 @@ const script = () => {
         init() {
             this.popup = $('.popup');
             this.popupVid = $('.popup-vid-wrap');
-            this.popupVidClose = $('.popup-close');
-            this.popupVidClose.on('click', () => {
+            this.popupOpen = $('[data-popup="open"]');
+            this.popupClose = $('[data-popup="close"]');
+            this.isReady = true;
+
+            this.popupOpen.on('click', (e) => {
+                if (!this.isReady) return;
+                this.openPopupVid($(e.currentTarget).attr('data-youtube-id'));
+            });
+            this.popupClose.on('click', () => {
                 this.closePopupVid();
+            });
+            $(window).on('click', (e) => {
+                if (!e.target.closest('.popup-content, [data-popup="open"]')) {
+                    this.closePopupVid();
+                }
+            });
+            $(window).on('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    this.closePopupVid();
+                }
             });
         }
         createIframe(videoId) {
@@ -570,13 +587,15 @@ const script = () => {
             this.popupVid.addClass('is-short');
             this.popupVid.append(this.createIframe(videoId));
             $('.popup').addClass('active');
+            this.isReady = false;
         }
         closePopupVid() {
             this.popup.removeClass('active');
             setTimeout(() => {
                 this.popupVid.removeClass('is-short');
                 this.destroyIframe();
-            }, 500);
+                this.isReady = true;
+            }, 300);
         }
     }
     const popup = new Popup();
@@ -1373,22 +1392,24 @@ const script = () => {
             animationScrub() {
             }
             interact() {
-                $('.vc-type-main').addClass('swiper');
-                $('.vc-type-list').addClass('swiper-wrapper');
-                $('.vc-type-item').addClass('swiper-slide');
+                if (viewport.w <= 767) {
+                    $('.vc-type-main').addClass('swiper');
+                    $('.vc-type-list').addClass('swiper-wrapper');
+                    $('.vc-type-item').addClass('swiper-slide');
 
-                $('.vc-type-list').css('gap', 0);
-                let swiper = new Swiper('.vc-type-main', {
-                    slidesPerView: 'auto',
-                    spaceBetween: cvUnit(20, 'rem'),
-                    centeredSlides: true,
-                    pagination: {
-                        el: '.vc-type-pagin',
-                        type: 'bullets',
-                        bulletClass: 'vc-type-pagin-dot',
-                        bulletActiveClass: 'active'
-                    }
-                });
+                    $('.vc-type-list').css('gap', 0);
+                    let swiper = new Swiper('.vc-type-main', {
+                        slidesPerView: 'auto',
+                        spaceBetween: cvUnit(20, 'rem'),
+                        centeredSlides: true,
+                        pagination: {
+                            el: '.vc-type-pagin',
+                            type: 'bullets',
+                            bulletClass: 'vc-type-pagin-dot',
+                            bulletActiveClass: 'active'
+                        }
+                    });
+                }
             }
             destroy() {
                 super.destroy();
@@ -1573,6 +1594,15 @@ const script = () => {
             animationScrub() {
             }
             interact() {
+                $('.calc-hero-tab').on('click', function(e) {
+                    let index = $(this).index();
+                    $(this).addClass('active').siblings().removeClass('active');
+                    if (index === 0) {
+                        $('.calc-hero-main-inner').show();
+                    } else {
+                        $('.calc-hero-main-inner').eq(index - 1).show().siblings().hide();
+                    }
+                });
             }
             destroy() {
                 super.destroy();
@@ -1620,32 +1650,16 @@ const script = () => {
             animationScrub() {
             }
             interact() {
-                $('.video-card').on('click', function(e) {
-                    popup.openPopupVid($(this).attr('data-youtube-id'));
-                });
-                // $('.video-card').on('click', function(e) {
-                //     e.preventDefault();
-                //     if (!$(this).find('.check-vid-type').hasClass('w-condition-invisible')) {
-                //         $('.popup-vid-wrap').addClass('is-short');
-                //     }
-                //     let videoId = $(this).attr('data-youtube-id');
-                //     let iframe = $('.popup-vid-wrap iframe').length > 0 ? $('.popup-vid-wrap iframe'): $('<iframe></iframe>');
-                //     let iframeSrc = new URL(`https://www.youtube.com/embed/${videoId}?origin=${window.location.origin}&autoplay=1`);
-                //     iframe.attr({
-                //         'src': iframeSrc,
-                //         'allow': 'autoplay',
-                //         // 'title': 'COLMEIA - Job Architecture Made Easy!',
-                //         'allowfullscreen': '',
-                //         'width': '100%',
-                //         'height': '100%',
-                //         'frameborder': 0,
-                //         'allow': 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
-                //         'referrerpolicy': 'strict-origin-when-cross-origin'
-                //     });
-                //     iframe.appendTo('.popup-vid-wrap');
-                //     $('.popup').addClass('active');
-                //     smoothScroll.stop();
-                // });
+                if (viewport.w <= 767) {
+                    $('.calc-learn-main-cms').addClass('swiper');
+                    $('.calc-learn-main-cms-list').addClass('swiper-wrapper');
+                    $('.calc-learn-main-cms-item').addClass('swiper-slide');
+
+                    $('.calc-learn-main-cms-list').css('gap', 0);
+                    let swiper = new Swiper('.calc-learn-main-cms', {
+                        slidesPerView: 'auto',
+                    });
+                }
             }
             destroy() {
                 super.destroy();
