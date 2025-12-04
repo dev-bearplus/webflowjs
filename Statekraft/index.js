@@ -331,15 +331,26 @@ const script = () => {
             animationReveal() {
             }
             animationScrub() {
-                let tl = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: $(this).find('section'),
-                        start: 'top 45%',
-                        end: 'bottom bottom+=10%',
-                        scrub: true
-                    }
-                })
-                tl.fromTo('.home-val-list', { x : 0}, { x: -($('.home-val-list').width() - $('.home-val-main').width()), duration: 1, ease: 'none' });
+                if ($(window).width() > 991) {
+                    let tl = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: $(this).find('section').find('.home-val-main'),
+                            start: 'bottom+=50% bottom',
+                            end: 'top-=50% top',
+                            scrub: true,
+                            markers: true
+                        }
+                    })
+                    tl.fromTo('.home-val-list', { x : 0}, { x: -($('.home-val-list').width() - $('.home-val-main').width()), duration: 1, ease: 'none' });
+                } else {
+                    $(this).find('.home-val-main').addClass('swiper')
+                    $(this).find('.home-val-main').find('.home-val-list').addClass('swiper-wrapper')
+                    $(this).find('.home-val-main').find('.home-val-item').addClass('swiper-slide')
+                    let swiperVal = new Swiper('.home-val-main', {
+                        slidesPerView: 'auto',
+                        spaceBetween: cvUnit(24, 'rem'),
+                    })
+                }
             }
             interact() {
             }
