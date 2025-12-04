@@ -246,8 +246,8 @@ const mainScript = () => {
 				let currentUrl = window.location.pathname;
 				console.log(currentUrl)
 				if(currentUrl.includes('/archived-blog/')) {
-					$('.nav-archived-btn').toggleClass('active');
-					$('.nav-archived-blog-main').slideDown();
+					$('.nav-archived-btn').addClass('active');
+					$('.nav-archived-btn-ic').removeClass('w-variant-d6d7db2e-4695-f35d-da80-8f1df8f7f96c');
 				}
 			}
 			interact() {
