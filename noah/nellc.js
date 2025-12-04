@@ -1068,6 +1068,37 @@ const script = () => {
                 this.tlTrigger.kill();
             }
         },
+        'team-listing-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+                $('.team-listing-main').each((idx, item) => {
+                    let hideItem = $(item).find('.team-listing-cms-item-inner.w-condition-invisible');
+                    if (hideItem.length <= 0) {
+                        $(item).find('.team-listing-btn').remove();
+                    }
+                    else {
+                        $(item).find('.team-listing-btn').on('click', () => {
+                            $(item).find('.team-listing-cms-item-inner.w-condition-invisible').removeClass('w-condition-invisible');
+                            $(item).find('.team-listing-btn').remove();
+                        });
+                    }
+                });
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
     }
 
     const LoanPage = {
