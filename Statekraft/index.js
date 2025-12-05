@@ -388,6 +388,37 @@ const script = () => {
             destroy() {
                 super.destroy();
             }
+        },
+        'home-pricing-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+                if (viewport.w <= 991) {
+                    $('.home-pricing-main').addClass('swiper')
+                    $('.home-pricing-list').addClass('swiper-wrapper')
+                    $('.home-pricing-item').addClass('swiper-slide');
+                    $('.home-pricing-list').css('gap', 0);
+                    let swiper = new Swiper('.home-pricing-main', {
+                        slidesPerView: 'auto',
+                        spaceBetween: cvUnit(24, 'rem'),
+                        centeredSlides: true,
+                        initialSlide: 1
+                    });
+                }
+            }
+            destroy() {
+                super.destroy();
+            }
         }
     }
     class PageManager {
