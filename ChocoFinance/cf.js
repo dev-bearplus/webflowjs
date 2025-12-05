@@ -785,7 +785,6 @@ const mainScript = () => {
         const $headerLangContentItems = $('.header-lang-content-item');
         const $html = $('html');
         const $header = $('.header');
-
         const langPaths = ['hk-zh-hant', 'hk-en'];
         const pathname = window.location.pathname;
         const lastSegment = pathname.split('/').pop();
@@ -4883,7 +4882,29 @@ const mainScript = () => {
         thankGetFaq();
     }
     SCRIPT.guaranteeScript = () => {
+        function formatNumber(num) {
+            const str = num.toString();
+            if (/e[+-]/i.test(str)) {
+                const fullNumber = Number(num).toLocaleString('fullwide', { useGrouping: false });
+                return formatNumberNormal(fullNumber);
+            }
+            
+            return formatNumberNormal(str);
+        }
         
+        function formatNumberNormal(str) {
+            const match = str.match(/^([^0-9-]*)(-?\d[\d,]*\.?\d*)/);
+            if (!match) return str;
+            
+            const symbol = match[1];
+            let number = match[2].replace(/,/g, '');
+            const parts = number.split('.');
+            const integerPart = parts[0];
+            const decimalPart = parts[1];
+            
+            const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return symbol + formattedInteger + (decimalPart ? '.' + decimalPart : '');
+        }
         function guaranteeFee() {
             let textUnitInit = $('.unit-init').text();
             let textUnitWillChange = $('.unit-will-change').text();
@@ -4915,18 +4936,14 @@ const mainScript = () => {
                 if (cleanedSgdValue.length > 0) {
                     const hasDecimal = cleanedSgdValue.includes('.') || cleanedSgdValue.includes(',');
                     if (hasDecimal) {
-                        // For numbers with decimals, remove leading zeros before decimal point
                         cleanedSgdValue = cleanedSgdValue.replace(/^0+(?=\d)/, '');
                     } else {
-                        // For whole numbers, remove leading zeros but keep at least one digit
                         cleanedSgdValue = cleanedSgdValue.replace(/^0+(?=\d)/, '');
                     }
-                    // If all zeros were removed, keep at least '0'
                     if (cleanedSgdValue === '' || cleanedSgdValue === '.' || cleanedSgdValue === ',') {
                         cleanedSgdValue = '0';
                     }
                 }
-                // update value input
                 if (sgdValue !== cleanedSgdValue) {
                 $(this).val(cleanedSgdValue);
                 sgdValue = cleanedSgdValue;
@@ -4960,9 +4977,9 @@ const mainScript = () => {
         
             $('.guarantee-fee-form-input').on('input', function() {
             let sgdAmount = $(this).val();
-            // sgdAmount = validInputUsd.call(this, sgdAmount);
             let cleanedFee = validInputUsd(sgdAmount);
-            $('.guarantee-fee-form-input-val').text(cleanedFee);
+            $(this).val(cleanedFee);
+            $('.guarantee-fee-form-input-val').text(formatNumber(cleanedFee));
             handleInput(sgdAmount);
             });
             function convertAmount(sgdAmount) {
@@ -4989,17 +5006,18 @@ const mainScript = () => {
                     midMarketRate: currentRateData.midMarketRate.original
                     }),
                     success: function(data) {
-                    updateDisplay(sgdAmount, data);
+                    updateDisplay(data);
                     },
                     error: function(xhr, status, error) {
                     console.log('Lỗi: ' + error);
                     }
                 });
             }
-            function updateDisplay(sgdAmount, data) {
-            $('.sgd-to-usd-total').text(parseFloat(data.totalAmount.quantity).toFixed(2));
-            $('.sgd-to-usd-fee').text(Math.abs(parseFloat(data.fee.quantity)).toFixed(2));
-            $('.guarantee-fee-form-input-result').text(parseFloat(data.convertedAmount.quantity).toFixed(2));
+            function updateDisplay( data) {
+                console.log('khanh',data);
+            $('.sgd-to-usd-total').text(formatNumber(data.totalAmount.quantity));
+            $('.sgd-to-usd-fee').text(formatNumber(Math.abs(data.fee.quantity)));
+            $('.guarantee-fee-form-input-result').text(formatNumber(data.convertedAmount.quantity));
             }
             function resetDisplay() {
             $('.sgd-to-usd-total').text('0');
