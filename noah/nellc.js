@@ -1766,6 +1766,111 @@ const script = () => {
                         $('.article-hero-other-item').eq(index - 1).show().siblings().hide();
                     }
                 });
+                if (viewport.w <= 767) {
+                    $('.article-hero-cms:not(.main-one):visible').addClass('swiper');
+                    $('.article-hero-cms:not(.main-one):visible .article-hero-cms-list').addClass('swiper-wrapper');
+                    $('.article-hero-cms:not(.main-one):visible .article-hero-cms-item').addClass('swiper-slide');
+                    $('.article-hero-cms:not(.main-one):visible .article-hero-cms-list').css('gap', 0);
+                    $('.article-hero-cms:not(.main-one):visible').each(function () {
+                        let swiper = new Swiper(this, {
+                            slidesPerView: 1.1,
+                            spaceBetween: cvUnit(18, 'rem'),
+                            navigation: {
+                                nextEl: $(this).parents('.article-hero-other-item').find('.article-hero-other-ctrl-arr.next').get(0),
+                                prevEl: $(this).parents('.article-hero-other-item').find('.article-hero-other-ctrl-arr.prev').get(0),
+                                disabledClass: 'is-list-pagination-disabled',
+                            }
+                        });
+                    });
+                }
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+    }
+    const PostPage = {
+        'post-hero-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                    requestAnimationFrame(() => {
+                        $('.body').css({
+                            'overflow': 'initial',
+                            'position': 'relative',
+                            'max-height': 'none',
+                            'inset': 'auto',
+                            'overflow-y': 'initial'
+                        })
+                    })
+                    console.log("run")
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+                $('.post-related-cms').addClass('swiper');
+                $('.post-related-list').addClass('swiper-wrapper');
+                $('.post-related-item').addClass('swiper-slide');
+
+                $('.post-related-list').css('gap', 0);
+                let swiper = new Swiper('.post-related-cms', {
+                    slidesPerView: 'auto',
+                    spaceBetween: cvUnit(viewport.w > 991 ? 32 : 22, 'rem'),
+                    navigation: {
+                        nextEl: '.post-related-ctrl-arr.next',
+                        prevEl: '.post-related-ctrl-arr.prev',
+                        disabledClass: 'disabled',
+                    }
+                });
+
+                function socialShare() {
+                    const url = window.location.href;
+                    const encodedUrl = encodeURIComponent(url);
+                    $('.post-hero-share-btn').each((_, icon) => {
+                        icon.setAttribute('target', '_blank');
+                        switch (icon.getAttribute('data-share')) {
+                            case 'linkedin': icon.setAttribute('href', `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`); break;
+                            case 'facebook': icon.setAttribute('href', `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`); break;
+                            case 'x': icon.setAttribute('href', `https://twitter.com/intent/tweet?url=${encodedUrl}`); break;
+                            case 'copy': break;
+                            default: break;
+                        }
+                    });
+
+                    $('[data-share="copy"]').on('click', function (e) {
+                        e.preventDefault();
+                        copyTextToClipboard(url);
+                    })
+
+                    function copyTextToClipboard(text) {
+                        let textArea = document.createElement('textarea');
+                        textArea.style.display = 'none';
+                        textArea.value = text;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        navigator.clipboard
+                            .writeText(text)
+                            .then(() => {
+                                console.log('Text copied to clipboard');
+                            })
+                            .catch((error) => {
+                                console.error('Failed to copy text to clipboard:', error);
+                            });
+                        document.body.removeChild(textArea);
+
+                        $('.ar-content-share-popup').addClass('active');
+                        setTimeout(() => {
+                            $('.ar-content-share-popup').removeClass('active');
+                        }, 2000);
+                    }
+                }
+                socialShare();
             }
             destroy() {
                 super.destroy();
@@ -1819,7 +1924,8 @@ const script = () => {
         veteran: VeteranPage,
         calculators: CalculatorPage,
         hub: HubPage,
-        articles: ArticlePage
+        articles: ArticlePage,
+        post: PostPage
     };
     const registry = {};
     registry[pageName]?.destroy();
