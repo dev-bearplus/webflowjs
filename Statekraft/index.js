@@ -254,6 +254,44 @@ const script = () => {
 	const smoothScroll = new SmoothScroll();
     smoothScroll.init();
 
+    class ParallaxImage {
+        constructor({ el, scaleOffset = 0.1 }) {
+            this.el = el;
+            this.elWrap = null;
+            this.scaleOffset = scaleOffset;
+            this.init();
+        }
+        init() {
+            this.elWrap = this.el.parentElement;
+            this.setup();
+        }
+        setup() {
+            const scalePercent = 100 + 5 + ((this.scaleOffset - 0.1) * 100);
+            gsap.set(this.el, {
+                width: scalePercent + '%',
+                height: $(this.el).hasClass('img-fill') ? scalePercent + '%' : 'auto'
+            });
+            this.scrub();
+        }
+        scrub() {
+            let dist = this.el.offsetHeight - this.elWrap.offsetHeight;
+            let total = this.elWrap.getBoundingClientRect().height + window.innerHeight;
+            this.updateOnScroll(dist, total);
+            smoothScroll.lenis.on('scroll', () => {
+                this.updateOnScroll(dist, total);
+            });
+        }
+        updateOnScroll(dist, total) {
+            if (this.el) {
+                if (isInViewport(this.elWrap)) {
+                    let percent = this.elWrap.getBoundingClientRect().top / total;
+                    gsap.quickSetter(this.el, 'y', 'px')(-dist * percent * 1.2);
+                    gsap.set(this.el, { scale: 1 + (percent * this.scaleOffset) });
+                }
+            }
+        }
+    }
+
     class TriggerSetup extends HTMLElement {
         constructor() {
             super();
@@ -381,7 +419,9 @@ const script = () => {
                         scrub: true
                     }
                 })
-                tl.fromTo('.home-fea-thumb-inner', { yPercent: -15 }, { yPercent: 15, duration: 1, ease: 'power1.inOut' });
+                new ParallaxImage({ el: $('.home-fea-thumb .img-fill').get(0) });
+                tl
+                    .fromTo('.home-fea-thumb-inner', { yPercent: -15 }, { yPercent: 15, duration: 1, ease: 'power1.inOut' })
             }
             interact() {
             }
@@ -415,6 +455,38 @@ const script = () => {
                         initialSlide: 1
                     });
                 }
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+        'home-role-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+                $('.home-role-main').addClass('swiper')
+                $('.home-role-list').addClass('swiper-wrapper')
+                $('.home-role-item').addClass('swiper-slide')
+                $('.home-role-list').css('gap', 0);
+                let swiper = new Swiper('.home-role-main', {
+                    slidesPerView: 'auto',
+                    spaceBetween: cvUnit(16, 'rem'),
+                    pagination: {
+                        el: '.home-role-pagin',
+                        bulletClass: 'home-role-pagin-item',
+                        bulletActiveClass: 'active'
+                    }
+                });
             }
             destroy() {
                 super.destroy();
@@ -468,5 +540,10 @@ const script = () => {
     documentHeightObserver("init");
     refreshOnBreakpoint();
     scrollTop(() => pageConfig[pageName] && (registry[pageName] = new PageManager(pageConfig[pageName])));
+    AOS.init({
+        offset: cvUnit(100, 'rem'),
+        duration: 600,
+        once: true,
+    });
 }
 window.onload = script
