@@ -2018,14 +2018,21 @@ const mainScript = () => {
                         $('.loader-24').remove()
                     }
                     $('.loader').remove()
-                    let newsId = window.location.search.split('?news=')[1]
+                    // Convert the URLSearchParams of window.location.search to a plain object
+                    let paramsObj = {};
+                    let searchParams = new URLSearchParams(window.location.search);
+                    for (let [key, value] of searchParams.entries()) {
+                        paramsObj[key] = value;
+                    }
+                    console.log(paramsObj)
+                    let newsId = paramsObj.news
                     if (newsId) {
                         let newsEl = $(`[data-news-id="${newsId}"]`)
                         if (newsEl.length > 0) {
                             newsEl.trigger('click')
                         }
                     } else {
-                        history.replaceState({},'', window.location.pathname)
+                        // history.replaceState({},'', window.location.pathname)
                     }
                 }})
             } else {
