@@ -584,7 +584,9 @@ const script = () => {
             $('.popup-vid-wrap iframe').remove();
         }
         openPopupVid(videoId) {
-            this.popupVid.addClass('is-short');
+            if (this.popupOpen.find('.check-vid-type').length > 0) {
+                this.popupVid.addClass('is-short');
+            }
             this.popupVid.append(this.createIframe(videoId));
             $('.popup').addClass('active');
             this.isReady = false;
