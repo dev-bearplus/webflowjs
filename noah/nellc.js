@@ -1881,6 +1881,37 @@ const script = () => {
             }
         },
     }
+
+    const LegalPage = {
+        'legal-main-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                    requestAnimationFrame(() => {
+                        $('.body').css({
+                            'overflow': 'initial',
+                            'position': 'relative',
+                            'max-height': 'none',
+                            'inset': 'auto',
+                            'overflow-y': 'initial'
+                        })
+                    })
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+    }
     class PageManager {
         constructor(page) {
             if (!page || typeof page !== 'object') {
@@ -1929,7 +1960,8 @@ const script = () => {
         calculators: CalculatorPage,
         hub: HubPage,
         articles: ArticlePage,
-        post: PostPage
+        post: PostPage,
+        legal: LegalPage
     };
     const registry = {};
     registry[pageName]?.destroy();
