@@ -1352,7 +1352,6 @@ const script = () => {
             }
         },
     }
-
     const VeteranPage = {
         'vc-hero-wrap': class extends TriggerSetup {
             constructor() {
@@ -1573,7 +1572,6 @@ const script = () => {
             }
         },
     }
-
     const CalculatorPage = {
         'calc-hero-wrap': class extends TriggerSetup {
             constructor() {
@@ -1612,34 +1610,6 @@ const script = () => {
                 super.destroy();
             }
         },
-        'calc-main-wrap': class extends TriggerSetup {
-            constructor() {
-                super();
-                this.onTrigger = () => {
-                    this.animationReveal();
-                    this.animationScrub();
-                    this.interact();
-                    requestAnimationFrame(() => {
-                        $('.body').css({
-                            'overflow': 'initial',
-                            'position': 'relative',
-                            'max-height': 'none',
-                            'inset': 'auto',
-                            'overflow-y': 'initial'
-                        })
-                    })
-                };
-            }
-            animationReveal() {
-            }
-            animationScrub() {
-            }
-            interact() {
-            }
-            destroy() {
-                super.destroy();
-            }
-        },
         'calc-learn-wrap': class extends TriggerSetup {
             constructor() {
                 super();
@@ -1671,6 +1641,69 @@ const script = () => {
                         }
                     });
                 }
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+    }
+    const ToolPage = {
+        'tool-main-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                    requestAnimationFrame(() => {
+                        $('.body').css({
+                            'overflow': 'initial',
+                            'position': 'relative',
+                            'max-height': 'none',
+                            'inset': 'auto',
+                            'overflow-y': 'initial'
+                        })
+                    })
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+            }
+            destroy() {
+                super.destroy();
+            }
+        },
+        'tool-news-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+                $('.tool-news-cms').addClass('swiper');
+                $('.tool-news-list').addClass('swiper-wrapper');
+                $('.tool-news-item').addClass('swiper-slide');
+
+                $('.tool-news-list').css('gap', 0);
+                let swiper = new Swiper('.tool-news-cms', {
+                    slidesPerView: 'auto',
+                    spaceBetween: cvUnit(viewport.w > 991 ? 32 : 22, 'rem'),
+                    navigation: {
+                        nextEl: '.tool-news-ctrl-arr.next',
+                        prevEl: '.tool-news-ctrl-arr.prev',
+                        disabledClass: 'disabled',
+                    }
+                });
             }
             destroy() {
                 super.destroy();
@@ -1881,7 +1914,6 @@ const script = () => {
             }
         },
     }
-
     const LegalPage = {
         'legal-main-wrap': class extends TriggerSetup {
             constructor() {
@@ -1958,6 +1990,7 @@ const script = () => {
         loan: LoanPage,
         veteran: VeteranPage,
         calculators: CalculatorPage,
+        tool: ToolPage,
         hub: HubPage,
         articles: ArticlePage,
         post: PostPage,
