@@ -1428,6 +1428,15 @@ const mainScript = () => {
     }
 
     let requestID;
+    function faq() {
+        $('.home-faq .accordion-item').eq(0).addClass('active');
+        $('.home-faq .accordion-title').on('click', function (e) {
+            let parent = $(this).parents('.accordion-item');
+            $('.accordion-item').removeClass('active');
+            parent.toggleClass('active');
+            ScrollTrigger.refresh();
+        })
+    }
     const SCRIPTS = {
         home: {
             namespace: 'home',
@@ -1758,7 +1767,7 @@ const mainScript = () => {
                     })
                 }
                 scCustomer();
-
+                faq();
                 function checkActionRedirect() {
                     let searchParam = new URLSearchParams(window.location.search);
                     let actionParam = searchParam.get('action');
@@ -2528,6 +2537,7 @@ const mainScript = () => {
                     })
                 }
                 scUseCase();
+                faq();
             },
             beforeLeave() {
                 // $('input[type="radio"][name="Product"]').prop('checked', false);
