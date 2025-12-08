@@ -1792,32 +1792,128 @@ const script = () => {
             animationScrub() {
             }
             interact() {
+                // $('.article-hero-tab').on('click', function(e) {
+                //     let index = $(this).index();
+                //     console.log(index)
+                //     // // $('.article-hero-tab').addClass('active').siblings().removeClass('active');
+                //     // if (index === 0) {
+                //     //     $('.article-hero-other-item').show();
+                //     //     $('.article-hero-main').show();
+                //     // } else {
+                //     //     $('.article-hero-main').hide();
+                //     //     $('.article-hero-other-item').eq(index - 1).show().siblings().hide();
+                //     // }
+                // });
                 $('.article-hero-tab').on('click', function(e) {
-                    let index = $(this).index();
-                    $(this).addClass('active').siblings().removeClass('active');
-                    if (index === 0) {
+                    let slug = $(this).attr('data-slug');
+                    $('.article-hero-tab').removeClass('active');
+                    $(this).addClass('active');
+                    $('.article-hero-main').hide();
+                    if (slug !== 'all') {
+                        $('.article-hero-other-item').hide();
+                        $('.article-hero-other-item[data-slug="' + slug + '"]').show();
+                    } else {
                         $('.article-hero-other-item').show();
                         $('.article-hero-main').show();
-                    } else {
-                        $('.article-hero-main').hide();
-                        $('.article-hero-other-item').eq(index - 1).show().siblings().hide();
                     }
                 });
                 if (viewport.w <= 767) {
-                    $('.article-hero-cms:not(.main-one):visible').addClass('swiper');
-                    $('.article-hero-cms:not(.main-one):visible .article-hero-cms-list').addClass('swiper-wrapper');
-                    $('.article-hero-cms:not(.main-one):visible .article-hero-cms-item').addClass('swiper-slide');
-                    $('.article-hero-cms:not(.main-one):visible .article-hero-cms-list').css('gap', 0);
-                    $('.article-hero-cms:not(.main-one):visible').each(function () {
-                        let swiper = new Swiper(this, {
-                            slidesPerView: 1.1,
-                            spaceBetween: cvUnit(18, 'rem'),
-                            navigation: {
-                                nextEl: $(this).parents('.article-hero-other-item').find('.article-hero-other-ctrl-arr.next').get(0),
-                                prevEl: $(this).parents('.article-hero-other-item').find('.article-hero-other-ctrl-arr.prev').get(0),
-                                disabledClass: 'is-list-pagination-disabled',
+                    $('.article-hero-other-item, .article-hero-main .article-hero-cms:not(.main-one)').addClass('swiper');
+                    $('.article-hero-other-item .article-hero-cms-list, .article-hero-main .article-hero-cms:not(.main-one) .article-hero-cms-list').addClass('swiper-wrapper');
+                    $('.article-hero-other-item .article-hero-cms-item, .article-hero-main .article-hero-cms:not(.main-one) .article-hero-cms-item').addClass('swiper-slide');
+                    $('.article-hero-other-item .article-hero-cms-list, .article-hero-main .article-hero-cms:not(.main-one) .article-hero-cms-list').css('gap', 0);
+
+                    new Swiper('.article-hero-other-item', {
+                        slidesPerView: 1.1,
+                        spaceBetween: cvUnit(18, 'rem'),
+                        navigation: {
+                            nextEl: '.article-hero-other-ctrl-arr.next',
+                            prevEl: '.article-hero-other-ctrl-arr.prev',
+                            disabledClass: 'is-list-pagination-disabled',
+                        }
+                    });
+                    new Swiper('.article-hero-main .article-hero-cms:not(.main-one)', {
+                        slidesPerView: 1.1,
+                        spaceBetween: cvUnit(18, 'rem'),
+                    });
+                }
+                else {
+                    const itemOnPage = 5;
+                    const updateCurrentPage = (parent, currentPage) => {
+                        const items = $(parent).find('.article-hero-cms-item');
+                        const totalItems = items.length;
+                        const maxPage = Math.ceil(totalItems / itemOnPage);
+                        const startIdx = (currentPage - 1) * itemOnPage;
+                        const endIdx = Math.min(startIdx + itemOnPage, totalItems);
+
+                        // Remove 'half' class from all items first
+                        items.removeClass('half');
+
+                        items.each((idx, item) => {
+                            const $item = $(item);
+                            if (idx >= startIdx && idx < endIdx) {
+                                $item.show();
+                                // Add 'half' class to first 2 items of current page
+                                if (idx === startIdx || idx === startIdx + 1) {
+                                    $item.addClass('half');
+                                }
+                            } else {
+                                $item.hide();
                             }
                         });
+
+                        // Update button states
+                        const $parent = $(parent);
+                        const $nextBtn = $parent.find('.article-hero-other-ctrl-arr.next');
+                        const $prevBtn = $parent.find('.article-hero-other-ctrl-arr.prev');
+                        const $paginationContainer = $nextBtn.parent(); // Container của pagination buttons
+
+                        // Hide pagination if maxPage <= 2
+                        if (maxPage <= 1) {
+                            $paginationContainer.hide();
+                        } else {
+                            $paginationContainer.show();
+
+                            if (currentPage >= maxPage) {
+                                $nextBtn.addClass('is-list-pagination-disabled');
+                            } else {
+                                $nextBtn.removeClass('is-list-pagination-disabled');
+                            }
+
+                            if (currentPage <= 1) {
+                                $prevBtn.addClass('is-list-pagination-disabled');
+                            } else {
+                                $prevBtn.removeClass('is-list-pagination-disabled');
+                            }
+                        }
+                    };
+
+                    $('.article-hero-other-item').each(function () {
+                        const $target = $(this);
+                        let currentPage = 1;
+
+                        $target.find('.article-hero-other-ctrl-arr').on('click', function(e) {
+                            e.preventDefault();
+                            const items = $target.find('.article-hero-cms-item');
+                            const totalItems = items.length;
+                            const maxPage = Math.ceil(totalItems / itemOnPage);
+
+                            if ($(this).hasClass('next')) {
+                                if (currentPage < maxPage) {
+                                    currentPage++;
+                                }
+                            } else if ($(this).hasClass('prev')) {
+                                if (currentPage > 1) {
+                                    currentPage--;
+                                }
+                            }
+
+                            requestAnimationFrame(() => {
+                                updateCurrentPage($target[0], currentPage);
+                            });
+                        });
+
+                        updateCurrentPage($target[0], currentPage);
                     });
                 }
             }
