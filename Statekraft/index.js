@@ -474,19 +474,21 @@ const script = () => {
             animationScrub() {
             }
             interact() {
-                $('.home-role-main').addClass('swiper')
-                $('.home-role-list').addClass('swiper-wrapper')
-                $('.home-role-item').addClass('swiper-slide')
-                $('.home-role-list').css('gap', 0);
-                let swiper = new Swiper('.home-role-main', {
-                    slidesPerView: 'auto',
-                    spaceBetween: cvUnit(16, 'rem'),
-                    pagination: {
-                        el: '.home-role-pagin',
-                        bulletClass: 'home-role-pagin-item',
-                        bulletActiveClass: 'active'
-                    }
-                });
+                if (viewport.w <= 767) {
+                    $('.home-role-main').addClass('swiper')
+                    $('.home-role-list').addClass('swiper-wrapper')
+                    $('.home-role-item').addClass('swiper-slide')
+                    $('.home-role-list').css('gap', 0);
+                    let swiper = new Swiper('.home-role-main', {
+                        slidesPerView: 'auto',
+                        spaceBetween: cvUnit(16, 'rem'),
+                        pagination: {
+                            el: '.home-role-pagin',
+                            bulletClass: 'home-role-pagin-item',
+                            bulletActiveClass: 'active'
+                        }
+                    });
+                }
             }
             destroy() {
                 super.destroy();
