@@ -201,6 +201,7 @@ const script = () => {
         constructor(el, options = {}) {
             this.el = el;
             this.options = options;
+            this.counter = null;
             this.init();
         }
         init() {
@@ -214,7 +215,7 @@ const script = () => {
             let suffix = value.includes('+') ? '+' : '';
             let counterTo = value.replace(/[,]/g, '.').replace(/[+]/g, '').replace(/[+]/g, '');
             let decimalPlaces = hasDecimal && counterTo.length - value.indexOf(decimal) - 1;
-            const counter = new countUp.CountUp(this.el, counterTo, {
+            this.counter = new countUp.CountUp(this.el, counterTo, {
                 duration: 1,
                 decimalPlaces,
                 decimal,
@@ -222,6 +223,13 @@ const script = () => {
                 enableScrollSpy: true,
                 ...this.options
             });
+            // Store instance on element for easy access
+            this.el._countUpInstance = this.counter;
+        }
+        start() {
+            if (this.counter && typeof this.counter.start === 'function') {
+                this.counter.start();
+            }
         }
     }
     class Marquee {
@@ -585,7 +593,7 @@ const script = () => {
         }
         openPopupVid(videoId) {
             if (this.popupOpen.find('.check-vid-type').length > 0) {
-                this.popupVid.addClass('is-short');
+            this.popupVid.addClass('is-short');
             }
             this.popupVid.append(this.createIframe(videoId));
             $('.popup').addClass('active');
@@ -769,7 +777,41 @@ const script = () => {
             animationReveal() {
             }
             animationScrub() {
-                $('.home-stats-item-val [data-counter]').each((index, item) => new CounterUp(item, { scrollSpyDelay: index * 0.2}));
+                $('.home-stats-item-val [data-counter]').each((index, item) => {
+                    const $item = $(item);
+                    if ($item.is(':visible') && $item.length) {
+                        // On mobile, disable scroll spy and trigger manually
+                        const options = viewport.w <= 767
+                            ? { enableScrollSpy: false, scrollSpyDelay: 0 }
+                            : { scrollSpyDelay: index * 0.2 };
+
+                        const counter = new CounterUp(item, options);
+
+                        // On mobile, use IntersectionObserver to trigger when element enters viewport
+                        if (viewport.w <= 767) {
+                            const rect = item.getBoundingClientRect();
+                            const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+
+                            if (isInViewport) {
+                                // Already in viewport, trigger immediately
+                                counter.start();
+                            } else {
+                                // Not in viewport yet, use IntersectionObserver
+                                const observer = new IntersectionObserver((entries) => {
+                                    entries.forEach(entry => {
+                                        if (entry.isIntersecting) {
+                                            setTimeout(() => {
+                                                counter.start();
+                                            }, 100 + (index * 200));
+                                            observer.unobserve(entry.target);
+                                        }
+                                    });
+                                }, { threshold: 0.1 });
+                                observer.observe(item);
+                            }
+                        }
+                    }
+                });
             }
             interact() {
             }
@@ -1696,7 +1738,7 @@ const script = () => {
 
                 $('.tool-news-list').css('gap', 0);
                 let swiper = new Swiper('.tool-news-cms', {
-                    slidesPerView: 'auto',
+                        slidesPerView: 'auto',
                     spaceBetween: cvUnit(viewport.w > 991 ? 32 : 22, 'rem'),
                     navigation: {
                         nextEl: '.tool-news-ctrl-arr.next',
