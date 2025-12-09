@@ -791,7 +791,9 @@ const mainScript = () => {
         const allowedRoutesLive = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist'];
         const allowedRoutesStagging = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'how-it-works'];
         const allowedRoutes = isStagging() ? allowedRoutesStagging : allowedRoutesLive;
-        const shouldSkipRedirect = pathname.includes('hk-en') && allowedRoutes.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
+        // pathname.includes('hk-en') hoặc  pathname.includes('hk-zh-hant') for shouldSkipRedirect should not redirect
+
+        const shouldSkipRedirect = (pathname.includes('hk-en') || pathname.includes('hk-zh-hant')) && allowedRoutes.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
         if (!shouldSkipRedirect) {
             const matchedLang = langPaths.find(lang => new RegExp(`^/${lang}/.+`).test(pathname));
             if (matchedLang) {
