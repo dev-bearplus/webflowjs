@@ -495,6 +495,183 @@ const script = () => {
             }
         }
     }
+    const SignUpPage = {
+        'signup-hero-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                    this.currentStep = -1;
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+                $('.signup-hero-item-info-btn-inner').on('click', (e) => {
+                    e.preventDefault();
+                    this.currentStep += 1;
+                    this.updateScreenStep();
+                    let planTitle = $(e.currentTarget).parents('.signup-hero-item').find('.signup-hero-item-title .heading').text();
+                    $('.plan-hero-main-head-title .txt').text(planTitle);
+                });
+                $('.signup-hero-plan-head-back').on('click', (e) => {
+                    e.preventDefault();
+                    this.currentStep = -1;
+                    $('.signup-hero-plan-step form').get(0).reset();
+                    $('.signup-hero-plan-step .input-field-wrap .input-field').removeClass('filled');
+                    $('.signup-hero-plan-step .input-field-wrap .input-field').val('');
+                    $('.signup-hero-plan-step .radio-field-wrap .radio-field').prop('checked', false);
+                    this.updateScreenStep();
+                });
+                this.attachFormHandler();
+            }
+            updateScreenStep() {
+                if (this.currentStep >= 0) {
+                    let stepProgress = $('.signup-hero-plan-step').eq(this.currentStep).attr('data-progress');
+                    if (stepProgress) {
+                        $('.signup-hero-plan-pagin-item').each(function (idx, item) {
+                            if (idx < Number(stepProgress) - 1) {
+                                $(item).addClass('filled').removeClass('active');
+                            }
+                            else {
+                                $(item).removeClass('filled');
+                            }
+                        });
+                        $('.signup-hero-plan-pagin-item').eq(Number(stepProgress) - 1).addClass('active').siblings().removeClass('active');
+                    }
+                    if (this.currentStep == 0) {
+                        $('.signup-hero-title').hide();
+
+                        $('.signup-hero-screen').eq(0).removeClass('active');
+                        $('.signup-hero-screen').eq(1).addClass('active');
+                        $('.signup-hero-plan-step').eq(this.currentStep).addClass('active').siblings().removeClass('active');
+                    } else if (this.currentStep == $('.signup-hero-plan-step').length) {
+                        $('.signup-hero-title').hide();
+
+                        $('.signup-hero-screen').eq(1).removeClass('active');
+                        $('.signup-hero-screen').eq(2).addClass('active');
+                        $('.signup-hero-plan-step').removeClass('active');
+                    }
+                    else {
+                        $('.signup-hero-title').hide();
+                        $('.signup-hero-plan-step').eq(this.currentStep).addClass('active').siblings().removeClass('active');
+                    }
+                }
+                else {
+                    $('.signup-hero-title').show();
+                    $('.signup-hero-screen').eq(0).addClass('active');
+                    $('.signup-hero-screen').eq(1).removeClass('active');
+                    $('.signup-hero-plan-step').removeClass('active');
+                }
+                if (this.currentStep == $('.signup-hero-plan-step').length - 1) {
+                    $('.signup-hero-plan-step').eq(this.currentStep).find('input[type="submit"]').prop('disabled', true);
+                    $('.signup-hero-plan-step').eq(this.currentStep).find('input[type="submit"]').css('pointer-events', 'none');
+                }
+
+            }
+            attachFormHandler() {
+                $('.signup-hero-plan-step').each(function (idx, step) {
+                    let form = $(this).find('form').get(0);
+                    let hasForm = $(this).find('form').length > 0;
+                    let isValid = true;
+                    let isFilled = false;
+                    if (hasForm) {
+                        $(this).find('.input-field-wrap .input-field, .confirm-input-wrap .input-default').on('blur', function (e) {
+                            if ($(this).val() != '') {
+                                $(this).closest('.input-field-wrap, .confirm-input-wrap').addClass('filled')
+                                isFilled = true;
+                            }
+                            else {
+                                $(this).closest('.input-field-wrap, .confirm-input-wrap').removeClass('filled');
+                                isFilled = false;
+                            }
+                        })
+                        $(this).find('.input-field-wrap .input-field, .confirm-input-wrap .input-default').bind('input, change keydown keyup', function (e) {
+                            isValid = form.checkValidity();
+                            $(form).find('input[type="submit"]').prop('disabled', isValid);
+                            $(form).find('input[type="submit"]').css('pointer-events', isValid ? 'none' : 'auto');
+                        })
+                        $(form).find('.input-submit.main, input[type="submit"]').on("pointerenter", function () {
+                            if ($(this).prop("disabled") && !isFilled) {
+                                $(this).prop("disabled", false);
+                            }
+                        });
+                        $(form).find('[type="tel"]').bind('change keydown keyup', function (e) {
+                            let inputVal = $(this).val();
+                            $(this).val(inputVal.replace(/\D/g, ''));
+                        })
+                        $(form).find('.input-select-toggle').on('click', function (e) {
+                            $(this).parent().toggleClass('active');
+                            if ($(this).parent().hasClass('active')) {
+                                $(this).siblings().slideDown({
+                                    start: function () {
+                                        $(this).css({ display: "flex" })
+                                    }
+                                });
+                            }
+                            else {
+                                $(this).siblings().slideUp();
+                            }
+                        });
+                        $(form).find('.input-select-opt').on('click', function (e) {
+                            e.preventDefault();
+                            let valText = $(this).text();
+                            $(this).parents('.type-select').find('.input-field').val(valText);
+                            isFilled = true;
+                            $(form).find('input[type="submit"]').prop('disabled', true);
+                            $(form).find('input[type="submit"]').css('pointer-events', 'none');
+                        });
+                        $(window).on('click', function (e) {
+                            if (!$(e.target).closest('.input-select-toggle').length) {
+                                if ($(form).find('.type-select').hasClass('active')) {
+                                    $(form).find('.input-select-dropdown').slideUp();
+                                    $(form).find('.type-select').removeClass('active');
+                                }
+                            }
+                        });
+                        $('.confirm-input-edit').on('click', function (e) {
+                            $(this).parent().find('input').removeAttr('readonly');
+                            $(this).parent().find('input').focus();
+                            setTimeout(() => {
+                                $(this).remove();
+                            }, 200);
+                        });
+                        $(form).find('.input-submit.placeholder').on('click', () => {
+                            isValid && handleContinue();
+                        });
+                    }
+                    else {
+                        $(this).find('.signup-hero-plan-ctrl-btn.next').on('click', () => {
+                            handleContinue();
+                        });
+                    }
+
+                    $(this).find('.signup-hero-plan-ctrl-btn.prev').on('click', () => {
+                        handleBack();
+                    });
+                });
+                const handleContinue = () => {
+                    if (this.currentStep <= $('.signup-hero-plan-step').length - 1) {
+                        this.currentStep += 1;
+                    }
+                    this.updateScreenStep();
+                }
+                const handleBack = () => {
+                    if (this.currentStep >= 0) {
+                        this.currentStep -= 1;
+                    }
+                    this.updateScreenStep();
+                }
+            }
+            destroy() {
+                super.destroy();
+            }
+        }
+    }
     class PageManager {
         constructor(page) {
             if (!page || typeof page !== 'object') {
@@ -534,7 +711,8 @@ const script = () => {
     }
     const pageName = $('.main-inner').attr('data-namespace');
     const pageConfig = {
-        home: HomePage
+        home: HomePage,
+        signup: SignUpPage
     };
     const registry = {};
     registry[pageName]?.destroy();
