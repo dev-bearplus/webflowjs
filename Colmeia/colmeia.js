@@ -2537,7 +2537,24 @@ const mainScript = () => {
                     })
                 }
                 scUseCase();
-                faq();
+
+                function scFAQ() {
+                    let cloneFAQ = $('.home-faq-item').eq(0).clone();
+                    $('.home-faq-item').eq(0).remove()
+                    console.log($('.home-faq-listing .hidden-content h3'))
+                    $('.home-faq-listing .hidden-content h3').each((i, h3) => {
+                        console.log("run")
+                        let html = cloneFAQ.clone();
+                        let parent = childSelect(html);
+                        parent('.accordion-title .txt').text($(h3).text());
+                        parent('.accordion-content .txt').text($(h3).next().text());
+
+                        html.toggleClass('active', i === 0);
+                        $('.home-faq-listing').append(html);
+                    })
+                    faq();
+                }
+                scFAQ();
             },
             beforeLeave() {
                 // $('input[type="radio"][name="Product"]').prop('checked', false);
@@ -2586,7 +2603,18 @@ const mainScript = () => {
                 scCompare();
 
                 function scFAQ() {
-                    $('.accordion-item').eq(0).addClass('active');
+                    let cloneFAQ = $('.comp-faq-item').eq(0).clone();
+                    $('.comp-faq-item').eq(0).remove()
+                    console.log($('.comp-faq-listing .hidden-content h3'))
+                    $('.comp-faq-listing .hidden-content h3').each((i, h3) => {
+                        let html = cloneFAQ.clone();
+                        let parent = childSelect(html);
+                        parent('.accordion-title .txt').text($(h3).text());
+                        parent('.accordion-content .txt').text($(h3).next().text());
+
+                        html.toggleClass('active', i === 0);
+                        $('.comp-faq-listing').append(html);
+                    })
 
                     $('.accordion-title').on('click', function (e) {
                         let parent = $(this).closest('.accordion-item');
