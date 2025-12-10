@@ -537,6 +537,19 @@ const script = () => {
                     this.updateScreenStep();
                 });
                 this.attachFormHandler();
+
+                if (viewport.w <= 991) {
+                    $('.signup-hero-main').addClass('swiper')
+                    $('.signup-hero-list').addClass('swiper-wrapper')
+                    $('.signup-hero-item').addClass('swiper-slide');
+                    $('.signup-hero-list').css('gap', 0);
+                    let swiper = new Swiper('.signup-hero-main', {
+                        slidesPerView: 'auto',
+                        spaceBetween: cvUnit(24, 'rem'),
+                        centeredSlides: true,
+                        initialSlide: 1
+                    });
+                }
             }
             updateScreenStep() {
                 if (this.currentStep >= 0) {
