@@ -455,6 +455,9 @@ const script = () => {
                         initialSlide: 1
                     });
                 }
+                $('.home-pricing-btn').each(function (idx, item) {
+                    $(this).attr('href', `${$(this).attr('href')}#${$(this).attr('data-plan')}`);
+                })
             }
             destroy() {
                 super.destroy();
@@ -500,13 +503,19 @@ const script = () => {
             constructor() {
                 super();
                 this.onTrigger = () => {
+                    this.currentStep = -1;
                     this.animationReveal();
                     this.animationScrub();
                     this.interact();
-                    this.currentStep = -1;
                 };
             }
             animationReveal() {
+                if (window.location.hash) {
+                    this.currentStep += 1;
+                    this.updateScreenStep();
+                    let planTitle = $(`.signup-hero-item-info-btn-inner${window.location.hash}`).parents('.signup-hero-item').find('.signup-hero-item-title .heading').text();
+                    $('.plan-hero-main-head-title .txt').text(planTitle);
+                }
             }
             animationScrub() {
             }
