@@ -2,10 +2,10 @@ const mainScript = () => {
     const pageName = $('.main-inner').attr('data-barba-namespace');
 
     gsap.registerPlugin(ScrollTrigger)
-    ScrollTrigger.defaults({
-        invalidateOnRefresh: true,
-        scroller: '.main-inner',
-    });
+    // ScrollTrigger.defaults({
+    //     invalidateOnRefresh: true,
+    //     scroller: '.main-inner',
+    // });
     const viewport = {
 		get w() {
 			return window.innerWidth;
@@ -65,11 +65,6 @@ const mainScript = () => {
 
 				if (currentHeight !== previousHeight) {
 					console.log("Document height changed. Refreshing ScrollTrigger...");
-
-                    if (smoothScroll.lenis) {
-                        smoothScroll.lenis.resize();
-                        ScrollTrigger.refresh();
-                    }
                     if (callback) {
                         callback();
                     }
@@ -199,7 +194,7 @@ const mainScript = () => {
 		}
 	}
 	const smoothScroll = new SmoothScroll();
-    smoothScroll.init();
+    // smoothScroll.init();
 
     class Nav {
         constructor() {
@@ -216,7 +211,7 @@ const mainScript = () => {
                 $(this.el).removeClass('active');
             } else if (data.next.namespace === "notes") {
 				$(this.el).addClass('active');
-				
+
 			}
 		}
 		interact() {
@@ -237,6 +232,16 @@ const mainScript = () => {
             }
             connectedCallback() {
                 this.onTrigger();
+            }
+            disconnectedCallback() {
+                // Clean up scroll listener
+                if (this.scrollHandler) {
+                    window.removeEventListener('scroll', this.scrollHandler);
+                    const mainInner = document.querySelector('.main-inner');
+                    if (mainInner) {
+                        mainInner.removeEventListener('scroll', this.scrollHandler);
+                    }
+                }
             }
             onTrigger() {
 				this.setup();
@@ -278,16 +283,44 @@ const mainScript = () => {
 					$(this.el).find('.note-header').toggleClass('active');
                 });
 
-                smoothScroll.lenis.on('scroll', (e) => {
+                // Native scroll handler
+                const mainInner = document.querySelector('.main-inner');
+                const scrollElement = mainInner || window;
+
+                this.scrollHandler = () => {
+					console.log('scroll')
+                    let scrollTop, scrollHeight, clientHeight;
+
+                    if (mainInner) {
+                        scrollTop = mainInner.scrollTop;
+                        scrollHeight = mainInner.scrollHeight;
+                        clientHeight = mainInner.clientHeight;
+                    } else {
+                        scrollTop = window.scrollY || document.documentElement.scrollTop;
+                        scrollHeight = document.documentElement.scrollHeight;
+                        clientHeight = window.innerHeight;
+                    }
+
+                    const maxScroll = scrollHeight - clientHeight;
+                    const progress = maxScroll > 0 ? scrollTop / maxScroll : 0;
+
                     if (viewport.w <= 767) {
-                        gsap.set($(this.el).find('.note-header-cms-item-link.w--current').siblings('.line').find('.line-inner'), { scaleX: e.progress })
+                        gsap.set($(this.el).find('.note-header-cms-item-link.w--current').siblings('.line').find('.line-inner'), { scaleX: progress })
                     }
                     else {
-                        gsap.set($(this.el).find('.note-content-links-totop'), { '--progress': e.progress })
+                        gsap.set($(this.el).find('.note-content-links-totop'), { '--progress': progress })
                     }
-                });
+                };
+
+                if (mainInner) {
+                    mainInner.addEventListener('scroll', this.scrollHandler);
+                } else {
+                    window.addEventListener('scroll', this.scrollHandler);
+                }
+                // Call once to set initial state
+                this.scrollHandler();
                 $(this.el).find('.note-content-links-totop').on('click', () => {
-                    smoothScroll.scrollTo('top', { lock: true });
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
 				});
 
 				$(this.el).find('.note-header-cms-archived-title').on('click', function () {
