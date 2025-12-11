@@ -553,23 +553,33 @@ const script = () => {
             this.popupVid = $('.popup-vid-wrap');
             this.popupOpen = $('[data-popup="open"]');
             this.popupClose = $('[data-popup="close"]');
+            this.isPopupVid = false;
             this.isReady = true;
 
             this.popupOpen.on('click', (e) => {
-                if (!this.isReady) return;
-                this.openPopupVid($(e.currentTarget).attr('data-youtube-id'));
+                console.log("click")
+                if ($(e.currentTarget).attr('data-youtube-id')) {
+                    if (!this.isReady) return;
+                    this.isPopupVid = true;
+                    this.openPopupVid($(e.currentTarget).attr('data-youtube-id'));
+                }
+                else {
+                    this.isPopupVid = false;
+                    this.popup.addClass('active');
+                }
             });
             this.popupClose.on('click', () => {
-                this.closePopupVid();
+                console.log(this.isPopupVid)
+                this.closePopup();
             });
             $(window).on('click', (e) => {
-                if (!e.target.closest('.popup-content, [data-popup="open"]')) {
-                    this.closePopupVid();
+                if (!e.target.closest('.popup-content, [data-popup="open"], .popup-work')) {
+                    this.closePopup();
                 }
             });
             $(window).on('keydown', (e) => {
                 if (e.key === 'Escape') {
-                    this.closePopupVid();
+                    this.closePopup();
                 }
             });
         }
@@ -606,6 +616,14 @@ const script = () => {
                 this.destroyIframe();
                 this.isReady = true;
             }, 300);
+        }
+        closePopup() {
+            if (this.isPopupVid) {
+                this.closePopupVid();
+            }
+            else {
+                this.popup.removeClass('active');
+            }
         }
     }
     const popup = new Popup();
