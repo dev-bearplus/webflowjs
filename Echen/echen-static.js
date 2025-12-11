@@ -284,7 +284,7 @@ const mainScript = () => {
                 });
 
                 // Native scroll handler
-                const mainInner = document.querySelector('.main-inner');
+                const mainInner = document.querySelector('.main-content');
                 const scrollElement = mainInner || window;
 
                 this.scrollHandler = () => {
@@ -320,7 +320,7 @@ const mainScript = () => {
                 // Call once to set initial state
                 this.scrollHandler();
                 $(this.el).find('.note-content-links-totop').on('click', () => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    mainInner.scrollTo({ top: 0, behavior: 'smooth' });
 				});
 
 				$(this.el).find('.note-header-cms-archived-title').on('click', function () {
