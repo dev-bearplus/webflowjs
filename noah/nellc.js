@@ -557,7 +557,6 @@ const script = () => {
             this.isReady = true;
 
             this.popupOpen.on('click', (e) => {
-                console.log("click")
                 if ($(e.currentTarget).attr('data-short-youtube-id') || $(e.currentTarget).attr('data-full-youtube-id')) {
                     if (!this.isReady) return;
                     this.isPopupVid = true;
