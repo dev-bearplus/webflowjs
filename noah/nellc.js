@@ -558,10 +558,20 @@ const script = () => {
 
             this.popupOpen.on('click', (e) => {
                 console.log("click")
-                if ($(e.currentTarget).attr('data-youtube-id')) {
+                if ($(e.currentTarget).attr('data-short-youtube-id') || $(e.currentTarget).attr('data-full-youtube-id')) {
                     if (!this.isReady) return;
                     this.isPopupVid = true;
-                    this.openPopupVid($(e.currentTarget).attr('data-youtube-id'));
+                    if ($(e.currentTarget).attr('data-short-youtube-id')) {
+                        if (viewport.w <= 767) {
+                            this.openPopupVid($(e.currentTarget).attr('data-short-youtube-id'));
+                        }
+                        else {
+                            this.openPopupVid($(e.currentTarget).attr('data-full-youtube-id'));
+                        }
+                    }
+                    else {
+                        this.openPopupVid($(e.currentTarget).attr('data-full-youtube-id'));
+                    }
                 }
                 else {
                     this.isPopupVid = false;
@@ -602,8 +612,8 @@ const script = () => {
             $('.popup-vid-wrap iframe').remove();
         }
         openPopupVid(videoId) {
-            if (this.popupOpen.find('.check-vid-type').length > 0) {
-            this.popupVid.addClass('is-short');
+            if (viewport.w <= 767) {
+                this.popupVid.addClass('is-short');
             }
             this.popupVid.append(this.createIframe(videoId));
             $('.popup').addClass('active');
