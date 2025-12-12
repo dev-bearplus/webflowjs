@@ -419,7 +419,7 @@ const script = () => {
             }
         }
         updateOnScroll(inst) {
-            this.toggleHide(inst);
+            // this.toggleHide(inst);
             this.toggleScroll(inst);
         }
         toggleScroll(inst) {
