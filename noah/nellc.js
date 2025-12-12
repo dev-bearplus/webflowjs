@@ -698,12 +698,15 @@ const script = () => {
                 })
 
                 let originalWidth = $('.home-hero-front-main-img').width();
-                gsap.set('.home-hero-front-main-img', { scale: 1, y: 0, width: originalWidth });
+                gsap.set('.home-hero-front-main-img', { scale: 1, y: 0, x: 0, width: originalWidth });
                 let middleOffsetTop = $('.home-hero-front-main-img-bg').get(0).getBoundingClientRect().top - $('.home-hero-front-title-flex').eq(0).get(0).getBoundingClientRect().top;
 
                 let offsetBottom = $(window).height() - $('.home-hero-front-main-img').get(0).getBoundingClientRect().bottom;
                 let scaleOffSet = $('.home-hero-main-img.full').height() / $('.home-hero-front-main-img-inner').height();
-
+                if (viewport.w <= 767) {
+                    // scaleOffSet = $('.home-hero-main-img.full').height() / $('.home-hero-front-main-img-inner').height();
+                    gsap.set('.home-hero-main-img.full .home-hero-main-img-inner img', { objectPosition: `45% bottom` });
+                }
                 this.tl
                     .to('.home-hero-front-sub-img.left', { rotation: 0, x: 0, y: 0, duration: .6, ease: 'none' }, 0)
                     .to('.home-hero-front-sub-img.right', { rotation: 0, x: 0, y: 0, duration: .6, ease: 'none' }, 0)
@@ -716,7 +719,7 @@ const script = () => {
                     .to($('.home-hero-front-title-flex').eq(0).find('.heading').eq(1), { x: cvUnit(250, 'rem'), y: -cvUnit(15, 'rem'), scale: .9, autoAlpha: 0, duration: .6, ease: 'power2.inOut' }, '<=0')
                     .to($('.home-hero-front-title').find('.heading').eq(0).get(0), { y: -cvUnit(15, 'rem'), scale: .9, autoAlpha: 0, duration: .6, ease: 'power2.inOut' }, '<=0.1')
                     .set('.home-hero-front-main-img', { scale: 1, y: -middleOffsetTop, width: originalWidth, transformOrigin: `center bottom`, duration: 0 }, "-=.1")
-                    .to('.home-hero-front-main-img', { scale: scaleOffSet, y: offsetBottom, width: originalWidth * scaleOffSet, duration: 1,  ease: 'power1.inOut'}, "<=0")
+                    .to('.home-hero-front-main-img', { scale: scaleOffSet, transformOrigin: `${cvUnit(viewport.w <= 767 ? 45.3 : 0, 'rem')}% bottom`, y: offsetBottom, width: originalWidth * scaleOffSet, duration: 1,  ease: 'power1.inOut'}, "<=0")
                     .to('.home-hero-front-main-img-inner', { marginLeft: 0, duration: .7, ease: 'power1.inOut'  }, "<=0")
                     .to('.home-hero-front-main-img-bg', { borderRadius: 0, borderWidth: 0, duration: .8,  ease: 'power1.inOut' }, "<=0")
                     .to('.home-hero-front', { autoAlpha: 0, duration: .8,  ease: 'power1.inOut'  }, "-=.25")
