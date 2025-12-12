@@ -25,6 +25,9 @@ const mainScript = () => {
         requestAnimationFrame(raf)
     }
     requestAnimationFrame(raf)
+    if ($('.intro-wrap').length) {
+        $('.intro-wrap').addClass('loaded')
+    }
     const parseRem = (input) => {
         return (input / 10) * parseFloat($("html").css("font-size"));
       };
@@ -52,35 +55,10 @@ const mainScript = () => {
     const lerp = (a,b,t = 0.08) => {
         return a + (b - a) * t;
     }
-    const formatter = (value, decimal = true) => {
-        return new Intl.NumberFormat('en-SG', {
-            style: 'currency',
-            currency: 'SGD',
-            minimumFractionDigits: decimal ? 2 : 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
-            // maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
-        }).format(value)
-    };
-    const uniqueArr = (arr) => [...new Set(arr)];
-    function toSlug(text) {
-        return text.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-    }
     function toTitle(slug) {
         return slug.replace(/-/g, " ").replace(/\b[a-z]/g, function() {
             return arguments[0].toUpperCase();
         });
-    }
-    function toDateFormat(date) {
-        return new Date(date).toLocaleDateString("en-GB", {
-            day: 'numeric',
-            month: "short",
-            year: 'numeric'
-        });
-
-    }
-    function changeText(el, text) {
-        if (el.length > 0) {
-            el.text(text)
-        }
     }
     function debounce(func, delay = 100){
         let timer;
@@ -103,25 +81,6 @@ const mainScript = () => {
             (navigator.maxTouchPoints > 0) ||
             (navigator.msMaxTouchPoints > 0));
     }
-    function updateUrl(title, type, desc, ogImg) {
-        history.replaceState({},'',`/${type}/${title}`)
-        $('title').text(`${toTitle(title)} | Chocolate Finance`)
-        $('meta[property="og:title"]').attr('content', `${toTitle(title)} | Chocolate Finance`)
-        $('meta[property="twitter:title"]').attr('content', `${toTitle(title)} | Chocolate Finance`)
-        $('meta[property="og:url"]').attr('content',`${window.location.href}`)
-        $('link[rel="canonical"]').attr('href', `https://chocolatefinance.webflow.io/article/${title}`)
-        if (desc) {
-            $('meta[property="og:type"]').attr('content','article')
-            $('meta[name="description"]').attr('content', desc)
-            $('meta[property="og:description"]').attr('content', desc)
-            $('meta[property="twitter:description"]').attr('content', desc)
-        }
-        if (ogImg) {
-            $('meta[property="og:image"]').attr('content', ogImg)
-            $('meta[property="twitter:image"]').attr('content', ogImg)
-        }
-    }
-
     function detectPage(pageName) {
         // Header link
         $('[data-link]').removeClass('active');
@@ -313,33 +272,7 @@ const mainScript = () => {
         return deviceInfo;
     };
 
-    function detectOS() {
-        let isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && window['safari'].pushNotification));
-        if (!isTouchDevice()) {
-            if (!isSafari) {
-                $('video[data-os-depend] [data-ext="mov"]').remove()
-            } else {
-                $('video[data-os-depend] [data-ext="webm"]').remove()
-            }
-            $('video[data-os-depend]').each(function(index) {
-                $(this).get(0).load()
-            })
-            return isSafari
-        } else {
-            if(navigator.userAgent.match(/SAMSUNG|Samsung|SGH-[I|N|T]|GT-[I|N]|SM-[A|N|P|T|Z]|SHV-E|SCH-[I|J|R|S]|SPH-L/i)) {
-                if (!isSafari) {
-                    $('video[data-os-depend] [data-ext="mov"]').remove()
-                } else {
-                    $('video[data-os-depend] [data-ext="webm"]').remove()
-                }
-                $('video[data-os-depend]').each(function(index) {
-                    $(this).get(0).load()
-                })
-                return isSafari
-            }
-        }
-    }
-    // detectOS()
+    
 
     function updateVideoSrc() {
         if (checkOS().browser === 'Safari' || checkOS().browser === 'Instagram' || checkOS().browser === 'IABMV') {
@@ -376,14 +309,6 @@ const mainScript = () => {
         let currentUrl = window.location.href;
         return currentUrl.includes('webflow.io')
     }
-    // let namespace = $('.main').attr('data-barba-namespace');
-    // let rateExtent ='';
-    // if (isStagging()) {
-    //     rateExtent = '-sgd';
-    //     if (namespace === 'usd') {
-    //         rateExtent = '-usd';
-    //     }
-    // }
     function scrollToFaq() {
         $('[data-scroll-faq]').on('click', function(e) {
             e.preventDefault();
@@ -396,226 +321,6 @@ const mainScript = () => {
             }
 
         })
-    }
-    function updateRichtextFaqClass(faqHtml) {
-        let ans = faqHtml.find('.home-faq--itemans');
-        // Paragraphs
-        ans.find('p:not(.block-img)').addClass('txt-16 art-para-sm-sub');
-        // Lists
-        ans.find('ul').addClass('art-txt-ul mod-faq-ans');
-        ans.find('li').addClass('txt-16 art-txt-li');
-        // Links
-        ans.find('a').addClass('span-txt-link');
-        // Images
-        ans.find('.block-img img').addClass('img-basic art-main-img');
-        ans.find('.block-img').removeClass('block-img').addClass('art-img-lg-wrap mod-faq');
-        // data-rate Tags
-        ans.find('.big-rate-sgd').attr('data-rate-sgd','big');
-        ans.find('.small-rate-sgd').attr('data-rate-sgd','small');
-        ans.find('.other-rate-sgd').attr('data-rate-sgd','other');
-        ans.find('.limit-amount-sgd').attr('data-rate-sgd','amount');
-        ans.find('.limit-date-sgd').attr('data-rate-sgd','date');
-        ans.find('.minimum-sum-sgd').attr('data-rate-sgd','minimum-sum');
-        ans.find('.withdrawal-sgd').attr('data-rate-sgd','withdrawal');
-        ans.find('.big-rate-usd').attr('data-rate-usd','big');
-        ans.find('.small-rate-usd').attr('data-rate-usd','small');
-        ans.find('.other-rate-usd').attr('data-rate-usd','other');
-        ans.find('.limit-amount-usd').attr('data-rate-usd','amount');
-        ans.find('.limit-date-usd').attr('data-rate-usd','date');
-        ans.find('.minimum-sum-usd').attr('data-rate-usd','minimum-sum');
-        ans.find('.withdrawal-usd').attr('data-rate-usd','withdrawal');
-        // Embed
-        ans.find('[data-oembed]').addClass('art-embed-wrap mod-faq');
-
-        return ans.closest('.home-faq-item')
-    }
-    function createFaq(el,isRichtext = false) {
-        if (isRichtext) {
-            let ans = '';
-            let richTextArray = el.data.content_richtext;
-            for (const block of richTextArray) {
-                switch (block.type) {
-                case 'paragraph':
-                        let string = block.text;
-                        for (const span of block.spans) {
-                            switch (span.type) {
-                                case 'strong':
-                                string = string.replace(block.text.substring(span.start, span.end),`<strong>${block.text.substring(span.start, span.end)}</strong>`);
-                                break;
-                                case 'em':
-                                string = string.replace(block.text.substring(span.start, span.end),`<em>${block.text.substring(span.start, span.end)}</em>`);
-                                break;
-                                case 'hyperlink':
-                                string = string.replace(block.text.substring(span.start, span.end),`<a href="${span.data.url}" ${span.data.target ? "target='_blank'" : ''} class="span-txt-link hover-un">${block.text.substring(span.start, span.end)}</a>`);
-                                break;
-                                case 'label':
-                                if (span.data.label == 'big-rate' || span.data.label == 'small-rate' || span.data.label == 'limit-amount' || span.data.label == 'limit-date' || span.data.label == 'other-rate') {
-                                    let tag;
-                                    switch (span.data.label) {
-                                        case 'big-rate':
-                                        tag = "big"
-                                        break;
-                                        case 'small-rate':
-                                        tag = "small"
-                                        break;
-                                        case 'other-rate':
-                                        tag = "other"
-                                        break;
-                                        case 'limit-amount':
-                                        tag = "amount"
-                                        break;
-                                        case 'limit-date':
-                                        tag = "date"
-                                        break;
-                                        default:
-                                        break;
-                                    }
-                                    string = string.replace(block.text.substring(span.start, span.end), `<span data-rate=${tag}>${block.text.substring(span.start,span.end)}</span>`)
-                                }
-                                break;
-                                default:
-                                break;
-                            }
-                        }
-                        ans += `<p class="txt-16 art-para-sm-sub">${string}</p>`;
-                    break;
-                case 'image':
-                    ans += `<div class="art-img-lg-wrap mod-faq">
-                    <img class="img-basic art-main-img" src="${block.url}" alt="${block.alt}" width="${block.dimensions.width}" height="${block.dimensions.height}"/>
-                    </div>`;
-                    //${block.alt != null ? `<div class="txt-14 art-img-cap">${block.alt}</div>` : "" }
-                    break;
-                case 'embed':
-                    ans += `<div class="art-embed-wrap mod-faq">${block.oembed.html}</div>`
-                    break;
-                case 'list-item':
-                    let listString = block.text;
-                        for (const span of block.spans) {
-                            switch (span.type) {
-                                case 'strong':
-                                listString = listString.replace(block.text.substring(span.start, span.end),`<strong>${block.text.substring(span.start, span.end)}</strong>`);
-                                break;
-                                case 'em':
-                                listString = listString.replace(block.text.substring(span.start, span.end),`<em>${block.text.substring(span.start, span.end)}</em>`);
-                                break;
-                                case 'hyperlink':
-                                listString = listString.replace(block.text.substring(span.start, span.end),`<a href="${span.data.url}" ${span.data.target ? "target='_blank'" : ''} class="span-txt-link hover-un">${block.text.substring(span.start, span.end)}</a>`);
-                                break;
-                                case 'label':
-                                    if (span.data.label == 'big-rate' || span.data.label == 'small-rate' || span.data.label == 'limit-amount' || span.data.label == 'limit-date' || span.data.label == 'other-rate') {
-                                        let tag;
-                                        switch (span.data.label) {
-                                            case 'big-rate':
-                                            tag = "big"
-                                            break;
-                                            case 'small-rate':
-                                            tag = "small"
-                                            break;
-                                            case 'other-rate':
-                                            tag = "other"
-                                            break;
-                                            case 'limit-amount':
-                                            tag = "amount"
-                                            break;
-                                            case 'limit-date':
-                                            tag = "date"
-                                            break;
-                                            default:
-                                            break;
-                                        }
-                                        listString = listString.replace(block.text.substring(span.start, span.end), `<span data-rate=${tag}>${block.text.substring(span.start,span.end)}</span>`)
-                                    }
-                                break;
-                                default:
-                                break;
-                            }
-                        }
-                    ans += `<li class="txt-16 art-txt-li">${listString}</li>`;
-                    break;
-                default:
-                    console.error(`Unsupported block type: ${block.type}`);
-                    break;
-                }
-            }
-            let faqItem = $(`
-                <div class="home-faq-item" id="${el.uid.replaceAll('.','')}">
-                    <a href="#" class="home-faq-item-head w-inline-block">
-                        <div class="txt-16 home-faq-item-ques">${el.data.question}</div>
-                        <div class="ic-plus-wrap">
-                            <div class="ic-plus-inner"></div>
-                            <div class="ic-plus-inner mod-rotate"></div>
-                        </div>
-                    </a>
-                    <div class="home-faq-item-body">
-                        <div class="txt-16 home-faq--itemans">${ans}</div>
-                    </div>
-                    <div class="home-faq-bar">
-                        <div class="home-faq-bar-inner"></div>
-                    </div>
-                </div>
-            `);
-            ans = updateUlLi($(faqItem).find('.home-faq--itemans'))
-            function updateUlLi(wraper) {
-                const wraperEl = wraper;
-                const liEls = wraperEl.find('li');
-                liEls.each((i) => {
-                    let ulTemplate = $('<ul class="art-txt-ul mod-faq-ans"></ul>')
-                    if (liEls.eq(i).prev().get(0) != liEls.eq(i - 1).get(0)) {
-                        ulTemplate.clone().insertBefore(liEls.eq(i))
-                    }
-                })
-                liEls.each((i) => {
-                    if (liEls.eq(i).prev().prop('tagName') == 'UL') {
-                        liEls.eq(i).appendTo(liEls.eq(i).prev())
-                    }
-                })
-            }
-            return faqItem;
-            // let faqItem = $(`<div class="txt-16">Richtext</div>`)
-            // return faqItem;
-        } else {
-            let faqItem = $(`
-                <div class="home-faq-item" id="${el.uid.replaceAll('.','')}">
-                    <a href="#" class="home-faq-item-head w-inline-block">
-                        <div class="txt-16 home-faq-item-ques">${el.data.question}</div>
-                        <div class="ic-plus-wrap">
-                            <div class="ic-plus-inner"></div>
-                            <div class="ic-plus-inner mod-rotate"></div>
-                        </div>
-                    </a>
-                    <div class="home-faq-item-body">
-                        <p class="txt-16 home-faq--itemans">${el.data.answer}</p>
-                    </div>
-                    <div class="home-faq-bar">
-                        <div class="home-faq-bar-inner"></div>
-                    </div>
-                </div>
-            `);
-            return faqItem
-        }
-    }
-    function createFaqNew(el) {
-        let richTextArray = el.data.content_richtext;
-            let ans = PrismicDOM.RichText.asHtml(richTextArray);
-            let faqItem = $(`
-                <div class="home-faq-item" id="${el.uid.replaceAll('.','')}" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                    <a href="#" class="home-faq-item-head w-inline-block">
-                        <div class="txt-16 home-faq-item-ques" itemprop="name">${el.data.question}</div>
-                        <div class="ic-plus-wrap">
-                            <div class="ic-plus-inner"></div>
-                            <div class="ic-plus-inner mod-rotate"></div>
-                        </div>
-                    </a>
-                    <div class="home-faq-item-body" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-                        <div class="txt-16 home-faq--itemans" itemprop="text">${ans}</div>
-                    </div>
-                    <div class="home-faq-bar">
-                        <div class="home-faq-bar-inner"></div>
-                    </div>
-                </div>
-            `);
-            faqItem = updateRichtextFaqClass(faqItem)
-            return faqItem;
     }
     function pushFaqTracking(item) {
         let id = $(item).closest('.home-faq-item').attr('id')
@@ -676,47 +381,13 @@ const mainScript = () => {
             })
         }
     }
-    function createHtml(template, blog, hideAuthor = false) {
-        const html = template.clone();
-        html.find('[data-blog="img"]').attr('src',blog.data.thumbnail.url);
-        html.find('[data-blog="link"]').attr('href',`/article/${blog.uid}`)
-        html.find('[data-blog-dou="link"]').attr('href',`/article/${blog.uid}`)
-        changeText(html.find('[data-blog="category"]'), toTitle(blog.data.category.slug))
-        html.find('[data-blog="category"]').attr('href',`/blog-category/${blog.data.category.uid}`)
-        html.find('[data-blog-dou="category"]').attr('href',`/blog-category/${blog.data.category.uid}`)
-        changeText(html.find('[data-blog="title"]'), blog.data.title)
-        changeText(html.find('[data-blog="author"]'), toTitle(blog.data.author.uid))
-        getDetail('author', blog.data.author.uid).then(((res) => {
-            html.find('[data-blog="author-img"]').attr('src', res.data.thumbnail.url);
-            html.find('[data-blog-dou="author-link"]').attr('href', hideAuthor ? '#' : `/blog-author/${res.uid}`)
-        }));
-        changeText(html.find('[data-blog="sum"]'), blog.data.short_description)
-        changeText(html.find('[data-blog="date"]'), toDateFormat(blog.last_publication_date))
-        return html;
-    }
+    
     function createPartnerHTML(template, partner) {
         const html = template.clone();
         if (!partner.visibility) html.addClass('hidden');
         let imgurl = partner.image.url.includes('gif') ? partner.image.url.replace('?auto=format,compress', '') : partner.image.url;
         html.find('[data-partner="img"]').attr('src',imgurl);
         html.find('[data-partner="label"]').text(partner.label);
-        return html;
-    }
-    function createCEOProfileHTML(template, profile) {
-        const html = template.clone();
-        if (!profile.visibility) html.addClass('hidden');
-        html.find('[data-ceo-profile="img"]').attr('src', profile.logo.url);
-        html.find('[data-ceo-profile="label"]').text(profile.label[0].text);
-        return html;
-    }
-    function createTestiHTML(template, testi) {
-        const html = template.clone();
-        html.find('[data-testi="avatar"]').attr('src',testi.data.avatar.url);
-        html.find('[data-testi="platform"]').attr('src',testi.data.platform.url);
-        html.find('[data-testi="rate"]').text(testi.data.rating);
-        html.find('[data-testi="content"]').text(testi.data.content[0].text);
-        html.find('[data-testi="author"]').text(testi.data.author[0].text);
-        html.find('[data-testi="date"]').text(testi.data.date ? `${toDateFormat(testi.data.date).replace(',','')}` : '');
         return html;
     }
     let isScrolling = false;
@@ -739,19 +410,10 @@ const mainScript = () => {
         })
     }
     openFaqItem()
-    function backToBlog() {
-        window.location.href = window.location.origin + '/blog'
-    }
-    function handle404() {
-        window.location.href = window.location.origin + '/404'
-    }
+    
     // Scroll Events
     let header = $('.header');
-    if ($('.intro-wrap').length) {
-        // header.removeAttr('df-on-init')
-        $('.intro-wrap').addClass('loaded')
-        // setTimeout(() => $('.intro-wrap').addClass('loaded'), 50);
-    }
+    
     function suggestLanguage() {
         const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone.toLowerCase();
         if (userTimeZone.includes('asia') && (userTimeZone.includes('hong_kong') || userTimeZone.includes('shanghai') || userTimeZone.includes('beijing') || userTimeZone.includes('macau'))) {
@@ -1399,7 +1061,6 @@ const mainScript = () => {
         let SGDmediumRate = $('[data-rate-source-sgd="medium"]').text();
         let SGDsmallRate = $('[data-rate-source-sgd="small"]').text();
         let SGDotherRate = $('[data-rate-source-sgd="other"]').text();
-        // let SGDfixedRate = $('[data-rate-source-sgd="fixed"]').text();
         let SGDamount = $('[data-rate-source-sgd="amount"]').text();
         let SGDdate = $('[data-rate-source-sgd="date"]').text();
         let SGDwidthdrawal = $('[data-rate-source-sgd="withdrawal"]').text();
@@ -1757,38 +1418,6 @@ const mainScript = () => {
             .from('.sc-home-hero .home-hero-img-c-bg img, .sc-home-hero .home-hero-rate-wrap', {y: 40, duration: .6}, '<=0')
         }
         homeHeroIntro();
-        function getHomePartners() {
-            getAllDataByType('partners_logo').then((res) => {
-                if (res) {
-                    let allPartner = sortAsc(res, true, 'order');
-                    let template = $('.home-partner-inner').find('.home-partner-item').eq(0).clone();
-                    $('.home-partner-inner').html('')
-                    allPartner.forEach(({ data }, i) => {
-                        if (i < 5) createPartnerHTML(template, data).appendTo($('.home-partner-inner'))
-                    })
-                    homePartnerAppendDisclaimer();
-                    $('.home-partner-inner').find('.load-ske').addClass('loaded')
-                }
-            });
-            function homePartnerAppendDisclaimer() {
-                let columnGap = viewport.w > 767 ? '6rem' : '2.4rem';
-                if(viewport.w < 767 ) {
-                    $('.home-partner-item-img-wrap').css('height', '4.1rem')
-                }
-                $('.home-partner-inner').css('column-gap', columnGap);
-                $('.home-partner').css('height', 'auto');
-                $('.home-partner-item').css('justify-content', 'space-between')
-                let textTemplate = $('.home-partner-inner').find('.home-partner-item').eq(0).clone();
-                textTemplate.find('.home-partner-item-img-wrap').remove();
-                textTemplate.find('.home-partner-item-label').text('Chocolate Finance is not a bank. We’re an asset manager built to target a happier return on your spare cash.');
-                textTemplate.css('max-width', '18.6rem')
-                $('.home-partner-inner').find('.home-partner-item').eq(1).before(textTemplate);
-            }
-        }
-        // if(!isStagging()){
-        //     getHomePartners();
-
-        // }
         function homeHeroHandle() {
             let ribbonOffset, humanOffset;
             if ($(window).width() > 991) {
@@ -1920,8 +1549,6 @@ const mainScript = () => {
         }
         homeEnjoy();
         homeRich();
-        // if(isStagging()){ //liam bỏ isStagging() 
-        // }
         function homeBenefSetup() {
             if ($(window).outerWidth() > 991) {
                 let cloneSwiper = $('.home-benef-main.swiper').clone().removeClass('mod-bot').addClass('mod-top');
@@ -1929,37 +1556,6 @@ const mainScript = () => {
             } 
         }
         homeBenefSetup();
-        function homeBenefHanlde() {
-            let homeBenefCardsHigh = $('.home-benef-cards .home-benef-item-wrap.mod-high');
-            let homeBenefCardsLow = $('.home-benef-cards .home-benef-item-wrap.mod-low');
-            let homeBenefCardOffset = 7.6;
-            const homeBenefTl = new gsap.timeline({
-                scrollTrigger: {
-                    trigger: '.sc-home-benef',
-                    start: 'top bottom',
-                    end: 'bottom top',
-                    scrub: 1,
-                }
-            });
-            homeBenefTl
-            .fromTo('.home-benef-img-inner', {x: -20 * unit, y: 2.5 * unit}, {x: 20 * unit, y: -2.5 * unit, ease: 'none'})
-            .fromTo(homeBenefCardsHigh, {y: homeBenefCardOffset * unit, ease: 'none'}, {y: -2 * unit}, '0')
-            .fromTo(homeBenefCardsLow, {y: -homeBenefCardOffset / 2 * unit, ease: 'none'}, {y: 2 * unit}, '0')
-
-            if ($(window).width() > 991) {
-                const homeBenefSubTl = new gsap.timeline({
-                    scrollTrigger: {
-                        trigger: '.home-benef-sub-wrap',
-                        start: `-=${8 * unit} bottom`,
-                        end: `bottom+=${8 * unit} bottom`,
-                        scrub: 1,
-                        //markers: true,
-                    }
-                })
-                homeBenefSubTl.from('.home-benef-sub-inner', {yPercent: 100, ease: 'none'})
-            }
-        }
-        // homeBenefHanlde();
         function homeBenefHandleMobile() {
             if ($(window).outerWidth() <= 991 && $(window).outerWidth() > 767) {
                 console.log('init swiper')
@@ -2057,390 +1653,6 @@ const mainScript = () => {
             }
         };
         homeSecuHover();
-        function homeChartHandle() {
-            let c_Canvas = document.getElementById('myChart');
-            const ctx = c_Canvas.getContext("2d");
-            const chocoFin_bg = ctx.createLinearGradient(0, 0, 0, $('#myChart').height() - (4 * unit));
-            chocoFin_bg.addColorStop(0, 'rgba(228, 32, 130, .4)');
-            chocoFin_bg.addColorStop(1, 'rgba(228, 32, 130, 0)');
-            let dotBorderRad, lineWidth, dotBorderWidth;
-            let isFixed = false;
-            if ($(window).width() > 1920) {
-                dotBorderRad = .6;
-                dotBorderWidth = .6;
-                lineWidth = .2;
-            } else if ($(window).width() > 991) {
-                dotBorderRad = .6;
-                dotBorderWidth = .4;
-                lineWidth = .2;
-            } else {
-                dotBorderRad = .3;
-                lineWidth = .1;
-                dotBorderWidth = .4;
-            }
-
-            const limitAmount = parseInt($('[data-rate-source-sgd="amount"]').text().replace(',','')) * 1000;
-            const bigRate = parseFloat($('[data-rate-source-sgd="big"]').text()) / 100;
-            const smallRate = parseFloat($('[data-rate-source-sgd="small"]').text()) / 100;
-            const otherRate = parseFloat($('[data-rate-source-sgd="other"]').text()) / 100;
-            const fixedRate = parseFloat($('[data-rate-source-sgd="fixed"]').text()) / 100;
-            // const fixedRate = parseFloat(2) / 100;
-
-            const style = {
-                chocoFin: {
-                    color: 'rgba(228, 32, 130, 1)',
-                    bg: chocoFin_bg,
-                },
-                other: {
-                    color: 'rgba(112, 29, 27, 1)'
-                },
-                fixed: {
-                    color: 'rgb(186, 137, 79)'
-                }
-            }
-            const data = {
-                time: [],
-                chocoFin: [],
-                other: [],
-                fixed: [],
-                pointRadius: [],
-            };
-
-            fomularCf(100, 360);
-
-            let c_Data = {
-                type: 'line',
-                data: {
-                    labels: data.time,
-                    datasets: [
-                        {
-                            data: data.chocoFin,
-                            borderColor: style.chocoFin.color,
-                            fill: true,
-                            backgroundColor: style.chocoFin.bg,
-                        },
-                        {
-                            data: data.other,
-                            borderColor: style.other.color,
-                        },
-                        {
-                            data: data.fixed,
-                            borderColor: style.fixed.color,
-                        },
-                    ]
-                },
-            };
-            let c_Options = {
-                animation: true,
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        text: 'Chart Title',
-                        display: false,
-                    },
-                    legend: {
-                        display: false,
-                    },
-                    tooltip: {
-                        enabled: false,
-                    }
-                },
-                layout: {
-                    padding: 0,
-                },
-                clip: false,
-                scales: {
-                    x: {
-                        display: false,
-                        ticks: {
-                            padding: 100,
-                        },
-                        grid: {
-                            drawOnChartArea: false,
-                            display: false,
-                            drawTicks: false,
-                        }
-                    },
-                    y: {
-                        display: false,
-                        ticks: {
-                            padding: 0,
-                            //display: false, // display true to get offset top/left for chart
-                            stepSize: 1000
-                        },
-                        grid: {
-                            drawOnChartArea: false,
-                            //display: false,
-                            drawTicks: false,
-                        },
-                        //grace: '1%',
-                        // beginAtZero: false,
-                        offset: false,
-                        max: data.chocoFin[data.time.length - 1],
-                        min: data.chocoFin[0]
-                    }
-                },
-                elements: {
-                    point: {
-                        pointRadius: data.pointRadius,
-                        hitRadius: data.pointRadius,
-                        hoverRadius: data.pointRadius,
-                        hoverBorderWidth: dotBorderWidth * unit,
-                        hoverBackgroundColor: 'white',
-                        pointBackgroundColor: 'white',
-                        pointBorderWidth: dotBorderWidth * unit,
-                    },
-                    line: {
-                        borderWidth: .4 * unit,
-                    }
-                }
-            }
-
-            // Init Chart js + Scrolltrigger
-            let lineChart;
-
-            requestAnimationFrame(() => {
-                let homeChartInitTl = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: '.home-chart-wrap',
-                        start: 'top top+=40%',
-                        once: true,
-                        onEnter: () => {
-                            lineChart = new Chart(c_Canvas, {
-                                ...c_Data,
-                                options: {
-                                    ...c_Options
-                                }
-                            });
-                            updateChart(parseInt($('#chartBalance').val()), parseInt($('#chartTime').val()));
-                            setTimeout(() => {
-                                lineChart.options.animation = false;
-                            }, 400);
-                        }
-                    }
-                })
-                requestAnimationFrame(() => {
-                    homeChartInitTl.from('.chart-tip-box', {autoAlpha: 0, yPercent: 100, duration: .4, ease: 'Power1.easeInOut', stagger: 0.1, clearProps: 'all'})
-                    // .from('.home-chart-txt-top', {autoAlpha: 0, yPercent: 60, duration: .6, ease: 'Power1.easeInOut', clearProps: 'all'}, 0)
-                    // .from('.home-chart-txt-bot', {autoAlpha: 0, yPercent: 60, duration: .6, ease: 'Power1.easeInOut', clearProps: 'all'}, '<=.2')
-                    .from('.homt-chart-balance-start', {autoAlpha: 0, yPercent: 60, duration: .6, ease: 'Power1.easeInOut', clearProps: 'all'}, '<=.2')
-                })
-            })
-
-
-            function fomularCf(balance, time) {
-                data.time = [0]
-                for (let x = 1; x <= time; x++) {
-                    data.time.push(x)
-                }
-
-                data.pointRadius = [unit * dotBorderRad]
-                for (let x = 1; x <= time; x++) {
-                    if (x == time) {
-                        data.pointRadius.push(unit * dotBorderRad)
-                    } else {
-                        data.pointRadius.push(0)
-                    }
-                }
-
-                data.chocoFin = [balance];
-
-                let lastBalance = balance;
-                let result;
-                for (let x = 1; x <= time; x++) {
-                    if (lastBalance >= limitAmount) {
-                        result = (limitAmount * (1 + (bigRate / 12))) + ((lastBalance - limitAmount) * (1 + (smallRate / 12)));
-                    } else {
-                        result = lastBalance * (1 + (bigRate / 12));
-                    }
-                    data.chocoFin.push(result)
-                    lastBalance = result;
-                }
-
-                data.other = [balance];
-                for (let x = 1; x <= time; x++) {
-                    let formular = balance * Math.pow((1 + (otherRate / 12)), x);
-                    data.other.push(formular)
-                }
-
-                data.fixed = [balance];
-                for (let x = 1; x <= time; x++) {
-                    let formular = balance * (1 + ((fixedRate / 12) * x));
-                    data.fixed.push(formular)
-                }
-            }
-
-            function updateChart(balance, time) {
-                fomularCf(balance,time)
-                console.log('update chart' +balance)
-                //c_Options.animation = false;
-                lineChart.data.labels = data.time;
-                lineChart.data.datasets[0].data = data.chocoFin;
-                lineChart.data.datasets[1].data = data.other;
-                lineChart.data.datasets[2].data = data.fixed;
-
-                c_Options.scales.y.min = data.chocoFin[0];
-                c_Options.scales.y.max = data.chocoFin[time];
-                c_Options.elements.point.pointRadius = data.pointRadius;
-                c_Options.elements.point.hitRadius = data.pointRadius;
-                c_Options.elements.point.hoverRadius = data.pointRadius;
-                lineChart.options.scales.y = c_Options.scales.y;
-
-                lineChart.update();
-                let data_Cf = data.chocoFin[time];
-                let data_other = data.other[time];
-                let data_fixed = data.fixed[time];
-                $('.chart-tip-amount.amount-cf').text(` S${formatter(data_Cf)} `)
-                // $('.span-choco-white.re-total-cf').text(` ${formatter(data_Cf)} `)
-                $('.chart-tip-amount.amount-other').text(` S${formatter(data_other)} `)
-                $('.chart-tip-amount.amount-fixed').text(` S${formatter(data_fixed)} `)
-                // $('.chart-tip-amount.amount-fixed').text(` ${formatter(data_fixed)} `)
-                // $('.span-choco-white.re-total-other').text(` ${isFixed == true ? formatter(data_fixed) : formatter(data_other)} `)
-                let difference = data_Cf - data.chocoFin[0];
-                // $('.span-txt-link.re-earn-cf').text(` S${formatter(difference)} `);
-
-                if ($(window).width() > 991) {
-                    let bottomOther = (data_other - data.chocoFin[0]) / (data_Cf - data.chocoFin[0]) * 100;
-                    let bottomFixed = (data_fixed - data.chocoFin[0]) / (data_Cf - data.chocoFin[0]) * 100;
-                    // $('.chart-tip-box.box-other').css('bottom', `calc(${bottomOther}%)`)
-                    // $('.chart-tip-box.box-fixed').css('bottom', `calc(${bottomFixed}%)`)
-                    if (balance <= 200) {
-                        //$('.chart-tip-box.box-cf').addClass('box-cf-low')
-                    } else {
-                        //$('.chart-tip-box.box-cf').removeClass('box-cf-low')
-                    }
-                }
-            }
-            // Input events - Update chart
-
-            // $('input.input-slider').on('input', function() {
-            //     let balanceVal = $('#chartBalance').val();
-            //     let timeVal = $('#chartTime').val();
-            //     let timeYear = Math.floor(timeVal / 12);
-            //     let timeMonth = timeVal % 12;
-            //     let minVal = $(this).attr('min');
-            //     let maxVal = $(this).attr('max');
-            //     let percent = (($(this).val() - minVal) / (maxVal - minVal)) * 100;
-            //     $(this).css('background', 'linear-gradient(to right, #e42082 0%, #e42082 ' + percent + '%, #f0f0f0 ' + percent + '%, #f0f0f0 100%)');
-            //     if ($(this).attr('id') == 'chartBalance') {
-            //         balanceVal = 'S' + formatter($(this).val())
-            //         $('.homt-chart-balance-start').text(balanceVal)
-            //         $(this).parent().parent().find('.home-chart-ctrl-number').text(balanceVal)
-            //     } else if ($(this).attr('id') == 'chartTime') {
-            //         timeVal = $(this).val()
-            //         timeYear = Math.floor(timeVal / 12);
-            //         timeMonth = timeVal % 12;
-
-            //         let monthUnit, yearUnit, unitExtra;
-
-            //         if (timeYear == 1) {
-            //             yearUnit = 'year'
-            //         } else {
-            //             yearUnit = 'years'
-            //         }
-
-            //         if (timeMonth == 1) {
-            //             monthUnit = 'month'
-
-            //         } else {
-            //             monthUnit = 'months'
-            //         }
-
-            //         if (timeMonth == 0) {
-            //             if (timeYear == 1) {
-            //                 unitExtra = "'s"
-            //             } else {
-            //                 unitExtra = "'"
-            //             }
-            //         } else {
-            //             if (timeMonth == 1) {
-            //                 unitExtra = "'s"
-            //             } else {
-            //                 unitExtra = "'"
-            //             }
-            //         }
-            //         if (timeVal <= 244) {
-            //             $('.homt-chart-balance-start').addClass('mod-lift')
-            //         } else {
-            //             $('.homt-chart-balance-start').removeClass('mod-lift')
-            //         }
-            //         $('.home-chart-time-txt').text(`${timeYear == 0 ? '' : timeYear + ' ' + yearUnit}${timeMonth == 0 ? '' : ' ' + timeMonth + ' ' + monthUnit}${unitExtra} time`)
-            //         //$(this).parent().parent().find('.home-chart-ctrl-number').text(`${timeVal} ${monthUnit}`)
-            //         $(this).parent().parent().find('.home-chart-ctrl-number').text(`${timeYear == 0 ? '' : timeYear + ' ' + yearUnit} ${timeMonth == 0 ? '' : timeMonth + ' ' + monthUnit}`)
-            //     }
-            //     updateChart(parseInt($('#chartBalance').val()), parseInt($('#chartTime').val()));
-            // });
-            $('input.input-slider').on('input', function(e) {
-                let minVal = $(e.target).attr('min');
-                let maxVal = $(e.target).attr('max');
-                let percent = (($(e.target).val() - minVal) / (maxVal - minVal)) * 100;
-                $(e.target).css('background', 'linear-gradient(to right, #e42082 0%, #e42082 ' + percent + '%, #f0f0f0 ' + percent + '%, #f0f0f0 100%)');
-                let balanceVal = $('#chartBalance').val();
-                let timeVal = $('#chartTime').val();
-                let timeYear = Math.floor(timeVal / 12);
-                let timeMonth = timeVal % 12;
-                if ($(e.target).attr('id') == 'chartBalance') {
-                    balanceVal = 'HK' + formatter($(e.target).val(), false)
-                    console.log(balanceVal)
-                    $('.homt-chart-balance-start').text(balanceVal)
-                    $(e.target).parent().parent().find('.home-chart-ctrl-number').text(balanceVal)
-                } else if ($(e.target).attr('id') == 'chartTime') {
-                    timeVal = $(e.target).val()
-                    timeYear = Math.floor(timeVal / 12);
-                    timeMonth = timeVal % 12;
-
-                    let monthUnit, yearUnit, unitExtra;
-
-                    if (timeYear == 1) {
-                        yearUnit = 'year'
-                    } else {
-                        yearUnit = 'years'
-                    }
-
-                    if (timeMonth == 1) {
-                        monthUnit = 'month'
-
-                    } else {
-                        monthUnit = 'months'
-                    }
-
-                    if (timeMonth == 0) {
-                        if (timeYear == 1) {
-                            unitExtra = "'s"
-                        } else {
-                            unitExtra = "'"
-                        }
-                    } else {
-                        if (timeMonth == 1) {
-                            unitExtra = "'s"
-                        } else {
-                            unitExtra = "'"
-                        }
-                    }
-                    $('.home-chart-time-end').text(`${timeYear == 0 ? '' : timeYear + ' ' + yearUnit}${timeMonth == 0 ? '' : ' ' + timeMonth + ' ' + monthUnit}${unitExtra} time`)
-                    //$(e.target).parent().parent().find('.home-chart-ctrl-number').text(`${timeVal} ${monthUnit}`)
-                    $(e.target).parent().parent().find('.home-chart-ctrl-number').text(`${timeYear == 0 ? '' : timeYear + ' ' + yearUnit} ${timeMonth == 0 ? '' : timeMonth + ' ' + monthUnit}`)
-                }
-            })
-            $('input.input-slider').on('input', debounce(function(e) {
-                updateChart(parseInt($('#chartBalance').val()), parseInt($('#chartTime').val()));
-            }, 100))
-
-            const homeChartTl = new gsap.timeline({
-                scrollTrigger: {
-                    trigger: '.sc-home-graph',
-                    start: 'top bottom',
-                    end: `top+=20% top`,
-                    scrub: true,
-                }
-            });
-            // homeChartTl.fromTo('.home-benef-coin-wrap.mod-lg', {y: -4 * unit, ease: 'none'}, {y: 12 * unit})
-            // .fromTo('.home-benef-coin-wrap.mod-sm', {y: -3 * unit, ease: 'none'}, {y: 3 * unit}, '0')
-        };
-        if (isStagging() && $('#myChart').length > 0) {
-            homeChartHandle();
-        }
         function homeVisa() {
             if(viewport.w > 480){
                 var swiper = new Swiper(".home-visa-card-inner", {
@@ -2468,34 +1680,8 @@ const mainScript = () => {
                 });
             }
         }
-        if($('.sc-home-visa').length > 0){ //liam bỏ isStagging() 
+        if($('.sc-home-visa').length > 0){
             homeVisa();
-        }
-        function getHomeTesti() {
-            getAllDataByType('testi').then((res) => {
-                if (res) {
-                    let allTesti = sortAsc(res, true, 'order')
-                    let template;
-                    if ($(window).width() > 991) {
-                        template = $('.home-testi-col-inner.mod-left').find('.home-testi-item-wrap').eq(0).clone();
-                    } else {
-                        template = $('.swiper-wrapper.home-testi-col-inner').find('.swiper-slide.home-testi-item-wrap').eq(0).clone();
-                    }
-                    $('.home-testi-col-inner.mod-left').html('')
-                    $('.home-testi-col-inner.mod-right').html('')
-                    $('.swiper-wrapper.home-testi-col-inner').html('')
-                    allTesti.forEach((i) => {
-                        if ($(window).width() > 991) {
-                            createTestiHTML(template, i).appendTo($('.home-testi-col-inner.mod-left'))
-                            createTestiHTML(template, i).appendTo($('.home-testi-col-inner.mod-right'))
-                        } else {
-                            createTestiHTML(template, i).appendTo($('.swiper-wrapper.home-testi-col-inner'))
-                        }
-                    })
-                    $('.home-testi-col-inner').find('.load-ske').addClass('loaded')
-                    homeTestiHandleNew();
-                }
-            });
         }
         homeTestiHandleNew();
         function homeTestiHandleNew() {
@@ -2506,16 +1692,6 @@ const mainScript = () => {
                 for (let x = 0; x < rate; x++) {
                     stars.eq(x).addClass('rate-true')
                 }
-                // if(!isStagging()){
-                //     let store = $(this).find('.data-store').text();
-                //     if (store == 'Google') {
-                //         $(this).find('.home-testi-item-rate').addClass('mod-gg')
-                //     } else if (store == 'Apple Store') {
-                //         $(this).find('.home-testi-item-rate').addClass('mod-apple')
-                //     } else {
-                //         $(this).find('.home-testi-item-rate').addClass('mod-trust')
-                //     }
-                // }
             })
             if ($(window).width() > 991) {
                 $('.home-testi-main').on('mouseenter', function(e) {
@@ -2604,86 +1780,6 @@ const mainScript = () => {
             }
         }
         
-        function homeTestiHanlde() {
-            // Update rate
-            $('.home-testi-item').each(function(e) {
-                let rate = Number($(this).find('.data-rate').text());
-                let stars = $(this).find('.ic-star');
-                for (let x = 0; x < rate; x++) {
-                    stars.eq(x).addClass('rate-true')
-                }
-                let store = $(this).find('.data-store').text();
-                if (store == 'Google') {
-                    $(this).find('.home-testi-item-rate').addClass('mod-gg')
-                } else if (store == 'Apple Store') {
-                    $(this).find('.home-testi-item-rate').addClass('mod-apple')
-                } else {
-                    $(this).find('.home-testi-item-rate').addClass('mod-trust')
-                }
-            })
-
-            // Animation
-            if ($(window).width() > 991) {
-                let offsetVal = (($(window).height() - $('.sc-home-testi').height()) / 2) - 1;
-                let distanceVal;
-                if ($('.home-testi-col-inner.mod-right').height() >= $('.home-testi-col-inner.mod-left').height()) {
-                    distanceVal = $('.home-testi-col-inner.mod-right').height() - $('.home-testi-bg-wrap.background').height();
-                } else {
-                    distanceVal = $('.home-testi-col-inner.mod-left').height() - $('.home-testi-bg-wrap.background').height();
-                }
-
-                $('.wrapper').css('overflow', 'visible');
-                // gsap.set('.sc-home-testi', {top: offsetVal})
-                gsap.set('.sc-home-testi-wrap', {height: $('.home-testi-col-inner.mod-right').height() + $('.sc-home-testi').height()})
-                // Extra scub video
-                let homeTestiVid = document.querySelector('.mod-home-testi video')
-                const homeTestiTl = new gsap.timeline({
-                    scrollTrigger: {
-                        trigger: '.sc-home-testi-wrap',
-                        start: `-=${$('.sc-home-testi').height() / 2} top`,
-                        end: `bottom+=${$('.sc-home-testi').height()} bottom`,
-                        scrub: 1,
-                        onEnter() {
-                            homeTestiVid.play()
-                        },
-                    }
-                });
-                homeTestiTl.to('.home-testi-bar-inner', {scaleX: 1, ease: 'none'})
-                .fromTo('.home-testi-col-inner.mod-left', {yPercent: 0, ease: 'none'}, {y: -distanceVal, ease: 'none'},'0')
-                .fromTo('.home-testi-col-inner.mod-right', {yPercent: 0, ease: 'none'}, {y: distanceVal, ease: 'none'},'0')
-            } else {
-                const homeTestiSwiperMb = new Swiper('.swiper.home-testi-col-wrapper', {
-                    slidesPerView: "auto",
-                    spaceBetween: 1.6 * unit,
-                    breakpoints: {
-                        767: {
-                            slidesPerView: 2,
-                        }
-                    }
-                })
-
-                let homeTestiVid = document.querySelector('.mod-home-testi video')
-                const homeTestiTl = new gsap.timeline({
-                    scrollTrigger: {
-                        trigger: '.sc-home-testi-wrap',
-                        start: `top top+=25%`,
-                        end: `bottom+=${$('.sc-home-testi').height()} bottom`,
-                        onEnter() {
-                            homeTestiVid.play()
-                        }
-                    }
-                });
-            }
-            ScrollTrigger.create({
-                trigger: '.home-card-title',
-                start: 'center center',
-                end: 'center center',
-                once: true,
-                onEnter: () => {
-                    homeCardHandle()
-                }
-            })
-        };
         function homeGraphHandle() {
             let tl = gsap.timeline({
                 scrollTrigger: {
@@ -2733,90 +1829,10 @@ const mainScript = () => {
     
             });
         }
-        if( $('.sc-home-work').length > 0){ //liam bỏ isStagging() 
+        if( $('.sc-home-work').length > 0){ 
             homeWork();
         }
-        console.log('khanh')
-        function homeClimateHandle() {
-            let vid = document.querySelector('.vid-home-climate');
-
-            let odoSpeed = 3000;
-            let startValue = "1" + "000000" + "1";
-            let endValue = "1" + "451700" + "1";
-            let odometer = new Odometer({
-                el: $('.odometer').get(0),
-                value: startValue,
-                format: '(,ddd).ddd',
-                duration: odoSpeed,
-            })
-            odometer.render(startValue);
-
-            const homeClimateTl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: '.sc-home-climate',
-                    start: `-=${10 * unit} top`,
-                    //markers: true,
-                    onEnter: () => {
-                        odometer.update(endValue);
-                    },
-                    onLeaveBack: self => self.disable()
-                }
-            });
-
-            if ($(window).width() > 991) {
-                vid.currentTime = 0.;
-            }
-            const homeClimateVideoTl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: '.home-climate-vid-inner',
-                    start: `top top+=45%`,
-                    onEnter: () => {
-                        vid.currentTime = 0.;
-                        vid.play();
-                    },
-                    // onEnterBack: () => {
-                    //     vid.currentTime = 0.;
-                    //     vid.play();
-                    // }
-                }
-            });
-
-
-        };
-        //homeClimateHandle();
-        function homeClimateTl() {
-            let vid = document.querySelector('.vid-home-climate');
-            let tl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: '.sc-home-climate',
-                    start: "top top",
-                    end: "bottom+=100% top",
-                    //start: `-=${$('.sc-home-climate').height() / 2} top`,
-                    //end: `bottom+=${$('.sc-home-climate').height()} bottom`,
-                    //markers: true,
-                    //scrub: 1,
-                    //pin: true
-                }
-            })
-            tl.fromTo(vid, {currentTime: 3.2}, {currentTime: vid.duration, duration: 4.3})
-        }
-        //homeClimateTl();
-        function homeQrMove() {
-            $('.home-climate-btn-outer').css('pointer-events','none')
-            $('.home-climate-btn-wave-2').css('pointer-events', 'auto')
-            $(window).on('mousemove', function(e) {
-                e.preventDefault();
-                let elRect = $('.home-climate-btn-wave-2').get(0).getBoundingClientRect();
-                gsap.set('.home-climate-btn-wave-2', {
-                    x: (mousePosRaw.x - elRect.left - elRect.width / 2) / 30,
-                    y: (mousePosRaw.y - elRect.top - elRect.height / 2) / 30
-                })
-
-            })
-        }
-        //homeQrMove()
         function homeCardHandle() {
-            console.log('init home card')
             let allowPlay = true;
             const vidAction = {
                 reset: () => {
@@ -3021,17 +2037,10 @@ const mainScript = () => {
                 $(window).on('resize', debounce(function() {
                     getAllHeight()
                 }, 100))
-                // console.log(allHeight)
                 $('.how-expect-card').on('click', function(e) {
                     e.preventDefault()
                     let target = $(this).index()
                     if ($(this).hasClass('active')) {
-                        // $('.how-expect-card-wrap').removeClass('active-1 active-2 active-3')
-                        // $('.how-expect-card .how-expect-card-sub').attr('style', '')
-                        // $('.how-expect-card-wrap').attr('style', '')
-                        // $('.how-expect-card').attr('style', '')
-                        // $('.how-expect-card').removeClass('active')
-                        // $('.how-expect-card').removeClass('de-active')
                     } else {
                         activeBox(target, this)
                     }
@@ -3136,50 +2145,6 @@ const mainScript = () => {
         if($('.sc-abt-impact').length > 0) {
             aboutImpact();
         }
-        function aboutClimateHanlde() {
-            const aboutClimateTl = new gsap.timeline({
-                scrollTrigger: {
-                    trigger: '.sc-abt-climate',
-                    start: 'top bottom',
-                    end: 'bottom top',
-                    scrub: 1,
-                }
-            });
-            aboutClimateTl
-            .fromTo('.abt-climate-img-inner', {x: -20 * unit, y: 2.5 * unit}, {x: 20 * unit, y: -2.5 * unit, ease: 'none'})
-
-            if ($(window).width() <= 991) {
-                const aboutClimateSwiper = new Swiper('.swiper.abt-climate-swiper', {
-                    slidesPerView: 1,
-                    spaceBetween: 2.8 * unit,
-                    breakpoints: {
-                        768: {
-                            slidesPerView: 2,
-                            spaceBetween: 4 * unit,
-                        }
-                    }
-
-                })
-            }
-        }
-
-        function getCEOProfiles() {
-            getAllDataByType('ceo_profiles').then((res) => {
-                if (res) {
-                    let allProfile = sortAsc(res, true, 'order');
-                    let template = $('.abt-hero-logo-wrap').eq(0).clone();
-                    $('.abt-hero-logos').html('')
-                    allProfile.forEach(({ data }, i) => {
-                        if (i < 3) createCEOProfileHTML(template, data).appendTo($('.abt-hero-logos'))
-                    })
-                    $('.abt-hero-logos').removeClass('on-hide')
-                    $('.abt-hero-logos').find('.load-ske').addClass('loaded')
-                }
-            });
-        }
-        // getCEOProfiles();
-
-        //aboutClimateHanlde();
         function aboutGetFaq() {
             animateFaq();
             scrollToFaq();
@@ -3467,16 +2432,7 @@ const mainScript = () => {
         function updateURL() {
             let newPath;
             newPath = window.location.pathname.replace('/terms-and-policy','')
-            // console.log(newPath)
-            //Require 301 Redirect on Webflow
             history.replaceState({},'',`${newPath + hash}`)
-
-            if ((newPath == '/app-terms-and-conditions') || (newPath == '/privacy-policy')) {
-                //$('.header').remove();
-                //$('.nav').remove();
-                // $('.sc-home-cta-waitlist').remove();
-                // $('.sc-footer').remove();
-            }
         }
         updateURL();
 
@@ -3559,12 +2515,6 @@ const mainScript = () => {
                         } else {
                             $('.sc-term-sub-nav, .term-toc-wrap-overlay').removeClass('on-scroll-pushed')
                         }
-                        // if (inst.scroll > $('.term-outer-wrap').offset().top) {
-                        //     //$('.sc-term-sub-nav').addClass('on-scroll')
-                        // } else {
-                        //     //$('.term-toc-wrap-overlay').removeClass('on-cus-scroll')
-                        //     //$('.sc-term-sub-nav').removeClass('on-scroll')
-                        // }
                     }
                 })
             }
@@ -3670,13 +2620,10 @@ const mainScript = () => {
         createToc();
 
         function termTabInit() {
-            // $('.sc-term-main-inner-item').eq(0).fadeIn()
 
             const activeTab = (index) => {
                 $('.mod-term-subnav').removeClass('active');
                 $('.mod-term-subnav').eq(index).addClass('active');
-                // $(`.sc-term-main-inner-item`).fadeOut()
-                // $(`.sc-term-main-inner-item[data-subnav="${index}"]`).fadeIn();
             }
 
             $('.mod-term-subnav').on('click', function(e) {
@@ -3703,18 +2650,11 @@ const mainScript = () => {
                         $('.sc-term-sub-nav, .term-toc-wrap-overlay').removeClass('on-scroll-pushed')
                     }
                 } else {
-                    // $('.term-toc-wrap-overlay').addClass('on-scroll')
                     if ($('.header').hasClass('on-scroll') && !$('.header').hasClass('on-hide')) {
                         $('.sc-term-sub-nav, .term-toc-wrap-overlay').addClass('on-scroll')
                     } else {
                         $('.sc-term-sub-nav, .term-toc-wrap-overlay').removeClass('on-scroll')
                     }
-                    // if (inst.scroll > $('.term-outer-wrap').offset().top) {
-                    //     //$('.sc-term-sub-nav').addClass('on-scroll')
-                    // } else {
-                    //     //$('.term-toc-wrap-overlay').removeClass('on-cus-scroll')
-                    //     //$('.sc-term-sub-nav').removeClass('on-scroll')
-                    // }
                 }
             })
 
@@ -3778,16 +2718,9 @@ const mainScript = () => {
         termTocNav();
     }
     SCRIPT.faqsScript = () => {
-        function faqGetFaq() {
-            getAllDataByType('faq_category').then((res) => {
-                let allFaqCate = sortAsc(res)
-                updateUICate(allFaqCate)
-                updateAllFaq();
-            })
-        }
-            updateUICateNew();
-            faqInteraction();
-            animateFaq();
+        updateUICateNew();
+        faqInteraction();
+        animateFaq();
         $('.faq-main-wrap').attr(schemaFAQParentAttrs);
         function updateUICateNew() {
             const stickySearchIcon = $('.faq-cate-inner .faq-stick-srch').eq(0);
@@ -3814,95 +2747,6 @@ const mainScript = () => {
                     listSearch.append(newItemSearch);
                 })
             })
-        }
-        function updateUICate(allFaqCate) {
-            $('.faq-cate-list').html('');
-            const faqListTemplate = $('.faq-cate-wrap').eq(0).clone();
-            const faqTabTemplate = $('.faq-cate-btn-wrap').eq(0).clone();
-            const stickySearchIcon = $('.faq-cate-inner .faq-stick-srch').eq(0).clone();
-            $('.faq-cate-inner').html('');
-            $('.faq-cate-inner').append(stickySearchIcon)
-            $('.faq-main-wrap').html('');
-
-            allFaqCate.forEach((faqCate, i) => {
-                if (true) {
-                    //Tab
-                    let faqTabHtml = faqTabTemplate.clone();
-                    faqTabHtml.find('.faq-cate-btn').text(faqCate.data.name).attr('href',`#${faqCate.uid.replaceAll('.','')}`).attr('data-scrollTo', faqCate.uid.replaceAll('.',''))
-                    $('.faq-cate-inner').append(faqTabHtml)
-                    //List
-                    let faqListHtml = faqListTemplate.clone().attr('id',`${faqCate.uid.replaceAll('.','')}`);
-                    faqListHtml.find('.faq-cate-title-wrap').find('.faq-cate-title').text(faqCate.data.name)
-                    $('.faq-main-wrap').append(faqListHtml)
-                }
-                $('.sc-faq-main').find('.load-ske').addClass('loaded')
-            })
-        }
-        function updateAllFaq() {
-            const faqSearchItemTemplate = $('.faq-srch-item').eq(0).clone();
-            $('.faq-srch-drop-inner').html('')
-
-            getAllDataByType('faq').then((res) => {
-                let activeFaqItem = res.filter(i => i.data.cf_config[0])
-                let allFaqItem = sortAsc(activeFaqItem, true, 'order_on_faqs', true)
-                allFaqItem.forEach((i) => {
-                    if (true) {
-                        //Faq into their Category
-                        let parentSlot;
-                        if (i.data.faq_category.uid) {
-                            parentSlot = $(`.faq-cate-wrap[id="${i.data.faq_category.uid.replaceAll('.','')}"]`).find('.faq-cate-list')
-                            createFaqNew(i).appendTo(parentSlot)
-                        }
-
-                        //Search
-                        let faqSearchHtml = faqSearchItemTemplate.clone().attr('data-scrollto',`${i.uid.replaceAll('.','')}`)
-                        faqSearchHtml.find('.txt-16').text(i.data.question);
-                        //Search item answer
-                        faqSearchHtml.find('.hidden.data-faq-srch-body').append($(createFaqNew(i)).find('.home-faq--itemans').text().replaceAll('\n', ' '))
-                        $('.faq-srch-drop-inner').append(faqSearchHtml)
-                    }
-                })
-                animateFaq();
-                updateInterestRate('.faq-main-wrap');
-                faqInteraction();
-                cleanupEmptyCate();
-                $('.faq-main-wrap').find('.load-ske').addClass('loaded')
-
-                // init Swiper for sticky categories
-                let faqCateSwiper;
-                faqCateSwiper = new Swiper('.faq-cate-list-wrap.swiper', {
-                    slidesPerView: 'auto',
-                    mousewheel: true,
-                    on: {
-                        afterInit: () => {
-                            $('.faq-stick-srch.mod-tb').addClass('after-init')
-                        }
-                    }
-                })
-                // active on scroll
-                let allTitle = $('.faq-main-wrap .faq-cate-title');
-                lenis.on('scroll', function(e) {
-                    for (let x = 0; x < allTitle.length; x++) {
-                        let top = allTitle.eq(x).get(0).getBoundingClientRect().top - parseFloat(allTitle.eq(x).css('padding-top'));
-                        if (top > 0 && top < ($(window).height() / 5 + 100)) {
-                            $('.faq-cate-list-contain .faq-cate-btn').eq(x).addClass('active');
-                            $('.faq-cate-list-contain .faq-cate-btn').not(`:eq(${x})`).removeClass('active');
-                            faqCateSwiper.slideTo(x)
-                        }
-                    }
-                })
-                $('.txt-16.home-faq-empty').hide();
-            });
-        }
-        function cleanupEmptyCate() {
-            let cateItem = $('.faq-cate-wrap')
-            cateItem.each((index, el) => {
-                if ($(el).find('.faq-cate-list').text() == '') {
-                    $(el).remove();
-                    $(`.faq-cate-btn[href="#${$(el).attr('id')}"]`).closest('.faq-cate-btn-wrap').remove()
-                }
-            })
-
         }
         function faqInteraction() {
             setTimeout(() => {
@@ -4125,34 +2969,6 @@ const mainScript = () => {
                 console.log('fail')
             }
         });
-        // $('form.ctc-form').on('submit', function(e) {
-        //     e.preventDefault();
-        //     let formName = $(this).attr('data-name');
-        //     triggerContactBlueShift();
-        //     triggerFormSuccess('contact', formName);
-        //     $(this).trigger('reset')
-        //     return false;
-        // })
-        // $('form.ctc-form').find('[data-form="submit"]').on('click', function(e) {
-        //     e.preventDefault();
-        //     $('form.ctc-form').submit()
-        // })
-
-        function triggerContactBlueShift() {
-            // trigger blueshift for contact
-        }
-
-        function updateParam() {
-            let search = window.location.search.substring(1);
-            if (search.includes('=')) {
-                let param = JSON.parse('{"' + search.replace(/&/g, '","').replace(/=/g,'":"') + '"}', function(key, value) { return key===""?value:decodeURIComponent(value) })
-                if (param.subject == 'suggestion') {
-                    $('form.ctc-form').find('[data-name="subject"]').val('Make a suggestion')
-                }
-            }
-        }
-        // updateParam();
-
         $('.input-head').on('click', function(e) {
             if ($(this).closest('.input-select-wrap').find('.input-drop-wrap').hasClass('active')) {
                 $(this).closest('.input-select-wrap').find('.input-drop-wrap').removeClass('active')
@@ -4535,26 +3351,8 @@ const mainScript = () => {
         }
         corporateHero();
         function corporateGetFaq() {
-            // if(isStagging()){
-                console.log('faq stagging')
                 animateFaq();
                 scrollToFaq();
-            // }
-            // else {
-            //     getAllDataByType('faq').then((res) => {
-            //         if (res) {
-            //             let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_corporate_page)
-            //             let allFaq = sortAsc(activeFaqItem, true, 'order_on_corporate_page', true)
-            //             $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-            //             allFaq.forEach((i) => {
-            //                 createFaqNew(i).appendTo($('.home-faq-main'))
-            //             })
-            //             updateInterestRate('.home-faq-main');
-            //             $('.home-faq-main').find('.load-ske').addClass('loaded')
-            //             animateFaq();
-            //         }
-            //     });
-            // }
         }
         corporateGetFaq();
         function getHomePartners() {
@@ -4611,27 +3409,8 @@ const mainScript = () => {
         }
         cardFee();
         function cardGetFaq() {
-            // if(isStagging()){
-                console.log('faq stagging')
                 animateFaq();
                 scrollToFaq();
-            // }
-            // else {
-            //     getAllDataByType('faq').then((res) => {
-            //         console.log(res)
-            //         if (res) {
-            //             let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_card_page)
-            //             let allFaq = sortAsc(activeFaqItem, true, 'order_on_card_page', true)
-            //             $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-            //             allFaq.forEach((i) => {
-            //                 createFaqNew(i).appendTo($('.home-faq-main'))
-            //             })
-            //             updateInterestRate('.home-faq-main');
-            //             $('.home-faq-main').find('.load-ske').addClass('loaded')
-            //             animateFaq();
-            //         }
-            //     });
-            // }
         }
         cardGetFaq();
         function cardReason(){
@@ -4866,20 +3645,8 @@ const mainScript = () => {
         }
         homeCommunity();
         function thankGetFaq() {
-            getAllDataByType('faq').then((res) => {
-                if (res) {
-                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_homepage)
-                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_homepage', true)
-                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs)
-                    allFaq.forEach((i) => {
-                        createFaqNew(i).appendTo($('.home-faq-main'))
-                    })
-                    updateInterestRate('.home-faq-main');
-                    $('.home-faq-main').find('.load-ske').addClass('loaded')
-                    animateFaq();
-                    scrollToFaq();
-                }
-            });
+            animateFaq();
+            scrollToFaq();
         }
         thankGetFaq();
     }
@@ -5056,20 +3823,9 @@ const mainScript = () => {
         }
         usdSecu();
         function homeGetFaq() {
-            getAllDataByType('faq').then((res) => {
-                if (res) {
-                    let activeFaqItem = res.filter(i => i.data.cf_config[0]?.show_on_homepage)
-                    let allFaq = sortAsc(activeFaqItem, true, 'order_on_homepage', true)
-                    $('.home-faq-main').html('').attr(schemaFAQParentAttrs);
-                    allFaq.forEach((i) => {
-                        createFaqNew(i).appendTo($('.home-faq-main'))
-                    })
-                    updateInterestRate('.home-faq-main');
-                    $('.home-faq-main').find('.load-ske').addClass('loaded')
-                    animateFaq();
-                    scrollToFaq();
-                }
-            });
+            animateFaq();
+            scrollToFaq();
+
         }
         homeGetFaq();
         
