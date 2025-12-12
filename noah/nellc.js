@@ -704,7 +704,6 @@ const script = () => {
                 let offsetBottom = $(window).height() - $('.home-hero-front-main-img').get(0).getBoundingClientRect().bottom;
                 let scaleOffSet = $('.home-hero-main-img.full').height() / $('.home-hero-front-main-img-inner').height();
                 if (viewport.w <= 767) {
-                    // scaleOffSet = $('.home-hero-main-img.full').height() / $('.home-hero-front-main-img-inner').height();
                     gsap.set('.home-hero-main-img.full .home-hero-main-img-inner img', { objectPosition: `45% bottom` });
                 }
                 this.tl
