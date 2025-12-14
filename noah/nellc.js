@@ -1830,6 +1830,11 @@ const script = () => {
                             type: 'bullets',
                             bulletClass: 'hub-hero-pagin-dot',
                             bulletActiveClass: 'active'
+                        },
+                        navigation: {
+                            nextEl: '.hub-hero-main-ctrl-arr.next',
+                            prevEl: '.hub-hero-main-ctrl-arr.prev',
+                            disabledClass: 'disabled',
                         }
                     });
                 }
@@ -1900,7 +1905,7 @@ const script = () => {
                         navigation: {
                             nextEl: '.article-hero-other-ctrl-arr.next',
                             prevEl: '.article-hero-other-ctrl-arr.prev',
-                            disabledClass: 'is-list-pagination-disabled',
+                            disabledClass: 'disabled',
                         }
                     });
                     new Swiper('.article-hero-main .article-hero-cms:not(.main-one)', {
@@ -1946,15 +1951,15 @@ const script = () => {
                             $paginationContainer.show();
 
                             if (currentPage >= maxPage) {
-                                $nextBtn.addClass('is-list-pagination-disabled');
+                                $nextBtn.addClass('disabled');
                             } else {
-                                $nextBtn.removeClass('is-list-pagination-disabled');
+                                $nextBtn.removeClass('disabled');
                             }
 
                             if (currentPage <= 1) {
-                                $prevBtn.addClass('is-list-pagination-disabled');
+                                $prevBtn.addClass('disabled');
                             } else {
-                                $prevBtn.removeClass('is-list-pagination-disabled');
+                                $prevBtn.removeClass('disabled');
                             }
                         }
                     };
