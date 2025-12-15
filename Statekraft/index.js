@@ -443,21 +443,28 @@ const script = () => {
             animationScrub() {
             }
             interact() {
-                if (viewport.w <= 991) {
-                    $('.home-pricing-main').addClass('swiper')
-                    $('.home-pricing-list').addClass('swiper-wrapper')
-                    $('.home-pricing-item').addClass('swiper-slide');
-                    $('.home-pricing-list').css('gap', 0);
-                    let swiper = new Swiper('.home-pricing-main', {
-                        slidesPerView: 'auto',
-                        spaceBetween: cvUnit(24, 'rem'),
-                        centeredSlides: true,
-                        initialSlide: 1
-                    });
-                }
-                $('.home-pricing-btn').each(function (idx, item) {
-                    $(this).attr('href', `${$(this).attr('href')}#${$(this).attr('data-plan')}`);
-                })
+                $('.home-pricing-main').addClass('swiper')
+                $('.home-pricing-list').addClass('swiper-wrapper')
+                $('.home-pricing-item').addClass('swiper-slide');
+                $('.home-pricing-list').css('gap', 0);
+                let swiper = new Swiper('.home-pricing-main', {
+                    slidesPerView: 'auto',
+                    spaceBetween: cvUnit(24, 'rem'),
+                    centeredSlides: true,
+                    initialSlide: 1,
+                    breakpoints: {
+                        768: {
+                            centeredSlides: false,
+                            initialSlide: 0
+                        }
+                    }
+                });
+                // $('.home-pricing-btn').each(function (idx, item) {
+                //     $(this).attr('href', `${$(this).attr('href')}#${$(this).attr('data-plan')}`);
+                // })
+                $('.home-pricing-toggle-btn, .home-pricing-toggle-title').on('click', function (e) {
+                    $('.home-pricing-toggle').toggleClass('per-month');
+                });
             }
             destroy() {
                 super.destroy();
