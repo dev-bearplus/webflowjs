@@ -503,6 +503,40 @@ const script = () => {
             destroy() {
                 super.destroy();
             }
+        },
+        'home-review-wrap': class extends TriggerSetup {
+            constructor() {
+                super();
+                this.onTrigger = () => {
+                    this.animationReveal();
+                    this.animationScrub();
+                    this.interact();
+                };
+            }
+            animationReveal() {
+            }
+            animationScrub() {
+            }
+            interact() {
+                if (viewport.w <= 767) {
+                    $('.home-review-main').addClass('swiper')
+                    $('.home-review-list').addClass('swiper-wrapper')
+                    $('.home-review-item').addClass('swiper-slide')
+                    $('.home-review-list').css('gap', 0);
+                    let swiper = new Swiper('.home-review-main', {
+                        slidesPerView: 'auto',
+                        spaceBetween: cvUnit(16, 'rem'),
+                        pagination: {
+                            el: '.home-review-pagin',
+                            bulletClass: 'home-review-pagin-item',
+                            bulletActiveClass: 'active'
+                        }
+                    });
+                }
+            }
+            destroy() {
+                super.destroy();
+            }
         }
     }
     const SignUpPage = {
