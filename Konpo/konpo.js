@@ -2249,7 +2249,7 @@ const mainScript = () => {
             lenis.scrollTo(target)
         })
     }
-    function initTitleGrid(el, rgb = {x: '46', y: '46', z: '46'}) {
+    function initTitleGrid(el, rgb = { x: '46', y: '46', z: '46' }) {
         let canvas = el.get(0),
             ctx = canvas.getContext('2d'),
             points = [],
@@ -5183,7 +5183,52 @@ const mainScript = () => {
     SCRIPT.adsScript = {
         namespace: 'ads',
         afterEnter(data) {
-            console.log('enter Ads')
+            function adsHero(data) {
+                console.log("run")
+                ScrollTrigger.create({
+                    trigger: $(data.next.container).find('.ads-hero'),
+                    start: 'top bottom',
+                    once: true,
+                    onEnter: () => {
+                        if ($(window).width() < 767) {
+                            $(data.next.container).find('.ads-hero-client-logo img[loading="lazy"]').removeAttr('loading');
+                        }
+                        let items = $(data.next.container).find('.ads-hero-client');
+                        let speed;
+                        if ($(window).width() > 767) {
+                            speed = 90;
+                        } else {
+                            speed = 45;
+                        }
+                        items.each((idx, el) => {
+                            let cloneItem = $(el).find('.ads-hero-client-cms').eq(0).clone();
+                            cloneItem.clone().appendTo(el)
+                            requestAnimationFrame(() => {
+                                let tlDur = Math.floor($(el).find('.ads-hero-client-cms').eq(0).width() / speed)
+                                $(el).find('.ads-hero-client-cms').css('--marqueeDur', `${tlDur}s`)
+
+                                // let tlMarquee = gsap.timeline({
+                                //     repeat: -1,
+                                //     onUpdate: () => {
+                                //         if ($(window).width() > 767) {
+                                //             // let tlDir = lenis.direction >= 0 ? 1 : -1;
+                                //             let tlDir = 1
+                                //             gsap.to(tlMarquee, {timeScale: tlDir * Math.min(Math.max(lenis.velocity/2, 1), 4), duration: .1, ease: 'none'})
+                                //         }
+                                //     }
+                                // })
+                                // tlMarquee
+                                // .to($(el).find('.home-client-marquee-cms'), {xPercent: $(el).hasClass('left') ? -100 : 100, duration: tlDur,  ease: 'none'}, '0')
+                                // tlMarquee.seek(28800)
+                            })
+                        })
+                        requestAnimationFrame(() => {
+                            items.find('.ads-hero-client-cms').addClass('anim')
+                        })
+                    }
+                })
+            }
+            adsHero(data)
         },
         beforeLeave() {
         },
