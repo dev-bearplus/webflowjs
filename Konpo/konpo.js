@@ -11,7 +11,7 @@ const mainScript = () => {
     gsap.config({ nullTargetWarn: false });
 
     const isStaging = window.location.href.indexOf('webflow') > -1 ? true : false
-    
+
     const lenis = new Lenis({
         lerp: false,
         duration: 1.6
@@ -1675,14 +1675,14 @@ const mainScript = () => {
                     lastImages = targetElement.find('img').attr('src')
                     if (idx == 1) {
                         gsap.set(card.closest('.home-hero-client-item'), {zIndex: 10})
-                    } 
+                    }
                     let startPosition = targetElement.get(0).getBoundingClientRect().left - card.getBoundingClientRect().left
                     gsap.set(card, {x: startPosition })
                 } else {
                     lastImages = $('.home-hero-client-item-inner').eq(allClientCard.length - 1).find('img').attr('src')
                     if (idx == allClientCard.length - 1) {
                         gsap.set(card.closest('.home-hero-client-item'), {zIndex: 10})
-                    } 
+                    }
                     let startPosition = targetElement.get(0).getBoundingClientRect().left - card.getBoundingClientRect().left
                     gsap.set(card, {x: startPosition })
                 }
@@ -1729,7 +1729,7 @@ const mainScript = () => {
                 } else {
                     scaleFactor = ($(window).width() / $('.loader-img-inner').width()) * 2;
                 }
-                
+
                 distanceX = targetElement.get(0).getBoundingClientRect().left - startElement.get(0).getBoundingClientRect().left
                 distanceY = targetElement.get(0).getBoundingClientRect().top - startElement.get(0).getBoundingClientRect().top
                 $('.loader-img-inner').each((idx, el) => {
@@ -1964,7 +1964,7 @@ const mainScript = () => {
     function transitionOnce(data) {
         // Active Client news popup
         $('.client-news-popup-wrap').removeClass('loading')
-        
+
         const animationSettings = {
             duration: 1.6,
             itemDelay: 0.08
@@ -1972,6 +1972,7 @@ const mainScript = () => {
         $('.trans').addClass('loaded')
         $('.loader-idle').addClass('done')
         if (data.next.namespace == 'home') {
+            console.log("run")
             if (window.location.search == '?contact') {
                 $('.main-grid').addClass('loaded')
                 allowAnim = true;
@@ -2521,7 +2522,7 @@ const mainScript = () => {
             if ($('.home-hero-thumb').length > 0) {
                 homeHeroVid()
             }
-            
+
             function homeHeroClient() {
                 console.log('hello')
                 // Setup
@@ -2567,10 +2568,10 @@ const mainScript = () => {
                         })
                     }
                 }
-                
+
                 // Anim on Scroll
                 if ($(window).width() >= 767) {
-                    // let maxHeight; 
+                    // let maxHeight;
                     // maxHeight = $('.home-hero-client-cms-wrap').get(0).getBoundingClientRect().height
                     // let tl = gsap.timeline({
                     //     scrollTrigger: {
@@ -2691,11 +2692,11 @@ const mainScript = () => {
 
                 if ($(window).width() >= 768){
                     const allLinksLine = $('.home-abt-sub-wrap-p .hover-un')
-                    
+
                     const homeAbtLabel = new SplitText('.home-abt-label', typeOpts.words)
                     const homeAbtSubTxt = new SplitText('.home-abt-sub-wrap-p', typeOpts.words)
-                    gsap.set(allLinksLine, {'--line-width': '0%'})    
-                    
+                    gsap.set(allLinksLine, {'--line-width': '0%'})
+
                     gsap.set(homeAbtSubTxt.lines, {overflow: 'hidden'})
                     let tlAbt = gsap.timeline({
                         scrollTrigger: {
@@ -3038,7 +3039,7 @@ const mainScript = () => {
                             // .to($('.home-testi-bg').eq(3), {y: '-20vh', autoAlpha: 1, duration: 1, ease: 'power1.inOut'}, '<=0')
 
                             .to($('.home-testi-item-body').eq(3), {height: 'auto', duration: .25}, '>=0')
-                            
+
                         } else {
                             $('.home-testi-item').eq(0).addClass('active')
                             $('.home-testi-bg-item').eq(0).addClass('active')
@@ -5179,6 +5180,14 @@ const mainScript = () => {
             $('.header .ic-playg').attr('href', '/playground')
         }
     }
+    SCRIPT.adsScript = {
+        namespace: 'ads',
+        afterEnter(data) {
+            console.log('enter Ads')
+        },
+        beforeLeave() {
+        },
+    }
     const VIEWS = [
         SCRIPT.homeScript,
         SCRIPT.abtScript,
@@ -5188,7 +5197,8 @@ const mainScript = () => {
         SCRIPT.termAndPoliciesScript,
         SCRIPT.notfoundScript,
         SCRIPT.contactScript,
-        SCRIPT.playgroundScript
+        SCRIPT.playgroundScript,
+        SCRIPT.adsScript
     ]
     barba.init({
         preventRunning: true,

@@ -375,6 +375,11 @@ const script = () => {
                 let swiperVal = new Swiper('.home-val-main', {
                     slidesPerView: 'auto',
                     spaceBetween: cvUnit(24, 'rem'),
+                    pagination: {
+                        el: '.home-val-pagin',
+                        bulletClass: 'home-val-pagin-item',
+                        bulletActiveClass: 'active'
+                    }
                 })
                 if ($(window).width() > 991) {
                     let tl = gsap.timeline({
