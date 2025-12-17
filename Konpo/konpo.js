@@ -118,6 +118,42 @@ const mainScript = () => {
 
     const isProjectToProject = (current, next) => checkSameNamespace("projDtl", current, next);
 
+    const documentHeightObserver = (action) => {
+        let resizeObserver;
+        let debounceTimer;
+        let observerEl = document.documentElement;
+
+        let previousHeight = observerEl?.scrollHeight;
+        function onRefresh() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                const currentHeight = observerEl.scrollHeight;
+				if (currentHeight !== previousHeight) {
+                    console.log("Document height changed. Refreshing ScrollTrigger...");
+                    if (lenis) {
+                        lenis.resize();
+                    }
+                    ScrollTrigger.getAll().forEach(trigger => {
+                        if (trigger.progress === 0) {
+                            trigger.refresh();
+                        }
+                    });
+                    previousHeight = currentHeight;
+                }
+            }, 200);
+        }
+
+        if (action === "init") {
+            if (!observerEl) return;
+            resizeObserver = new ResizeObserver(onRefresh);
+            resizeObserver.observe(observerEl);
+        } else if (action === "disconnect") {
+            if (resizeObserver) {
+                resizeObserver.disconnect();
+            }
+        }
+    };
+
     // Utils vars
     let typeOpts = {
         lines: { type: 'lines', linesClass: 'g-lines'},
@@ -2167,6 +2203,7 @@ const mainScript = () => {
         lenis.start()
         addNavActiveLink(data)
         addStickyFooter(data)
+        documentHeightObserver('disconnect')
         const yearDates = $(data.next.container).find('[data-year]')
         yearDates.each((idx, el) => {
             $(el).text(dayjs(Date.now()).format('YYYY'))
@@ -5184,7 +5221,6 @@ const mainScript = () => {
         namespace: 'ads',
         afterEnter(data) {
             function adsHero(data) {
-                console.log("run")
                 ScrollTrigger.create({
                     trigger: $(data.next.container).find('.ads-hero'),
                     start: 'top bottom',
@@ -5229,6 +5265,55 @@ const mainScript = () => {
                 })
             }
             adsHero(data)
+
+            function adsReview(data) {
+                if ($(window).width() > 991) {
+                    if ($(data.next.container).find('.ads-review [data-move="wrap"]').length) {
+                        if ($(data.next.container).find('.ads-review [data-move="wrap"]').find('.title-dot-canvas').length) {
+                            requestAnimationFrame(() => {
+                                initTitleGrid($(data.next.container).find('.ads-review [data-move="wrap"]').find('.title-dot-canvas'))
+                            })
+                        }
+                    }
+                }
+            }
+            adsReview(data)
+
+            function adsClient(data) {
+                //$(data.next.container).find('.abt-val-imgs-stick').css('top', ($(window).height() - $(data.next.container).find('.abt-val-imgs-stick').height())/2);
+                $(data.next.container).find('.ads-client-asset-stick').css('margin-block', ($('.ads-client-asset-item').get(0).offsetTop * -1) + parseRem(65));
+                const items = $(data.next.container).find('.ads-client .ads-client-item');
+                $(data.next.container).find('.ads-client-asset-stick .ads-client-asset-item').eq(0).addClass('active')
+                items.each((idx, el) => {
+                    console.log(el)
+                    ScrollTrigger.create({
+                        trigger: el,
+                        start: 'top top+=35%',
+                        end: 'bottom top+=35%',
+                        onEnter: () => {
+                            $(data.next.container).find('.ads-client-asset-stick .ads-client-asset-item').removeClass('active')
+                            $(data.next.container).find('.ads-client-asset-stick .ads-client-asset-item').eq(idx).addClass('active')
+                        },
+                        onEnterBack: () => {
+                            $(data.next.container).find('.ads-client-asset-stick .ads-client-asset-item').removeClass('active')
+                            $(data.next.container).find('.ads-client-asset-stick .ads-client-asset-item').eq(idx).addClass('active')
+                        }
+                    })
+                })
+            }
+            adsClient(data)
+
+            function adsFAQ(data) {
+                $('.ads-faq-ans').hide();
+                $('.ads-faq-item').on('click', function(e) {
+                    e.preventDefault();
+                    $(this).find('.ads-faq-ques').slideToggle();
+                    $(this).find('.ads-faq-ans').slideToggle();
+                    $(this).siblings().find('.ads-faq-ques').slideDown();
+                    $(this).siblings().find('.ads-faq-ans').slideUp();
+                })
+            }
+            adsFAQ(data)
         },
         beforeLeave() {
         },
@@ -5262,6 +5347,7 @@ const mainScript = () => {
                 handleNav.isProjDtl(data)
                 // textReplace(data)
                 transitionOnce(data)
+                documentHeightObserver('init')
                 if ($(window).width() > 991) {
                     scrollProg(data.next.container)
                 }
@@ -5274,6 +5360,7 @@ const mainScript = () => {
                 if ($(window).width() > 767 && !isTouchDevice()) {
                     handleCursor.reUpdateHtml(data)
                 }
+                documentHeightObserver('init')
                 handleNav.isProjDtl(data)
                 await transitionEnter(data)
                 if ($(window).width() > 991) {
