@@ -5220,98 +5220,6 @@ const mainScript = () => {
     SCRIPT.adsScript = {
         namespace: 'ads',
         afterEnter(data) {
-            function adsHero(data) {
-                ScrollTrigger.create({
-                    trigger: $(data.next.container).find('.ads-hero'),
-                    start: 'top bottom',
-                    once: true,
-                    onEnter: () => {
-                        if ($(window).width() < 767) {
-                            $(data.next.container).find('.ads-hero-client-logo img[loading="lazy"]').removeAttr('loading');
-                        }
-                        let items = $(data.next.container).find('.ads-hero-client');
-                        let speed;
-                        if ($(window).width() > 767) {
-                            speed = 90;
-                        } else {
-                            speed = 45;
-                        }
-                        items.each((idx, el) => {
-                            let cloneItem = $(el).find('.ads-hero-client-cms').eq(0).clone();
-                            cloneItem.clone().appendTo(el)
-                            requestAnimationFrame(() => {
-                                let tlDur = Math.floor($(el).find('.ads-hero-client-cms').eq(0).width() / speed)
-                                $(el).find('.ads-hero-client-cms').css('--marqueeDur', `${tlDur}s`)
-
-                                // let tlMarquee = gsap.timeline({
-                                //     repeat: -1,
-                                //     onUpdate: () => {
-                                //         if ($(window).width() > 767) {
-                                //             // let tlDir = lenis.direction >= 0 ? 1 : -1;
-                                //             let tlDir = 1
-                                //             gsap.to(tlMarquee, {timeScale: tlDir * Math.min(Math.max(lenis.velocity/2, 1), 4), duration: .1, ease: 'none'})
-                                //         }
-                                //     }
-                                // })
-                                // tlMarquee
-                                // .to($(el).find('.home-client-marquee-cms'), {xPercent: $(el).hasClass('left') ? -100 : 100, duration: tlDur,  ease: 'none'}, '0')
-                                // tlMarquee.seek(28800)
-                            })
-                        })
-                        requestAnimationFrame(() => {
-                            items.find('.ads-hero-client-cms').addClass('anim')
-                        })
-                    }
-                })
-            }
-            adsHero(data)
-
-            function adsReview(data) {
-                if ($(window).width() > 991) {
-                    if ($(data.next.container).find('.ads-review [data-move="wrap"]').length) {
-                        if ($(data.next.container).find('.ads-review [data-move="wrap"]').find('.title-dot-canvas').length) {
-                            requestAnimationFrame(() => {
-                                initTitleGrid($(data.next.container).find('.ads-review [data-move="wrap"]').find('.title-dot-canvas'))
-                            })
-                        }
-                    }
-                }
-            }
-            adsReview(data)
-
-            function adsClient(data) {
-                //$(data.next.container).find('.abt-val-imgs-stick').css('top', ($(window).height() - $(data.next.container).find('.abt-val-imgs-stick').height())/2);
-                $(data.next.container).find('.ads-client-asset-stick').css('margin-block', ($('.ads-client-asset-item').get(0).offsetTop * -1) + parseRem(65));
-                const items = $(data.next.container).find('.ads-client .ads-client-item');
-                $(data.next.container).find('.ads-client-asset-stick .ads-client-asset-item').eq(0).addClass('active')
-                items.each((idx, el) => {
-                    console.log(el)
-                    ScrollTrigger.create({
-                        trigger: el,
-                        start: 'top top+=35%',
-                        end: 'bottom top+=35%',
-                        onEnter: () => {
-                            $(data.next.container).find('.ads-client-asset-stick .ads-client-asset-item').removeClass('active')
-                            $(data.next.container).find('.ads-client-asset-stick .ads-client-asset-item').eq(idx).addClass('active')
-                        },
-                        onEnterBack: () => {
-                            $(data.next.container).find('.ads-client-asset-stick .ads-client-asset-item').removeClass('active')
-                            $(data.next.container).find('.ads-client-asset-stick .ads-client-asset-item').eq(idx).addClass('active')
-                        }
-                    })
-                })
-            }
-            adsClient(data)
-
-            function adsFAQ(data) {
-                $('.ads-faq-ans').hide();
-                $('.ads-faq-ques').on('click', function(e) {
-                    e.preventDefault();
-                    $(this).siblings('.ads-faq-ans').slideToggle();
-                    $(this).parent().siblings().find('.ads-faq-ans').slideUp();
-                })
-            }
-            adsFAQ(data)
         },
         beforeLeave() {
         },
@@ -5413,4 +5321,9 @@ const mainScript = () => {
     })
 }
 
-window.onload = mainScript;
+
+window.onload = (() => {
+    if (!window.location.pathname.includes('ai-design-system')) {
+        mainScript();
+    }
+})();
