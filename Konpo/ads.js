@@ -701,21 +701,29 @@ const landingScript = () => {
             $('[data-popup="book"]').on('click', function(e) {
                 e.preventDefault();
                 if ($('.ads-ctc-popup').hasClass('active')) {
+                    headerOnClose()
                     handleContactForm.close()
                 } else {
+                    headerOnOpen()
                     handleContactForm.open()
                 }
             })
-            $('.ads-ctc-popup-bg').on('click', function(e) {
-                e.preventDefault();
-                if (!$('.ads-ctc-popup-inner:hover').length) {
-                    handleContactForm.close()
-                }
-            })
+            if ($(window).width() > 767) {
+                $('.ads-ctc-popup-bg').on('click', function(e) {
+                    e.preventDefault();
+                    if (!$('.ads-ctc-popup-inner:hover').length) {
+                        headerOnClose()
+                        handleContactForm.close()
+                    }
+                })
+            }
         },
         open: () => {
+            $(window).width() <= 767 && $('.header-btn-ctc').addClass('active');
             $('.ads-ctc-popup').addClass('active')
-            $('.ads-ctc-popup-bg').addClass('active')
+            setTimeout(() => {
+                $('.ads-ctc-popup-bg').addClass('active')
+            }, $(window).width() > 767 ? 0 : 400);
             requestAnimationFrame(() => {
             })
 
@@ -729,16 +737,18 @@ const landingScript = () => {
             .to('.ads-ctc-popup-inner', {scale: 1, duration: .6, transformOrigin: '100% 0%', ease: 'power2.inOut'})
         },
         close: () => {
-
+            $(window).width() <= 767 && $('.header-btn-ctc').removeClass('active');
             let tlClosePop = gsap.timeline({
 
             })
             tlClosePop
-                .fromTo('.ads-ctc-popup-inner', { transformOrigin: '0% 100%' }, { scale: 0, duration: .6, transformOrigin: '100% 100%', ease: 'power2.inOut' })
+                .fromTo('.ads-ctc-popup-inner', { transformOrigin: '0% 100%' }, { scale: 0, duration: .6, transformOrigin: '0% 100%', ease: 'power2.inOut' })
             setTimeout(() => {
                 $('.ads-ctc-popup').removeClass('active')
             }, 600);
             $('.ads-ctc-popup-bg').removeClass('active')
+
+
             handleContactForm.reset()
         },
         reset: () => {
@@ -760,14 +770,29 @@ const landingScript = () => {
         },
         update: (data) => {
             $('[data-popup="book"]').on('click', function(e) {
+                console.log("click")
                 e.preventDefault();
                 if ($('.ads-ctc-popup').hasClass('active')) {
                     handleContactForm.close()
+                    headerOnClose()
                 } else {
                     handleContactForm.open()
+                    headerOnOpen()
                 }
             })
         },
+    }
+    function headerOnOpen() {
+        $('.header-top').addClass('on-open')
+        gsap.set('.header', {'mix-blend-mode': 'normal', 'filter': 'invert(0)'})
+        $('.header').addClass('on-open')
+    }
+    function headerOnClose() {
+        $('.header-top').removeClass('on-open')
+        $('.header').removeClass('on-open')
+        setTimeout(() => {
+            gsap.set('.header', {'mix-blend-mode': 'difference', 'filter': 'invert(1)'})
+        }, 300);
     }
     function adsHero() {
         ScrollTrigger.create({
@@ -831,7 +856,7 @@ const landingScript = () => {
 
     function adsClient() {
         //$(data.next.container).find('.abt-val-imgs-stick').css('top', ($(window).height() - $(data.next.container).find('.abt-val-imgs-stick').height())/2);
-        $('.ads-client-asset-stick').css('margin-block', ($('.ads-client-asset-item').get(0).offsetTop * -1) + parseRem(90));
+        $('.ads-client-asset-stick').css('margin-block', ($('.ads-client-asset-item').get(0).offsetTop * -1) + parseRem($(window).width() > 991 ? 90 : 40));
         const items = $('.ads-client .ads-client-item');
         $('.ads-client-asset-stick .ads-client-asset-item').eq(0).addClass('active')
         items.each((idx, el) => {
@@ -863,9 +888,9 @@ const landingScript = () => {
     function init() {
         documentHeightObserver('init');
         scrollToTop();
-        magnetMove();
         if (!isTouchDevice()) {
             if ($(window).width() > 991) {
+                magnetMove();
                 $('[data-move="wrap"]').each((idx, el) => {
                     if ($(el).find('.title-dot-canvas').length) {
                         requestAnimationFrame(() => {
