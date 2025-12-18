@@ -1,5 +1,4 @@
 const landingScript = () => {
-    console.log("run");
     gsap.registerPlugin(ScrollTrigger, SplitText);
     gsap.config({ nullTargetWarn: false });
 
@@ -604,12 +603,77 @@ const landingScript = () => {
 
         updateOnScroll(dist, total);
         lenis.on('scroll', () => {
-            console.log("rim")
             updateOnScroll(dist, total);
         });
     };
+
+    class Reel {
+        constructor(el) {
+            this.el = el
+            this.video = this.el.find('video').get(0)
+            this.videoToggle = this.el.find('[data-video]')
+            this.videoToggle.on('click', this.toggleReel.bind(this))
+            this.el.find('.popup-reel-close-btn, .popup-reel-close-btn-mb').on('click', this.closeReel.bind(this))
+        }
+        resetReel() {
+            this.closeReel()
+            this.video.currentTime = 0
+        }
+        toggleReel(e) {
+            e.preventDefault();
+            if (this.videoToggle.attr('data-video') == 'to-play') {
+                this.playReel()
+            } else {
+                this.pauseReel()
+            }
+        }
+        playReel() {
+            if ($(window).width() < 768) {
+                this.el.find('.popup-reel-mb-info').removeClass('active')
+            }
+            $(this.videoToggle).attr('data-video', 'to-pause')
+            this.el.find('.popup-reel-inner').addClass('on-play')
+            this.el.find('.popup-reel-video-main').addClass('on-play')
+            this.video.play()
+            this.el.find('.cursor-vid-prog').addClass('active')
+            requestAnimationFrame(this.updateReel.bind(this))
+            this.status = 'to-pause'
+        }
+        pauseReel() {
+            if ($(window).width() < 768) {
+                this.el.find('.popup-reel-mb-info').addClass('active')
+            }
+            $(this.videoToggle).attr('data-video', 'to-play')
+            this.el.find('.popup-reel-inner').removeClass('on-play')
+            this.el.find('.popup-reel-video-main').removeClass('on-play')
+            this.el.find('.popup-reel-video-main').find('video').get(0).pause()
+            gsap.set('.cursor-vid-prog', {'--vid-prog': '0deg', clearProps: 'all'})
+            cancelAnimationFrame(this.updateReel.bind(this))
+            this.status = 'to-play'
+        }
+        openReel() {
+            this.el.addClass('active')
+            this.el.find('.popup-reel-close-inner').addClass('active')
+            // video.currentTime = 0
+            this.playReel()
+        }
+        closeReel() {
+            this.el.removeClass('active')
+            this.el.find('.popup-reel-close-inner').removeClass('active')
+            this.pauseReel()
+        }
+        updateReel() {
+            let progress = (this.video.currentTime / this.video.duration) * 360;
+            gsap.set('.cursor-vid-prog', {'--vid-prog': `${progress}deg`});
+            requestAnimationFrame(this.updateReel.bind(this));
+        }
+    }
+    //Reel
+    let reel = null;
+    if ($('.popup-reel').length) {
+        reel = new Reel($('.popup-reel'))
+    }
     function adsHero() {
-        console.log("run")
         ScrollTrigger.create({
             trigger: $('.ads-hero'),
             start: 'top bottom',
@@ -652,6 +716,16 @@ const landingScript = () => {
                 })
             }
         })
+    }
+    function adsIntro() {
+        if ($('.ads-intro-video').length > 0) {
+            $('.ads-intro-video[data-popup="showreel"]').on('click', function(e) {
+                e.preventDefault();
+                if (reel) {
+                    reel.openReel()
+                }
+            })
+        }
     }
     function adsCta() {
     }
@@ -707,6 +781,7 @@ const landingScript = () => {
         }
         adsHero()
         adsCta()
+        adsIntro()
         adsReview()
         adsClient()
         adsFAQ()
