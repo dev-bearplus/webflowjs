@@ -673,6 +673,102 @@ const landingScript = () => {
     if ($('.popup-reel').length) {
         reel = new Reel($('.popup-reel'))
     }
+    function inputInteractionInit(formEl) {
+        //Normal input
+        $(`${formEl} .input-grp .input-field`).on('focus', function(e) {
+            $(this).parent().addClass('active')
+        })
+        $(`${formEl} .input-grp .input-field`).on('blur', function(e) {
+            $('.input-grp').removeClass('active')
+        })
+        $(`${formEl} .input-grp .input-field`).on('keyup', function(e) {
+            if ($(this).val() != '') {
+                $(this).parent().addClass('filled')
+            } else {
+                $(this).parent().removeClass('filled')
+            }
+        })
+        $(`${formEl} .input-grp .input-field`).on('change', function(e) {
+            if ($(this).val() != '') {
+                $(this).parent().addClass('filled')
+            } else {
+                $(this).parent().removeClass('filled')
+            }
+        })
+    }
+    const handleContactForm = {
+        init: () => {
+            $('[data-popup="book"]').on('click', function(e) {
+                e.preventDefault();
+                if ($('.ads-ctc-popup').hasClass('active')) {
+                    handleContactForm.close()
+                } else {
+                    handleContactForm.open()
+                }
+            })
+            $('.ads-ctc-popup-bg').on('click', function(e) {
+                e.preventDefault();
+                if (!$('.ads-ctc-popup-inner:hover').length) {
+                    handleContactForm.close()
+                }
+            })
+        },
+        open: () => {
+            $('.ads-ctc-popup').addClass('active')
+            $('.ads-ctc-popup-bg').addClass('active')
+            requestAnimationFrame(() => {
+            })
+
+            // gsap.set('.pop-ctc-main-bg, .pop-ctc-sub-bg', {scale: 0, transformOrigin: 'top left', overwrite: true})
+            // gsap.set('.pop-ctc-main, .pop-ctc-sub', {clipPath: 'polygon(0% 0%, 0% 0%, 0% 0%, 0% 0%)', overwrite: true})
+            let tlOpenPop = gsap.timeline({
+
+            })
+            tlOpenPop
+            .set('.ads-ctc-popup-inner', {transformOrigin: '100% 0%', scale: 0})
+            .to('.ads-ctc-popup-inner', {scale: 1, duration: .6, transformOrigin: '100% 0%', ease: 'power2.inOut'})
+        },
+        close: () => {
+
+            let tlClosePop = gsap.timeline({
+
+            })
+            tlClosePop
+                .fromTo('.ads-ctc-popup-inner', { transformOrigin: '0% 100%' }, { scale: 0, duration: .6, transformOrigin: '100% 100%', ease: 'power2.inOut' })
+            setTimeout(() => {
+                $('.ads-ctc-popup').removeClass('active')
+            }, 600);
+            $('.ads-ctc-popup-bg').removeClass('active')
+            handleContactForm.reset()
+        },
+        reset: () => {
+            $('.ads-ctc-popup-form').trigger('reset');
+            $('.ads-ctc-popup-form .input-grp').removeClass('filled');
+            document.querySelector('.ads-ctc-popup-form').scrollTo({
+                top: 0,
+                left: 0,
+                behavior: 'smooth'
+            })
+            if ($('.pop-ctc-succ.w-form-done').css('display') == 'block') {
+                // $('.pop-ctc-succ').css('display', 'none');
+                // $('.ads-ctc-popup-inner').css('display', 'block');
+
+            }
+        },
+        isOpen: () => {
+            return $('.ads-ctc-popup').hasClass('active')
+        },
+        update: (data) => {
+            $('[data-popup="book"]').on('click', function(e) {
+                e.preventDefault();
+                if ($('.ads-ctc-popup').hasClass('active')) {
+                    handleContactForm.close()
+                } else {
+                    handleContactForm.open()
+                }
+            })
+        },
+    }
     function adsHero() {
         ScrollTrigger.create({
             trigger: $('.ads-hero'),
@@ -735,7 +831,7 @@ const landingScript = () => {
 
     function adsClient() {
         //$(data.next.container).find('.abt-val-imgs-stick').css('top', ($(window).height() - $(data.next.container).find('.abt-val-imgs-stick').height())/2);
-        $('.ads-client-asset-stick').css('margin-block', ($('.ads-client-asset-item').get(0).offsetTop * -1) + parseRem(65));
+        $('.ads-client-asset-stick').css('margin-block', ($('.ads-client-asset-item').get(0).offsetTop * -1) + parseRem(90));
         const items = $('.ads-client .ads-client-item');
         $('.ads-client-asset-stick .ads-client-asset-item').eq(0).addClass('active')
         items.each((idx, el) => {
@@ -779,6 +875,8 @@ const landingScript = () => {
                 })
             }
         }
+        handleContactForm.init()
+        inputInteractionInit('.ads-ctc-popup-form')
         adsHero()
         adsCta()
         adsIntro()
