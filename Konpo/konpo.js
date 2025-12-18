@@ -5305,12 +5305,10 @@ const mainScript = () => {
 
             function adsFAQ(data) {
                 $('.ads-faq-ans').hide();
-                $('.ads-faq-item').on('click', function(e) {
+                $('.ads-faq-ques').on('click', function(e) {
                     e.preventDefault();
-                    $(this).find('.ads-faq-ques').slideToggle();
-                    $(this).find('.ads-faq-ans').slideToggle();
-                    $(this).siblings().find('.ads-faq-ques').slideDown();
-                    $(this).siblings().find('.ads-faq-ans').slideUp();
+                    $(this).siblings('.ads-faq-ans').slideToggle();
+                    $(this).parent().siblings().find('.ads-faq-ans').slideUp();
                 })
             }
             adsFAQ(data)
