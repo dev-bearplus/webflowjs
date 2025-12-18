@@ -587,6 +587,27 @@ const landingScript = () => {
         }
         requestAnimationFrame(animloop)
     }
+    const parallaxImage = ({ el, scaleOffset = 0.3 }) => {
+        gsap.set(el, { 'overflow': 'hidden' });
+        gsap.set($(el).find('img'), { height: '120%' });
+        const updateOnScroll = (dist, total) => {
+            if ($(el).find('img') && isInViewport(el)) {
+                let percent = el.getBoundingClientRect().bottom / total;
+
+                ySetter($(el).find('img'))(-dist * percent * 1.2);
+                gsap.set($(el).find('img'), { scale: 1 + (percent * scaleOffset) });
+            }
+        };
+
+        let dist = $(el).find('img').get(0).offsetHeight - el.offsetHeight;
+        let total = el.getBoundingClientRect().height + window.innerHeight;
+
+        updateOnScroll(dist, total);
+        lenis.on('scroll', () => {
+            console.log("rim")
+            updateOnScroll(dist, total);
+        });
+    };
     function adsHero() {
         console.log("run")
         ScrollTrigger.create({
@@ -632,17 +653,10 @@ const landingScript = () => {
             }
         })
     }
-
+    function adsCta() {
+    }
     function adsReview() {
-        if ($(window).width() > 991) {
-            if ($('.ads-review [data-move="wrap"]').length) {
-                if ($('.ads-review [data-move="wrap"]').find('.title-dot-canvas').length) {
-                    requestAnimationFrame(() => {
-                        initTitleGrid($('.ads-review [data-move="wrap"]').find('.title-dot-canvas'))
-                    })
-                }
-            }
-        }
+        parallaxImage({ el: $('.ads-review-bg').get(0), scaleOffset: .1 })
     }
 
     function adsClient() {
@@ -692,6 +706,7 @@ const landingScript = () => {
             }
         }
         adsHero()
+        adsCta()
         adsReview()
         adsClient()
         adsFAQ()
