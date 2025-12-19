@@ -450,7 +450,7 @@ const mainScript = () => {
         const langPaths = ['hk-zh-hant', 'hk-en'];
         const pathname = window.location.pathname;
         const lastSegment = pathname.split('/').pop();
-        const allowedRoutesLive = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist'];
+        const allowedRoutesLive = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us'];
         const allowedRoutesStagging = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us'];
         const allowedRoutes = isStagging() ? allowedRoutesStagging : allowedRoutesLive;
         // pathname.includes('hk-en') hoặc  pathname.includes('hk-zh-hant') for shouldSkipRedirect should not redirect
