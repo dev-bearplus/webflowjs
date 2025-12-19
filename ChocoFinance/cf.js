@@ -3298,12 +3298,175 @@ const mainScript = () => {
 
     }
     SCRIPT.usdScript = () => {
+        function formatNumber(num) {
+            const str = num.toString();
+            if (/e[+-]/i.test(str)) {
+                const fullNumber = Number(num).toLocaleString('fullwide', { useGrouping: false });
+                return formatNumberNormal(fullNumber);
+            }
+            
+            return formatNumberNormal(str);
+        }
+        
+        function formatNumberNormal(str) {
+            const match = str.match(/^([^0-9-]*)(-?\d[\d,]*\.?\d*)/);
+            if (!match) return str;
+            
+            const symbol = match[1];
+            let number = match[2].replace(/,/g, '');
+            const parts = number.split('.');
+            const integerPart = parts[0];
+            const decimalPart = parts[1];
+            
+            const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return symbol + formattedInteger + (decimalPart ? '.' + decimalPart : '');
+        }
+        function guaranteeFee() {
+            let textUnitInit = $('.unit-init').text();
+            let textUnitWillChange = $('.unit-will-change').text();
+            let flagChangeSgdToUsd = true;
+            function validInputUsd(sgdValue) {
+                let cleanedSgdValue = sgdValue.replace(/[^\d.,]/g, '');
+                const lastComma = cleanedSgdValue.lastIndexOf(',');
+                const lastDot = cleanedSgdValue.lastIndexOf('.');
+                // function only get one dot or one comma
+                if (lastComma > -1 && lastDot > -1) {
+                if (lastComma > lastDot) {
+                    cleanedSgdValue = cleanedSgdValue.replace(/\./g, '');
+                    cleanedSgdValue = cleanedSgdValue.replace(/(,)(?=.*\,)/g, '');
+                } else {
+                    cleanedSgdValue = cleanedSgdValue.replace(/\,/g, '');
+                    cleanedSgdValue = cleanedSgdValue.replace(/(\.)(?=.*\.)/g, '');
+                }
+                } else {
+                cleanedSgdValue = cleanedSgdValue
+                    .replace(/,/g, (match, offset) => offset === 0 ? '' : ',')
+                    .replace(/(,)(?=.*\,)/g, '')
+                    .replace(/\./g, (match, offset) => offset === 0 ? '' : '.')
+                    .replace(/(\.)(?=.*\.)/g, '');
+                }
+                if (cleanedSgdValue.startsWith(',') || cleanedSgdValue.startsWith('.')) {
+                cleanedSgdValue = cleanedSgdValue.substring(1);
+                }
+                // Remove leading zeros, but keep '0' if value is just zeros or has decimal
+                if (cleanedSgdValue.length > 0) {
+                    const hasDecimal = cleanedSgdValue.includes('.') || cleanedSgdValue.includes(',');
+                    if (hasDecimal) {
+                        cleanedSgdValue = cleanedSgdValue.replace(/^0+(?=\d)/, '');
+                    } else {
+                        cleanedSgdValue = cleanedSgdValue.replace(/^0+(?=\d)/, '');
+                    }
+                    if (cleanedSgdValue === '' || cleanedSgdValue === '.' || cleanedSgdValue === ',') {
+                        cleanedSgdValue = '0';
+                    }
+                }
+                if (sgdValue !== cleanedSgdValue) {
+                $(this).val(cleanedSgdValue);
+                sgdValue = cleanedSgdValue;
+                }
+                return sgdValue;
+            }
+            function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+            }
+        
+            const handleInput = debounce(function(sgdAmount) {
+            if (!sgdAmount || parseFloat(sgdAmount) <= 0) {
+                resetDisplay();
+                return;
+            }
+        
+            if (!currentRateData) {
+                return;
+            }
+        
+            convertAmount(sgdAmount);
+            }, 500);
+        
+            $('.guarantee-fee-form-input').on('input', function() {
+            let sgdAmount = $(this).val();
+            let cleanedFee = validInputUsd(sgdAmount);
+            $(this).val(cleanedFee);
+            $('.guarantee-fee-form-input-val').text(formatNumber(cleanedFee));
+            handleInput(sgdAmount);
+            });
+            function convertAmount(sgdAmount) {
+                console.log(sgdAmount);
+                if(sgdAmount <=0){
+                    resetDisplay();
+                    return;
+                }
+                $.ajax({
+                    url: 'https://data.chocolate-technologies.io/api/fx/convert-amount-and-fee',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    headers: {
+                    'cf-turnstile-response': turnstileToken
+                    },
+                    data: JSON.stringify({
+                    offeredRate: currentRateData.rate,
+                    amount: {
+                        currency: 'SGD',
+                        quantity: sgdAmount
+                    },
+                    action: 'buy',
+                    pair: 'USD:SGD',
+                    midMarketRate: currentRateData.midMarketRate.original
+                    }),
+                    success: function(data) {
+                    updateDisplay(data);
+                    },
+                    error: function(xhr, status, error) {
+                    console.log('Lỗi: ' + error);
+                    }
+                });
+            }
+            function updateDisplay( data) {
+                console.log('khanh',data);
+            $('.sgd-to-usd-total').text(formatNumber(data.totalAmount.quantity));
+            $('.sgd-to-usd-fee').text(formatNumber(Math.abs(data.fee.quantity)));
+            $('.guarantee-fee-form-input-result').text(formatNumber(data.convertedAmount.quantity));
+            }
+            function resetDisplay() {
+            $('.sgd-to-usd-total').text('0');
+            $('.sgd-to-usd-fee').text('0');
+            $('.guarantee-fee-form-input-result').text('0');
+            }
+            $('.guarantee-fee-form-input').on('click focus', function() {
+                const length = $(this).val().length;
+                this.setSelectionRange(length, length);
+              });
+            $('.guarantee-fee-convert-ic').on('click', function () {
+            if (flagChangeSgdToUsd) {
+                $('.unit-init').text(textUnitWillChange);
+                $('.unit-will-change').text(textUnitInit);
+                $('.sgd-to-usd').text(usdToSgd)
+                flagChangeSgdToUsd = false;
+            }
+            else {
+                $('.unit-init').text(textUnitInit);
+                $('.unit-will-change').text(textUnitWillChange);
+                $('.sgd-to-usd').text(sgdToUsd)
+                flagChangeSgdToUsd = true;
+            }
+            })
+        }
+        guaranteeFee();
         $('.home-graph-note-txt [href="#FAQs"], .usd-benef-sub-new-link[href="#FAQs"]').on('click', function(e) {
             let faqEl = $('.home-faq-item#what-is-the-chocolate-top-up-programme-and-its-qualifying-period');
             if (!faqEl.hasClass('active')) {
                 faqEl.find('.home-faq-item-head').trigger('click')
             }
         })
+
         function usdGetFaq() {
             animateFaq();
             scrollToFaq();
