@@ -785,5 +785,6 @@ const script = () => {
         duration: 600,
         once: true,
     });
+    integration();
 }
 window.onload = script
