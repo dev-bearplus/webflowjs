@@ -158,6 +158,54 @@ const landingScript = () => {
         }
     })
 
+    const formSubmitEvent = (function () {
+        const init = ({
+            onlyWorkOnThisFormName,
+            onSuccess,
+            onFail
+        }) => {
+            let inputSubmit = $(`#${getIDFormName(onlyWorkOnThisFormName)} .input-submit-wrap .txt`);
+
+            $(document).on('ajaxSend', function (event, xhr, settings) {
+                if (settings.url.includes("https://webflow.com/api/v1/form/")) {
+                    inputSubmit.text('Please wait...');
+                }
+            });
+            $(document).on('ajaxComplete', function (event, xhr, settings) {
+                if (settings.url.includes("https://webflow.com/api/v1/form/")) {
+                    const isSuccessful = xhr.status === 200
+                    const isWorkOnAllForm = onlyWorkOnThisFormName == undefined
+                    const isCorrectForm = !isWorkOnAllForm && settings.data.includes(getSanitizedFormName(onlyWorkOnThisFormName));
+
+                    if (isWorkOnAllForm) {
+                        if (isSuccessful) {
+                            onSuccess?.()
+                            inputSubmit.text('Sent');
+                        } else {
+                            onFail?.()
+                        }
+                    } else if (isCorrectForm) {
+                        if (isSuccessful) {
+                            onSuccess?.()
+                            inputSubmit.text('Sent');
+                        } else {
+                            onFail?.()
+                        }
+                    }
+                }
+            });
+        }
+        function getIDFormName(name) {
+            return name.toLowerCase().replaceAll(" ", "-");
+        }
+        function getSanitizedFormName(name) {
+            return name.replaceAll(" ", "+")
+        }
+        return {
+            init
+        }
+    })();
+
     let idleTime = 0;
     const handleCursor = {
         updateHtml: () => {
@@ -701,10 +749,10 @@ const landingScript = () => {
             $('[data-popup="book"]').on('click', function(e) {
                 e.preventDefault();
                 if ($('.ads-ctc-popup').hasClass('active')) {
-                    headerOnClose()
+                    $(window).width() <= 767 && headerOnClose()
                     handleContactForm.close()
                 } else {
-                    headerOnOpen()
+                    $(window).width() <= 767 && headerOnOpen()
                     handleContactForm.open()
                 }
             })
@@ -712,11 +760,57 @@ const landingScript = () => {
                 $('.ads-ctc-popup-bg').on('click', function(e) {
                     e.preventDefault();
                     if (!$('.ads-ctc-popup-inner:hover').length) {
-                        headerOnClose()
+                        $(window).width() <= 767 && headerOnClose()
                         handleContactForm.close()
                     }
                 })
             }
+
+            let currentIndex = 0;
+            let interval = null;
+
+            const activeIndex = () => {
+                $('.ads-ctc-testi-item').eq(currentIndex).addClass('active').siblings().removeClass('active');
+            }
+
+            const startInterval = () => {
+                if (interval) {
+                    clearInterval(interval);
+                }
+
+                interval = setInterval(() => {
+                    currentIndex++;
+                    if (currentIndex >= $('.ads-ctc-testi-item').length) {
+                        currentIndex = 0;
+                    }
+                    activeIndex();
+                }, 3200);
+            }
+            let name = '';
+            function capitalizeFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+            $('input[data-name="Name"]').bind('change keyup paste keydown', function (e) {
+                name = $(this).val();
+            })
+
+            formSubmitEvent.init({
+                onlyWorkOnThisFormName: 'Contact Form',
+                onSuccess: () => {
+                    $('.ads-ctc-popup-success [data-name]').text(capitalizeFirstLetter(name));
+                    $('.ads-ctc-popup-inner').addClass('success');
+                    setTimeout(() => {
+                        handleContactForm.reset();
+                    }, 1000);
+                    setTimeout(() => {
+                        currentIndex++;
+                        activeIndex();
+                        startInterval();
+                    }, 2500);
+                },
+                onFail: () => {
+                }
+            })
         },
         open: () => {
             $(window).width() <= 767 && $('.header-btn-ctc').addClass('active');
@@ -724,8 +818,6 @@ const landingScript = () => {
             setTimeout(() => {
                 $('.ads-ctc-popup-bg').addClass('active')
             }, $(window).width() > 767 ? 0 : 400);
-            requestAnimationFrame(() => {
-            })
 
             // gsap.set('.pop-ctc-main-bg, .pop-ctc-sub-bg', {scale: 0, transformOrigin: 'top left', overwrite: true})
             // gsap.set('.pop-ctc-main, .pop-ctc-sub', {clipPath: 'polygon(0% 0%, 0% 0%, 0% 0%, 0% 0%)', overwrite: true})
@@ -774,10 +866,10 @@ const landingScript = () => {
                 e.preventDefault();
                 if ($('.ads-ctc-popup').hasClass('active')) {
                     handleContactForm.close()
-                    headerOnClose()
+                    $(window).width() <= 767 && headerOnClose()
                 } else {
                     handleContactForm.open()
-                    headerOnOpen()
+                    $(window).width() <= 767 && headerOnOpen()
                 }
             })
         },
