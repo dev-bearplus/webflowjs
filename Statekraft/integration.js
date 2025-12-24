@@ -1,12 +1,3 @@
-window.STATEKRAFT_CONFIG = {
-  API_BASE_URL: 'https://api-dev.statekraft.ai/api/v1',
-  SITE_URL: 'https://statekraft.webflow.io',
-  PAYMENT_CALLBACK_URL: 'https://statekraft.webflow.io/payment-callback',
-  OKTA_DOMAIN: 'https://integrator-1378271.okta.com',
-  OKTA_ISSUER: 'https://integrator-1378271.okta.com/oauth2/default',
-  OKTA_CLIENT_ID: '0oay8z1jbhoW79m7L697',
-  AIRWALLEX_ENV: 'demo',
-};
 const integration = () => {
     const CONFIG = window.STATEKRAFT_CONFIG;
 
@@ -87,11 +78,10 @@ const integration = () => {
       }
     }
 
-    const options = { method, headers,credentials: "include" };
+    const options = { method, headers };
     if (data) options.body = JSON.stringify(data);
 
-      const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`, options,
-    );
+    const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`, options);
     const result = await response.json();
 
     if (!response.ok) {
@@ -259,8 +249,7 @@ const integration = () => {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json',
-          },
-        credentials: "include",
+        },
         body: params.toString(),
       });
 
@@ -304,8 +293,7 @@ const integration = () => {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json',
-          },
-        credentials: "include",
+        },
         body: params.toString(),
       });
 
