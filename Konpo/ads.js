@@ -840,8 +840,12 @@ const landingScript = () => {
             }, 600);
             $('.ads-ctc-popup-bg').removeClass('active')
 
-
-            handleContactForm.reset()
+            document.querySelector('.ads-ctc-popup-form').scrollTo({
+                top: 0,
+                left: 0,
+                behavior: 'smooth'
+            })
+            // handleContactForm.reset()
         },
         reset: () => {
             $('.ads-ctc-popup-form').trigger('reset');
@@ -854,7 +858,6 @@ const landingScript = () => {
             if ($('.pop-ctc-succ.w-form-done').css('display') == 'block') {
                 // $('.pop-ctc-succ').css('display', 'none');
                 // $('.ads-ctc-popup-inner').css('display', 'block');
-
             }
         },
         isOpen: () => {
