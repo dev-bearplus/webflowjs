@@ -546,7 +546,6 @@ const script = () => {
 
     class Popup {
         constructor() {
-            this.init();
         }
         init() {
             this.popup = $('.popup');
