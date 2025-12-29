@@ -554,6 +554,8 @@ const script = () => {
             this.popupClose = $('[data-popup="close"]');
             this.isPopupVid = false;
             this.isReady = true;
+            this.player = null;
+            this.playerContainer = null;
 
             this.popupOpen.on('click', (e) => {
                 if ($(e.currentTarget).attr('data-short-youtube-id') || $(e.currentTarget).attr('data-full-youtube-id')) {
@@ -591,26 +593,66 @@ const script = () => {
                 }
             });
         }
-        createIframe(videoId) {
-            // Always remove existing iframe first to prevent loop
-            this.destroyIframe();
+        createPlayer(videoId) {
+            // Check if YouTube API is available
+            if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
+                console.error("YouTube IFrame Player API is not loaded");
+                this.isReady = true;
+                return;
+            }
 
-            let iframe = $('<iframe></iframe>');
-            let iframeSrc = new URL(`https://www.youtube.com/embed/${videoId}?origin=${window.location.origin}&autoplay=1&playsinline=1`);
-            iframe.attr({
-                'src': iframeSrc,
-                'allow': 'autoplay',
-                'allowfullscreen': '',
+            // Always remove existing player first to prevent loop
+            this.destroyPlayer();
+
+            // Create container div for YouTube player
+            const containerId = 'youtube-player-' + Date.now();
+            this.playerContainer = $('<div></div>').attr('id', containerId);
+            this.playerContainer.css({
                 'width': '100%',
-                'height': '100%',
-                'frameborder': 0,
-                'allow': 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
-                'referrerpolicy': 'strict-origin-when-cross-origin'
+                'height': '100%'
             });
-            return iframe;
+            this.popupVid.append(this.playerContainer);
+
+            // Initialize YouTube Player
+            this.player = new YT.Player(containerId, {
+                videoId: videoId,
+                playerVars: {
+                    'autoplay': 1,
+                    'playsinline': 1,
+                    'origin': window.location.origin,
+                    'rel': 0,
+                    'modestbranding': 1,
+                    'enablejsapi': 1
+                },
+                events: {
+                    'onReady': (event) => {
+                        console.log("YouTube player ready");
+                        this.isReady = true;
+                    },
+                    'onStateChange': (event) => {
+                        // Handle state changes if needed
+                        // YT.PlayerState.ENDED, YT.PlayerState.PLAYING, etc.
+                    },
+                    'onError': (event) => {
+                        console.error("YouTube player error:", event.data);
+                        this.isReady = true;
+                    }
+                }
+            });
+
+            console.log("create YouTube player");
         }
-        destroyIframe() {
-            $('.popup-vid-wrap iframe').remove();
+        destroyPlayer() {
+            if (this.player && typeof this.player.destroy === 'function') {
+                this.player.destroy();
+                this.player = null;
+            }
+            if (this.playerContainer) {
+                this.playerContainer.remove();
+                this.playerContainer = null;
+            }
+            // Fallback: remove any remaining iframes
+            $('.popup-vid-wrap iframe, .popup-vid-wrap > div[id^="youtube-player-"]').remove();
         }
         openPopupVid(videoId) {
             if (!this.isReady) return; // Prevent multiple calls
@@ -618,15 +660,21 @@ const script = () => {
             if (viewport.w <= 767) {
                 this.popupVid.addClass('is-short');
             }
-            this.popupVid.append(this.createIframe(videoId));
-            $('.popup').addClass('active');
+
             this.isReady = false;
+            this.createPlayer(videoId);
+            $('.popup').addClass('active');
         }
         closePopupVid() {
+            // Stop video before closing
+            if (this.player && typeof this.player.stopVideo === 'function') {
+                this.player.stopVideo();
+            }
+
             this.popup.removeClass('active');
             setTimeout(() => {
                 this.popupVid.removeClass('is-short');
-                this.destroyIframe();
+                this.destroyPlayer();
                 this.isReady = true;
             }, 300);
         }
