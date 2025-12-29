@@ -614,11 +614,6 @@ const script = () => {
             this.popupVid.append(this.playerContainer);
 
             // Initialize YouTube Player
-            // Try to autoplay with sound first (user interaction allows this)
-            const isMobile = viewport.w <= 767;
-            let hasTriedUnmute = false;
-            let unmuteTimeout = null;
-
             this.player = new YT.Player(containerId, {
                 videoId: videoId,
                 playerVars: {
@@ -627,55 +622,16 @@ const script = () => {
                     'origin': window.location.origin,
                     'rel': 0,
                     'modestbranding': 1,
-                    'enablejsapi': 1,
-                    'mute': 0  // Try unmuted first (user interaction should allow this)
+                    'enablejsapi': 1
                 },
                 events: {
                     'onReady': (event) => {
                         console.log("YouTube player ready");
-                        const player = event.target;
-
-                        // Try to play video unmuted (user click should allow this)
-                        if (typeof player.playVideo === 'function') {
-                            player.playVideo();
-
-                            // On mobile, check if video actually plays
-                            if (isMobile) {
-                                // Give it a moment to start, then check state
-                                setTimeout(() => {
-                                    const state = player.getPlayerState();
-                                    // If video is not playing (state 1), try muted fallback
-                                    if (state !== YT.PlayerState.PLAYING) {
-                                        console.log("Unmuted autoplay failed, trying muted...");
-                                        player.mute();
-                                        player.playVideo();
-                                    } else {
-                                        console.log("Unmuted autoplay succeeded!");
-                                    }
-                                }, 500);
-                            }
-                        }
-
                         this.isReady = true;
                     },
                     'onStateChange': (event) => {
-                        // Try to unmute after video starts playing (some browsers allow this)
-                        if (isMobile && !hasTriedUnmute && event.data === YT.PlayerState.PLAYING) {
-                            hasTriedUnmute = true;
-
-                            // Try unmuting after a short delay
-                            if (unmuteTimeout) clearTimeout(unmuteTimeout);
-                            unmuteTimeout = setTimeout(() => {
-                                if (this.player && typeof this.player.unMute === 'function') {
-                                    try {
-                                        this.player.unMute();
-                                        console.log("Attempted to unmute after play");
-                                    } catch (e) {
-                                        console.log("Could not unmute:", e);
-                                    }
-                                }
-                            }, 300);
-                        }
+                        // Handle state changes if needed
+                        // YT.PlayerState.ENDED, YT.PlayerState.PLAYING, etc.
                     },
                     'onError': (event) => {
                         console.error("YouTube player error:", event.data);
