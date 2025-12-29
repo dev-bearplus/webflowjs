@@ -593,8 +593,11 @@ const script = () => {
             });
         }
         createIframe(videoId) {
-            let iframe = $('.popup-vid-wrap iframe').length > 0 ? $('.popup-vid-wrap iframe'): $('<iframe></iframe>');
-            let iframeSrc = new URL(`https://www.youtube.com/embed/${videoId}?origin=${window.location.origin}&autoplay=1`);
+            // Always remove existing iframe first to prevent loop
+            this.destroyIframe();
+
+            let iframe = $('<iframe></iframe>');
+            let iframeSrc = new URL(`https://www.youtube.com/embed/${videoId}?origin=${window.location.origin}&autoplay=1&playsinline=1`);
             iframe.attr({
                 'src': iframeSrc,
                 'allow': 'autoplay',
@@ -611,6 +614,8 @@ const script = () => {
             $('.popup-vid-wrap iframe').remove();
         }
         openPopupVid(videoId) {
+            if (!this.isReady) return; // Prevent multiple calls
+
             if (viewport.w <= 767) {
                 this.popupVid.addClass('is-short');
             }
@@ -1951,15 +1956,15 @@ const script = () => {
                             $paginationContainer.show();
 
                             if (currentPage >= maxPage) {
-                                $nextBtn.addClass('disabled');
+                                $nextBtn.addClass('is-list-pagination-disabled');
                             } else {
-                                $nextBtn.removeClass('disabled');
+                                $nextBtn.removeClass('is-list-pagination-disabled');
                             }
 
                             if (currentPage <= 1) {
-                                $prevBtn.addClass('disabled');
+                                $prevBtn.addClass('is-list-pagination-disabled');
                             } else {
-                                $prevBtn.removeClass('disabled');
+                                $prevBtn.removeClass('is-list-pagination-disabled');
                             }
                         }
                     };
