@@ -71,7 +71,7 @@ const mainScript = () => {
         let lang = $('html').attr('lang');
         let key ;
         if(lang == 'en-HK' || lang == 'zh-HK') {
-            key ='39299081-8fb6-4a91-9e77-2feea792353b'
+            key ='828c3b01-7155-4ead-9114-3d244832fa64'
         } 
         else {
             key ='828c3b01-7155-4ead-9114-3d244832fa64'
