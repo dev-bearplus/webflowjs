@@ -799,6 +799,7 @@ const landingScript = () => {
                 onSuccess: () => {
                     $('.ads-ctc-popup-success [data-name]').text(capitalizeFirstLetter(name));
                     $('.ads-ctc-popup-inner').addClass('success');
+                    dataLayer.push({'event': 'form_submit'});
                     setTimeout(() => {
                         handleContactForm.reset();
                     }, 1000);
