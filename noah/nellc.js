@@ -979,6 +979,13 @@ const script = () => {
                     updateLocationPopup(slug);
                     smoothScroll.scrollTo(`.location-area[id="${slug}"]`, { offset: -150 });
                 });
+                $('.location-area').each((_, item) => {
+                    let slug = $(item).attr('id');
+                    if ($(`.home-state-btn-item[data-slug="${slug}"]`).length === 0) {
+                        $(item).find('.location-dot').remove();
+                        $(item).removeClass('location-area');
+                    }
+                })
                 $('.location-area').on('mouseenter', (e) => {
                     e.preventDefault();
                     const slug = $(e.currentTarget).attr('id');
