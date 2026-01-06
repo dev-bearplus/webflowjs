@@ -4858,8 +4858,8 @@ const mainScript = () => {
 
                 const abtMainItems = $('.nabt-main-item');
                 for (let x = 0; x < abtMainItems.length; x++) {
-                    gsap.set(abtMainItems.eq(x).find('.nabt-main-item-img-wrap'), { clipPath: 'inset(20%)' })
-                    gsap.set(abtMainItems.eq(x).find('.nabt-main-item-img-wrap img'), { scale: 1.4, autoAlpha: 0 })
+                    gsap.set(abtMainItems.eq(x).find('.nabt-main-item-img'), { clipPath: 'inset(20%)' })
+                    gsap.set(abtMainItems.eq(x).find('.nabt-main-item-img img'), { scale: 1.4, autoAlpha: 0 })
 
                     const tlAbtMainImg = gsap.timeline({
                         scrollTrigger: {
@@ -4868,8 +4868,8 @@ const mainScript = () => {
                         }
                     })
                     tlAbtMainImg
-                        .to(abtMainItems.eq(x).find('.nabt-main-item-img-wrap'), { clipPath: 'inset(0%)', duration: 1.4, ease: 'expo.out' }, '0')
-                        .to(abtMainItems.eq(x).find('.nabt-main-item-img-wrap img'), { scale: 1, duration: 1.4, autoAlpha: 1, ease: 'expo.out', clearProps: 'all' }, '0')
+                        .to(abtMainItems.eq(x).find('.nabt-main-item-img'), { clipPath: 'inset(0%)', duration: 1.4, ease: 'expo.out' }, '0')
+                        .to(abtMainItems.eq(x).find('.nabt-main-item-img img'), { scale: 1, duration: 1.4, autoAlpha: 1, ease: 'expo.out', clearProps: 'all' }, '0')
 
                     const abtMainItemTitle = new SplitText(abtMainItems.eq(x).find('.nabt-main-item-title'), { type: 'lines, words' })
 
