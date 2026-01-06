@@ -321,7 +321,7 @@ const mainScript = () => {
     const errorValidation = {
         active: (form, errors) => {
             Array.from(form.querySelectorAll('.input-wrap input.w-input')).forEach(node => {
-                // let errorEl = node.parentElement.lastChild; 
+                // let errorEl = node.parentElement.lastChild;
                 let errorEl = node.parentElement.querySelector('.input-error');
 
                 if (errors.hasOwnProperty(node.getAttribute('name'))) {
@@ -1148,7 +1148,7 @@ const mainScript = () => {
 
                 .to('.legal-top-wrap, .legal-bot-wrap', { autoAlpha: 1, duration: .8 }, `${loadPer * 100 + 1}`)
         } else {
-            // $('.legal-top-wrap .h-size32').text("Let's explore lucrative whiskey investments today") 
+            // $('.legal-top-wrap .h-size32').text("Let's explore lucrative whiskey investments today")
             $('.legal-top-wrap .h-size32').text("Let's explore lucrative whiskey offerings today") //change content
 
             $('.legal-bot-wrap .home-hero-scroll-txt').remove()
@@ -1645,7 +1645,7 @@ const mainScript = () => {
         const mouseCursor = () => {
 
             if ($('.btn-hover-v2:hover').length) {
-                targetBtn = $('.btn-hover-v2:hover'); // reset target  
+                targetBtn = $('.btn-hover-v2:hover'); // reset target
                 $('.cursor .cursor-inner').addClass('cursor-hide')
                 if (!gotBtnSize) {
                     gsap.set('html', { '--cursor-width': `${targetBtn.get(0).getBoundingClientRect().width}px`, '--cursor-height': `${targetBtn.get(0).getBoundingClientRect().height}px` })
@@ -4472,157 +4472,393 @@ const mainScript = () => {
         namespace: 'about',
         afterEnter() {
             console.log('enter about us page')
-            function aboutHero3dInit() {
-                console.log('about hero 3d init')
+            // function aboutHero3dInit() {
+            //     console.log('about hero 3d init')
 
-                let cameraOpt = {
-                    zPosition: 14.8,
-                }
-                let barrelStart = {
-                    zPosition: 0,
-                    yPosition: 0,
-                    xRotation: 0,
-                    yRotation: 0,
-                }
-                let lightIntensity = {
-                    env: 1,
-                    rim: {
-                        lr: .6,
-                        tb: .6,
-                        bot: .6
-                    }
-                };
+            //     let cameraOpt = {
+            //         zPosition: 14.8,
+            //     }
+            //     let barrelStart = {
+            //         zPosition: 0,
+            //         yPosition: 0,
+            //         xRotation: 0,
+            //         yRotation: 0,
+            //     }
+            //     let lightIntensity = {
+            //         env: 1,
+            //         rim: {
+            //             lr: .6,
+            //             tb: .6,
+            //             bot: .6
+            //         }
+            //     };
 
-                const scene = new THREE.Scene()
+            //     const scene = new THREE.Scene()
 
-                rendererAboutHero.domElement.id = 'about3d';
+            //     rendererAboutHero.domElement.id = 'about3d';
 
-                $('.about-3d-wrap').append(rendererAboutHero.domElement);
+            //     $('.about-3d-wrap').append(rendererAboutHero.domElement);
 
-                cameraAboutHero.position.z = cameraOpt.zPosition;
+            //     cameraAboutHero.position.z = cameraOpt.zPosition;
 
-                let rimLeft = new THREE.DirectionalLight("#FBC30F", lightIntensity.rim.lr);
-                let rimRight = new THREE.DirectionalLight("#FBC30F", lightIntensity.rim.lr);
-                let rimTop = new THREE.DirectionalLight("#ffffff", lightIntensity.rim.tb);
-                let rimBottom = new THREE.DirectionalLight("#FBC30F", lightIntensity.rim.bot);
+            //     let rimLeft = new THREE.DirectionalLight("#FBC30F", lightIntensity.rim.lr);
+            //     let rimRight = new THREE.DirectionalLight("#FBC30F", lightIntensity.rim.lr);
+            //     let rimTop = new THREE.DirectionalLight("#ffffff", lightIntensity.rim.tb);
+            //     let rimBottom = new THREE.DirectionalLight("#FBC30F", lightIntensity.rim.bot);
 
-                rimLeft.lookAt(0, 0, 0);
-                rimLeft.position.set(5, 0, -10);
-                rimLeft.scale.set(2, 2, 2)
-                rimLeft.rotation.z = -Math.PI / 2;
+            //     rimLeft.lookAt(0, 0, 0);
+            //     rimLeft.position.set(5, 0, -10);
+            //     rimLeft.scale.set(2, 2, 2)
+            //     rimLeft.rotation.z = -Math.PI / 2;
 
-                rimRight.lookAt(0, 0, 0);
-                rimRight.position.set(-5, 0, -10);
-                rimRight.scale.set(2, 2, 2)
-                rimRight.rotation.z = Math.PI / 2;
+            //     rimRight.lookAt(0, 0, 0);
+            //     rimRight.position.set(-5, 0, -10);
+            //     rimRight.scale.set(2, 2, 2)
+            //     rimRight.rotation.z = Math.PI / 2;
 
-                rimTop.lookAt(0, 0, 0);
-                rimTop.position.set(0, 4, -12);
-                rimTop.scale.set(2, 2, 2)
-                rimTop.rotation.z = Math.PI / 2;
+            //     rimTop.lookAt(0, 0, 0);
+            //     rimTop.position.set(0, 4, -12);
+            //     rimTop.scale.set(2, 2, 2)
+            //     rimTop.rotation.z = Math.PI / 2;
 
-                rimBottom.lookAt(0, 0, 0);
-                rimBottom.position.set(0, -6, -12);
-                rimBottom.scale.set(2, 2, 2)
-                rimBottom.rotation.z = Math.PI / 2;
+            //     rimBottom.lookAt(0, 0, 0);
+            //     rimBottom.position.set(0, -6, -12);
+            //     rimBottom.scale.set(2, 2, 2)
+            //     rimBottom.rotation.z = Math.PI / 2;
 
-                const environmentMap = enviromentMapLoad;
+            //     const environmentMap = enviromentMapLoad;
 
-                let barrel;
-                let outerGroup = new THREE.Group();
-                let clock = new THREE.Clock();
-                barrelAboutHero.then((gltf) => {
-                    barrel = gltf.scene
-                    updateAllMaterial(barrel, environmentMap, false)
-                    updateLight(barrel, lightIntensity.env)
+            //     let barrel;
+            //     let outerGroup = new THREE.Group();
+            //     let clock = new THREE.Clock();
+            //     barrelAboutHero.then((gltf) => {
+            //         barrel = gltf.scene
+            //         updateAllMaterial(barrel, environmentMap, false)
+            //         updateLight(barrel, lightIntensity.env)
 
-                    barrel.scale.set(2.8, 2.8, 2.8);
-                    barrel.position.set(0, barrelStart.yPosition, barrelStart.zPosition)
-                    barrel.rotation.set(barrelStart.xRotation, barrelStart.yRotation, 0)
-                    outerGroup.add(barrel);
-                    scene.add(outerGroup)
-                    scene.add(rimLeft);
-                    scene.add(rimRight);
-                    scene.add(rimTop);
-                    scene.add(rimBottom);
-                    aboutHero3dAnim()
-                })
+            //         barrel.scale.set(2.8, 2.8, 2.8);
+            //         barrel.position.set(0, barrelStart.yPosition, barrelStart.zPosition)
+            //         barrel.rotation.set(barrelStart.xRotation, barrelStart.yRotation, 0)
+            //         outerGroup.add(barrel);
+            //         scene.add(outerGroup)
+            //         scene.add(rimLeft);
+            //         scene.add(rimRight);
+            //         scene.add(rimTop);
+            //         scene.add(rimBottom);
+            //         aboutHero3dAnim()
+            //     })
 
-                rendererAboutHero.setAnimationLoop(animate)
-                function animate() {
-                    if (!$('[data-barba-namespace="about"]').length) {
-                        return;
-                    }
-                    if (barrel) {
-                        barrel.rotation.y -= pi * 0.001;
-                        barrel.rotation.z = Math.sin(clock.getElapsedTime() / 100)
-                        barrel.rotation.x = Math.cos(clock.getElapsedTime() / 10)
+            //     rendererAboutHero.setAnimationLoop(animate)
+            //     function animate() {
+            //         if (!$('[data-barba-namespace="about"]').length) {
+            //             return;
+            //         }
+            //         if (barrel) {
+            //             barrel.rotation.y -= pi * 0.001;
+            //             barrel.rotation.z = Math.sin(clock.getElapsedTime() / 100)
+            //             barrel.rotation.x = Math.cos(clock.getElapsedTime() / 10)
 
-                        if ($(window).width() > 991) {
-                            outerGroup.position.x = lerp(outerGroup.position.x, - ((pointer.x / (viewport.width) - 0.5) * 2) * .4, 0.02)
-                            outerGroup.position.y = lerp(outerGroup.position.y, ((pointer.y / (viewport.height) - 0.5) * 2) * .4, 0.02)
-                        }
-                    }
-                    rendererAboutHero.render(scene, cameraAboutHero);
-                }
+            //             if ($(window).width() > 991) {
+            //                 outerGroup.position.x = lerp(outerGroup.position.x, - ((pointer.x / (viewport.width) - 0.5) * 2) * .4, 0.02)
+            //                 outerGroup.position.y = lerp(outerGroup.position.y, ((pointer.y / (viewport.height) - 0.5) * 2) * .4, 0.02)
+            //             }
+            //         }
+            //         rendererAboutHero.render(scene, cameraAboutHero);
+            //     }
 
-                function aboutHero3dAnim() {
-                    const aboutHero3dTl = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: '.sc-abt-hero',
-                            start: `top top`,
-                            end: `bottom top`,
-                            scrub: .1,
-                        }
-                    })
-                    aboutHero3dTl
-                        .to(outerGroup.rotation, { y: Math.PI, ease: 'linear' })
-                }
-            }
-            aboutHero3dInit();
+            //     function aboutHero3dAnim() {
+            //         const aboutHero3dTl = gsap.timeline({
+            //             scrollTrigger: {
+            //                 trigger: '.sc-abt-hero',
+            //                 start: `top top`,
+            //                 end: `bottom top`,
+            //                 scrub: .1,
+            //             }
+            //         })
+            //         aboutHero3dTl
+            //             .to(outerGroup.rotation, { y: Math.PI, ease: 'linear' })
+            //     }
+            // }
+            // aboutHero3dInit();
 
-            function abtHeroSetup() {
-                let offsetTop = `${($(window).height() - $('.abt-hero-stick-inner').height()) / 2}px`;
-                let abt3dMargin = $(window).width() - $('.container').width();
+            // function abtHeroSetup() {
+            //     let offsetTop = `${($(window).height() - $('.abt-hero-stick-inner').height()) / 2}px`;
+            //     let abt3dMargin = $(window).width() - $('.container').width();
 
-                if (viewport.width > 767) {
-                    $('.abt-hero-title-wrap').css('padding-top', offsetTop)
-                    $('.abt-hero-stick-inner').css('top', offsetTop)
-                    $('.abt-hero-stick-inner').css('margin-top', offsetTop)
-                    $('.about-3d-wrap').css('margin', `-${abt3dMargin}px`);
-                }
-                $(window).resize()
-            }
-            abtHeroSetup();
-            function abtTimeSetup() {
-                const allTimeZones = $('[data-time]')
-                allTimeZones.each((index, el) => {
-                    let zone = $(el).attr('data-time');
-                    $(el).find('[data-time-txt]').text(dayjs(Date.now()).tz(zone).format('HH:mm:ss'))
-                })
-            }
-            abtTimeSetup()
+            //     if (viewport.width > 767) {
+            //         $('.abt-hero-title-wrap').css('padding-top', offsetTop)
+            //         $('.abt-hero-stick-inner').css('top', offsetTop)
+            //         $('.abt-hero-stick-inner').css('margin-top', offsetTop)
+            //         $('.about-3d-wrap').css('margin', `-${abt3dMargin}px`);
+            //     }
+            //     $(window).resize()
+            // }
+            // abtHeroSetup();
+            // function abtTimeSetup() {
+            //     const allTimeZones = $('[data-time]')
+            //     allTimeZones.each((index, el) => {
+            //         let zone = $(el).attr('data-time');
+            //         $(el).find('[data-time-txt]').text(dayjs(Date.now()).tz(zone).format('HH:mm:ss'))
+            //     })
+            // }
+            // abtTimeSetup()
+
+            // function aboutHeroInit() {
+            //     const abtHeroTitle = new SplitText('.abt-hero-title', { type: 'words' })
+            //     const tlAbtHero = gsap.timeline({
+            //         scrollTrigger: {
+            //             trigger: '.abt-hero-title-wrap',
+            //             start: 'top top',
+            //             end: `bottom-=${viewportBreak({ desktop: 0, mobile: 50 })}% top+=${viewportBreak({ desktop: 40, mobile: 0 })}%`,
+            //             scrub: true,
+            //         }
+            //     })
+            //     tlAbtHero
+            //         .from(abtHeroTitle.words.slice(1), { color: '#212121', duration: .1, stagger: .02, ease: 'power1.out' })
+            // }
+            // aboutHeroInit()
+
+            // function abtMainInit() {
+            //     const abtMainItems = $('.abt-main-item-wrap');
+            //     for (let x = 0; x < abtMainItems.length; x++) {
+            //         gsap.set(abtMainItems.eq(x).find('.abt-main-item-img-wrap'), { clipPath: 'inset(20%)' })
+            //         gsap.set(abtMainItems.eq(x).find('.abt-main-item-img-wrap img'), { scale: 1.4, autoAlpha: 0 })
+
+            //         const tlAbtMainImg = gsap.timeline({
+            //             scrollTrigger: {
+            //                 trigger: abtMainItems.eq(x),
+            //                 start: 'top top+=60%',
+            //             }
+            //         })
+            //         tlAbtMainImg
+            //             .from(abtMainItems.eq(x).find('.part-help-img-grad'), { autoAlpha: 0, duration: 1, ease: 'expo.out' }, '0')
+            //             .to(abtMainItems.eq(x).find('.abt-main-item-img-wrap'), { clipPath: 'inset(0%)', duration: 1.4, ease: 'expo.out' }, '0')
+            //             .to(abtMainItems.eq(x).find('.abt-main-item-img-wrap img'), { scale: 1, duration: 1.4, autoAlpha: 1, ease: 'expo.out', clearProps: 'all' }, '0')
+
+            //         const abtMainItemTitle = new SplitText(abtMainItems.eq(x).find('.abt-main-item-title'), { type: 'lines, words' })
+
+            //         const tlAbtMainTitle = gsap.timeline({
+            //             scrollTrigger: {
+            //                 trigger: abtMainItems.eq(x).find('.abt-main-content-wrap'),
+            //                 start: 'top bottom-=25%',
+            //                 end: 'bottom top+=50%',
+            //                 scrub: true,
+            //             }
+            //         })
+            //         tlAbtMainTitle
+            //             .from(abtMainItemTitle.words, { color: '#212121', duration: .1, stagger: .02, ease: 'power1.out' })
+
+            //         const abtMainItemBody = new SplitText(abtMainItems.eq(x).find('.abt-main-item-sub'), { type: 'lines, words' })
+            //         gsap.set(abtMainItemBody.lines, { 'overflow': 'hidden' })
+
+            //         const tlAbtMainItemBody = gsap.timeline({
+            //             scrollTrigger: {
+            //                 trigger: abtMainItems.eq(x).find('.abt-main-content-wrap'),
+            //                 start: 'top top+=60%',
+            //             }
+            //         })
+            //         tlAbtMainItemBody
+            //             .from(abtMainItemBody.words, { autoAlpha: 0, yPercent: 100, duration: .8, stagger: .003 })
+            //     }
+            // }
+            // abtMainInit()
+
+            // function abtWhySetup() {
+            //     $('.abt-why-item-wrap').on('pointerover', function (e) {
+            //         gsap.to('.abt-why-img-inner', { yPercent: -100 * $(this).index(), duration: .6, ease: 'sine.out', overwrite: true })
+            //     })
+            //     let tlAbtWhyMain = gsap.timeline({
+            //         scrollTrigger: {
+            //             trigger: '.abt-why-list-wrap',
+            //             start: 'top bottom',
+            //             end: 'bottom top',
+            //             scrub: true
+            //         }
+            //     })
+            //     tlAbtWhyMain
+            //         .to('.abt-why-img-inner-wrap', { yPercent: 100, ease: 'none' })
+
+            //     const abtWhyLabel = new SplitText('.abt-why-title-wrap .abt-why-label', { type: 'lines, words' })
+            //     const abtWhyTitle = new SplitText('.abt-why-title-wrap .h-size72', { type: 'lines, words' })
+            //     gsap.set([abtWhyLabel.lines, abtWhyTitle.lines], { 'overflow': 'hidden' })
+
+            //     const tlAbtWhyTitle = gsap.timeline({
+            //         scrollTrigger: {
+            //             trigger: '.abt-why-title-wrap',
+            //             start: 'top top+=60%',
+            //         }
+            //     })
+            //     tlAbtWhyTitle
+            //         .from(abtWhyLabel.words, { autoAlpha: 0, yPercent: 100, duration: 1 }, '0')
+            //         .from(abtWhyTitle.words, { autoAlpha: 0, yPercent: 100, duration: .6, stagger: .03 }, '<= .25')
+
+            //     gsap.set('.abt-why-list-wrap', { perspective: '40rem', perspectiveOrigin: 'top' })
+            //     gsap.set('.abt-why-list-item-inner', { transformOrigin: 'top' })
+            //     const tlAbtTeamMain = gsap.timeline({
+            //         scrollTrigger: {
+            //             trigger: '.abt-why-list-wrap',
+            //             start: 'top top+=70%',
+            //             end: 'bottom top+=70%',
+            //             scrub: true
+            //         }
+            //     })
+            //     tlAbtTeamMain
+            //         .from('.abt-why-list-item-inner', { rotationX: -45, autoAlpha: 0, duration: 2.5, stagger: 1 }, '0')
+
+            // }
+            // abtWhySetup()
+
+            // function abtTeamInit() {
+            //     const abtTeamLabel = new SplitText('.abt-team-title-wrap .abt-team-label', { type: 'lines, words' })
+            //     const abtTeamTitle = new SplitText('.abt-team-title-wrap .abt-team-title', { type: 'lines, words' })
+            //     gsap.set([abtTeamLabel.lines, abtTeamTitle.lines], { 'overflow': 'hidden' })
+
+            //     const tlAbtTeamTitle = gsap.timeline({
+            //         scrollTrigger: {
+            //             trigger: '.abt-team-title-wrap',
+            //             start: 'top top+=60%',
+            //         }
+            //     })
+            //     tlAbtTeamTitle
+            //         .from(abtTeamLabel.words, { autoAlpha: 0, yPercent: 100, duration: 1, stagger: .02 }, '0')
+            //         .from(abtTeamTitle.words, { autoAlpha: 0, yPercent: 100, duration: .6, stagger: .03 }, '<= .25')
+
+            //     if ($(window).width() > 991) {
+            //         const abtTeamSub = new SplitText('.abt-team-cms-wrap .abt-team-sub:not(.w-condition-invisible)', { type: 'lines, words' })
+            //         gsap.set(abtTeamSub.lines, { 'overflow': 'hidden' })
+            //         const tlAbtTeamSub = gsap.timeline({
+            //             scrollTrigger: {
+            //                 trigger: '.abt-team-cms-wrap .abt-team-sub:not(.w-condition-invisible)',
+            //                 start: 'top top+=60%',
+            //             }
+            //         })
+            //         tlAbtTeamSub
+            //             .from(abtTeamSub.words, { autoAlpha: 0, yPercent: 100, duration: .6, stagger: .003 }, '<= .25')
+            //     } else {
+            //         const abtTeamSub = new SplitText('.abt-team-sub.hidden-dk', { type: 'lines, words' })
+            //         gsap.set(abtTeamSub.lines, { 'overflow': 'hidden' })
+            //         const tlAbtTeamSub = gsap.timeline({
+            //             scrollTrigger: {
+            //                 trigger: '.abt-team-sub.hidden-dk',
+            //                 start: 'top top+=60%',
+            //             }
+            //         })
+            //         tlAbtTeamSub
+            //             .from(abtTeamSub.words, { autoAlpha: 0, yPercent: 100, duration: .6, stagger: .003 }, '<= .25')
+            //     }
+
+            //     const allAbtTeamItems = $('.abt-team-cms-item')
+            //     for (let x = 0; x < allAbtTeamItems.length; x++) {
+            //         gsap.set(allAbtTeamItems.eq(x).find('.abt-team-item-img-wrap'), { clipPath: 'inset(20%)' })
+            //         gsap.set(allAbtTeamItems.eq(x).find('.abt-team-item-img-wrap img'), { scale: 1.4 })
+
+            //         const tl = gsap.timeline({
+            //             scrollTrigger: {
+            //                 trigger: allAbtTeamItems.eq(x),
+            //                 start: 'top top+=60%',
+            //             },
+            //             delay: (x == 2 || x == 4) ? '0.2' : '0',
+            //         })
+            //         tl
+            //             .from(allAbtTeamItems.eq(x).find('.abt-team-item-wrap'), { autoAlpha: 0, duration: .4, ease: 'linear' }, '0')
+            //             .to(allAbtTeamItems.eq(x).find('.abt-team-item-img-wrap'), { clipPath: 'inset(0%)', duration: 1, ease: 'expo.out', clearProps: 'background-color' }, '0')
+            //             .to(allAbtTeamItems.eq(x).find('.abt-team-item-img-wrap img'), { scale: 1, duration: 1, ease: 'expo.out', clearProps: 'all' }, '0')
+            //             .from(allAbtTeamItems.eq(x).find('.abt-team-item-info-name'), { autoAlpha: 0, yPercent: 100, duration: .8 }, '.1')
+            //             .from(allAbtTeamItems.eq(x).find('.abt-team-item-info-job'), { autoAlpha: 0, yPercent: 100, duration: .8 }, '.2')
+            //     }
+
+
+            // }
+            // abtTeamInit()
+
+            // function abtTimeInit() {
+            //     const abtTimeLabel = new SplitText('.abt-loca-label', { type: 'lines, words' });
+
+            //     gsap.set(abtTimeLabel.lines, { 'overflow': 'hidden' })
+
+            //     const tlAbtTimeLabel = gsap.timeline({
+            //         scrollTrigger: {
+            //             trigger: '.abt-loca-label',
+            //             start: 'top top+=60%',
+            //         }
+            //     })
+            //     tlAbtTimeLabel
+            //         .from(abtTimeLabel.words, { autoAlpha: 0, yPercent: 100, duration: 1, stagger: .03 });
+
+            //     const allAbtTimeItems = $('.abt-loca-item-wrap');
+            //     for (let x = 0; x < allAbtTimeItems.length; x++) {
+            //         const tl = gsap.timeline({
+            //             scrollTrigger: {
+            //                 trigger: allAbtTimeItems.eq(x),
+            //                 start: 'top top+=65%',
+            //             }
+            //         })
+            //         tl
+            //             .from(allAbtTimeItems.eq(x).find('.abt-loca-country'), { autoAlpha: 0, yPercent: 100, duration: .6 }, '0')
+            //             .from(allAbtTimeItems.eq(x).find('.abt-loca-place'), { autoAlpha: 0, yPercent: 50, duration: .8 }, '<=.1')
+            //             .from(allAbtTimeItems.eq(x).find('.abt-loca-time'), { autoAlpha: 0, yPercent: 100, duration: .6 }, '<=.2')
+            //     }
+
+            // }
+            // abtTimeInit()
 
             function aboutHeroInit() {
-                const abtHeroTitle = new SplitText('.abt-hero-title', { type: 'words' })
-                const tlAbtHero = gsap.timeline({
+                let aboutHeroTl = gsap.timeline({
                     scrollTrigger: {
-                        trigger: '.abt-hero-title-wrap',
+                        trigger: '.sc-nabt-hero-stick',
                         start: 'top top',
-                        end: `bottom-=${viewportBreak({ desktop: 0, mobile: 50 })}% top+=${viewportBreak({ desktop: 40, mobile: 0 })}%`,
+                        end: 'bottom top',
+                        scrub: true
+                    }
+                })
+                if (!isTouchDevice()) {
+                    $('.sc-nabt-hero-stick .pre-invest-bg-wrap').clone().appendTo('.sc-nabt-hero-stick');
+                    aboutHeroTl
+                        .to($('.pre-invest-bg-wrap').eq(0).find('.pre-invest-x.right .pre-invest-x-inner'), { yPercent: -100, duration: 2, ease: Power1.easeOut })
+                        .to($('.pre-invest-bg-wrap').eq(0).find('.pre-invest-x.left .pre-invest-x-inner'), { yPercent: -100, duration: 2, ease: Power1.easeOut }, "<=0")
+                        .from($('.pre-invest-bg-wrap').eq(1).find('.pre-invest-x.right .pre-invest-x-inner'), { yPercent: 100, duration: 2, ease: Power1.easeOut }, "<=0")
+                        .from($('.pre-invest-bg-wrap').eq(1).find('.pre-invest-x.left .pre-invest-x-inner'), { yPercent: 100, duration: 2, ease: Power1.easeOut }, "<=0")
+                        .to('.nabt-hero-title-wrap', { autoAlpha: 0, scale: 1.05, duration: 2.5, ease: Power1.easeOut }, "<=.2")
+                        .to('.sc-nabt-hero-stick .pre-invest-bg-wrap', { autoAlpha: 0, scale: 1.1, duration: 2.5, ease: Power1.easeOut }, "<=0")
+
+                } else {
+                    aboutHeroTl
+                        .to('.nabt-hero-title-wrap', { autoAlpha: 0, scale: 1.05, duration: 2.5, ease: Power1.easeOut })
+                        .to('.sc-nabt-hero-stick .pre-invest-bg-wrap', { autoAlpha: 0, scale: 1.1, duration: 2.5, ease: Power1.easeOut }, "<=0")
+                }
+            }
+            aboutHeroInit();
+
+            function aboutMainInit() {
+                const aboutMainTitle = new SplitText('.nabt-main-title', { type: 'lines, words, chars' });
+                gsap.set([aboutMainTitle.lines], { overflow: 'hidden' })
+                const aboutMainTitleTl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '.nabt-main-title',
+                        start: 'top bottom-=15%',
+                        end: 'bottom top+=35%',
                         scrub: true,
                     }
                 })
-                tlAbtHero
-                    .from(abtHeroTitle.words.slice(1), { color: '#212121', duration: .1, stagger: .02, ease: 'power1.out' })
-            }
-            aboutHeroInit()
+                aboutMainTitleTl
+                    .from(aboutMainTitle.chars, { color: 'rgb(79, 79, 79)', duration: .1, stagger: 0.02, ease: 'power1.out' }, '0.2')
 
-            function abtMainInit() {
-                const abtMainItems = $('.abt-main-item-wrap');
+
+                const aboutMainBgTl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '.sc-nabt-main .pre-invest-bg-wrap',
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        scrub: true
+                    }
+                })
+                aboutMainBgTl
+                    .from('.sc-nabt-main .pre-invest-bg', { yPercent: -25, duration: 2.5, ease: 'none' })
+
+                const abtMainItems = $('.nabt-main-item');
                 for (let x = 0; x < abtMainItems.length; x++) {
-                    gsap.set(abtMainItems.eq(x).find('.abt-main-item-img-wrap'), { clipPath: 'inset(20%)' })
-                    gsap.set(abtMainItems.eq(x).find('.abt-main-item-img-wrap img'), { scale: 1.4, autoAlpha: 0 })
+                    gsap.set(abtMainItems.eq(x).find('.nabt-main-item-img-wrap'), { clipPath: 'inset(20%)' })
+                    gsap.set(abtMainItems.eq(x).find('.nabt-main-item-img-wrap img'), { scale: 1.4, autoAlpha: 0 })
 
                     const tlAbtMainImg = gsap.timeline({
                         scrollTrigger: {
@@ -4631,15 +4867,14 @@ const mainScript = () => {
                         }
                     })
                     tlAbtMainImg
-                        .from(abtMainItems.eq(x).find('.part-help-img-grad'), { autoAlpha: 0, duration: 1, ease: 'expo.out' }, '0')
-                        .to(abtMainItems.eq(x).find('.abt-main-item-img-wrap'), { clipPath: 'inset(0%)', duration: 1.4, ease: 'expo.out' }, '0')
-                        .to(abtMainItems.eq(x).find('.abt-main-item-img-wrap img'), { scale: 1, duration: 1.4, autoAlpha: 1, ease: 'expo.out', clearProps: 'all' }, '0')
+                        .to(abtMainItems.eq(x).find('.nabt-main-item-img-wrap'), { clipPath: 'inset(0%)', duration: 1.4, ease: 'expo.out' }, '0')
+                        .to(abtMainItems.eq(x).find('.nabt-main-item-img-wrap img'), { scale: 1, duration: 1.4, autoAlpha: 1, ease: 'expo.out', clearProps: 'all' }, '0')
 
-                    const abtMainItemTitle = new SplitText(abtMainItems.eq(x).find('.abt-main-item-title'), { type: 'lines, words' })
+                    const abtMainItemTitle = new SplitText(abtMainItems.eq(x).find('.nabt-main-item-title'), { type: 'lines, words' })
 
                     const tlAbtMainTitle = gsap.timeline({
                         scrollTrigger: {
-                            trigger: abtMainItems.eq(x).find('.abt-main-content-wrap'),
+                            trigger: abtMainItems.eq(x).find('.nabt-main-content-wrap'),
                             start: 'top bottom-=25%',
                             end: 'bottom top+=50%',
                             scrub: true,
@@ -4648,12 +4883,12 @@ const mainScript = () => {
                     tlAbtMainTitle
                         .from(abtMainItemTitle.words, { color: '#212121', duration: .1, stagger: .02, ease: 'power1.out' })
 
-                    const abtMainItemBody = new SplitText(abtMainItems.eq(x).find('.abt-main-item-sub'), { type: 'lines, words' })
+                    const abtMainItemBody = new SplitText(abtMainItems.eq(x).find('.nabt-main-item-sub'), { type: 'lines, words' })
                     gsap.set(abtMainItemBody.lines, { 'overflow': 'hidden' })
 
                     const tlAbtMainItemBody = gsap.timeline({
                         scrollTrigger: {
-                            trigger: abtMainItems.eq(x).find('.abt-main-content-wrap'),
+                            trigger: abtMainItems.eq(x).find('.nabt-main-content-wrap'),
                             start: 'top top+=60%',
                         }
                     })
@@ -4661,147 +4896,7 @@ const mainScript = () => {
                         .from(abtMainItemBody.words, { autoAlpha: 0, yPercent: 100, duration: .8, stagger: .003 })
                 }
             }
-            abtMainInit()
-
-            function abtWhySetup() {
-                $('.abt-why-item-wrap').on('pointerover', function (e) {
-                    gsap.to('.abt-why-img-inner', { yPercent: -100 * $(this).index(), duration: .6, ease: 'sine.out', overwrite: true })
-                })
-                let tlAbtWhyMain = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: '.abt-why-list-wrap',
-                        start: 'top bottom',
-                        end: 'bottom top',
-                        scrub: true
-                    }
-                })
-                tlAbtWhyMain
-                    .to('.abt-why-img-inner-wrap', { yPercent: 100, ease: 'none' })
-
-                const abtWhyLabel = new SplitText('.abt-why-title-wrap .abt-why-label', { type: 'lines, words' })
-                const abtWhyTitle = new SplitText('.abt-why-title-wrap .h-size72', { type: 'lines, words' })
-                gsap.set([abtWhyLabel.lines, abtWhyTitle.lines], { 'overflow': 'hidden' })
-
-                const tlAbtWhyTitle = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: '.abt-why-title-wrap',
-                        start: 'top top+=60%',
-                    }
-                })
-                tlAbtWhyTitle
-                    .from(abtWhyLabel.words, { autoAlpha: 0, yPercent: 100, duration: 1 }, '0')
-                    .from(abtWhyTitle.words, { autoAlpha: 0, yPercent: 100, duration: .6, stagger: .03 }, '<= .25')
-
-                gsap.set('.abt-why-list-wrap', { perspective: '40rem', perspectiveOrigin: 'top' })
-                gsap.set('.abt-why-list-item-inner', { transformOrigin: 'top' })
-                const tlAbtTeamMain = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: '.abt-why-list-wrap',
-                        start: 'top top+=70%',
-                        end: 'bottom top+=70%',
-                        scrub: true
-                    }
-                })
-                tlAbtTeamMain
-                    .from('.abt-why-list-item-inner', { rotationX: -45, autoAlpha: 0, duration: 2.5, stagger: 1 }, '0')
-
-            }
-            abtWhySetup()
-
-            function abtTeamInit() {
-                const abtTeamLabel = new SplitText('.abt-team-title-wrap .abt-team-label', { type: 'lines, words' })
-                const abtTeamTitle = new SplitText('.abt-team-title-wrap .abt-team-title', { type: 'lines, words' })
-                gsap.set([abtTeamLabel.lines, abtTeamTitle.lines], { 'overflow': 'hidden' })
-
-                const tlAbtTeamTitle = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: '.abt-team-title-wrap',
-                        start: 'top top+=60%',
-                    }
-                })
-                tlAbtTeamTitle
-                    .from(abtTeamLabel.words, { autoAlpha: 0, yPercent: 100, duration: 1, stagger: .02 }, '0')
-                    .from(abtTeamTitle.words, { autoAlpha: 0, yPercent: 100, duration: .6, stagger: .03 }, '<= .25')
-
-                if ($(window).width() > 991) {
-                    const abtTeamSub = new SplitText('.abt-team-cms-wrap .abt-team-sub:not(.w-condition-invisible)', { type: 'lines, words' })
-                    gsap.set(abtTeamSub.lines, { 'overflow': 'hidden' })
-                    const tlAbtTeamSub = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: '.abt-team-cms-wrap .abt-team-sub:not(.w-condition-invisible)',
-                            start: 'top top+=60%',
-                        }
-                    })
-                    tlAbtTeamSub
-                        .from(abtTeamSub.words, { autoAlpha: 0, yPercent: 100, duration: .6, stagger: .003 }, '<= .25')
-                } else {
-                    const abtTeamSub = new SplitText('.abt-team-sub.hidden-dk', { type: 'lines, words' })
-                    gsap.set(abtTeamSub.lines, { 'overflow': 'hidden' })
-                    const tlAbtTeamSub = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: '.abt-team-sub.hidden-dk',
-                            start: 'top top+=60%',
-                        }
-                    })
-                    tlAbtTeamSub
-                        .from(abtTeamSub.words, { autoAlpha: 0, yPercent: 100, duration: .6, stagger: .003 }, '<= .25')
-                }
-
-                const allAbtTeamItems = $('.abt-team-cms-item')
-                for (let x = 0; x < allAbtTeamItems.length; x++) {
-                    gsap.set(allAbtTeamItems.eq(x).find('.abt-team-item-img-wrap'), { clipPath: 'inset(20%)' })
-                    gsap.set(allAbtTeamItems.eq(x).find('.abt-team-item-img-wrap img'), { scale: 1.4 })
-
-                    const tl = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: allAbtTeamItems.eq(x),
-                            start: 'top top+=60%',
-                        },
-                        delay: (x == 2 || x == 4) ? '0.2' : '0',
-                    })
-                    tl
-                        .from(allAbtTeamItems.eq(x).find('.abt-team-item-wrap'), { autoAlpha: 0, duration: .4, ease: 'linear' }, '0')
-                        .to(allAbtTeamItems.eq(x).find('.abt-team-item-img-wrap'), { clipPath: 'inset(0%)', duration: 1, ease: 'expo.out', clearProps: 'background-color' }, '0')
-                        .to(allAbtTeamItems.eq(x).find('.abt-team-item-img-wrap img'), { scale: 1, duration: 1, ease: 'expo.out', clearProps: 'all' }, '0')
-                        .from(allAbtTeamItems.eq(x).find('.abt-team-item-info-name'), { autoAlpha: 0, yPercent: 100, duration: .8 }, '.1')
-                        .from(allAbtTeamItems.eq(x).find('.abt-team-item-info-job'), { autoAlpha: 0, yPercent: 100, duration: .8 }, '.2')
-                }
-
-
-            }
-            abtTeamInit()
-
-            function abtTimeInit() {
-                const abtTimeLabel = new SplitText('.abt-loca-label', { type: 'lines, words' });
-
-                gsap.set(abtTimeLabel.lines, { 'overflow': 'hidden' })
-
-                const tlAbtTimeLabel = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: '.abt-loca-label',
-                        start: 'top top+=60%',
-                    }
-                })
-                tlAbtTimeLabel
-                    .from(abtTimeLabel.words, { autoAlpha: 0, yPercent: 100, duration: 1, stagger: .03 });
-
-                const allAbtTimeItems = $('.abt-loca-item-wrap');
-                for (let x = 0; x < allAbtTimeItems.length; x++) {
-                    const tl = gsap.timeline({
-                        scrollTrigger: {
-                            trigger: allAbtTimeItems.eq(x),
-                            start: 'top top+=65%',
-                        }
-                    })
-                    tl
-                        .from(allAbtTimeItems.eq(x).find('.abt-loca-country'), { autoAlpha: 0, yPercent: 100, duration: .6 }, '0')
-                        .from(allAbtTimeItems.eq(x).find('.abt-loca-place'), { autoAlpha: 0, yPercent: 50, duration: .8 }, '<=.1')
-                        .from(allAbtTimeItems.eq(x).find('.abt-loca-time'), { autoAlpha: 0, yPercent: 100, duration: .6 }, '<=.2')
-                }
-
-            }
-            abtTimeInit()
-
+            aboutMainInit()
         },
         beforeLeave() {
             console.log('leave about us page')
