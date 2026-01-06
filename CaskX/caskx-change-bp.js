@@ -4842,7 +4842,7 @@ const mainScript = () => {
                 })
                 aboutMainTitleTl
                     .from(aboutMainTitle.chars, { color: 'rgb(79, 79, 79)', duration: .1, stagger: 0.02, ease: 'power1.out' }, '0.2')
-                    .from('.nabt-main-sub', { autoAlpha: 0, y: 50, duration: .6, ease: Power1.easeOut }, '<=.8')
+                    .from('.nabt-main-sub', { autoAlpha: 0, y: 30, duration: .6, ease: Power1.easeOut }, '<=.8')
 
 
                 const aboutMainBgTl = gsap.timeline({
