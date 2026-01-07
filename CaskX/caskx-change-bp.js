@@ -1038,7 +1038,6 @@ const mainScript = () => {
         return introTl
     }
     function introInit() {
-
         if (isDev) {
             $('.intro-wrap').remove();
             progressBar();
@@ -1147,7 +1146,8 @@ const mainScript = () => {
                 }, `${loadPer * 100}`)
 
                 .to('.legal-top-wrap, .legal-bot-wrap', { autoAlpha: 1, duration: .8 }, `${loadPer * 100 + 1}`)
-        } else {
+        } 
+        else{
             // $('.legal-top-wrap .h-size32').text("Let's explore lucrative whiskey investments today")
             $('.legal-top-wrap .h-size32').text("Let's explore lucrative whiskey offerings today") //change content
 
@@ -5428,11 +5428,16 @@ const mainScript = () => {
 
                 let isFirstLoad = document.referrer === "" && !window.opener ||
                     !isLoadFromWebCurrent
-
-                if (isFirstLoad || isPageReloaded()) {
-                    introInit();
-                } else {
-                    introInitLoadAfter();
+                if ($('[data-barba-namespace="about"]').length == 0){
+                    if (isFirstLoad || isPageReloaded() ) {
+                        introInit();
+                    } else {
+                        introInitLoadAfter();
+                    }
+                } 
+                else {
+                    progressBar();
+                    lenis.scrollTo(0, { duration: .0 })
                 }
 
                 footerInit()
