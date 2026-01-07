@@ -898,7 +898,7 @@ const mainScript = () => {
 
     let isDev, willCheckLegal;
 
-    if ($('[data-barba-namespace="notFound"]').length) {
+    if ($('[data-barba-namespace="notFound"]').length || $('[data-barba-namespace="about"]').length) {
         // 404 page
         isDev = false;
         willCheckLegal = false;
