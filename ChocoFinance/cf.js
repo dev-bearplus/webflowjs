@@ -2151,11 +2151,11 @@ const mainScript = () => {
     }
     SCRIPT.whyUsScript = () => {
         function aboutImpact() {
-            $('.sc-abt-impact-item').on('click', function(){
-                $(this).find('.sc-abt-impact-item-sub').slideToggle();
-                $(this).toggleClass('active');
-            })
             if(viewport.w < 480) {
+                $('.sc-abt-impact-item').on('click', function(){
+                    $(this).find('.sc-abt-impact-item-sub').slideToggle();
+                    $(this).toggleClass('active');
+                })
                 $('.sc-abt-impact-item').eq(0).click();
             }
         }
