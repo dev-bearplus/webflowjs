@@ -2209,7 +2209,15 @@ const mainScript = () => {
         aboutNameVideo()
     }
     SCRIPT.blogScript = () => {
+        
         function latestUpdate() {
+            $('.blog-nav-item').each((idx, el)=>{
+                let isNotOpen = $(el).find('.blog-nav-item-not-open-new-tab:not(.w-condition-invisible)').length > 0;
+                console.log(isNotOpen)
+                if(isNotOpen){
+                    $(el).find('.blog-nav-item-title').removeAttr('target');
+                }
+            })
             if ($(window).width() > 991) {
                 let blogNavItem = $('.blog-nav-item');
                 let blogHeroSwiper = new Swiper('.blog-hero-cms', {
