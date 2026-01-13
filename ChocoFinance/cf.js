@@ -2213,7 +2213,6 @@ const mainScript = () => {
         function latestUpdate() {
             $('.blog-nav-item').each((idx, el)=>{
                 let isNotOpen = $(el).find('.blog-nav-item-not-open-new-tab:not(.w-condition-invisible)').length > 0;
-                console.log(isNotOpen)
                 if(isNotOpen){
                     $(el).find('.blog-nav-item-title').removeAttr('target');
                 }
@@ -2454,13 +2453,13 @@ const mainScript = () => {
     }
     SCRIPT.termScript = () => {
         const hash = window.location.hash;
+        let tab = window.location.search.split('tab=')[1];
         function updateURL() {
             let newPath;
             newPath = window.location.pathname.replace('/terms-and-policy','')
             history.replaceState({},'',`${newPath + hash}`)
         }
         updateURL();
-
         let isAppTerm = !$('.sc-term-sub-nav').hasClass('w-condition-invisible') && $('.sc-term-sub-nav').length > 0;
         console.log('isAppTerm' + isAppTerm)
         function createToc() {
@@ -2508,7 +2507,6 @@ const mainScript = () => {
                 $(`.sc-term-main-inner-item`).fadeOut()
                 $(`.sc-term-main-inner-item[data-subnav="${index}"]`).fadeIn();
             }
-
             $('.mod-term-subnav').on('click', function(e) {
                 e.preventDefault();
                 if (!$(this).hasClass('active')) {
@@ -2547,7 +2545,11 @@ const mainScript = () => {
             let tabIndex = hash.replace('#toc', '').charAt(0);
             if (hash) {
                 activeTab(tabIndex)
-            } else {
+            }
+            else if(tab == 'liquidity_incentive'){
+                activeTab(2);
+            }
+            else {
                 activeTab(0);
             }
 
