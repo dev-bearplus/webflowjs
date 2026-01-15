@@ -682,7 +682,7 @@ const landingScript = () => {
             // $(this.videoToggle).attr('data-video', 'to-pause')
             // this.el.find('.popup-reel-inner').addClass('on-play')
             // this.el.find('.popup-reel-video-main').addClass('on-play')
-            // this.video.play()
+            this.video.play()
             // this.el.find('.cursor-vid-prog').addClass('active')
             // requestAnimationFrame(this.updateReel.bind(this))
             // this.status = 'to-pause'
@@ -694,7 +694,7 @@ const landingScript = () => {
             // $(this.videoToggle).attr('data-video', 'to-play')
             // this.el.find('.popup-reel-inner').removeClass('on-play')
             // this.el.find('.popup-reel-video-main').removeClass('on-play')
-            // this.el.find('.popup-reel-video-main').find('video').get(0).pause()
+            this.el.find('.popup-reel-video-main').find('video').get(0).pause()
             // gsap.set('.cursor-vid-prog', {'--vid-prog': '0deg', clearProps: 'all'})
             // cancelAnimationFrame(this.updateReel.bind(this))
             // this.status = 'to-play'
