@@ -676,50 +676,53 @@ const landingScript = () => {
             }
         }
         playReel() {
-            if ($(window).width() < 768) {
-                this.el.find('.popup-reel-mb-info').removeClass('active')
-            }
-            $(this.videoToggle).attr('data-video', 'to-pause')
-            this.el.find('.popup-reel-inner').addClass('on-play')
-            this.el.find('.popup-reel-video-main').addClass('on-play')
-            this.video.play()
-            this.el.find('.cursor-vid-prog').addClass('active')
-            requestAnimationFrame(this.updateReel.bind(this))
-            this.status = 'to-pause'
+            // if ($(window).width() < 768) {
+            //     this.el.find('.popup-reel-mb-info').removeClass('active')
+            // }
+            // $(this.videoToggle).attr('data-video', 'to-pause')
+            // this.el.find('.popup-reel-inner').addClass('on-play')
+            // this.el.find('.popup-reel-video-main').addClass('on-play')
+            // this.video.play()
+            // this.el.find('.cursor-vid-prog').addClass('active')
+            // requestAnimationFrame(this.updateReel.bind(this))
+            // this.status = 'to-pause'
         }
         pauseReel() {
-            if ($(window).width() < 768) {
-                this.el.find('.popup-reel-mb-info').addClass('active')
-            }
-            $(this.videoToggle).attr('data-video', 'to-play')
-            this.el.find('.popup-reel-inner').removeClass('on-play')
-            this.el.find('.popup-reel-video-main').removeClass('on-play')
-            this.el.find('.popup-reel-video-main').find('video').get(0).pause()
-            gsap.set('.cursor-vid-prog', {'--vid-prog': '0deg', clearProps: 'all'})
-            cancelAnimationFrame(this.updateReel.bind(this))
-            this.status = 'to-play'
+            // if ($(window).width() < 768) {
+            //     this.el.find('.popup-reel-mb-info').addClass('active')
+            // }
+            // $(this.videoToggle).attr('data-video', 'to-play')
+            // this.el.find('.popup-reel-inner').removeClass('on-play')
+            // this.el.find('.popup-reel-video-main').removeClass('on-play')
+            // this.el.find('.popup-reel-video-main').find('video').get(0).pause()
+            // gsap.set('.cursor-vid-prog', {'--vid-prog': '0deg', clearProps: 'all'})
+            // cancelAnimationFrame(this.updateReel.bind(this))
+            // this.status = 'to-play'
         }
         openReel() {
+            this.el.find('.popup-reel-close-btn, .popup-reel-close-btn-mb').css('pointer-events', 'auto')
             this.el.addClass('active')
-            this.el.find('.popup-reel-close-inner').addClass('active')
+            this.el.find('.popup-ads-close-inner').addClass('active')
             // video.currentTime = 0
             this.playReel()
         }
         closeReel() {
+            console.log('heloo')
+            this.el.find('.popup-reel-close-btn, .popup-reel-close-btn-mb').css('pointer-events', 'none')
             this.el.removeClass('active')
-            this.el.find('.popup-reel-close-inner').removeClass('active')
+            this.el.find('.popup-ads-close-inner').removeClass('active')
             this.pauseReel()
         }
         updateReel() {
-            let progress = (this.video.currentTime / this.video.duration) * 360;
-            gsap.set('.cursor-vid-prog', {'--vid-prog': `${progress}deg`});
-            requestAnimationFrame(this.updateReel.bind(this));
+            // let progress = (this.video.currentTime / this.video.duration) * 360;
+            // gsap.set('.cursor-vid-prog', {'--vid-prog': `${progress}deg`});
+            // requestAnimationFrame(this.updateReel.bind(this));
         }
     }
     //Reel
     let reel = null;
-    if ($('.popup-reel').length) {
-        reel = new Reel($('.popup-reel'))
+    if ($('.popup-ads').length) {
+        reel = new Reel($('.popup-ads'))
     }
     function inputInteractionInit(formEl) {
         //Normal input
@@ -938,7 +941,9 @@ const landingScript = () => {
         if ($('.ads-intro-video').length > 0) {
             $('.ads-intro-video[data-popup="showreel"]').on('click', function(e) {
                 e.preventDefault();
+                console.log('hello')
                 if (reel) {
+                    
                     reel.openReel()
                 }
             })
