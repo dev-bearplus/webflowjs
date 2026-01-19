@@ -2303,6 +2303,40 @@ const mainScript = () => {
             }
         }
         latestUpdate();
+        function blogArticle() {
+            let $articles = $('.blog-article-item');
+            let count = 1;
+            for (let i = 0; i < $articles.length; i += 3) {
+                let $group = $articles.slice(i, i + 3);
+                $group.wrapAll('<div class="blog-article-item-inner"></div>');
+                let $inner = $group.parent('.blog-article-item-inner');
+                $inner.wrapAll('<div class="blog-article-item-wrap"></div>');
+                let $wrapper = $inner.parent('.blog-article-item-wrap');
+                let $featureInner;
+                let cycle = ((count - 1) % 4) + 1; // Cycle từ 1-4
+                
+                switch(cycle) {
+                    case 1:
+                        $featureInner = $('.blog-cate-cms .blog-feature-cate-cms-inner.item-feature').first().clone();
+                        break;
+                    case 2:
+                        $featureInner = $('.blog-cate-cms .blog-feature-cate-cms-inner.item-last').first().clone();
+                        break;
+                    case 3:
+                        $featureInner = $('.blog-cate-cms .blog-feature-cate-cms-inner.item-most-read').first().clone();
+                        break;
+                    case 4:
+                        $featureInner = $('.blog-cate-cms .blog-feature-cate-cms-inner.item-by-choco').first().clone();
+                        break;
+                }
+                
+                $wrapper.append($featureInner);
+                count++;
+            }
+        }
+        if($('.blog-article').length > 0) {
+            blogArticle();
+        }
     }
     SCRIPT.blogCatScript = () => {
     }
