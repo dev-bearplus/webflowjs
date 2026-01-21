@@ -158,6 +158,249 @@ const landingScript = () => {
         }
     })
 
+    const isObjectEmpty = (objectName) => {
+        return (
+            objectName &&
+            Object.keys(objectName).length === 0 &&
+            objectName.constructor === Object
+        );
+    };
+
+    $.fn.hasAttr = function (name) {
+        return this.attr(name) !== undefined;
+    };
+
+    const required = (message) => ({ message, required: true });
+    const regexp = (pattern, message) => ({ regexp: pattern, message });
+
+    const REGEXP = {
+        email: /^(?!.*@(gmail|yahoo|hotmail|outlook|live|msn|icloud|aol|protonmail|proton|zoho|mail|gmx|yandex|tutanota|me|mac|inbox|rediffmail|rocketmail|sbcglobal|att|verizon|comcast|cox|charter|earthlink|juno|netzero|aim|bellsouth|qq|163|sina|naver|daum|hanmail|ymail|rediff|extandard|fastmail|mailru|web\.de|rambler\.ru|libero\.it|uol\.com\.br|bol\.com\.br|sfr\.fr|neuf\.fr|tiscali\.it|shaw\.ca|optonline\.net|freenet\.de|t-online\.de|bluewin\.ch|skynet\.be|sympatico\.ca|windstream\.net|centurytel\.net|bigpond\.com\.au|optusnet\.com\.au|blueyonder\.co\.uk|ntlworld\.com|frontiernet\.net|hetnet\.nl|zonnet\.nl|club-internet\.fr|chello\.nl|bigpond\.net\.au|terra\.com\.br|ig\.com\.br|orange\.fr|wanadoo\.fr|alice\.it|tin\.it|arcor\.de|virgilio\.it|mailfence|posteo|mailbox\.org|startmail|soverin|disroot\.org|cock\.li)\..*)(?!.*\.(edu|ac|sch|gov|mil)$)[\w\.-]+@([\w-]+\.)+[a-zA-Z]{2,}$/gi,
+        tel: /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/
+    }
+
+    const ERROR_MESSAGE = {
+        required: (name) => `Please fill your ${name}`,
+        regexp: 'Field not like format'
+    }
+
+    const mapFormToObject = (form, originFormData) => {
+        /** -NOTE-
+         * read it: https://stackoverflow.com/questions/12077859/difference-between-this-and-event-target
+         * form: this property will be
+         *          [e.target]: when the form have event
+         *       or [$(formID).get(0)]: when the form don't have event
+         */
+
+        let formData = originFormData || new FormData(form);
+
+        const parsedFormData = [...formData.entries()].reduce(
+            (prev, cur) => {
+                const name = cur[0];
+                const val = cur[1];
+                let dataName;
+
+                for (let field of form) {
+                    let fieldDataName = field.dataset.name;
+                    let fieldName = field.name;
+                    if (name === fieldName) dataName = fieldDataName;
+                }
+
+                return {
+                    ...prev, [name]: {
+                        value: val,
+                        name: dataName,
+                        validType: []
+                    }
+                };
+            },
+            {}
+        );
+        return parsedFormData;
+    }
+
+    const mapObjectFormToValidate = (form, obj) => {
+        const parsedFormData = [...Object.entries(obj)].reduce((prev, cur) => {
+            const name = cur[0];
+            const val = cur[1];
+            let validArr = val.validType;
+
+            for (let field of form) {
+                let fieldName = field.name;
+                let fieldType = field.type;
+                let fieldRequired = field.required || false;
+                let REGEXP_TYPE = ['email', 'tel'];
+                if (name === fieldName) {
+                    if (fieldRequired) {
+                        let CusMessage = field.getAttribute('mess-required');
+                        validArr.unshift(required(CusMessage))
+                    }
+                    if (REGEXP_TYPE.includes(fieldType)) {
+                        let CusMessage = field.getAttribute('mess-regexp');
+                        let CusRegexp = field.getAttribute('cus-regexp');
+                        validArr.unshift(regexp(CusRegexp || fieldType, CusMessage))
+                    }
+                }
+                continue;
+            }
+            return {
+                ...prev, [name]: val
+            }
+        }, {})
+        return parsedFormData;
+    }
+
+    const validateForm = ({ formsObj: forms, rules }) => {
+        const errors = {};
+        for (let name in rules) {
+            for (let rule of rules[name].validType) {
+                if (rule.required && forms[name]) {
+                    if (!forms[name].value.trim() || forms[name].value.trim() == "false") {
+                        errors[name] = rule.message || ERROR_MESSAGE.required(forms[name].name);
+                    }
+                }
+                if (rule.regexp && forms[name]) {
+                    let regexp = rule.regexp;
+                    if (regexp in REGEXP) {
+                        regexp = new RegExp(REGEXP[regexp]);
+                    }
+                    else if (!(regexp instanceof RegExp)) {
+                        regexp = new RegExp()
+                    }
+                    if (!regexp.test(forms[name].value.trim())) {
+                        errors[name] = rule.message || ERROR_MESSAGE.regexp;
+                    }
+                }
+            }
+        }
+        return {
+            errors,
+            isValidated: Object.keys(errors).length === 0
+        };
+    }
+
+    const validateInput = ({ targetInputObject: input, targetInputRule: rules }) => {
+        let errors;
+        const isEmpty = (value) => (value == null || (typeof value === "string" && value.trim().length === 0));
+        for (let rule of rules.validType) {
+            if (rule.required) {
+                if (!input.value.trim() || input.value.trim() == "false") {
+                    errors = rule.message || ERROR_MESSAGE.required(input.name);
+                }
+            }
+            if (rule.regexp) {
+                let regexp = rule.regexp;
+                if (regexp in REGEXP) {
+                    regexp = new RegExp(REGEXP[regexp]);
+                }
+                else if (!(regexp instanceof RegExp)) {
+                    regexp = new RegExp()
+                }
+                if (!regexp.test(input.value.trim())) {
+                    errors = rule.message || ERROR_MESSAGE.regexp;
+                }
+            }
+        }
+        return errors;
+    }
+
+    const errorValidation = {
+        singleActive: (input, error) => {
+            let errorEl = $(input).find('.input-error');
+            if (error) {
+                $(errorEl).find('.txt').html(error);
+                $(errorEl).slideDown('fast');
+            }
+            else {
+                $(errorEl).slideUp('fast', () => $(errorEl).find('.txt').html(''));
+            }
+        },
+        active: (form, errors) => {
+            Array.from(form.querySelectorAll('.input-grp input.w-input')).forEach(node => {
+                let errorEl = node.parentElement.querySelector('.input-error');
+                if (errors.hasOwnProperty(node.getAttribute('name'))) {
+                    errorEl.querySelector('.txt').innerHTML = errors[node.getAttribute('name')];
+                    $(errorEl).slideDown('fast');
+                }
+                else {
+                    $(errorEl).slideUp('fast', () => errorEl.querySelector('.txt').innerHTML = '');
+                }
+            });
+        },
+        reset: (form) => {
+            Array.from(form.querySelectorAll('.input-grp input.w-input')).forEach(node => {
+                let errorEl = node.parentElement.querySelector('.input-error');
+                $(errorEl).slideUp('fast', () => errorEl.querySelector('.txt').innerHTML = '');
+            });
+        }
+    }
+
+    const submitForm = ({ formsObj, rules }) => {
+        let validateInfo = { status: false, resultForm: {} };
+
+        const { errors, isValidated } = validateForm({ formsObj, rules });
+    if (isValidated) {
+            validateInfo.status = true;
+            Object.entries(rules).forEach(([key, { value }]) => {
+                validateInfo.resultForm[key.toLowerCase()] = value;
+            });
+            return { validateInfo };
+        }
+        else {
+            validateInfo.status = false;
+            return { errors, validateInfo };
+        }
+    }
+
+    const validateOnInput = ({ targetInputObject, targetInputRule }) => {
+        let validateInfo = { status: false, resultForm: {} };
+        const error = validateInput({ targetInputObject, targetInputRule });
+
+        return error;
+    }
+
+    const formHandler = (formID, options = {}) => {
+        /** -NOTE-
+         * read it: https://stackoverflow.com/questions/12077859/difference-between-this-and-event-target
+         *  e.target <--> $(formID).get(0)
+         *  e.currentTarget <--> $(this) <--> $(formID)
+         */
+        const formTarget = $(formID).get(0);
+        let formsObj = mapFormToObject(formTarget);
+        let rules = mapObjectFormToValidate(formTarget, formsObj);
+
+        const validateThisInput = (e) => {
+            let targetInputObject = {
+                ...formsObj[$(e.target).attr('name')],
+                value: $(e.target).val()
+            };
+            let targetInputRule = { ...rules[$(e.target).attr('name')] }
+            const error = validateOnInput({ targetInputObject, targetInputRule });
+            errorValidation.singleActive($(e.target).closest('.input-grp'), error);
+        }
+
+        $(`${formID} .input-grp input`).bind('input', debounce(validateThisInput))
+
+        $(`${formID} .form-submit`).on('click', function (e) {
+            console.log("click")
+            const { onSuccess, onError } = options;
+            formsObj = mapFormToObject(formTarget);
+            rules = mapObjectFormToValidate(formTarget, formsObj);
+
+            const { errors, validateInfo } = submitForm({ formsObj, rules });
+            if (validateInfo.status) {
+                onSuccess?.(validateInfo);
+                $(this).closest('form').trigger('submit');
+                errorValidation.reset($(formID).get(0));
+            }
+            else {
+                e.preventDefault();
+                onError?.(errors);
+                errorValidation.active($(formID).get(0), errors);
+            }
+            return false;
+        })
+    }
+
     const formSubmitEvent = (function () {
         const init = ({
             onlyWorkOnThisFormName,
@@ -796,25 +1039,26 @@ const landingScript = () => {
             $('input[data-name="Name"]').bind('change keyup paste keydown', function (e) {
                 name = $(this).val();
             })
-
-            formSubmitEvent.init({
-                onlyWorkOnThisFormName: 'Contact Form',
-                onSuccess: () => {
-                    $('.ads-ctc-popup-success [data-name]').text(capitalizeFirstLetter(name));
-                    $('.ads-ctc-popup-inner').addClass('success');
-                    dataLayer.push({'event': 'form_submit'});
-                    setTimeout(() => {
-                        handleContactForm.reset();
-                    }, 1000);
-                    setTimeout(() => {
-                        currentIndex++;
-                        activeIndex();
-                        startInterval();
-                    }, 2500);
-                },
-                onFail: () => {
+            formHandler('#contact-form', {
+                onSuccess: ({ resultForm }) => {
+                    formSubmitEvent.init({
+                        onlyWorkOnThisFormName: "Contact Form",
+                        onSuccess: () => {
+                            $('.ads-ctc-popup-success [data-name]').text(capitalizeFirstLetter(name));
+                            $('.ads-ctc-popup-inner').addClass('success');
+                            dataLayer.push({'event': 'form_submit'});
+                            setTimeout(() => {
+                                handleContactForm.reset();
+                            }, 1000);
+                            setTimeout(() => {
+                                currentIndex++;
+                                activeIndex();
+                                startInterval();
+                            }, 2500);
+                        },
+                    });
                 }
-            })
+            });
         },
         open: () => {
             $(window).width() <= 767 && $('.header-btn-ctc').addClass('active');
@@ -943,7 +1187,7 @@ const landingScript = () => {
                 e.preventDefault();
                 console.log('hello')
                 if (reel) {
-                    
+
                     reel.openReel()
                 }
             })
