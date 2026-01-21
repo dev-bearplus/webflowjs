@@ -192,7 +192,6 @@ const landingScript = () => {
          */
 
         let formData = originFormData || new FormData(form);
-
         const parsedFormData = [...formData.entries()].reduce(
             (prev, cur) => {
                 const name = cur[0];
@@ -215,6 +214,22 @@ const landingScript = () => {
             },
             {}
         );
+
+        // Handle select fields that might be missing due to disabled option
+        for (let field of form) {
+            if (field.tagName === 'SELECT' && field.name && !parsedFormData[field.name]) {
+                const selectedOption = field.options[field.selectedIndex];
+                const value = selectedOption ? selectedOption.value : '';
+                const dataName = field.dataset.name;
+
+                parsedFormData[field.name] = {
+                    value: value,
+                    name: dataName,
+                    validType: []
+                };
+            }
+        }
+
         return parsedFormData;
     }
 
@@ -315,7 +330,7 @@ const landingScript = () => {
             }
         },
         active: (form, errors) => {
-            Array.from(form.querySelectorAll('.input-grp input.w-input')).forEach(node => {
+            Array.from(form.querySelectorAll('.input-grp input.w-input, .input-grp select')).forEach(node => {
                 let errorEl = node.parentElement.querySelector('.input-error');
                 if (errors.hasOwnProperty(node.getAttribute('name'))) {
                     errorEl.querySelector('.txt').innerHTML = errors[node.getAttribute('name')];
@@ -336,9 +351,8 @@ const landingScript = () => {
 
     const submitForm = ({ formsObj, rules }) => {
         let validateInfo = { status: false, resultForm: {} };
-
         const { errors, isValidated } = validateForm({ formsObj, rules });
-    if (isValidated) {
+        if (isValidated) {
             validateInfo.status = true;
             Object.entries(rules).forEach(([key, { value }]) => {
                 validateInfo.resultForm[key.toLowerCase()] = value;
@@ -379,9 +393,8 @@ const landingScript = () => {
         }
 
         $(`${formID} .input-grp input`).bind('input', debounce(validateThisInput))
-
+        $(`${formID} .input-grp select`).bind('change', debounce(validateThisInput))
         $(`${formID} .form-submit`).on('click', function (e) {
-            console.log("click")
             const { onSuccess, onError } = options;
             formsObj = mapFormToObject(formTarget);
             rules = mapObjectFormToValidate(formTarget, formsObj);
@@ -950,7 +963,6 @@ const landingScript = () => {
             this.playReel()
         }
         closeReel() {
-            console.log('heloo')
             this.el.find('.popup-reel-close-btn, .popup-reel-close-btn-mb').css('pointer-events', 'none')
             this.el.removeClass('active')
             this.el.find('.popup-ads-close-inner').removeClass('active')
@@ -989,6 +1001,7 @@ const landingScript = () => {
                 $(this).parent().removeClass('filled')
             }
         })
+        $(`${formEl} .input-grp select option:first-child`).css('display', 'none');
     }
     const handleContactForm = {
         init: () => {
@@ -1113,7 +1126,6 @@ const landingScript = () => {
         },
         update: (data) => {
             $('[data-popup="book"]').on('click', function(e) {
-                console.log("click")
                 e.preventDefault();
                 if ($('.ads-ctc-popup').hasClass('active')) {
                     handleContactForm.close()
@@ -1185,9 +1197,7 @@ const landingScript = () => {
         if ($('.ads-intro-video').length > 0) {
             $('.ads-intro-video[data-popup="showreel"]').on('click', function(e) {
                 e.preventDefault();
-                console.log('hello')
                 if (reel) {
-
                     reel.openReel()
                 }
             })
