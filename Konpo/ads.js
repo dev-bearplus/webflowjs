@@ -330,7 +330,7 @@ const landingScript = () => {
             }
         },
         active: (form, errors) => {
-            Array.from(form.querySelectorAll('.input-grp input.w-input, .input-grp select')).forEach(node => {
+            Array.from(form.querySelectorAll('.input-grp input.w-input, .input-grp select, .input-grp textarea')).forEach(node => {
                 let errorEl = node.parentElement.querySelector('.input-error');
                 if (errors.hasOwnProperty(node.getAttribute('name'))) {
                     errorEl.querySelector('.txt').innerHTML = errors[node.getAttribute('name')];
@@ -342,7 +342,7 @@ const landingScript = () => {
             });
         },
         reset: (form) => {
-            Array.from(form.querySelectorAll('.input-grp input.w-input')).forEach(node => {
+            Array.from(form.querySelectorAll('.input-grp input.w-input, .input-grp select, .input-grp textarea')).forEach(node => {
                 let errorEl = node.parentElement.querySelector('.input-error');
                 $(errorEl).slideUp('fast', () => errorEl.querySelector('.txt').innerHTML = '');
             });
@@ -393,6 +393,7 @@ const landingScript = () => {
         }
 
         $(`${formID} .input-grp input`).bind('input', debounce(validateThisInput))
+        $(`${formID} .input-grp textarea`).bind('input', debounce(validateThisInput))
         $(`${formID} .input-grp select`).bind('change', debounce(validateThisInput))
         $(`${formID} .form-submit`).on('click', function (e) {
             const { onSuccess, onError } = options;
