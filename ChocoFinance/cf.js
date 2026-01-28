@@ -468,7 +468,7 @@ const mainScript = () => {
         const pathname = window.location.pathname;
         const lastSegment = pathname.split('/').pop();
         const allowedRoutesLive = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us'];
-        const allowedRoutesStagging = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us'];
+        const allowedRoutesStagging = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works'];
         const allowedRoutes = isStagging() ? allowedRoutesStagging : allowedRoutesLive;
         // pathname.includes('hk-en') hoặc  pathname.includes('hk-zh-hant') for shouldSkipRedirect should not redirect
 
@@ -1980,6 +1980,44 @@ const mainScript = () => {
             
         }
         homeGetFaq();
+        function howExpectHK() {
+            if($('.how-expect-hk').length == 0) return;
+            $('.how-expect-hk-item-head').on('click', function(e) {
+                e.preventDefault();
+                let parrentItem = $(this).closest('.how-expect-hk-item');
+                console.log(parrentItem)
+                if(parrentItem.hasClass('active')) {
+                    parrentItem.removeClass('active');
+                    parrentItem.find('.how-expect-hk-item-content').slideUp();
+                } else {
+                    $('.how-expect-hk-item').removeClass('active');
+                    $('.how-expect-hk-item-content').slideUp();
+                    parrentItem.addClass('active');
+                    parrentItem.find('.how-expect-hk-item-content').slideDown();
+                }
+            })
+            $('.how-expect-hk-item').eq(0).find('.how-expect-hk-item-head').trigger('click');
+        }
+        howExpectHK();
+        function howWithdrawHK() {
+            if($('.how-withdraw-hk').length == 0) return;
+            $('.how-withdraw-hk-item-head').on('click', function(e) {
+                e.preventDefault();
+                let parrentItem = $(this).closest('.how-withdraw-hk-item');
+                console.log(parrentItem)
+                if(parrentItem.hasClass('active')) {
+                    parrentItem.removeClass('active');
+                    parrentItem.find('.how-withdraw-hk-item-content').slideUp();
+                } else {
+                    $('.how-withdraw-hk-item').removeClass('active');
+                    $('.how-withdraw-hk-item-content').slideUp();
+                    parrentItem.addClass('active');
+                    parrentItem.find('.how-withdraw-hk-item-content').slideDown();
+                }
+            })
+            $('.how-withdraw-hk-item').eq(0).find('.how-withdraw-hk-item-head').trigger('click');
+        }
+        howWithdrawHK();
         function howTriggerIconAnim() {
             let howHigherReturnVid
             if ($(window).width() > 768) {
