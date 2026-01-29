@@ -2389,6 +2389,9 @@ const mainScript = () => {
     SCRIPT.blogAuthScript = () => {
     }
     SCRIPT.articleScript = () => {
+        if($('.blog-eco-item').length == 0) {
+            $('.sc-art-rel').addClass('hidden')
+        }
         function updateMobileTable() {
             if ($(window).width() < 767) {
                 $('.w-embed:has(.embed-tab)').css({
