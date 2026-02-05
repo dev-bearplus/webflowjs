@@ -3623,25 +3623,31 @@ const mainScript = () => {
             }
         }
         corporateHero();
+
         function corporateGetFaq() {
                 animateFaq();
                 scrollToFaq();
         }
         corporateGetFaq();
-        function getHomePartners() {
-            getAllDataByType('partners_logo').then((res) => {
-                if (res) {
-                    let allPartner = sortAsc(res, true, 'order');
-                    let template = $('.home-partner-inner').find('.home-partner-item').eq(0).clone();
-                    $('.home-partner-inner').html('')
-                    allPartner.forEach(({ data }, i) => {
-                        if (i < 5) createPartnerHTML(template, data).appendTo($('.home-partner-inner'))
-                    })
-                    $('.home-partner-inner').find('.load-ske').addClass('loaded')
-                }
-            });
+        function corporateReason() {
+            if ($(window).outerWidth() <= 480) {
+                $('.home-benef-item').on('click', function (e) {
+                    if ($(this).hasClass('active')) {
+                        $(this).removeClass('active');
+                        $(this).find('.home-benef-item-sub').slideUp();
+                    }
+                    else {
+                        $('.home-benef-item').not($(this)).removeClass('active');
+                        $(this).addClass('active')
+
+                        $('.home-benef-item').not($(this)).find('.home-benef-item-sub').slideUp();
+                        $(this).find('.home-benef-item-sub').slideDown();
+                    }
+                })
+                $('.home-benef-item').eq(0).trigger('click');
+            }
         }
-        getHomePartners()
+        corporateReason();
     }
     SCRIPT.cardScript = () => {
         console.log('card script')
