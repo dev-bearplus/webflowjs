@@ -587,12 +587,12 @@ const mainScript = () => {
     }
     let firstLoad = sessionStorage.getItem('firstLoad');
     if(!firstLoad && !checkFirstPathIsHK()){
+        sessionStorage.setItem('firstLoad', true)
         let currentLang = $('html').attr('lang');
         let suggestedLanguage = suggestLanguage();
         if(currentLang != suggestedLanguage){
             redirectCurrentLanguage(suggestedLanguage);
         }
-        sessionStorage.setItem('firstLoad', true)
     }
     function scrollDown() {
         header.addClass('on-hide')
@@ -2479,6 +2479,14 @@ const mainScript = () => {
             updateTabTable();
         }
         currentUpdate();
+        if($('.blog-empty-btn').length > 0) {
+            let pathParts = window.location.pathname.split('/').filter(part => part !== '');
+            pathParts.shift(); // bỏ phần đầu tiên
+            let currentPath = '/hk-zh-hant/' + pathParts.join('/');
+            // bỏ path đầu tiên
+            console.log('currentPath' + currentPath)
+            $('.blog-empty-btn').attr('href', `${currentPath}`);
+        }
         
     }
     SCRIPT.notFoundScript = () => {
