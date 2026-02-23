@@ -362,5 +362,10 @@ const script = () => {
     if (pageName) {
         SCRIPT[`${pageName}Script`]?.();
     }
+    const anchor = document.querySelector('.images-for-slider.w-lightbox');
+    const json = JSON.parse(anchor?.querySelector('script.w-json').textContent);
+    if (json.items && json.items.length) {
+        anchor.href = json.items[0].url;
+    }
 };
 window.onload = script;
