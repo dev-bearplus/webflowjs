@@ -2481,9 +2481,12 @@ const mainScript = () => {
         currentUpdate();
         if($('.blog-empty-btn').length > 0) {
             let pathParts = window.location.pathname.split('/').filter(part => part !== '');
-            pathParts.shift(); // bỏ phần đầu tiên
-            let currentPath = '/hk-zh-hant/' + pathParts.join('/');
-            // bỏ path đầu tiên
+            let currentPath = window.location.pathname;
+            // nếu phần đầu tiên là hk-en thì bỏ đi và thay bằng /hk-zh-hant
+            if(pathParts[0] === 'hk-en') {
+                pathParts.shift(); // bỏ phần đầu tiên
+            }
+            currentPath = '/hk-zh-hant/' + pathParts.join('/');
             console.log('currentPath' + currentPath)
             $('.blog-empty-btn').attr('href', `${currentPath}`);
         }
