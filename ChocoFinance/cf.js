@@ -585,9 +585,9 @@ const mainScript = () => {
         });
         return segments.length > 0 && segments[0].toLowerCase() === "hk-en";
     }
-    let firstLoad = sessionStorage.getItem('firstLoad');
+    let firstLoad = localStorage.getItem('firstLoad');
     if(!firstLoad && !checkFirstPathIsHK()){
-        sessionStorage.setItem('firstLoad', true)
+        localStorage.setItem('firstLoad', true)
         let currentLang = $('html').attr('lang');
         let suggestedLanguage = suggestLanguage();
         if(currentLang != suggestedLanguage){
