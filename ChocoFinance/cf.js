@@ -470,18 +470,17 @@ const mainScript = () => {
         const allowedRoutesLive = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog', '/blogs'];
         const allowedRoutesStagging = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog-new', 'blog', '/blogs'];
         const allowedRoutes = isStagging() ? allowedRoutesStagging : allowedRoutesLive;
-        // pathname.includes('hk-en') hoặc  pathname.includes('hk-zh-hant') for shouldSkipRedirect should not redirect
-
-        // Redirect /hk-en/blogs/... hoặc /hk-zh-hant/blogs/... về /hk-zh-hant/blog
-        if (pathname.match(/^\/(hk-en|hk-zh-hant)\/blogs\/.+/)) {
-            window.location.replace('/hk-zh-hant/blog');
-            return;
-        }
-
-        // Redirect /blogs-hong-kong/... về /blog (chỉ khi blogs-hong-kong là segment đầu tiên, không phải ở giữa path)
-        if (pathname.match(/^\/blogs-hong-kong\/.+/)) {
-            window.location.replace('/blog');
-            return;
+        if(!isStagging()){
+            if (pathname.match(/^\/(hk-en|hk-zh-hant)\/blogs\/.+/)) {
+                window.location.replace('/hk-zh-hant/blog');
+                return;
+            }
+    
+            // Redirect /blogs-hong-kong/... về /blog (chỉ khi blogs-hong-kong là segment đầu tiên, không phải ở giữa path)
+            if (pathname.match(/^\/blogs-hong-kong\/.+/)) {
+                window.location.replace('/blog');
+                return;
+            }
         }
 
         const shouldSkipRedirect = (pathname.includes('hk-en') || pathname.includes('hk-zh-hant')) && allowedRoutes.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
