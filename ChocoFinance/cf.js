@@ -470,19 +470,6 @@ const mainScript = () => {
         const allowedRoutesLive = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog', '/blogs'];
         const allowedRoutesStagging = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog-new', 'blog', '/blogs'];
         const allowedRoutes = isStagging() ? allowedRoutesStagging : allowedRoutesLive;
-        if(!isStagging()){
-            if (pathname.match(/^\/(hk-en|hk-zh-hant)\/blogs\/.+/)) {
-                window.location.replace('/hk-zh-hant/blog');
-                return;
-            }
-    
-            // Redirect /blogs-hong-kong/... về /blog (chỉ khi blogs-hong-kong là segment đầu tiên, không phải ở giữa path)
-            if (pathname.match(/^\/blogs-hong-kong\/.+/)) {
-                window.location.replace('/blog');
-                return;
-            }
-        }
-
         const shouldSkipRedirect = (pathname.includes('hk-en') || pathname.includes('hk-zh-hant')) && allowedRoutes.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
         if (!shouldSkipRedirect) {
             const matchedLang = langPaths.find(lang => new RegExp(`^/${lang}/.+`).test(pathname));
