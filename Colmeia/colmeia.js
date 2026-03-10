@@ -2302,6 +2302,16 @@ const mainScript = () => {
                         })
                     })
 
+                    function marqueeLogo() {
+                        const cloneAmount = 2;
+                        new Array(cloneAmount).fill().forEach((_, index) => {
+                            let itemClone = $('.home-hero-company-list').clone();
+                            $('.home-hero-company-cms').append(itemClone);
+                        })
+                        $('.home-hero-company-list').addClass('animMarquee')
+                    }
+                    marqueeLogo();
+
                     function animShowEl() {
                         const heroTitle = splitTextFadeUpSetup('.prod-hero-title');
                         const heroSub = splitTextFadeUpSetup('.prod-hero-sub > *');
@@ -2324,10 +2334,10 @@ const mainScript = () => {
                             .from('.prod-hero-sub li', { yPercent: 40, autoAlpha: 0, duration: .5, stagger: .02 }, '<=.1')
                             .from('.prod-hero-form', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' },  '>-.6')
                     }
-                        animShowEl();
-                        $('.prod-hero-form button[type=submit]').on('click', function() {
-                            $('.prod-hero-form #bot-hunter').val('');
-                        })
+                    animShowEl();
+                    $('.prod-hero-form button[type=submit]').on('click', function() {
+                        $('.prod-hero-form #bot-hunter').val('');
+                    })
                     // let iframeSrc = new URL($('.prod-hero-thumb-vid-inner').attr('data-iframe-src'));
                     // let iframeTitle = $('.prod-hero-thumb-vid-inner').attr('data-iframe-title');
                     // $('.prod-hero-thumb-btn a').on('click', function (e) {
