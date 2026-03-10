@@ -2410,6 +2410,15 @@ const mainScript = () => {
                 }
                 scHero();
 
+                function scProblem() {
+                    if (viewport.w <= 767) {
+                        $('.prod-problem-toggle-p').on('click', function() {
+                            $('.prod-problem-desc').toggleClass('full');
+                        })
+                    }
+                }
+                scProblem();
+
                 function scBenefit() {
                     const parent = childSelect('.prod-benefit .about-benefit-main');
                     if (viewport.w <= 767) {
@@ -2425,10 +2434,14 @@ const mainScript = () => {
                     let cloneService = $('.prod-service-item').eq(0).clone();
                     $('.prod-service-item').eq(0).remove()
                     $('.prod-service-main .hidden-content h3').each((i, h3) => {
+                        console.log()
                         let html = cloneService.clone();
                         let parent = childSelect(html);
                         parent('.prod-service-item-title').text($(h3).text());
                         parent('.prod-service-item-desc').text($(h3).next().text());
+                        if ($(h3).prev().is('figure')) {
+                            parent('.prod-service-item-ic img').attr('src', $(h3).prev().find('img').attr('src'));
+                        }
                         html.insertBefore('.prod-service-item:last');
                     })
 
@@ -2516,6 +2529,11 @@ const mainScript = () => {
                         $(`.prod-solution-${isGlobalJobCatalog ? 'sub' : 'main'}-img-inner`).eq(parent.index() - 1).addClass('active').siblings().removeClass('active');
                         ScrollTrigger.refresh();
                     })
+                    if (viewport.w <= 767) {
+                        $('.prod-solution-toggle-p').on('click', function() {
+                            $('.prod-solution-desc').toggleClass('full');
+                        })
+                    }
                 }
                 scSolution();
 
@@ -2541,9 +2559,7 @@ const mainScript = () => {
                 function scFAQ() {
                     let cloneFAQ = $('.home-faq-item').eq(0).clone();
                     $('.home-faq-item').eq(0).remove()
-                    console.log($('.home-faq-listing .hidden-content h3'))
                     $('.home-faq-listing .hidden-content h3').each((i, h3) => {
-                        console.log("run")
                         let html = cloneFAQ.clone();
                         let parent = childSelect(html);
                         parent('.accordion-title .txt').text($(h3).text());
