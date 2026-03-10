@@ -2304,7 +2304,7 @@ const mainScript = () => {
 
                     function animShowEl() {
                         const heroTitle = splitTextFadeUpSetup('.prod-hero-title');
-                        const heroSub = splitTextFadeUpSetup('.prod-hero-sub');
+                        const heroSub = splitTextFadeUpSetup('.prod-hero-sub > *');
                         const heroDesc = splitTextFadeUpSetup('.prod-hero-desc');
 
                         let tl = gsap.timeline({
@@ -2321,6 +2321,7 @@ const mainScript = () => {
                             .to(heroDesc.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
                             .to(heroTitle.words, { yPercent: 0, autoAlpha: 1, duration: .8, stagger: .04 }, "<=.1")
                             .to(heroSub.words, { yPercent: 0, autoAlpha: 1, duration: .5, stagger: .02 }, '<=.1')
+                            .from('.prod-hero-sub li', { yPercent: 40, autoAlpha: 0, duration: .5, stagger: .02 }, '<=.1')
                             .from('.prod-hero-form', { autoAlpha: 0, y: 20, duration: 1, clearProps: 'all' },  '>-.6')
                     }
                         animShowEl();
