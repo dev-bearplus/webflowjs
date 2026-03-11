@@ -118,7 +118,21 @@ const mainScript = () => {
     $('.product-cta-close').on('click', function () {
         $('.product-cta').slideUp();
     })
-    viewport.w <= 767 && setupMarquee($('.product-cta-marquee'));
+    if (viewport.w <= 767) {
+        setupMarquee($('.product-cta-marquee'));
+    } else {
+        const $titleWraps = $('.product-cta-title-wrap');
+        if ($titleWraps.length > 1) {
+            let currentIndex = 0;
+            const delay = 5000; // ms between each switch
+            $titleWraps.eq(0).addClass('active');
+            const titleInterval = setInterval(() => {
+                $titleWraps.removeClass('active');
+                currentIndex = (currentIndex + 1) % $titleWraps.length;
+                $titleWraps.eq(currentIndex).addClass('active');
+            }, delay);
+        }
+    }
 
     const HEADER = {
         toggleHide: (inst) => {
