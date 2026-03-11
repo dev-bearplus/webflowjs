@@ -2223,7 +2223,13 @@ const mainScript = () => {
                         let html = cloneCard.clone();
                         let parent = childSelect(html);
                         parent('.uc-intro-card-title').text($(h3).text());
-                        parent('.uc-intro-card-desc').text($(h3).next().text());
+                        let $between = $();
+                        let $el = $(h3).next();
+                        while ($el.length && !$el.is('h3')) {
+                            $between = $between.add($el);
+                            $el = $el.next();
+                        }
+                        parent('.uc-intro-card-desc').html($between.length ? $('<div>').append($between.clone()).html() : '');
                         html.toggleClass('active', i === 0);
                         $('.uc-intro-listing').append(html);
                     })
@@ -2445,11 +2451,16 @@ const mainScript = () => {
                     let cloneService = $('.prod-service-item').eq(0).clone();
                     $('.prod-service-item').eq(0).remove()
                     $('.prod-service-main .hidden-content h3').each((i, h3) => {
-                        console.log()
                         let html = cloneService.clone();
                         let parent = childSelect(html);
                         parent('.prod-service-item-title').text($(h3).text());
-                        parent('.prod-service-item-desc').text($(h3).next().text());
+                        let $between = $();
+                        let $el = $(h3).next();
+                        while ($el.length && !$el.is('h3')) {
+                            if (!$el.is('figure')) $between = $between.add($el);
+                            $el = $el.next();
+                        }
+                        parent('.prod-service-item-desc').html($between.length ? $('<div>').append($between.clone()).html() : '');
                         if ($(h3).prev().is('figure')) {
                             parent('.prod-service-item-ic img').attr('src', $(h3).prev().find('img').attr('src'));
                         }
@@ -2523,7 +2534,13 @@ const mainScript = () => {
                         let solutionImg = cloneImg.clone();
 
                         childSelect(solutionText)('.prod-solution-main-item-title-txt').text($(h3).text());
-                        childSelect(solutionText)('.prod-solution-main-item-content .txt').text($(h3).next().text());
+                        let $between = $();
+                        let $el = $(h3).next();
+                        while ($el.length && !$el.is('h3')) {
+                            if (!$el.is('figure')) $between = $between.add($el);
+                            $el = $el.next();
+                        }
+                        childSelect(solutionText)('.prod-solution-main-item-content .txt').html($between.length ? $('<div>').append($between.clone()).html() : '');
 
                         childSelect(solutionImg)('img').attr('src', $(h3).next().next().find('img').attr('src'));
 
@@ -2574,7 +2591,13 @@ const mainScript = () => {
                         let html = cloneFAQ.clone();
                         let parent = childSelect(html);
                         parent('.accordion-title .txt').text($(h3).text());
-                        parent('.accordion-content .txt').text($(h3).next().text());
+                        let $between = $();
+                        let $el = $(h3).next();
+                        while ($el.length && !$el.is('h3')) {
+                            $between = $between.add($el);
+                            $el = $el.next();
+                        }
+                        parent('.accordion-content .txt').html($between.length ? $('<div>').append($between.clone()).html() : '');
 
                         html.toggleClass('active', i === 0);
                         $('.home-faq-listing').append(html);
@@ -2637,7 +2660,13 @@ const mainScript = () => {
                         let html = cloneFAQ.clone();
                         let parent = childSelect(html);
                         parent('.accordion-title .txt').text($(h3).text());
-                        parent('.accordion-content .txt').text($(h3).next().text());
+                        let $between = $();
+                        let $el = $(h3).next();
+                        while ($el.length && !$el.is('h3')) {
+                            if (!$el.is('figure')) $between = $between.add($el);
+                            $el = $el.next();
+                        }
+                        parent('.accordion-content .txt').html($between.length ? $('<div>').append($between.clone()).html() : '');
 
                         html.toggleClass('active', i === 0);
                         $('.comp-faq-listing').append(html);
