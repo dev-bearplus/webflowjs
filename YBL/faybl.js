@@ -129,6 +129,10 @@ const mainScript = () => {
             const titleInterval = setInterval(() => {
                 $titleWraps.removeClass('active');
                 currentIndex = (currentIndex + 1) % $titleWraps.length;
+                let link = $titleWraps.eq(currentIndex).attr('data-link');
+                if (link) {
+                    $('.product-cta-btn').attr('href', link);
+                }
                 $titleWraps.eq(currentIndex).addClass('active');
             }, delay);
         }
