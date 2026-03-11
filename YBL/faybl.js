@@ -124,7 +124,7 @@ const mainScript = () => {
         const $titleWraps = $('.product-cta-title-wrap');
         if ($titleWraps.length > 1) {
             let currentIndex = 0;
-            const delay = 5000; // ms between each switch
+            const delay = 4000; // ms between each switch
             $titleWraps.eq(0).addClass('active');
             const titleInterval = setInterval(() => {
                 $titleWraps.removeClass('active');
