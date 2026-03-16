@@ -2233,6 +2233,7 @@ const mainScript = () => {
                         html.toggleClass('active', i === 0);
                         $('.uc-intro-listing').append(html);
                     })
+                    $('.uc-intro .hidden-content').remove();
                     if (viewport.w > 767) {
                         if ($('.uc-intro-card-wrap').length % 2 == 0) {
                             $('.uc-intro-listing').addClass('even-layout');
@@ -2466,6 +2467,7 @@ const mainScript = () => {
                         }
                         html.insertBefore('.prod-service-item:last');
                     })
+                    $('.prod-service-main .hidden-content').remove();
 
                     if (viewport.w > 767) {
                         if ($('.prod-service-item').length === 3) {
@@ -2549,6 +2551,7 @@ const mainScript = () => {
                         $('.prod-solution-main-inner').append(solutionText);
                         $(`.prod-solution-${isGlobalJobCatalog ? 'sub' : 'main'}-img`).append(solutionImg);
                     })
+                    $('.prod-solution-main .hidden-content').remove();
 
                     $('.prod-solution-main .accordion-title').on('click', function (e) {
                         let parent = $(this).parents('.accordion-item');
@@ -2602,6 +2605,7 @@ const mainScript = () => {
                         html.toggleClass('active', i === 0);
                         $('.home-faq-listing').append(html);
                     })
+                    $('.home-faq-listing .hidden-content').remove();
                     faq();
                 }
                 scFAQ();
@@ -2655,7 +2659,6 @@ const mainScript = () => {
                 function scFAQ() {
                     let cloneFAQ = $('.comp-faq-item').eq(0).clone();
                     $('.comp-faq-item').eq(0).remove()
-                    console.log($('.comp-faq-listing .hidden-content h3'))
                     $('.comp-faq-listing .hidden-content h3').each((i, h3) => {
                         let html = cloneFAQ.clone();
                         let parent = childSelect(html);
@@ -2671,6 +2674,7 @@ const mainScript = () => {
                         html.toggleClass('active', i === 0);
                         $('.comp-faq-listing').append(html);
                     })
+                    $('.comp-faq-listing .hidden-content').remove();
 
                     $('.accordion-title').on('click', function (e) {
                         let parent = $(this).closest('.accordion-item');
