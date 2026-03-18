@@ -586,11 +586,11 @@ const mainScript = () => {
     let firstLoad = localStorage.getItem('firstLoad');
     if(!firstLoad && !checkFirstPathIsHK()){
         localStorage.setItem('firstLoad', true)
-        let currentLang = $('html').attr('lang');
-        let suggestedLanguage = suggestLanguage();
-        if(currentLang != suggestedLanguage){
-            redirectCurrentLanguage(suggestedLanguage);
-        }
+        // let currentLang = $('html').attr('lang');
+        // let suggestedLanguage = suggestLanguage();
+        // if(currentLang != suggestedLanguage){
+        //     redirectCurrentLanguage(suggestedLanguage);
+        // }
     }
     function scrollDown() {
         header.addClass('on-hide')
