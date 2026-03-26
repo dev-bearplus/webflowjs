@@ -2716,7 +2716,7 @@ const mainScript = () => {
                     }
                 })
             }
-            $('.term-toc-item-link').on('click', function (e) {
+            $('.term-toc-inner').on('click', '.term-toc-item-link', function (e) {
                 e.preventDefault();
                 $('.term-toc-head').removeClass('on-open');
                 $('.term-toc-inner').removeClass('on-open');
