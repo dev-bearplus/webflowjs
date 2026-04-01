@@ -1276,6 +1276,9 @@ const mainScript = () => {
                 el.find('.float-sub').removeClass('hidden')
                 el.find('.float-sub').text("We'll reply to you as soon as possible.")
             }
+            else {
+                $('[data-form="form"]').trigger('reset');
+            }
             el.addClass('active')
             setTimeout(() => {
                 el.removeClass('active')
