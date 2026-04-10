@@ -168,15 +168,15 @@ const mainScript = () => {
             $headerLangContentInner.height($headerLangContentLists.eq(indexList).height());
             $headerLangContentLists.eq(indexList).addClass('active');
             $headerLangNationItems.eq(indexList).addClass('active');
-            $('[data-lang-code]').on('click', function (e) {
-                e.preventDefault();
-                let target = $(this).attr('href');
-                let currentSubdomain = $(e.currentTarget).closest('[data-lang-code]').attr('data-lang-code');
-                console.log(currentSubdomain);
-                localStorage.setItem('currentSubdomain', currentSubdomain);
-                let url = new URL(target);
-                window.location.href = url.href;
-            })
+            // $('[data-lang-code]').on('click', function (e) {
+            //     e.preventDefault();
+            //     let target = $(this).attr('href');
+            //     let currentSubdomain = $(e.currentTarget).closest('[data-lang-code]').attr('data-lang-code');
+            //     console.log(currentSubdomain);
+            //     localStorage.setItem('currentSubdomain', currentSubdomain);
+            //     let url = new URL(target);
+            //     window.location.href = url.href;
+            // })
         };
         initLang();
         if (!shouldSkipRedirect) {
