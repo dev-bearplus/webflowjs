@@ -7,9 +7,11 @@
     const allowedRoutesStagging = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog-new', 'blog', '/blogs'];
     const allowedRoutes = isStagging ? allowedRoutesStagging : allowedRoutesLive;
     const checkAllowedRoute = allowedRoutes.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
+    const isHomepage = pathname === '/' || pathname === '' || pathname === '/hk-zh-hant' || pathname === '/hk-en' || pathname === '/hk-zh-hant/' || pathname === '/hk-en/';
+    console.log('isHomepage', isHomepage);
     let currentSubdomain = localStorage.getItem('currentSubdomain');
     let checkDomain = '';
-    if (!currentSubdomain) {
+    if (!currentSubdomain && isHomepage) {
         let suggestedLang = 'en-SG'; // Default location
         try {
             const response = await fetch('https://1.1.1.1/cdn-cgi/trace');
@@ -33,7 +35,6 @@
     }
 
     const storedSubdomain = localStorage.getItem('currentSubdomain') || checkDomain;
-    console.log('storedSubdomain', storedSubdomain);
     if (storedSubdomain && currentLang !== storedSubdomain) {
         let langSubDomain = '';
         if (storedSubdomain === 'zh-HK') langSubDomain = 'hk-zh-hant';
@@ -50,18 +51,18 @@
             ? `${baseUrl}/${langSubDomain}${cleanPathname ? '/' + cleanPathname : ''}${search}${hash}`
             : `${baseUrl}/${cleanPathname}${search}${hash}`;
 
-        window.location.replace(targetUrl);
         console.log('targetUrl', targetUrl);
-        // try {
-        //     let response = await fetch(targetUrl, { method: 'GET' });
-        //     if (response.ok) {
-        //     } else {
-        //         // localStorage.setItem('currentSubdomain', currentLang);
-        //     }
-        // } catch (error) {
-        //     console.error(error);
-        //     // localStorage.setItem('currentSubdomain', currentLang);
-        // }
+        try {
+            let response = await fetch(targetUrl, { method: 'GET' });
+            if (response.ok) {
+                window.location.replace(targetUrl);
+            } else {
+                // localStorage.setItem('currentSubdomain', currentLang);
+            }
+        } catch (error) {
+            console.error(error);
+            // localStorage.setItem('currentSubdomain', currentLang);
+        }
     }
 })();
 
