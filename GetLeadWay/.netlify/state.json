@@ -1,0 +1,14 @@
+{
+	"geolocation": {
+		"data": {
+			"country": {
+				"code": "VN",
+				"name": "Vietnam"
+			},
+			"timezone": "Asia/Bangkok",
+			"latitude": 16.1667,
+			"longitude": 107.8333
+		},
+		"timestamp": 1775809171041
+	}
+}
