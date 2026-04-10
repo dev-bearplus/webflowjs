@@ -7,9 +7,9 @@
     const allowedRoutesStagging = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog-new', 'blog', '/blogs'];
     const allowedRoutes = isStagging ? allowedRoutesStagging : allowedRoutesLive;
     const checkAllowedRoute = allowedRoutes.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
-
-    if (!localStorage.getItem('firstLoad')) {
-        localStorage.setItem('firstLoad', 'true');
+    let currentSubdomain = localStorage.getItem('currentSubdomain');
+    let checkDomain = '';
+    if (!currentSubdomain) {
         let suggestedLang = 'en-SG'; // Default location
         try {
             const response = await fetch('https://1.1.1.1/cdn-cgi/trace');
@@ -25,44 +25,43 @@
             if (countryCode === 'HK') {
                 suggestedLang = 'zh-HK';
             }
+            checkDomain = suggestedLang;
         } catch (e) {
             console.error('Geo detect failed', e);
         }
-        localStorage.setItem('currentSubdomain', suggestedLang);
+        // localStorage.setItem('currentSubdomain', suggestedLang);
     }
 
-    const storedSubdomain = localStorage.getItem('currentSubdomain');
+    const storedSubdomain = localStorage.getItem('currentSubdomain') || checkDomain;
+    console.log('storedSubdomain', storedSubdomain);
     if (storedSubdomain && currentLang !== storedSubdomain) {
-        if (checkAllowedRoute || pathname === '/' || pathname === '') {
-            let langSubDomain = '';
-            if (storedSubdomain === 'zh-HK') langSubDomain = 'hk-zh-hant';
-            else if (storedSubdomain === 'en-HK') langSubDomain = 'hk-en';
+        let langSubDomain = '';
+        if (storedSubdomain === 'zh-HK') langSubDomain = 'hk-zh-hant';
+        else if (storedSubdomain === 'en-HK') langSubDomain = 'hk-en';
 
-            const baseUrl = window.location.origin;
-            const search = window.location.search || '';
-            const hash = window.location.hash || '';
-            const urlPrefixes = ['hk-zh-hant', 'hk-en'];
-            const pattern = new RegExp(`^/(${urlPrefixes.join('|')})(/|$)`);
-            let cleanPathname = pathname.replace(pattern, '').replace(/^\/+/, '');
-            
-            const targetUrl = langSubDomain 
-                ? `${baseUrl}/${langSubDomain}${cleanPathname ? '/' + cleanPathname : ''}${search}${hash}`
-                : `${baseUrl}/${cleanPathname}${search}${hash}`;
+        const baseUrl = window.location.origin;
+        const search = window.location.search || '';
+        const hash = window.location.hash || '';
+        const urlPrefixes = ['hk-zh-hant', 'hk-en'];
+        const pattern = new RegExp(`^/(${urlPrefixes.join('|')})(/|$)`);
+        let cleanPathname = pathname.replace(pattern, '').replace(/^\/+/, '');
 
-            try {
-                let response = await fetch(targetUrl, { method: 'GET' });
-                if (response.ok) {
-                    window.location.replace(targetUrl);
-                } else {
-                    localStorage.setItem('currentSubdomain', currentLang);
-                }
-            } catch (error) {
-                console.error(error);
-                localStorage.setItem('currentSubdomain', currentLang);
-            }
-        }
-    } else {
-        localStorage.setItem('currentSubdomain', currentLang);
+        const targetUrl = langSubDomain
+            ? `${baseUrl}/${langSubDomain}${cleanPathname ? '/' + cleanPathname : ''}${search}${hash}`
+            : `${baseUrl}/${cleanPathname}${search}${hash}`;
+
+        window.location.replace(targetUrl);
+        console.log('targetUrl', targetUrl);
+        // try {
+        //     let response = await fetch(targetUrl, { method: 'GET' });
+        //     if (response.ok) {
+        //     } else {
+        //         // localStorage.setItem('currentSubdomain', currentLang);
+        //     }
+        // } catch (error) {
+        //     console.error(error);
+        //     // localStorage.setItem('currentSubdomain', currentLang);
+        // }
     }
 })();
 
