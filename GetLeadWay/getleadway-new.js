@@ -761,18 +761,18 @@ const bpScript = () => {
                 }
             });
         };
-        const handleSetTopPositionWrap = () => {
-            // waiting setup show one item, after set calc position
-            setTimeout(() => {
-                const wrapPinning = $(`.${parent}-wrap`);
-                const heightWrap = wrapPinning.children().first().height();
-                const top = (window.innerHeight - heightWrap) / 2;
-                wrapPinning.css({
-                    top: `${top}px`,
-                    marginBottom: `-${top}px`
-                });
-            }, 300);
-        };
+        // const handleSetTopPositionWrap = () => {
+        //     // waiting setup show one item, after set calc position
+        //     setTimeout(() => {
+        //         const wrapPinning = $(`.${parent}-wrap`);
+        //         const heightWrap = wrapPinning.children().first().height();
+        //         const top = (window.innerHeight - heightWrap) / 2;
+        //         wrapPinning.css({
+        //             top: `${top}px`,
+        //             marginBottom: `-${top}px`
+        //         });
+        //     }, 300);
+        // };
         const setIndexCurrent = (newValue) => {
             const distance = numDistance() * newValue;
             listInner && gsap.to(listInner, {
