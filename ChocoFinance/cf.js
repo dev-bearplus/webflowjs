@@ -1476,7 +1476,6 @@ const mainScript = () => {
         }
         homeViewportHandle();
         function homeHeroIntro() {
-            let vid = document.querySelector('.vid-home-hero');
             let textCir;
             if ($(window).width() > 991) {
                 textCir = new CircleType(document.querySelector('.mod-circletext.mod-dk'));
@@ -1488,14 +1487,6 @@ const mainScript = () => {
             //  vid.defaultPlaybackRate = 1.4;
             const homeIntroTl = gsap.timeline({
                 default: { ease: Power1.easeIn },
-                onStart() {
-                    //gsap.set('.sc-home-hero .home-hero-rate-wrap',{'transform-origin': 'center center'})
-                    setTimeout(() => {
-                        if (vid) {
-                            vid.play()
-                        }
-                    }, 1200);
-                }
             })
             gsap.set('.sc-home-hero .home-hero-img-human img', { y: $(window).width() > 767 ? 40 : 0, duration: .6 }, '<=.3')
             homeIntroTl.from('.home-hero-content .home-hero-title', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0')
@@ -2027,6 +2018,173 @@ const mainScript = () => {
             }
         }
         homeWithDraw();
+    }
+    SCRIPT.gameScript = () => {
+        function gameHeroIntro() {
+            let textCir;
+            if ($(window).width() > 991) {
+                textCir = new CircleType(document.querySelector('.mod-circletext.mod-dk'));
+            } else {
+                textCir = new CircleType(document.querySelector('.mod-circletext.mod-tb'));
+            }
+            $('.mod-circletext').css('display', 'flex')
+            $('.text-cir-wrap').addClass('anim-rotate')
+            //  vid.defaultPlaybackRate = 1.4;
+            const gameIntroTl = gsap.timeline({
+                default: { ease: Power1.easeIn },
+            })
+            gsap.set('.game-hero .game-hero-img-human img', { y: $(window).width() > 767 ? 40 : 0, duration: .6 }, '<=.3')
+            gameIntroTl.from('.game-hero-content .game-hero-title', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0')
+                .from('.game-hero-content .game-hero-sub', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0')
+                .from('.game-hero-content .btn.mod-game-hero', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0')
+                // Human first
+                .to('.game-hero .game-hero-img-human img', { y: 0, autoAlpha: 1, duration: .6 }, '<=.3')
+                //.from('.game-hero .game-hero-rate-wrap', {y: 40, autoAlpha: 0, duration: .6}, '>=0')
+                .to('.game-hero .game-hero-img-c-bg, .game-hero .game-hero-rate-wrap', { opacity: 1, duration: .6 }, '>=0')
+        }
+        gameHeroIntro();
+        function gameHeroHandle() {
+            let ribbonOffset, humanOffset;
+            if ($(window).width() > 991) {
+                ribbonOffset = 6.9;
+                humanOffset = 10;
+                circleOffset = 4;
+            } else {
+                ribbonOffset = 2.6;
+                humanOffset = 6;
+                circleOffset = 2;
+            }
+            const gameHeroTl = new gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.game-hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: 1,
+                }
+            });
+            gameHeroTl.from('.game-rich-bg-img', { y: ribbonOffset * unit, ease: 'none' })
+                .to('.game-hero-img-human img', { y: $(window).width() > 767 ? humanOffset * unit : 0, ease: 'none' }, '0')
+                .to('.game-hero-img-c-bg img', { y: $(window).width() > 767 ? -humanOffset * unit : 0, ease: 'none' }, '0')
+
+            if ($(window).width() > 991) {
+                // gameHeroTl.from('.game-partner-inner', { 'grid-column-gap': '10rem', ease: 'none' }, '0')
+                // Mouse move human parallax
+                function applyHumanParallax() {
+                    let humanX = xGetter('.game-hero-img-human');
+                    let humanY = yGetter('.game-hero-img-human');
+                    let circleX = xGetter('.game-hero-img-c-bg');
+                    let circleY = yGetter('.game-hero-img-c-bg');
+                    let rateX = xGetter('.game-hero-rate-wrap .game-hero-rate');
+                    let rateY = yGetter('.game-hero-rate-wrap .game-hero-rate');
+                    if ($('.game-hero-img-human').length) {
+                        xSetter('.game-hero-img-human')(lerp(humanX, -mousePos.x * 1.2));
+                        ySetter('.game-hero-img-human')(lerp(humanY, -mousePos.y));
+
+                        xSetter('.game-hero-img-c-bg')(lerp(circleX, mousePos.x));
+                        ySetter('.game-hero-img-c-bg')(lerp(circleY, mousePos.y * .8));
+
+                        xSetter('.game-hero-rate-wrap .game-hero-rate')(lerp(rateX, -mousePos.x * 1.6));
+                        ySetter('.game-hero-rate-wrap .game-hero-rate')(lerp(rateY, -mousePos.y * 1.4));
+                        requestAnimationFrame(applyHumanParallax)
+                    }
+                }
+                requestAnimationFrame(applyHumanParallax)
+            }
+        }
+        gameHeroHandle();
+        function gameBenefSetup() {
+            if ($(window).outerWidth() > 991) {
+                let cloneSwiper = $('.game-benef-main.swiper').clone().removeClass('mod-bot').addClass('mod-top');
+                $('.game-benef-main-wrap').append(cloneSwiper);
+            }
+        }
+        gameBenefSetup();
+        function gameBenefHandleMobile() {
+            console.log('mobile')
+            if ($(window).outerWidth() <= 480) {
+                $('.game-benef-item').on('click', function (e) {
+                    console.log('click')
+                    if ($(this).hasClass('active')) {
+                        $(this).removeClass('active');
+                        $(this).find('.game-benef-item-sub').slideUp();
+                    }
+                    else {
+                        $('.game-benef-item').not($(this)).removeClass('active');
+                        $(this).addClass('active')
+
+                        $('.game-benef-item').not($(this)).find('.game-benef-item-sub').slideUp();
+                        $(this).find('.game-benef-item-sub').slideDown();
+                    }
+                })
+                $('.game-benef-item').eq(0).trigger('click');
+            }
+        }
+        gameBenefHandleMobile();
+        gameTestiHandleNew();
+        function gameTestiHandleNew() {
+            $('.game-testi-item').each(function (e) {
+                let rate = Number($(this).find('.data-rate').text());
+                let stars = $(this).find('.ic-star');
+                for (let x = 0; x < rate; x++) {
+                    stars.eq(x).addClass('rate-true')
+                }
+            })
+            if ($(window).width() > 991) {
+                $('.game-testi-main').on('mouseenter', function (e) {
+                    if (!isScrolling) {
+                        lenis.stop();
+                    }
+                })
+                $('.game-testi-main').on('mouseleave', function (e) {
+                    if (!isScrolling) {
+                        lenis.start();
+                    }
+                })
+
+                let distanceVal;
+                if ($('.game-testi-col-inner.mod-right').height() >= $('.game-testi-col-inner.mod-left').height()) {
+                    distanceVal = $('.game-testi-col-inner.mod-right').outerHeight() - $('.game-testi-wrap').height();
+                } else {
+                    distanceVal = $('.game-testi-col-inner.mod-left').outerHeight() - $('.game-testi-wrap').height();
+                }
+
+                const gameTestiTl = new gsap.timeline({
+                    paused: true,
+                });
+                gameTestiTl.to('.game-testi-bar-inner', { scaleX: 1, ease: 'none' })
+                    .fromTo('.game-testi-col-inner.mod-left', { yPercent: 0, ease: 'none' }, { y: -distanceVal, ease: 'none' }, '0')
+                    .fromTo('.game-testi-col-inner.mod-right', { yPercent: 0, ease: 'none' }, { y: distanceVal, ease: 'none' }, '0')
+
+                let currProg = 0;
+                $('.game-testi-main').on('wheel', function (e) {
+                    currProg = currProg + e.originalEvent.deltaY > distanceVal ? distanceVal : currProg + e.originalEvent.deltaY < 0 ? 0 : currProg + e.originalEvent.deltaY;
+                    let prog = currProg / distanceVal > 1 ? 1 : currProg / distanceVal < 0 ? 0 : currProg / distanceVal;
+                    gsap.to(gameTestiTl, { duration: .8 * gsap.utils.clamp(.5, 1, Math.abs(e.originalEvent.deltaY / 110)), progress: prog, ease: Power2.easeOut, overwrite: true });
+                })
+            } else {
+                const gameTestiSwiperMb = new Swiper('.swiper.game-testi-col-wrapper', {
+                    slidesPerView: "auto",
+                    spaceBetween: 1.6 * unit,
+                    breakpoints: {
+                        767: {
+                            slidesPerView: 2,
+                        }
+                    }
+                })
+            }
+            if ($('.game-card-title').length > 0) {
+                ScrollTrigger.create({
+                    trigger: '.game-card-title',
+                    start: 'center center',
+                    end: 'center center',
+                    once: true,
+                    onEnter: () => {
+                        gameCardHandle()
+                    }
+                })
+            }
+        }
+
     }
     SCRIPT.howItWorksScript = () => {
         const howWorkSwiper = new Swiper('.how-work-main-wrap', {
