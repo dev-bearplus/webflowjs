@@ -219,6 +219,12 @@ const mainScript = () => {
 				$(this).toggleClass('active');
 				$('.nav-archived-blog-main').slideToggle();
 			});
+			if ($(this.el).find('.nav-insight').length) {
+				$(this.el).find('.nav-insight-head').on('click', function () {
+					$(this).toggleClass('active');
+					$(this).siblings('.nav-insight-body').slideToggle();
+				});
+			}
 		}
     }
 	const nav = new Nav();
