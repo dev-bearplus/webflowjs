@@ -2048,7 +2048,7 @@ const mainScript = () => {
             if (viewport.w < 490) {
                 $('.game-hero-info-wrap').addClass('swiper');
                 $('.game-hero-info').addClass('swiper-wrapper');
-                $('.game-hero-info-item').children().addClass('swiper-slide');
+                $('.game-hero-info-item').addClass('swiper-slide');
                 new Swiper('.game-hero-info-wrap', {
                     slidesPerView: 'auto',
                     spaceBetween: parseRem(12)
