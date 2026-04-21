@@ -696,7 +696,8 @@ const mainScript = () => {
         }
     }
     function scrollUp() {
-        header.removeClass('on-hide')
+        header.removeClass('on-hide');
+
         if ($('.blog-page').length) {
             $('.blog-header').addClass('on-scroll')
         }
@@ -800,7 +801,9 @@ const mainScript = () => {
         }
         console.log(threshold)
         if (threshold) {
-            header.addClass('on-scroll')
+            header.addClass('on-scroll');
+            console.log('on-scroll');
+            $('.home-sticky').addClass('active');
             if (inst.direction == 1) {
                 // down
                 scrollDown()
@@ -812,7 +815,8 @@ const mainScript = () => {
                 header.removeClass('dark-mode')
             }
         } else {
-            header.removeClass('on-scroll on-hide')
+            header.removeClass('on-scroll on-hide');
+            $('.home-sticky').removeClass('active');
             if ($('.dark-header').length) {
                 header.addClass('dark-mode')
             }
