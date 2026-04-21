@@ -2045,6 +2045,15 @@ const mainScript = () => {
                 .to('.game-hero .game-hero-img-human img', { y: 0, autoAlpha: 1, duration: .6 }, '<=.3')
                 //.from('.game-hero .game-hero-rate-wrap', {y: 40, autoAlpha: 0, duration: .6}, '>=0')
                 .to('.game-hero .game-hero-img-c-bg, .game-hero .game-hero-rate-wrap', { opacity: 1, duration: .6 }, '>=0')
+            if (viewport.w < 490) {
+                $('.game-hero-info-wrap').addClass('swiper');
+                $('.game-hero-info').addClass('swiper-wrapper');
+                $('.game-hero-info-item').children().addClass('swiper-slide');
+                new Swiper('.game-hero-info-wrap', {
+                    slidesPerView: 'auto',
+                    spaceBetween: parseRem(12)
+                })
+            }
         }
         gameHeroIntro();
         function gameHeroHandle() {
