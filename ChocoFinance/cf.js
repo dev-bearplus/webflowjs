@@ -1210,6 +1210,85 @@ const mainScript = () => {
             }
         })
     }
+    function updateInterestRateStaging(wrapper) {
+        let SGDbigRate = $('[data-rate-source-sgd="big"]').text();
+        let SGDmediumRate = $('[data-rate-source-sgd="medium"]').text();
+        let SGDsmallRate = $('[data-rate-source-sgd="small"]').text();
+        let SGDotherRate = $('[data-rate-source-sgd="other"]').text();
+        let SGDamount1 = $('[data-rate-source-sgd="amount1"]').text();
+        let SGDamount2 = $('[data-rate-source-sgd="amount2"]').text();
+        let SGDTupAmount = $('[data-rate-source-sgd="tup-amount"]').text();
+        let SGDdate = $('[data-rate-source-sgd="date"]').text();
+        let SGDwidthdrawal = $('[data-rate-source-sgd="withdrawal"]').text();
+        let SGDminimumsum = $('[data-rate-source-sgd="minimum-sum"]').text();
+
+        let SGDallRates = $(wrapper).find('[data-rate-sgd]');
+        SGDallRates.each(function (e) {
+            let type = $(this).attr('data-rate-sgd');
+            if (type == 'big') {
+                $(this).text(SGDbigRate)
+            } else if (type == 'medium') {
+                $(this).text(SGDmediumRate)
+            } else if (type == 'small') {
+                $(this).text(SGDsmallRate)
+            } else if (type == 'amount1') {
+                $(this).text(SGDamount1)
+            } else if (type == 'amount2') {
+                $(this).text(SGDamount2)
+            } else if (type == 'tup-amount') {
+                $(this).text(SGDTupAmount)
+            } else if (type == 'date') {
+                $(this).text(SGDdate)
+            } else if (type == 'other') {
+                $(this).text(SGDotherRate)
+            } else if (type == 'withdrawal') {
+                $(this).text(SGDwidthdrawal)
+            } else if (type == 'minimum-sum') {
+                $(this).text(SGDminimumsum)
+            } else if (type == 'fixed') {
+                // $(this).text(fixedRate)
+            }
+        })
+
+        let USDbigRate = $('[data-rate-source-usd="big"]').text();
+        let USDmediumRate = $('[data-rate-source-usd="medium"]').text();
+        let USDsmallRate = $('[data-rate-source-usd="small"]').text();
+        let USDotherRate = $('[data-rate-source-usd="other"]').text();
+        // let USDfixedRate = $('[data-rate-source-usd="fixed"]').text();
+        let USDamount1 = $('[data-rate-source-usd="amount1"]').text();
+        let USDamount2 = $('[data-rate-source-usd="amount2"]').text();
+        let USDTupAmount = $('[data-rate-source-usd="tup-amount"]').text();
+        let USDdate = $('[data-rate-source-usd="date"]').text();
+        let USDwidthdrawal = $('[data-rate-source-usd="withdrawal"]').text();
+        let USDminimiumsum = $('[data-rate-source-usd="minimum-sum"]').text();
+        let USDallRates = $(wrapper).find('[data-rate-usd]');
+        USDallRates.each(function (e) {
+            let type = $(this).attr('data-rate-usd');
+            if (type == 'big') {
+                $(this).text(USDbigRate)
+            } else if (type == 'medium') {
+                $(this).text(USDmediumRate)
+            } else if (type == 'small') {
+                $(this).text(USDsmallRate)
+            } else if (type == 'amount1') {
+                $(this).text(USDamount1)
+            } else if (type == 'amount2') {
+                $(this).text(USDamount2)
+            } else if (type == 'tup-amount') {
+                $(this).text(USDTupAmount)
+            } else if (type == 'date') {
+                $(this).text(USDdate)
+            } else if (type == 'other') {
+                $(this).text(USDotherRate)
+            } else if (type == 'withdrawal') {
+                $(this).text(USDwidthdrawal)
+            } else if (type == 'minimum-sum') {
+                $(this).text(USDminimiumsum)
+            } else if (type == 'fixed') {
+                // $(this).text(USDfixedRate)
+            }
+        })
+    }
     function getAllDynamicData(richtextClass) {
         let wrapper = $(richtextClass)
         let allLink = wrapper.find('a')
@@ -1231,7 +1310,12 @@ const mainScript = () => {
                 $(item).replaceWith(span);
             }
         })
-        updateInterestRate(richtextClass)
+        if (!isStagging()) {
+            updateInterestRate(richtextClass)
+        }
+        else {
+            updateInterestRateStaging(richtextClass)
+        }
     }
     getAllDynamicData('.main')
     function setupDialCode(data, selectId) {
