@@ -1210,7 +1210,7 @@ const mainScript = () => {
             }
         })
     }
-    function updateInterestRateStaging(wrapper) {
+    function updateInterestRateLive(wrapper) {
         let SGDbigRate = $('[data-rate-source-sgd="big"]').text();
         let SGDmediumRate = $('[data-rate-source-sgd="medium"]').text();
         let SGDsmallRate = $('[data-rate-source-sgd="small"]').text();
@@ -1310,12 +1310,12 @@ const mainScript = () => {
                 $(item).replaceWith(span);
             }
         })
-        if (!isStagging()) {
-            updateInterestRate(richtextClass)
-        }
-        else {
-            updateInterestRateStaging(richtextClass)
-        }
+        // if (!isStagging()) {
+        //     updateInterestRate(richtextClass)
+        // }
+        // else {
+        updateInterestRateLive(richtextClass)
+        // }
     }
     getAllDynamicData('.main')
     function setupDialCode(data, selectId) {
