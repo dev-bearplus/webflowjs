@@ -366,7 +366,7 @@ const mainScript = () => {
     const handleReplaceLink = () => {
       if ($('.about-list-post-item').length > 0) {
         $('.about-list-post-item').each((_idx, item) => {
-          const pdfLink = $(item).find('.about-news-list-clone-link').attr('href');
+          const pdfLink = $(item).find('.about-news-list-clone-link').attr('data-href');
           function isValidLink(link) {
             const urlPattern = /https?:\/\/[^\s]+/;
             return urlPattern.test(link);
