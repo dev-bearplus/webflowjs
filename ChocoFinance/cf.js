@@ -4,6 +4,9 @@
     const isHomepage = pathname === '/' || pathname === '' || pathname === '/hk-zh-hant' || pathname === '/hk-en' || pathname === '/hk-zh-hant/' || pathname === '/hk-en/' || pathname === '/ae-en' || pathname === '/ae-ar/';
     let currentSubdomain = localStorage.getItem('currentSubdomain');
     let checkDomain = '';
+    // check is on language ae
+    let isAE = pathname.includes('ae-en') || pathname.includes('ae-ar');
+    if (isAE) return;
     if (!currentSubdomain && isHomepage) {
         let suggestedLang = 'en-SG'; // Default location
         try {
@@ -113,11 +116,10 @@ const mainScript = () => {
         const checkAllowedRouteHK = allowedRoutesHK.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
 
         // check allow routes for AE
-        const allowedRoutesAELive = ['waitlist'];
+        const allowedRoutesAELive = [];
         const allowedRoutesAEStagging = ['waitlist'];
         const allowedRoutesAE = isStagging() ? allowedRoutesAEStagging : allowedRoutesAELive;
         const checkAllowedRouteAE = allowedRoutesAE.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
-
         const isHK = pathname.includes('hk-en') || pathname.includes('hk-zh-hant');
         const isAE = pathname.includes('ae-ar') || pathname.includes('ae-en');
 
