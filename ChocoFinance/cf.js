@@ -1,14 +1,7 @@
 (async function priorityLanguageCheck() {
     let currentLang = document.documentElement.lang || 'en-SG';
-    const isStagging = window.location.href.includes('webflow.io');
     const pathname = window.location.pathname;
-    const lastSegment = pathname.split('/').pop();
-    const allowedRoutesLive = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog', '/blogs'];
-    const allowedRoutesStagging = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog-new', 'blog', '/blogs'];
-    const allowedRoutes = isStagging ? allowedRoutesStagging : allowedRoutesLive;
-    const checkAllowedRoute = allowedRoutes.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
     const isHomepage = pathname === '/' || pathname === '' || pathname === '/hk-zh-hant' || pathname === '/hk-en' || pathname === '/hk-zh-hant/' || pathname === '/hk-en/' || pathname === '/ae-en' || pathname === '/ae-ar/';
-    console.log('isHomepage', isHomepage);
     let currentSubdomain = localStorage.getItem('currentSubdomain');
     let checkDomain = '';
     if (!currentSubdomain && isHomepage) {
@@ -110,14 +103,26 @@ const mainScript = () => {
         const $headerLangContentItems = $('.header-lang-content-item');
         const $html = $('html');
         const $header = $('.header');
-        const langPaths = ['hk-zh-hant', 'hk-en'];
+        const langPaths = ['hk-zh-hant', 'hk-en', 'ae-ar', 'ae-en'];
         const pathname = window.location.pathname;
         const lastSegment = pathname.split('/').pop();
-        const allowedRoutesLive = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog', '/blogs'];
-        const allowedRoutesStagging = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog-new', 'blog', '/blogs'];
-        const allowedRoutes = isStagging() ? allowedRoutesStagging : allowedRoutesLive;
-        const checkAllowedRoute = allowedRoutes.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
-        const shouldSkipRedirect = (pathname.includes('hk-en') || pathname.includes('hk-zh-hant')) && checkAllowedRoute;
+        // check allow routes for HK
+        const allowedRoutesHKLive = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog', '/blogs'];
+        const allowedRoutesHKStagging = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog-new', 'blog', '/blogs'];
+        const allowedRoutesHK = isStagging() ? allowedRoutesHKStagging : allowedRoutesHKLive;
+        const checkAllowedRouteHK = allowedRoutesHK.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
+
+        // check allow routes for AE
+        const allowedRoutesAELive = ['waitlist'];
+        const allowedRoutesAEStagging = ['waitlist'];
+        const allowedRoutesAE = isStagging() ? allowedRoutesAEStagging : allowedRoutesAELive;
+        const checkAllowedRouteAE = allowedRoutesAE.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
+
+        const isHK = pathname.includes('hk-en') || pathname.includes('hk-zh-hant');
+        const isAE = pathname.includes('ae-ar') || pathname.includes('ae-en');
+
+        // Kiểm tra độc lập
+        const shouldSkipRedirect = (isHK && checkAllowedRouteHK) || (isAE && checkAllowedRouteAE);
         let currentLang = $('html').attr('lang');
         const initLang = () => {
             const langCodes = $headerLangContentItems.map(function () {
