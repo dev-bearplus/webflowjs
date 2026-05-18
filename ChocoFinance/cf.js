@@ -7,7 +7,7 @@
     const allowedRoutesStagging = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog-new', 'blog', '/blogs'];
     const allowedRoutes = isStagging ? allowedRoutesStagging : allowedRoutesLive;
     const checkAllowedRoute = allowedRoutes.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
-    const isHomepage = pathname === '/' || pathname === '' || pathname === '/hk-zh-hant' || pathname === '/hk-en' || pathname === '/hk-zh-hant/' || pathname === '/hk-en/';
+    const isHomepage = pathname === '/' || pathname === '' || pathname === '/hk-zh-hant' || pathname === '/hk-en' || pathname === '/hk-zh-hant/' || pathname === '/hk-en/' || pathname === '/ae-en' || pathname === '/ae-ar/';
     console.log('isHomepage', isHomepage);
     let currentSubdomain = localStorage.getItem('currentSubdomain');
     let checkDomain = '';
@@ -26,6 +26,8 @@
             }
             if (countryCode === 'HK') {
                 suggestedLang = 'zh-HK';
+            } else if (countryCode === 'AE') {
+                suggestedLang = 'ar-AE';
             }
             checkDomain = suggestedLang;
         } catch (e) {
@@ -39,11 +41,13 @@
         let langSubDomain = '';
         if (storedSubdomain === 'zh-HK') langSubDomain = 'hk-zh-hant';
         else if (storedSubdomain === 'en-HK') langSubDomain = 'hk-en';
+        else if (storedSubdomain === 'ar-AE') langSubDomain = 'ae-ar';
+        else if (storedSubdomain === 'en-AE') langSubDomain = 'ae-en';
 
         const baseUrl = window.location.origin;
         const search = window.location.search || '';
         const hash = window.location.hash || '';
-        const urlPrefixes = ['hk-zh-hant', 'hk-en'];
+        const urlPrefixes = ['hk-zh-hant', 'hk-en', 'ae-ar', 'ae-en'];
         const pattern = new RegExp(`^/(${urlPrefixes.join('|')})(/|$)`);
         let cleanPathname = pathname.replace(pattern, '').replace(/^\/+/, '');
 
@@ -3741,6 +3745,93 @@ const mainScript = () => {
         // check current url is /waitlist và language current is en-SG
         if (window.location.pathname === '/waitlist' && $('html').attr('lang') === 'en-SG') {
             window.location.href = '/404';
+        }
+
+        function formatCountryWaitlist(state) {
+            if (!state.id) return state.text;
+            let countryCode = $(state.element).attr('data-code');
+            if (!countryCode) return state.text;
+            let baseUrl = "https://flagcdn.com/20x15";
+            return $(
+                '<span><img src="' + baseUrl + '/' + countryCode.toLowerCase() + '.png" class="img-flag" style="margin-right: 8px;" /> ' + state.text + '</span>'
+            );
+        }
+
+        let selectIds = ['#dialCode', '#dialPopup', '.dial-code-select', '#dialHeader', '#dialHero'];
+
+        if (typeof dialCodes !== 'undefined') {
+            selectIds.forEach((selector) => {
+                let selectContainer = $(selector);
+
+                if (selectContainer.length > 0) {
+                    let selectItem = selectContainer;
+                    if (selectContainer.prop('tagName').toLowerCase() !== 'select') {
+                        selectContainer.html('');
+                        let injectedSelect = $('<select style="display:none;"></select>');
+                        selectContainer.append(injectedSelect);
+                        selectItem = injectedSelect;
+                    } else {
+                        selectItem.html('');
+                    }
+
+                    dialCodes.forEach((el) => {
+                        let html = `<option value="${el.dial_code}" data-code="${el.code}">${el.name} (${el.dial_code})</option>`;
+                        selectItem.append(html);
+                    });
+
+                    // Xác định phần tử cha để gắn (append) dropdown vào
+                    let dropdownParentNode = selectItem.closest('.waitlist-hero-form-input-inner');
+                    if (dropdownParentNode.length === 0) dropdownParentNode = selectItem.closest('.header-form-input-wrap');
+                    if (dropdownParentNode.length === 0) dropdownParentNode = selectItem.closest('.phone-input-group');
+                    if (dropdownParentNode.length === 0) dropdownParentNode = selectItem.closest('[data-form="form"]');
+
+                    if (dropdownParentNode.length === 0) dropdownParentNode = $(document.body);
+
+                    // Khởi tạo Select2
+                    selectItem.select2({
+                        templateResult: formatCountryWaitlist,
+                        dropdownParent: dropdownParentNode
+                    });
+
+                    // TÌM PHẦN TỬ NÚT BẤM (WRAPPER CHỨA CỜ VÀ MÃ VÙNG)
+                    let wrap = selectItem.closest('.waitlist-hero-form-input-inner').find('.waitlist-hero-form-input-deco');
+                    if (wrap.length === 0) wrap = selectItem.closest('.header-form-input-wrap').find('.header-form-input-deco');
+                    if (wrap.length === 0) wrap = selectItem.closest('.phone-input-group').find('.dial-code-wrap');
+                    if (wrap.length === 0) wrap = selectItem.closest('[data-form="form"]').find('.dial-code-wrap');
+                    if (wrap.length > 0) {
+                        // Tránh bind event click nhiều lần nếu gọi lại hàm
+                        wrap.off('click').on('click', function (e) {
+                            e.preventDefault();
+                            selectItem.select2('open');
+                        });
+
+                        // Cập nhật Cờ và Mã vùng hiển thị khi chọn
+                        selectItem.on('select2:select', function (e) {
+                            let code = $(this).val();
+                            let selectedOption = $(this).find('option:selected');
+                            let countryCode = selectedOption.attr('data-code').toLowerCase();
+
+                            // Lấy DOM hiển thị chữ mã vùng (+971)
+                            let phoneRegion = wrap.find('.txt-14');
+                            if (phoneRegion.length === 0) phoneRegion = wrap.find('.phone-region');
+
+                            // Lấy DOM hiển thị ảnh cờ
+                            let selectedFlag = wrap.find('.img-basic');
+                            if (selectedFlag.length === 0) selectedFlag = wrap.find('.selected-flag');
+
+                            // Cập nhật hiển thị
+                            phoneRegion.text(code);
+                            selectedFlag.attr('src', `https://flagcdn.com/20x15/${countryCode}.png`);
+                        });
+                    }
+
+                    selectItem.on('select2:opening', function (e) {
+                        setTimeout(() => {
+                            $('.select2-results__options').attr('data-lenis-prevent', '');
+                        }, 300);
+                    });
+                }
+            });
         }
     }
     SCRIPT.referralRewardScript = () => {
