@@ -339,7 +339,7 @@ const mainScript = () => {
                         }
                     });
 
-                    gsap.set('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)', display: 'block' })
+                    gsap.set('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)', display: 'flex' })
                     gsap.set('.main', { y: 200 })
                     tl
                         .to('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 0%, 0 0%)', delay: viewport.w > 767 ? 1.6 : 1, duration: .8, ease: 'quart.in' })
