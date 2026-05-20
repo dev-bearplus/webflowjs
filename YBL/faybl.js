@@ -165,7 +165,7 @@ const mainScript = () => {
         toggleOnScroll: (inst) => {
             const scrollTop = document.documentElement.scrollTop || window.scrollY
             let isScrollHeader = scrollTop > $('.header-container').height() * ratioScrollHeader;
-            if($('.cta-top-wrap').length > 0) {
+            if ($('.cta-top-wrap').length > 0) {
                 isScrollHeader = scrollTop > parseRem(5);
                 console.log(scrollTop)
             }
@@ -309,36 +309,43 @@ const mainScript = () => {
         }
         init(play) {
             let isLoaded = sessionStorage.getItem('isLoaded');
-            if (isLoaded) {
+            window.addEventListener("pageshow", function (event) {
+                if ($('.loader').length == 0) return;
+                var historyTraversal = event.persisted ||
+                    (typeof window.performance != "undefined" && window.performance.navigation.type === 2);
+
+                if (historyTraversal) {
+                    gsap.set('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 0%, 0 0%)', display: 'none' });
+                }
+            });
+            if ($('.loader').length == 0) {
                 play();
             }
             else {
-                let tl = gsap.timeline({
-                    onStart: () => {
-                        setTimeout(() => play(), viewport.w > 767 ? 2000 : 1200);
-                    },
-                    onComplete: () => {
-                        sessionStorage.setItem('isLoaded', true);
-                    }
-                });
+                if (isLoaded) {
+                    gsap.set('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 0%, 0 0%)', display: 'none' });
+                    gsap.set('.main', { y: 0, clearProps: 'all' });
+                    gsap.set('.faybl-logo', { y: 5 });
+                    play();
+                }
+                else {
+                    let tl = gsap.timeline({
+                        onStart: () => {
+                            setTimeout(() => play(), viewport.w > 767 ? 2000 : 1200);
+                        },
+                        onComplete: () => {
+                            sessionStorage.setItem('isLoaded', true);
+                            gsap.set('.loader', { display: 'none' });
+                        }
+                    });
 
-                gsap.set('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' })
-                gsap.set('.main', { y: 200 })
-                tl
-                    .to('.loader',{ clipPath: 'polygon(0% 0%, 100% 0%, 100% 0%, 0 0%)', delay: viewport.w > 767 ? 1.6 : 1,  duration: .8, ease: 'quart.in' })
-                    .to('.faybl-logo', { y: 5, duration: .8, ease: 'quart.in' }, '<=0')
-                    .to('.main', { y: 0, duration: 1, clearProps: 'all' }, viewport.w > 767 ? 1.6 : 1)
-
-                window.addEventListener("pageshow", function (event) {
-                    event.preventDefault();
-                    var historyTraversal = event.persisted ||
-                        (typeof window.performance != "undefined" &&
-                            window.performance.navigation.type === 2);
-                    if (historyTraversal) {
-                        const href = window.location.href;
-                        gsap.fromTo('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' }, { clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)', delay: 1, duration: .5, ease: 'circ.in' })
-                    }
-                })
+                    gsap.set('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)', display: 'block' })
+                    gsap.set('.main', { y: 200 })
+                    tl
+                        .to('.loader', { clipPath: 'polygon(0% 0%, 100% 0%, 100% 0%, 0 0%)', delay: viewport.w > 767 ? 1.6 : 1, duration: .8, ease: 'quart.in' })
+                        .to('.faybl-logo', { y: 5, duration: .8, ease: 'quart.in' }, '<=0')
+                        .to('.main', { y: 0, duration: 1, clearProps: 'all' }, viewport.w > 767 ? 1.6 : 1)
+                }
             }
         }
     }
@@ -371,13 +378,13 @@ const mainScript = () => {
                     new FadeIn({ el: $('.home-hero-act-request').get(0), delay: "<=0" }),
                     new FadeIn({ el: $('.home-hero-act-key').get(0) }),
                     new FadeSplitText({ el: $('.home-hero-marquee-txt').get(0), onMask: true }),
-                    new ScaleLine({ el: $('.home-hero-marquee-line').get(1), delay: '1'}),
+                    new ScaleLine({ el: $('.home-hero-marquee-line').get(1), delay: '1' }),
                     new FadeIn({ el: $('.home-hero-marquee').get(0) }),
                 ]
             });
         }
         interact() {
-            $('.home-hero-video-control').on('click', function() {
+            $('.home-hero-video-control').on('click', function () {
                 $('.home-hero-video-control-wrap').fadeOut();
                 $('.home-hero-video-inner').get(0).play();
             })
@@ -409,7 +416,7 @@ const mainScript = () => {
                     new FadeSplitText({ el: $('.home-user-content-position').get(0), onMask: true, breakType: 'words' }),
                     new FadeIn({ el: $('.home-user-cta').get(0), delay: '<=-.2' }),
                     new FadeSplitText({ el: $('.home-user-cta-title').get(0), onMask: true }),
-                    new FadeIn({ el: $('.home-user-cta-btn').get(0)}),
+                    new FadeIn({ el: $('.home-user-cta-btn').get(0) }),
                 ]
             })
         }
@@ -494,8 +501,8 @@ const mainScript = () => {
             super.setTrigger(this.setup.bind(this));
         }
         setup() {
-            if(isStagging()) {
-                if(viewport.w < 992) {
+            if (isStagging()) {
+                if (viewport.w < 992) {
                     let swiper = new Swiper('.home-why-cms', {
                         slidesPerView: 1,
                         spaceBetween: parseRem(10),
@@ -753,14 +760,14 @@ const mainScript = () => {
                                     gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -((widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen) - lastDistance), duration: 0.6, ease: 'power1.inOut' });
                                 }
                             }
-                            else if(viewport.w <= 991 && viewport.w > 767){
+                            else if (viewport.w <= 991 && viewport.w > 767) {
                                 gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
                             }
                         }
                     }
                 }, 3400);
             }
-            $('.home-case-tab').on('click',  (event) => {
+            $('.home-case-tab').on('click', (event) => {
                 let index = $(event.currentTarget).index();
                 this.currentIndex = index;
                 this.currentStepIndex = 0;
@@ -794,7 +801,7 @@ const mainScript = () => {
                                     gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -((widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen) - lastDistance), duration: 0.6, ease: 'power1.inOut' });
                                 }
                             }
-                            else if(viewport.w <= 991 && viewport.w > 767){
+                            else if (viewport.w <= 991 && viewport.w > 767) {
                                 gsap.to($('.home-case-content-tabs').eq(this.currentIndex), { marginLeft: -(widthItem + parseRem($(window).width() > 991 ? 20 : 16)) * (this.currentStepIndex - maxItemInScreen), duration: 0.6, ease: 'power1.inOut' });
                             }
                         }
@@ -958,10 +965,10 @@ const mainScript = () => {
                 triggerInit: this.triggerEl,
                 scrollTrigger: { trigger: '.about-join' },
                 tweenArr: [
-                    new FadeSplitText({ el: $('.about-join-title').get(0), onMask: true}),
-                    new FadeSplitText({ el: $('.about-join-sub').get(0), onMask: true}),
-                    ...Array.from($('.schedule-hero-form-input-wrap')).flatMap((el, idx) => new FadeIn({ el:el, delay: "<=.1" })),
-                    new FadeIn({el: $('.about-join-form-submit').get(0)}),
+                    new FadeSplitText({ el: $('.about-join-title').get(0), onMask: true }),
+                    new FadeSplitText({ el: $('.about-join-sub').get(0), onMask: true }),
+                    ...Array.from($('.schedule-hero-form-input-wrap')).flatMap((el, idx) => new FadeIn({ el: el, delay: "<=.1" })),
+                    new FadeIn({ el: $('.about-join-form-submit').get(0) }),
                     new FadeSplitText({ el: $('.schedule-hero-form-info-label').get(0), onMask: true, }),
                     new FadeSplitText({ el: $('.schedule-hero-form-info-title .txt').get(0), onMask: true }),
                 ]
@@ -969,12 +976,12 @@ const mainScript = () => {
             this.interact();
         }
         interact() {
-            $('.about-join-form-success-link').on('click', function(e) {
+            $('.about-join-form-success-link').on('click', function (e) {
                 e.preventDefault();
                 $('.about-join-form-inner').addClass('active');
                 $('.about-join-form-success').removeClass('active');
             })
-            $('.about-join-form-submit').on('click', function(e) {
+            $('.about-join-form-submit').on('click', function (e) {
                 e.preventDefault();
                 let originText = $('.about-join-form-submit').val();
                 let email = $('.schedule-hero-form-input[name="Email"]');
@@ -982,63 +989,63 @@ const mainScript = () => {
                 let linkedin = $('.schedule-hero-form-input[name="Linkedin-Profile"]');
                 let phone = $('.schedule-hero-form-input[name="Phone"]');
                 let flag = false;
-                if(fullname.val() == '') {
+                if (fullname.val() == '') {
                     fullname.closest('.schedule-hero-form-input-wrap').addClass('error');
                     flag = true;
                 }
                 else {
                     fullname.closest('.schedule-hero-form-input-wrap').removeClass('error');
                 }
-                if(phone.val() == '') {
+                if (phone.val() == '') {
                     phone.closest('.schedule-hero-form-input-wrap').addClass('error');
                     flag = true;
                 }
                 else {
                     phone.closest('.schedule-hero-form-input-wrap').removeClass('error');
                 }
-                if(linkedin.val() == '') {
+                if (linkedin.val() == '') {
                     linkedin.closest('.schedule-hero-form-input-wrap').addClass('error');
                     flag = true;
                 }
                 else {
                     linkedin.closest('.schedule-hero-form-input-wrap').removeClass('error');
                 }
-                if(email.val() == '') {
+                if (email.val() == '') {
                     email.closest('.schedule-hero-form-input-wrap').removeClass('error-format').addClass('error-null');
                     flag = true;
                 }
-                else if(!validateEmail(email.val())) {
+                else if (!validateEmail(email.val())) {
                     email.closest('.schedule-hero-form-input-wrap').removeClass('error-null').addClass('error-format');
                     flag = true;
                 }
                 else {
                     email.closest('.schedule-hero-form-input-wrap').removeClass('error-format, error-null');
                 }
-                if(!flag) {
+                if (!flag) {
                     $('.about-join-form-submit').val(`${originText}...`);
                     var formData = {
                         fields: [
-                        {
-                            name: "email",
-                            value: email.val()
-                        },
-                        {
-                            name: "lastname",
-                            value: fullname.val()
+                            {
+                                name: "email",
+                                value: email.val()
                             },
-                        {
-                            name: "phone",
-                            value: phone.val()
-                        },
-                        {
-                            name: "hs_linkedin_url",
-                            value: linkedin.val()
-                        },
+                            {
+                                name: "lastname",
+                                value: fullname.val()
+                            },
+                            {
+                                name: "phone",
+                                value: phone.val()
+                            },
+                            {
+                                name: "hs_linkedin_url",
+                                value: linkedin.val()
+                            },
                         ],
                         context: {
-                        // Thông tin tracking (tùy chọn)
-                        pageUri: window.location.href,
-                        pageName: document.title
+                            // Thông tin tracking (tùy chọn)
+                            pageUri: window.location.href,
+                            pageName: document.title
                         }
                     };
                     console.log(formData)
@@ -1047,7 +1054,7 @@ const mainScript = () => {
                         type: "POST",
                         contentType: "application/json",
                         data: JSON.stringify(formData),
-                        success: function(response) {
+                        success: function (response) {
                             $('.about-join-form-inner').removeClass('active');
                             $('.about-join-form-success').addClass('active');
                             $('.about-join-form-submit').val(originText);
@@ -1057,7 +1064,7 @@ const mainScript = () => {
                             linkedin.val('');
                             phone.val('');
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             $('.about-join-form-submit').text(originText);
                             console.error("Form submission error:", error);
                         }
@@ -1128,7 +1135,7 @@ const mainScript = () => {
         }
         setup() {
             if (viewport.w < 992) {
-                $('.about-team-person-item-toggle').on('click', function() {
+                $('.about-team-person-item-toggle').on('click', function () {
                     $(this).closest('.about-team-person-item').toggleClass('active');
                 })
                 $('.about-team-person-wrap').each((idx, item) => {
@@ -1263,7 +1270,7 @@ const mainScript = () => {
                 tweenArr: [
                     new FadeSplitText({ el: $('.about-indus-title').get(0), onMask: true }),
                     new FadeSplitText({ el: $('.about-indus-marquee-label .txt').get(0), onMask: true }),
-                    new ScaleLine({ el: $('.about-indus-marquee-line').get(1), delay: '1'}),
+                    new ScaleLine({ el: $('.about-indus-marquee-line').get(1), delay: '1' }),
                     new FadeIn({ el: $('.about-indus-marquee').get(0) }),
                 ]
             });
@@ -1300,7 +1307,7 @@ const mainScript = () => {
         }
         interact() {
             $('.pricing-hero-table-accor-content').slideUp();
-            $('.pricing-hero-table-accor-title').on('click', function() {
+            $('.pricing-hero-table-accor-title').on('click', function () {
                 $(this).siblings('.pricing-hero-table-accor-content').slideToggle();
                 $(this).parent().toggleClass('active');
             })
@@ -1341,7 +1348,7 @@ const mainScript = () => {
                         }
                     }
                 });
-                $('.pricing-hero-table-sticky .pricing-hero-table-col.head').on('click', function() {
+                $('.pricing-hero-table-sticky .pricing-hero-table-col.head').on('click', function () {
                     let index = $(this).index();
                     swiper.slideTo(index);
                     activeIndex(index);
@@ -1630,21 +1637,21 @@ const mainScript = () => {
                 timeline: this.tl,
                 allowMobile: true,
                 tweenArr: [
-                    new FadeSplitText({ el: $('.schedule-hero-title').get(0), onMask: true}),
-                    ...Array.from($('.schedule-hero-form-input-wrap')).flatMap((el, idx) => new FadeIn({ el:el, delay: "<=.1" })),
-                    new FadeIn({el: $('.schedule-hero-form-submit').get(0)}),
+                    new FadeSplitText({ el: $('.schedule-hero-title').get(0), onMask: true }),
+                    ...Array.from($('.schedule-hero-form-input-wrap')).flatMap((el, idx) => new FadeIn({ el: el, delay: "<=.1" })),
+                    new FadeIn({ el: $('.schedule-hero-form-submit').get(0) }),
                     new FadeSplitText({ el: $('.schedule-hero-form-info-label').get(0), onMask: true, }),
                     new FadeSplitText({ el: $('.schedule-hero-form-info-title .txt').get(0), onMask: true }),
                 ]
             })
         }
         interact() {
-            $('.schedule-hero-form-success-link').on('click', function(e) {
+            $('.schedule-hero-form-success-link').on('click', function (e) {
                 e.preventDefault();
                 $('.schedule-hero-form-inner').addClass('active');
                 $('.schedule-hero-form-success').removeClass('active');
             })
-            $('.schedule-hero-form-submit').on('click', function(e) {
+            $('.schedule-hero-form-submit').on('click', function (e) {
                 e.preventDefault();
                 let originText = $('.schedule-hero-form-submit').val();
                 let email = $('.schedule-hero-form-input[name="email"]');
@@ -1652,65 +1659,65 @@ const mainScript = () => {
                 let lastName = $('.schedule-hero-form-input[name="Last-name"]');
                 let meassage = $('.schedule-hero-form-input[name="message"]');
                 let flag = false;
-                if(firstName.val() == '') {
+                if (firstName.val() == '') {
                     firstName.closest('.schedule-hero-form-input-wrap').addClass('error');
                     flag = true;
                 }
                 else {
                     firstName.closest('.schedule-hero-form-input-wrap').removeClass('error');
                 }
-                if(lastName.val() == '') {
+                if (lastName.val() == '') {
                     lastName.closest('.schedule-hero-form-input-wrap').addClass('error');
                     flag = true;
                 }
                 else {
                     lastName.closest('.schedule-hero-form-input-wrap').removeClass('error');
                 }
-                if(email.val() == '') {
+                if (email.val() == '') {
                     email.closest('.schedule-hero-form-input-wrap').removeClass('error-format').addClass('error-null');
                     flag = true;
                 }
-                else if( !validateEmail(email.val())) {
+                else if (!validateEmail(email.val())) {
                     email.closest('.schedule-hero-form-input-wrap').removeClass('error-null').addClass('error-format');
                     flag = true;
                 }
                 else {
                     email.closest('.schedule-hero-form-input-wrap').removeClass('error-format, error-null');
                 }
-                if(!flag) {
+                if (!flag) {
                     $('.schedule-hero-form-submit').val(`${originText}...`);
                     var formData = {
                         fields: [
-                        {
-                            name: "email",
-                            value: email.val()
-                        },
-                        {
-                            name: "firstname",
-                            value: firstName.val()
-                        },
-                        {
-                            name: "lastname",
-                            value: lastName.val()
-                        },
-                        {
-                            name: "message",
-                            value: meassage.val()
-                        },
+                            {
+                                name: "email",
+                                value: email.val()
+                            },
+                            {
+                                name: "firstname",
+                                value: firstName.val()
+                            },
+                            {
+                                name: "lastname",
+                                value: lastName.val()
+                            },
+                            {
+                                name: "message",
+                                value: meassage.val()
+                            },
                         ],
                         context: {
-                        // Thông tin tracking (tùy chọn)
-                        pageUri: window.location.href,
-                        pageName: document.title
+                            // Thông tin tracking (tùy chọn)
+                            pageUri: window.location.href,
+                            pageName: document.title
                         }
                     };
                     console.log(formData)
-                     $.ajax({
+                    $.ajax({
                         url: "https://api.hsforms.com/submissions/v3/integration/submit/40167303/0ff7eeb5-33c6-41cb-9434-91d0496156de",
                         type: "POST",
                         contentType: "application/json",
                         data: JSON.stringify(formData),
-                        success: function(response) {
+                        success: function (response) {
                             lenis.scrollTo('.schedule-hero');
                             $('.schedule-hero-form-inner').removeClass('active');
                             $('.schedule-hero-form-success').addClass('active');
@@ -1720,7 +1727,7 @@ const mainScript = () => {
                             lastName.val('');
                             meassage.val('');
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             $('.schedule-hero-form-submit').text(originText);
                             console.error("Form submission error:", error);
                         }
@@ -1831,7 +1838,7 @@ const mainScript = () => {
             })
         }
         interact() {
-            $('.footer-form-submit-real').on('click', function(e) {
+            $('.footer-form-submit-real').on('click', function (e) {
                 let originText = $('.footer-form-submit-txt').text();
                 e.preventDefault();
                 let email = $('.footer-form-input[name="email"]');
@@ -1842,7 +1849,7 @@ const mainScript = () => {
                     $('.footer-form-message-error.error-format').slideUp();
                     flag = true;
                 }
-                 else if (!validateEmail(email.val())) {
+                else if (!validateEmail(email.val())) {
                     $('.footer-form-message-error.error-null').slideUp();
                     $('.footer-form-message-error.error-format').slideDown();
                     flag = true;
@@ -1851,20 +1858,20 @@ const mainScript = () => {
                     $('.footer-form-message-error.error-null').slideUp();
                     $('.footer-form-message-error.error-format').slideUp();
                 }
-                if (!flag){
+                if (!flag) {
                     $('.footer-form-submit').addClass('disable');
                     $('.footer-form-submit-txt').text('Sending...');
                     var formData = {
                         fields: [
-                        {
-                            name: "email",
-                            value: email.val()
-                        }
+                            {
+                                name: "email",
+                                value: email.val()
+                            }
                         ],
                         context: {
-                        // Thông tin tracking (tùy chọn)
-                        pageUri: window.location.href,
-                        pageName: document.title
+                            // Thông tin tracking (tùy chọn)
+                            pageUri: window.location.href,
+                            pageName: document.title
                         }
                     };
                     console.log(formData)
@@ -1873,15 +1880,15 @@ const mainScript = () => {
                         type: "POST",
                         contentType: "application/json",
                         data: JSON.stringify(formData),
-                        success: function(response) {
-                        $('.footer-form-message-success').slideDown();
-                        $('.footer-form-submit-txt').text(originText);
-                        setTimeout(function() {
-                            $('.footer-form-message-success').slideUp();
-                            email.val('');
-                        }, 5000)
+                        success: function (response) {
+                            $('.footer-form-message-success').slideDown();
+                            $('.footer-form-submit-txt').text(originText);
+                            setTimeout(function () {
+                                $('.footer-form-message-success').slideUp();
+                                email.val('');
+                            }, 5000)
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             $('.footer-form-submit-txt').text(originText);
                             console.error("Form submission error:", error);
                         }
