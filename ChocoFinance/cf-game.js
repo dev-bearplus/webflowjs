@@ -576,6 +576,18 @@ const mainScript = () => {
             .to('.footer-social-wrap .txt-14.nav-social-label', { x: 0, autoAlpha: 1, duration: .3 }, '<=.06')
             .to('.footer-social-wrap .footer-social-link.mod-nav', { x: 0, autoAlpha: 1, duration: .15, stagger: .008 }, '<-=.06')
     }
+    if (isTouchDevice()) {
+        let lastScrollTop = 0;
+        $(window).on('scroll', function (e) {
+            let st = $(this).scrollTop();
+            if (st > lastScrollTop && st > $('.announcement').height()) {
+                scrollDown()
+            } else {
+                scrollUp();
+            }
+            lastScrollTop = st;
+        })
+    }
     function closeNavmenu() {
         const closeNavTl = gsap.timeline({
             onStart() {
