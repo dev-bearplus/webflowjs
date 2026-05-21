@@ -350,7 +350,72 @@ const mainScript = () => {
         }
     }
     isHeaderDarkMode();
+    function scrollDown() {
+        header.addClass('on-hide')
+        if ($('.header-lang-main').length) {
+            $('.header-lang-main').removeClass('active');
+        }
+        if ($('.header-lang-btn').length) {
+            $('.header-lang-btn').removeClass('active');
+        }
+        if ($('.blog-page').length) {
+            $('.blog-header').removeClass('on-scroll')
+        }
+        if ($('.faq-page').length) {
+            $('.faq-stick-wrap').removeClass('on-hide')
+        }
+        if ($(window).width() <= 991) {
+            if ($('.faq-page').length) {
+                $('.faq-toc-inner').removeClass('on-scroll')
+            }
+        }
+        if ($(window).width() < 767) {
+            if ($('.term-page').length) {
+                $('.term-toc-wrap-overlay').removeClass('on-scroll')
+            }
+            if ($('.doc-page').length) {
+                $('.term-toc-wrap-overlay').removeClass('on-scroll')
+            }
+        } else {
+            if ($('.term-page').length) {
+                $('.term-toc-wrap-overlay').addClass('on-scroll')
+            }
+            if ($('.doc-page').length) {
+                $('.term-toc-wrap-overlay').addClass('on-scroll')
+            }
+        }
+    }
+    function scrollUp() {
+        header.removeClass('on-hide');
 
+        if ($('.blog-page').length) {
+            $('.blog-header').addClass('on-scroll')
+        }
+        if ($('.faq-page').length) {
+            $('.faq-stick-wrap').addClass('on-hide')
+        }
+        if ($(window).width() <= 991) {
+            if ($('.faq-page').length) {
+                $('.faq-toc-inner').addClass('on-scroll')
+            }
+        }
+        if ($(window).width() < 767) {
+            if ($('.term-page').length && !$('.sc-term-sub-nav').hasClass('w-condition-invisible')) {
+                $('.term-toc-wrap-overlay').addClass('on-scroll')
+            }
+            if ($('.doc-page').length) {
+                $('.term-toc-wrap-overlay').addClass('on-scroll')
+            }
+        } else {
+            if ($('.term-page').length) {
+                $('.term-toc-wrap-overlay').removeClass('on-scroll')
+            }
+            if ($('.doc-page').length) {
+                $('.term-toc-wrap-overlay').removeClass('on-scroll')
+            }
+        }
+    }
+    scrollUp()
     lenis.on('scroll', function (inst) {
         let threshold = inst.scroll > header.height();
         if ($('.announcement').length) {
@@ -364,6 +429,13 @@ const mainScript = () => {
             header.addClass('on-scroll');
             console.log('on-scroll');
             $('.home-sticky').addClass('active');
+            if (inst.direction == 1) {
+                // down
+                scrollDown()
+            } else if (inst.direction == -1) {
+                // up
+                scrollUp()
+            }
             if ($('.dark-header').length) {
                 header.removeClass('dark-mode')
             }
