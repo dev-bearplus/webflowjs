@@ -1055,6 +1055,10 @@ const mainScript = () => {
     const SCRIPT = {};
 
     SCRIPT.gameScript = () => {
+        setTimeout(() => {
+            $('.game-popup').addClass('active');
+            $('.game-popup-video-inner video')[0].play();
+        }, 2000);
         $('[data-popup-game="open"]').on('click', function (e) {
             e.preventDefault();
             $('.game-popup').addClass('active');
@@ -1063,12 +1067,12 @@ const mainScript = () => {
             e.preventDefault();
             $('.game-popup').removeClass('active');
         })
-        $('.game-popup').on('click', function (e) {
-            if (!$(e.target).closest('.game-popup-inner').length && !$(e.target).closest('[data-popup-game="close"]').length) {
-                e.preventDefault();
-                $('.game-popup').removeClass('active');
-            }
-        })
+        // $('.game-popup').on('click', function (e) {
+        //     if (!$(e.target).closest('.game-popup-inner').length && !$(e.target).closest('[data-popup-game="close"]').length) {
+        //         e.preventDefault();
+        //         $('.game-popup').removeClass('active');
+        //     }
+        // })
         function gameHeroIntro() {
             let textCir;
             if ($(window).width() > 991) {
