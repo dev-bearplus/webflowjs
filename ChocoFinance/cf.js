@@ -2830,7 +2830,7 @@ const mainScript = () => {
             $('.blog-empty-btn').attr('href', `${currentPath}`);
             $('.blog-empty-btn').on('click', function (e) {
                 e.preventDefault();
-                localStorage.setItem("currentSubdomain", "hk-zh-hant");
+                localStorage.setItem("currentSubdomain", "zh-HK");
                 window.location.href = `${currentPath}`;
             })
         }
