@@ -2722,6 +2722,14 @@ const mainScript = () => {
         if ($('.blog-article').length > 0) {
             blogArticle();
         }
+        if ($('.blog-empty-btn').length > 0) {
+            $('.blog-empty-btn').on('click', function (e) {
+                e.preventDefault();
+                let currentUrl = $(this).attr('href')
+                localStorage.setItem("currentSubdomain", "zh-HK");
+                window.location.href = `${currentUrl}`;
+            })
+        }
     }
     SCRIPT.blogCatScript = () => {
     }
@@ -2822,7 +2830,7 @@ const mainScript = () => {
             let pathParts = window.location.pathname.split('/').filter(part => part !== '');
             let currentPath = window.location.pathname;
             // nếu phần đầu tiên là hk-en thì bỏ đi và thay bằng /hk-zh-hant
-            if (pathParts[0] === 'hk-en') {
+            if (pathParts[0] === 'hk-en' || pathParts[0] === 'ae-en' || pathParts[0] === 'ae-ar') {
                 pathParts.shift(); // bỏ phần đầu tiên
             }
             currentPath = '/hk-zh-hant/' + pathParts.join('/');
