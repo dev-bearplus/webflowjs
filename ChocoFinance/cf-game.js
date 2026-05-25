@@ -1055,6 +1055,9 @@ const mainScript = () => {
     const SCRIPT = {};
 
     SCRIPT.gameScript = () => {
+        let $gameVideo = $('.game-popup-video-inner video');
+        let $iconPlay = $('.game-popup-control-ic.item-play');
+        let $iconPause = $('.game-popup-control-ic.item-pause');
         setTimeout(() => {
             $('.game-popup').addClass('active');
             // $('.game-popup-video-inner video')[0].play();
@@ -1065,12 +1068,13 @@ const mainScript = () => {
         })
         $('[data-popup-game="close"]').on('click', function (e) {
             e.preventDefault();
+            $gameVideo[0].pause();
+            $iconPause.removeClass('active');
+            $iconPlay.addClass('active');
             $('.game-popup').removeClass('active');
         })
 
-        let $gameVideo = $('.game-popup-video-inner video');
-        let $iconPlay = $('.game-popup-control-ic.item-play');
-        let $iconPause = $('.game-popup-control-ic.item-pause');
+
         $('.game-popup-video').on('click', function () {
             let vid = $gameVideo[0];
             if (!vid) return;
