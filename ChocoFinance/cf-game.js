@@ -1057,7 +1057,7 @@ const mainScript = () => {
     SCRIPT.gameScript = () => {
         setTimeout(() => {
             $('.game-popup').addClass('active');
-            $('.game-popup-video-inner video')[0].play();
+            // $('.game-popup-video-inner video')[0].play();
         }, 2000);
         $('[data-popup-game="open"]').on('click', function (e) {
             e.preventDefault();
@@ -1070,37 +1070,21 @@ const mainScript = () => {
 
         let $gameVideo = $('.game-popup-video-inner video');
         let $iconPlay = $('.game-popup-control-ic.item-play');
-        let $iconSound = $('.game-popup-control-ic.item-sound');
         let $iconPause = $('.game-popup-control-ic.item-pause');
-        let isVideoFirstClick = true;
-
         $('.game-popup-video').on('click', function () {
             let vid = $gameVideo[0];
             if (!vid) return;
-
-            if (isVideoFirstClick) {
-                vid.removeAttribute('muted');
-                vid.muted = false;
-                vid.volume = 1;
-                // vid.pause();
-                let playPromise = vid.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(e => console.log(e));
-                }
-
-                $iconSound.removeClass('active');
+            if ($('.game-popup-control').hasClass('active')) {
+                $('.game-popup-control').removeClass('active')
+            }
+            if (vid.paused) {
+                vid.play();
+                $iconPlay.removeClass('active');
                 $iconPause.addClass('active');
-                isVideoFirstClick = false;
             } else {
-                if (vid.paused) {
-                    vid.play();
-                    $iconPlay.removeClass('active');
-                    $iconPause.addClass('active');
-                } else {
-                    vid.pause();
-                    $iconPause.removeClass('active');
-                    $iconPlay.addClass('active');
-                }
+                vid.pause();
+                $iconPause.removeClass('active');
+                $iconPlay.addClass('active');
             }
         });
         // $('.game-popup').on('click', function (e) {

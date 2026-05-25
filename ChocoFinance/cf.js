@@ -2828,6 +2828,11 @@ const mainScript = () => {
             currentPath = '/hk-zh-hant/' + pathParts.join('/');
             console.log('currentPath' + currentPath)
             $('.blog-empty-btn').attr('href', `${currentPath}`);
+            $('.blog-empty-btn').on('click', function (e) {
+                e.preventDefault();
+                localStorage.setItem("currentSubdomain", "hk-zh-hant");
+                window.location.href = `${currentPath}`;
+            })
         }
 
     }
