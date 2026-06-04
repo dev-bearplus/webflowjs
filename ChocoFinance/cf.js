@@ -3840,7 +3840,6 @@ const mainScript = () => {
             });
         }
 
-        // GTM Tracking — fire event waitlist_signup after form submission success
         function onWaitlistSubmitSuccess(formData) {
             var eventId = (window.crypto && window.crypto.randomUUID)
                 ? window.crypto.randomUUID()
@@ -3851,12 +3850,11 @@ const mainScript = () => {
             var first_name = nameParts[0] || undefined;
             var last_name = nameParts.length > 1 ? nameParts.slice(1).join(' ') : undefined;
 
-            // Normalize UAE phone: keep only digits, ensure it starts with 971
             var rawPhone = formData.phone ? formData.phone.replace(/[^0-9]/g, '') : '';
             if (rawPhone && !rawPhone.startsWith('971')) {
                 rawPhone = rawPhone.startsWith('0')
-                    ? '971' + rawPhone.slice(1)   // 0501234567 → 971501234567
-                    : '971' + rawPhone;            // 501234567  → 971501234567
+                    ? '971' + rawPhone.slice(1)
+                    : '971' + rawPhone;
             }
             var phone = rawPhone || undefined;
 
@@ -3890,36 +3888,33 @@ const mainScript = () => {
         $(document).on('ajaxComplete', function (event, xhr, settings) {
             if (settings.url.includes("https://webflow.com/api/v1/form/")) {
                 if (xhr.status === 200) {
-                    var params = new URLSearchParams(settings.data);
-                    var formName = params.get('wf-form-name') || '';
+                    var rawData = settings.data;
+                    var params = new URLSearchParams(rawData);
+                    var formName = params.get('name') || '';
                     var formData = {};
-
                     if (formName === 'Waitlist Form Hero') {
                         formData = {
-                            name: getField(params, ['name', 'Name']) || undefined,
-                            phone: getField(params, ['Phone', 'phone']) || undefined,
+                            name: params.get('fields[Name]') || undefined,
+                            phone: params.get('fields[Phone]') || undefined,
                         };
                     } else if (formName === 'Waitlist Form Header') {
-                        var fields = params.getAll('field');
                         formData = {
-                            name: (fields[0] && fields[0].trim()) || undefined,
-                            phone: (fields[1] && fields[1].trim()) || undefined,
+                            name: params.get('fields[Name]') || undefined,
+                            phone: params.get('fields[Phone]') || undefined,
                         };
-                    } else if (formName === 'Waitlist Form Footer') {
-                        var nameFields = params.getAll('name');
+                    } else if (formName === 'Waitlist Form Footer' || formName === 'Email Form') {
                         formData = {
-                            name: (nameFields[0] && nameFields[0].trim()) || undefined,
-                            email: (nameFields[1] && nameFields[1].trim()) || undefined,
+                            name: params.get('fields[Name]') || undefined,
+                            email: params.get('fields[Email]') || undefined,
                         };
                     } else {
-                        // Fallback for other forms
+                        // Fallback
                         formData = {
-                            name: getField(params, ['name', 'Name', 'Full-Name', 'full-name']) || undefined,
-                            email: getField(params, ['email', 'Email']) || undefined,
-                            phone: getField(params, ['Phone', 'phone']) || undefined,
+                            name: params.get('fields[Name]') || undefined,
+                            email: params.get('fields[Email]') || undefined,
+                            phone: params.get('fields[Phone]') || undefined,
                         };
                     }
-
                     onWaitlistSubmitSuccess(formData);
                 }
             }
