@@ -813,7 +813,6 @@ const mainScript = () => {
         console.log(threshold)
         if (threshold) {
             header.addClass('on-scroll');
-            console.log('on-scroll');
             $('.home-sticky').addClass('active');
             if (inst.direction == 1) {
                 // down
@@ -849,7 +848,6 @@ const mainScript = () => {
     });
     function announcement() {
         $('.body').css('--open-top', `${$('.announcement').outerHeight() * -1}px`)
-        console.log(`${$('.announcement').outerHeight() * -1}px`)
         $(window).on('resize', debounce(function () {
             if ($('.home-hero').length) {
                 resizeHomeHero();
@@ -1317,7 +1315,6 @@ const mainScript = () => {
                 let span = newDom
                     .html($(item).html())
                     .attr(`data-rate-${type}`, rate);
-                console.log(span.html())
                 $(item).replaceWith(span);
             }
         })
@@ -1444,7 +1441,6 @@ const mainScript = () => {
         allForm.each(function (i, form) {
             $(form).on('submit', function (e) {
                 const valInputCheck = $(this).find('.bp-trap').val();
-                console.log(valInputCheck)
                 e.preventDefault();
                 if (valInputCheck == '' || valInputCheck == undefined) {
                     let type = $(this).find('[input-type]').attr('input-type');
@@ -3799,47 +3795,37 @@ const mainScript = () => {
                         selectItem.append(html);
                     });
 
-                    // Xác định phần tử cha để gắn (append) dropdown vào
                     let dropdownParentNode = selectItem.closest('.waitlist-hero-form-input-inner');
                     if (dropdownParentNode.length === 0) dropdownParentNode = selectItem.closest('.header-form-input-wrap');
                     if (dropdownParentNode.length === 0) dropdownParentNode = selectItem.closest('.phone-input-group');
                     if (dropdownParentNode.length === 0) dropdownParentNode = selectItem.closest('[data-form="form"]');
 
                     if (dropdownParentNode.length === 0) dropdownParentNode = $(document.body);
-
-                    // Khởi tạo Select2
                     selectItem.select2({
                         templateResult: formatCountryWaitlist,
                         dropdownParent: dropdownParentNode
                     });
 
-                    // TÌM PHẦN TỬ NÚT BẤM (WRAPPER CHỨA CỜ VÀ MÃ VÙNG)
                     let wrap = selectItem.closest('.waitlist-hero-form-input-inner').find('.waitlist-hero-form-input-deco');
                     if (wrap.length === 0) wrap = selectItem.closest('.header-form-input-wrap').find('.header-form-input-deco');
                     if (wrap.length === 0) wrap = selectItem.closest('.phone-input-group').find('.dial-code-wrap');
                     if (wrap.length === 0) wrap = selectItem.closest('[data-form="form"]').find('.dial-code-wrap');
                     if (wrap.length > 0) {
-                        // Tránh bind event click nhiều lần nếu gọi lại hàm
                         wrap.off('click').on('click', function (e) {
                             e.preventDefault();
                             selectItem.select2('open');
                         });
-
-                        // Cập nhật Cờ và Mã vùng hiển thị khi chọn
                         selectItem.on('select2:select', function (e) {
                             let code = $(this).val();
                             let selectedOption = $(this).find('option:selected');
                             let countryCode = selectedOption.attr('data-code').toLowerCase();
 
-                            // Lấy DOM hiển thị chữ mã vùng (+971)
                             let phoneRegion = wrap.find('.txt-14');
                             if (phoneRegion.length === 0) phoneRegion = wrap.find('.phone-region');
 
-                            // Lấy DOM hiển thị ảnh cờ
                             let selectedFlag = wrap.find('.img-basic');
                             if (selectedFlag.length === 0) selectedFlag = wrap.find('.selected-flag');
 
-                            // Cập nhật hiển thị
                             phoneRegion.text(code);
                             selectedFlag.attr('src', `https://flagcdn.com/20x15/${countryCode}.png`);
                         });
@@ -3853,6 +3839,91 @@ const mainScript = () => {
                 }
             });
         }
+
+        // GTM Tracking — fire event waitlist_signup after form submission success
+        function onWaitlistSubmitSuccess(formData) {
+            var eventId = (window.crypto && window.crypto.randomUUID)
+                ? window.crypto.randomUUID()
+                : Date.now() + '-' + Math.random().toString(36).slice(2);
+
+            var nameInput = formData.name ? formData.name.trim().toLowerCase() : '';
+            var nameParts = nameInput.split(/\s+/).filter(Boolean);
+            var first_name = nameParts[0] || undefined;
+            var last_name = nameParts.length > 1 ? nameParts.slice(1).join(' ') : undefined;
+
+            // Normalize UAE phone: keep only digits, ensure it starts with 971
+            var rawPhone = formData.phone ? formData.phone.replace(/[^0-9]/g, '') : '';
+            if (rawPhone && !rawPhone.startsWith('971')) {
+                rawPhone = rawPhone.startsWith('0')
+                    ? '971' + rawPhone.slice(1)   // 0501234567 → 971501234567
+                    : '971' + rawPhone;            // 501234567  → 971501234567
+            }
+            var phone = rawPhone || undefined;
+
+            window.dataLayer = window.dataLayer || [];
+            var dlPayload = {
+                event: 'waitlist_signup',
+                event_id: eventId,
+                email: formData.email ? formData.email.trim().toLowerCase() : undefined,
+                phone: phone,
+                first_name: first_name,
+                last_name: last_name,
+                city: formData.city ? formData.city.trim().toLowerCase() : undefined,
+                region: formData.region ? formData.region.trim().toLowerCase() : undefined,
+                country: 'ae',
+                postcode: formData.postcode ? formData.postcode.trim() : undefined,
+            };
+            window.dataLayer.push(dlPayload);
+            console.log('[GTM] waitlist_signup pushed:', dlPayload);
+        }
+
+        // Helper: Get field from URLSearchParams by multiple keys
+        function getField(params, keys) {
+            for (var i = 0; i < keys.length; i++) {
+                var val = params.get(keys[i]);
+                if (val && val.trim() !== '') return val.trim();
+            }
+            return undefined;
+        }
+
+        // Capture success event for all forms on the page
+        $(document).on('ajaxComplete', function (event, xhr, settings) {
+            if (settings.url.includes("https://webflow.com/api/v1/form/")) {
+                if (xhr.status === 200) {
+                    var params = new URLSearchParams(settings.data);
+                    var formName = params.get('wf-form-name') || '';
+                    var formData = {};
+
+                    if (formName === 'Waitlist Form Hero') {
+                        formData = {
+                            name: getField(params, ['name', 'Name']) || undefined,
+                            phone: getField(params, ['Phone', 'phone']) || undefined,
+                        };
+                    } else if (formName === 'Waitlist Form Header') {
+                        var fields = params.getAll('field');
+                        formData = {
+                            name: (fields[0] && fields[0].trim()) || undefined,
+                            phone: (fields[1] && fields[1].trim()) || undefined,
+                        };
+                    } else if (formName === 'Waitlist Form Footer') {
+                        var nameFields = params.getAll('name');
+                        formData = {
+                            name: (nameFields[0] && nameFields[0].trim()) || undefined,
+                            email: (nameFields[1] && nameFields[1].trim()) || undefined,
+                        };
+                    } else {
+                        // Fallback for other forms
+                        formData = {
+                            name: getField(params, ['name', 'Name', 'Full-Name', 'full-name']) || undefined,
+                            email: getField(params, ['email', 'Email']) || undefined,
+                            phone: getField(params, ['Phone', 'phone']) || undefined,
+                        };
+                    }
+
+                    onWaitlistSubmitSuccess(formData);
+                }
+            }
+        });
     }
     SCRIPT.referralRewardScript = () => {
 
