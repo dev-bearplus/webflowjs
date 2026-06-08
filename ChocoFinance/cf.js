@@ -22,8 +22,8 @@
             }
             if (countryCode === 'HK') {
                 suggestedLang = 'zh-HK';
-            } else if (countryCode === 'AE') {
-                suggestedLang = 'ar-AE';
+                // } else if (countryCode === 'AE') {
+                //     suggestedLang = 'ar-AE';
             }
             checkDomain = suggestedLang;
         } catch (e) {
