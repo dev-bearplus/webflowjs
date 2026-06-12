@@ -2139,7 +2139,9 @@ const mainScript = () => {
                 // Human first
                 .from('.game-hero .capita-hero-img-human', { y: 40, autoAlpha: 0, duration: .6 }, '.3')
                 //.from('.game-hero .game-hero-rate-wrap', {y: 40, autoAlpha: 0, duration: .6}, '>=0')
-                .from('.game-hero .game-hero-img-c-bg, .game-hero .game-hero-rate-wrap', { y: 40, autoAlpha: 0, duration: .6 }, '.3')
+                .fromTo('.game-hero .game-hero-img-c-bg, .game-hero .game-hero-rate-wrap.hidden-tb', { y: 40, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .6 }, '.3')
+                .fromTo('.game-hero-download', { y: 40, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .6 }, '.3')
+                .fromTo('.capita-hero-partner', { y: 40, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .6 }, '.3')
             if (viewport.w < 490) {
                 $('.game-hero-info-wrap').addClass('swiper');
                 $('.game-hero-info').addClass('swiper-wrapper');
