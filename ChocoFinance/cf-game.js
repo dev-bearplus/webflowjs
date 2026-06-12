@@ -1110,12 +1110,12 @@ const mainScript = () => {
             const gameIntroTl = gsap.timeline({
                 default: { ease: Power1.easeIn },
             })
-            gsap.set('.game-hero .game-hero-img-human img', { y: $(window).width() > 767 ? 40 : 0, duration: .6 }, '<=.3')
+            gsap.set('.game-hero .capita-hero-img-human img', { y: $(window).width() > 767 ? 40 : 0, duration: .6 }, '<=.3')
             gameIntroTl.from('.game-hero-content .game-hero-title', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0')
                 .from('.game-hero-content .game-hero-sub', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0')
                 .from('.game-hero-content .btn.mod-game-hero', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0')
                 // Human first
-                .to('.game-hero .game-hero-img-human img', { y: 0, autoAlpha: 1, duration: .6 }, '<=.3')
+                .to('.game-hero .capita-hero-img-human img', { y: 0, autoAlpha: 1, duration: .6 }, '<=.3')
                 //.from('.game-hero .game-hero-rate-wrap', {y: 40, autoAlpha: 0, duration: .6}, '>=0')
                 .to('.game-hero .game-hero-img-c-bg, .game-hero .game-hero-rate-wrap', { opacity: 1, duration: .6 }, '>=0')
             if (viewport.w < 490) {
@@ -1149,22 +1149,22 @@ const mainScript = () => {
                 }
             });
             gameHeroTl.from('.game-rich-bg-img', { y: ribbonOffset * unit, ease: 'none' })
-                .to('.game-hero-img-human img', { y: $(window).width() > 767 ? humanOffset * unit : 0, ease: 'none' }, '0')
+                .to('.capita-hero-img-human img', { y: $(window).width() > 767 ? humanOffset * unit : 0, ease: 'none' }, '0')
                 .to('.game-hero-img-c-bg img', { y: $(window).width() > 767 ? -humanOffset * unit : 0, ease: 'none' }, '0')
 
             if ($(window).width() > 991) {
                 // gameHeroTl.from('.game-partner-inner', { 'grid-column-gap': '10rem', ease: 'none' }, '0')
                 // Mouse move human parallax
                 function applyHumanParallax() {
-                    let humanX = xGetter('.game-hero-img-human');
-                    let humanY = yGetter('.game-hero-img-human');
+                    let humanX = xGetter('.capita-hero-img-human');
+                    let humanY = yGetter('.capita-hero-img-human');
                     let circleX = xGetter('.game-hero-img-c-bg');
                     let circleY = yGetter('.game-hero-img-c-bg');
                     let rateX = xGetter('.game-hero-rate-wrap .game-hero-rate');
                     let rateY = yGetter('.game-hero-rate-wrap .game-hero-rate');
-                    if ($('.game-hero-img-human').length) {
-                        xSetter('.game-hero-img-human')(lerp(humanX, -mousePos.x * 1.2));
-                        ySetter('.game-hero-img-human')(lerp(humanY, -mousePos.y));
+                    if ($('.capita-hero-img-human').length) {
+                        xSetter('.capita-hero-img-human')(lerp(humanX, -mousePos.x * 1.2));
+                        ySetter('.capita-hero-img-human')(lerp(humanY, -mousePos.y));
 
                         xSetter('.game-hero-img-c-bg')(lerp(circleX, mousePos.x));
                         ySetter('.game-hero-img-c-bg')(lerp(circleY, mousePos.y * .8));
