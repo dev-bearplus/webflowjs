@@ -2128,7 +2128,7 @@ const mainScript = () => {
             const gameIntroTl = gsap.timeline({
                 default: { ease: Power1.easeIn },
             })
-            gsap.set('.game-hero .game-hero-img-human img', { y: $(window).width() > 767 ? 40 : 0, duration: .6 }, '<=.3')
+            // gsap.set('.game-hero .game-hero-img-human img', { y: $(window).width() > 767 ? 40 : 0, duration: .6 }, '<=.3')
             gameIntroTl
                 .from('.game-hero-content .game-hero-logo', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0')
                 .from('.game-hero-content .game-hero-title', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0.1')
