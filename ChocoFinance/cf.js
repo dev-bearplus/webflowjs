@@ -2137,9 +2137,9 @@ const mainScript = () => {
                 .from('.game-hero-content .game-hero-info', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0.4')
                 .from('.game-hero-content .btn.mod-game-hero', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0.5')
                 // Human first
-                .to('.game-hero .capita-hero-img-human', { y: 0, autoAlpha: 1, duration: .6 }, '<=.3')
+                .from('.game-hero .capita-hero-img-human', { y: 40, autoAlpha: 0, duration: .6 }, '.3')
                 //.from('.game-hero .game-hero-rate-wrap', {y: 40, autoAlpha: 0, duration: .6}, '>=0')
-                .to('.game-hero .game-hero-img-c-bg, .game-hero .game-hero-rate-wrap', { opacity: 1, duration: .6 }, '.5')
+                .from('.game-hero .game-hero-img-c-bg, .game-hero .game-hero-rate-wrap', { y: 40, autoAlpha: 0, duration: .6 }, '.3')
             if (viewport.w < 490) {
                 $('.game-hero-info-wrap').addClass('swiper');
                 $('.game-hero-info').addClass('swiper-wrapper');
