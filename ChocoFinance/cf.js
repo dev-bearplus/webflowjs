@@ -2129,9 +2129,13 @@ const mainScript = () => {
                 default: { ease: Power1.easeIn },
             })
             gsap.set('.game-hero .game-hero-img-human img', { y: $(window).width() > 767 ? 40 : 0, duration: .6 }, '<=.3')
-            gameIntroTl.from('.game-hero-content .game-hero-title', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0')
-                .from('.game-hero-content .game-hero-sub', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0')
-                .from('.game-hero-content .btn.mod-game-hero', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0')
+            gameIntroTl
+                .from('.game-hero-content .game-hero-logo', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0')
+                .from('.game-hero-content .game-hero-title', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0.1')
+                .from('.game-hero-content .capita-hero-step', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0.2')
+                .from('.game-hero-content .game-hero-sub', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0.3')
+                .from('.game-hero-content .game-hero-info', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0.4')
+                .from('.game-hero-content .btn.mod-game-hero', { y: 40, autoAlpha: 0, duration: .8, clearProps: 'all' }, '0.5')
                 // Human first
                 .to('.game-hero .game-hero-img-human img', { y: 0, autoAlpha: 1, duration: .6 }, '<=.3')
                 //.from('.game-hero .game-hero-rate-wrap', {y: 40, autoAlpha: 0, duration: .6}, '>=0')
