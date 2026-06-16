@@ -1356,7 +1356,7 @@ const mainScript = () => {
 
         })
     }
-    if ($('#dialCode').length > 0 && $('#dialPopup').length) {
+    if ($('#dialCode').length > 0 || $('#dialPopup').length) {
         setupDialCode(dialCodes, ['#dialCode', '#dialPopup']);
     }
     function triggerSubscribeBlueShift(type, formName, value) {
