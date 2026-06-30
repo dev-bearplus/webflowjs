@@ -2114,6 +2114,9 @@ const mainScript = () => {
         }
         homeWithDraw();
     }
+    SCRIPT.landingpageScript = () => {
+
+    }
     SCRIPT.gameScript = () => {
         function gameHeroIntro() {
             let textCir;
