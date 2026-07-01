@@ -2288,6 +2288,42 @@ const mainScript = () => {
                 scCustomer();
             }
         },
+        usecases: {
+            namespace: 'usecases',
+            afterEnter() {
+                console.log("enter use cases");
+                function itemClick() {
+                    $('.ucs-6-listing .accordion-title, .ucs-2-main-inner .accordion-title').on('click', function (e) {
+                        let parent = $(this).parents('.accordion-item');
+                        parent.toggleClass('active');
+                        parent.siblings().removeClass('active');
+                        ScrollTrigger.refresh();
+                    })
+                    if (viewport.w <= 991) {
+                        $('.ucs-5-item').on('click', function () {
+                            $(this).toggleClass('active');
+                            $(this).siblings().removeClass('active');
+                            ScrollTrigger.refresh();
+                        })
+                    }
+                }
+                itemClick();
+                function swiperCard() {
+                    if (viewport.w <= 991) {
+                        $('.ucs-3-main .display-contents').contents().unwrap();
+                        const swiper3 = childSelect('.ucs-3');
+                        swiper.initClassName(swiper3);
+                        swiper.setup(swiper3, { slidesPerView: 'auto', pag: true, spacing: cvUnit(20, 'rem') });
+                    }
+                    if (viewport.w <= 767) {
+                        const swiper5 = childSelect('.ucs-5');
+                        swiper.initClassName(swiper5);
+                        swiper.setup(swiper5, { slidesPerView: 'auto', pag: true, spacing: cvUnit(20, 'rem') });
+                    }
+                }
+                swiperCard();
+            }
+        },
         product: {
             namespace: 'product',
             afterEnter(data) {
