@@ -3771,6 +3771,8 @@ const mainScript = () => {
         if (window.location.pathname === '/waitlist' && $('html').attr('lang') === 'en-SG') {
             window.location.href = '/404';
         }
+        animateFaq();
+        scrollToFaq();
 
         function formatCountryWaitlist(state) {
             if (!state.id) return state.text;
