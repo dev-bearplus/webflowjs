@@ -2322,6 +2322,41 @@ const mainScript = () => {
                     }
                 }
                 swiperCard();
+                function setupTable() {
+                    if (viewport.w > 767) return;
+                    $('.ucs-4-table').each(function () {
+                        const table = $(this);
+
+                        const headers = [];
+                        table.find('.ucs-4-table-head .ucs-4-table-col-item').each(function () {
+                            headers.push($(this).text().trim());
+                        });
+                        
+                        table.find('.ucs-4-table-row').each(function() {
+                            const row = $(this);
+                            const items = row.find('.ucs-4-table-row-item');
+                            
+                            if (items.length > 0) {
+                                const firstItem = items.eq(0);
+                                firstItem.find('.ucs-4-table-row-text-wrap').remove();
+                                for (let i = 1; i < items.length; i++) {
+                                    const cellValue = items.eq(i).find('.ucs-4-table-row-title').text().trim();
+                                    const headerText = headers[i] || '';
+                                    
+                                    const wrapHtml = `
+                                        <div class="ucs-4-table-row-text-wrap">
+                                            <div class="txt fs-16 fw-med">${headerText}</div>
+                                            <div class="txt fs-16 fw-med">:</div>
+                                            <div class="txt fs-16 fw-med">${cellValue}</div>
+                                        </div>
+                                    `;
+                                    firstItem.append(wrapHtml);
+                                }
+                            }
+                        });
+                    });
+                }
+                setupTable();
             }
         },
         product: {
