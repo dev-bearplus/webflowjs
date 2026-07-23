@@ -377,6 +377,14 @@ const mainScript = () => {
         $(`#${form.attr('id')} [data-input-url]`).val(window.location.href);
         let accreditedInput = $(`#${form.attr('id')} [data-input-hidden="accredited"]`);
         accreditedInput.val($(`#${form.attr('id')} .radio-input-item input[checked]`).parent().find('.radio-input-txt').text());
+        form.find('.radio-input-wrap').each(function () {
+            let hiddenInput = $(this).find('[data-input-hidden]');
+            let defaultTxt = $(this).find('.radio-input-item input[checked]').parent().find('.radio-input-txt').text() ||
+                $(this).find('.radio-input-item.active .radio-input-txt').text();
+            if (hiddenInput.length && defaultTxt) {
+                hiddenInput.val(defaultTxt);
+            }
+        });
     }
 
     function submitForm(formID, reset) {
@@ -622,8 +630,11 @@ const mainScript = () => {
             const posCenter = (setLength - $('.nav-link').height()) / 2;
             if (!$('[data-barba-namespace="termPolicyTemp"]').length) {
                 if (lenisNav) {
-                    const activeOffsetTop = $('.nav-link.active').get(0).offsetTop;
-                    lenisNav.scrollTo(activeOffsetTop - posCenter, { duration: 0 });
+                    const activeNavEl = $('.nav-link.active').get(0);
+                    if (activeNavEl) {
+                        const activeOffsetTop = activeNavEl.offsetTop;
+                        lenisNav.scrollTo(activeOffsetTop - posCenter, { duration: 0 });
+                    }
                 }
             }
         }
@@ -1146,8 +1157,8 @@ const mainScript = () => {
                 }, `${loadPer * 100}`)
 
                 .to('.legal-top-wrap, .legal-bot-wrap', { autoAlpha: 1, duration: .8 }, `${loadPer * 100 + 1}`)
-        } 
-        else{
+        }
+        else {
             // $('.legal-top-wrap .h-size32').text("Let's explore lucrative whiskey investments today")
             $('.legal-top-wrap .h-size32').text("Let's explore lucrative whiskey offerings today") //change content
 
@@ -1881,14 +1892,28 @@ const mainScript = () => {
     footerEmailSubscribe();
 
     function inputRadioInteract(formName) {
-        let accreditedInput = $(`${formName} [data-input-hidden="accredited"]`);
-        accreditedInput.val($(`${formName} .radio-input-item input[checked]`).parent().find('.radio-input-txt').text())
-        $(`${formName} .radio-input-item`).on('change', function (e) {
-            $(`${formName} .radio-input-item`).removeClass('active')
+        $(`${formName} .radio-input-wrap`).each(function () {
+            let wrap = $(this);
+            let hiddenInput = wrap.find('[data-input-hidden]');
+            let defaultTxt = wrap.find('.radio-input-item input[checked]').parent().find('.radio-input-txt').text() ||
+                wrap.find('.radio-input-item.active .radio-input-txt').text() ||
+                wrap.find('.radio-input-item .radio-input-txt').first().text();
+            if (hiddenInput.length && defaultTxt) {
+                hiddenInput.val(defaultTxt);
+            }
+        });
+
+        $(`${formName} .radio-input-item`).on('change click', function (e) {
+            let wrap = $(this).closest('.radio-input-wrap');
+            wrap.find('.radio-input-item').removeClass('active');
             $(this).addClass('active');
-            accreditedInput.val($(this).find('.radio-input-txt').text())
-            console.log(accreditedInput.val())
-        })
+            let txt = $(this).find('.radio-input-txt').text();
+            let hiddenInput = wrap.find('[data-input-hidden]');
+            if (hiddenInput.length) {
+                hiddenInput.val(txt);
+                hiddenInput.trigger('input').trigger('change');
+            }
+        });
 
         if ($(window).width() > 991) {
             $(`${formName} .radio-title-wrap`).on('click', (e) => {
@@ -5390,6 +5415,50 @@ const mainScript = () => {
         }
     }
 
+    SCRIPT.accessScript = {
+        namespace: 'access',
+        afterEnter() {
+            function earlyAccessFormInit() {
+                const formEl = $('.early-main-wrap').find('form');
+                if (!formEl.length) return;
+                const formID = formEl.attr('id') ? `#${formEl.attr('id')}` : (formEl.attr('data-name') ? `[data-name="${formEl.attr('data-name')}"]` : '.early-main-wrap form');
+
+                console.log('formID', formID)
+
+                function checkFormValidity() {
+                    const formTarget = $(formID).get(0);
+                    if (!formTarget) return;
+                    const formsObj = mapFormToObject(formTarget);
+                    const rules = mapObjectFormToValidate(formTarget, formsObj);
+                    const { isValidated, errorObj } = validateForm({ formsObj: formsObj, rules: rules });
+                    const submitBtn = $(formID).find('[data-form-btn="submit"], .btn-submit, button[type="submit"], input[type="submit"]');
+                    if (isValidated) {
+                        submitBtn.removeClass('btn-disable');
+                    } else {
+                        submitBtn.addClass('btn-disable');
+                    }
+                }
+
+                formHandler(formID, {
+                    onSuccess: (success) => {
+                        popupSuccessGeneration(success);
+                        checkFormValidity();
+                    }
+                });
+
+                checkFormValidity();
+
+                $(formID).on('input change keyup click', 'input, select, textarea, .input-checkbox-ic-wrap, .radio-input-item', function () {
+                    checkFormValidity();
+                });
+            }
+            earlyAccessFormInit();
+        },
+        beforeLeave() {
+            console.log('leave early-access')
+        }
+    }
+
     const VIEWS = [
         SCRIPT.homeScript,
         SCRIPT.howItWorkScript,
@@ -5409,7 +5478,8 @@ const mainScript = () => {
         SCRIPT.newsScript,
         SCRIPT.distilleryScript,
         SCRIPT.distilleryDtlScript,
-        SCRIPT.whiskyMadeScript
+        SCRIPT.whiskyMadeScript,
+        SCRIPT.accessScript
     ]
 
     barba.init({
@@ -5428,13 +5498,13 @@ const mainScript = () => {
 
                 let isFirstLoad = document.referrer === "" && !window.opener ||
                     !isLoadFromWebCurrent
-                if ($('[data-barba-namespace="about"]').length == 0){
-                    if (isFirstLoad || isPageReloaded() ) {
+                if ($('[data-barba-namespace="about"]').length == 0) {
+                    if (isFirstLoad || isPageReloaded()) {
                         introInit();
                     } else {
                         introInitLoadAfter();
                     }
-                } 
+                }
                 else {
                     progressBar();
                     lenis.scrollTo(0, { duration: .0 })
