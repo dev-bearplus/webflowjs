@@ -348,15 +348,14 @@ const mainScript = () => {
         // 1. Fire-and-forget log inquiry (Ignition Machine)
         try {
             const pageUrl = window.location.href;
+            const logData = { url: pageUrl, form_name: formName };
+
             let email = '';
             for (const [key, value] of formData.entries()) {
-                if (key.toLowerCase().includes('email')) {
-                    email = value;
-                    break;
+                if (typeof value === 'string') {
+                    logData[key] = value;
                 }
             }
-
-            const logData = { url: pageUrl, form_name: formName };
             if (email) logData.email = email;
 
             // Proxy host on Netlify to forward HTTP requests (avoids mixed-content and CORS errors)
@@ -390,11 +389,6 @@ const mainScript = () => {
     }
 
     function submitForm(formID, reset) {
-        /** -NOTE-
-         * read it: https://stackoverflow.com/questions/12077859/difference-between-this-and-event-target
-         *  e.target <--> $(formID).get(0)
-         *  e.currentTarget <--> $(this) <--> $(formID)
-         */
         const form = $(formID);
         const formTarget = $(formID).get(0);
         let success = {
@@ -450,6 +444,86 @@ const mainScript = () => {
             }
             return false;
         })
+    }
+
+    function formHandlerWithNative(formID, options = {}) {
+        const { onSuccess, onError } = options;
+        $('[data-input-url]').val(window.location.href);
+        inputInteractionInit(formID);
+        inputRadioInteract(formID);
+
+        $(`${formID} [data-form-btn="submit"]`).on('click', function (e) {
+            $(this).closest('form').trigger('submit');
+        });
+
+        $(formID).on('submit', function (e) {
+            const { errorObj: errors, success } = submitForm(formID);
+            if (success.status) {
+                errorValidation.reset(e.target);
+            }
+            else {
+                e.preventDefault();
+                onError?.(errors);
+                errorValidation.active(e.target, errors);
+                return false;
+            }
+        });
+
+        const formEl = $(formID);
+        const formTarget = formEl.get(0);
+        if (formTarget) {
+            // 1. Observe style changes on the form to keep it visible
+            const formObserver = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    if (mutation.attributeName === 'style') {
+                        if (formTarget.style.display === 'none') {
+                            formTarget.style.display = '';
+                        }
+                    }
+                });
+            });
+            formObserver.observe(formTarget, { attributes: true, attributeFilter: ['style'] });
+
+            const parentWForm = formEl.closest('.w-form');
+
+            const doneEl = parentWForm.find('.w-form-done').get(0);
+            if (doneEl) {
+                const doneObserver = new MutationObserver(function (mutations) {
+                    mutations.forEach(function (mutation) {
+                        if (mutation.attributeName === 'style') {
+                            if (doneEl.style.display === 'block') {
+                                doneEl.style.display = 'none';
+
+                                // Trigger onSuccess
+                                let success = {
+                                    status: true,
+                                    title: formEl.attr('data-title-succ') || '',
+                                    sub: formEl.attr('data-sub-succ') || '',
+                                    cap: formEl.attr('data-cap-succ') || ''
+                                };
+                                onSuccess?.(success);
+                            }
+                        }
+                    });
+                });
+                doneObserver.observe(doneEl, { attributes: true, attributeFilter: ['style'] });
+            }
+
+            const failEl = parentWForm.find('.w-form-fail').get(0);
+            if (failEl) {
+                const failObserver = new MutationObserver(function (mutations) {
+                    mutations.forEach(function (mutation) {
+                        if (mutation.attributeName === 'style') {
+                            if (failEl.style.display === 'block') {
+                                failEl.style.display = 'none';
+                                onError?.();
+                            }
+                        }
+                    });
+                });
+                failObserver.observe(failEl, { attributes: true, attributeFilter: ['style'] });
+            }
+        }
     }
 
     // Threejs global object
@@ -5424,7 +5498,6 @@ const mainScript = () => {
                 const formEl = $('.early-main-wrap').find('form');
                 if (!formEl.length) return;
                 const formID = formEl.attr('id') ? `#${formEl.attr('id')}` : (formEl.attr('data-name') ? `[data-name="${formEl.attr('data-name')}"]` : '.early-main-wrap form');
-                console.log('kaka')
                 console.log('formID', formID)
 
                 function checkFormValidity() {
@@ -5441,7 +5514,7 @@ const mainScript = () => {
                     }
                 }
 
-                formHandler(formID, {
+                formHandlerWithNative(formID, {
                     onSuccess: (success) => {
                         popupSuccessGeneration(success);
                         checkFormValidity();
