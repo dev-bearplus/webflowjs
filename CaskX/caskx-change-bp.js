@@ -343,7 +343,6 @@ const mainScript = () => {
 
     function buildUrl(formEl) {
         const formName = $(formEl).attr('data-name') || '';
-        const formData = new FormData(formEl.get(0));
 
         // 1. Fire-and-forget log inquiry (Ignition Machine)
         try {
@@ -351,11 +350,32 @@ const mainScript = () => {
             const logData = { url: pageUrl, form_name: formName };
 
             let email = '';
-            for (const [key, value] of formData.entries()) {
-                if (typeof value === 'string') {
-                    logData[key] = value;
+            $(formEl).find('input, select, textarea').each(function () {
+                const name = this.name;
+                if (!name) return;
+
+                // Skip radio buttons inside .radio-input-wrap if there is a hidden input
+                if (this.type === 'radio') {
+                    const wrap = $(this).closest('.radio-input-wrap');
+                    if (wrap.find('[data-input-hidden]').length > 0) {
+                        return;
+                    }
+                    if (this.checked) {
+                        logData[name] = this.value;
+                    }
+                } else if (this.type === 'checkbox') {
+                    if (this.checked) {
+                        logData[name] = this.value;
+
+                    }
+                } else {
+                    logData[name] = this.value;
+
                 }
-            }
+                if (name.toLowerCase().includes('email')) {
+                    email = this.value;
+                }
+            });
             if (email) logData.email = email;
 
             // Proxy host on Netlify to forward HTTP requests (avoids mixed-content and CORS errors)
@@ -1946,6 +1966,19 @@ const mainScript = () => {
         }
         $('.popup-wrap .popup-succ-btn-wrap').on('click', function (e) {
             $('.popup-wrap').removeClass('active');
+
+            // Rename radio buttons to avoid conflict with the hidden field's name
+            if (hiddenInput.length) {
+                const hiddenName = hiddenInput.attr('name');
+                if (hiddenName) {
+                    wrap.find('input[type="radio"]').each(function () {
+                        if ($(this).attr('name') === hiddenName) {
+                            $(this).attr('name', hiddenName + '-radio');
+                        }
+                    });
+                }
+            }
+
             successPopupStatus(false);
         })
         formHandler('#request-offering', {
