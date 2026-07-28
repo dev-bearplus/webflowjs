@@ -257,7 +257,7 @@ const mainScript = () => {
                 let fieldName = field.name;
                 let fieldType = field.type;
                 let fieldRequired = field.required || false;
-                let REGEXP_TYPE = ['email', 'phone'];
+                let REGEXP_TYPE = ['email', 'phone', 'tel'];
                 if (name === fieldName) {
                     if (fieldRequired) {
                         let CusMessage = field.getAttribute('mess-required');
@@ -282,7 +282,9 @@ const mainScript = () => {
     const regexp = (pattern, message) => ({ regexp: pattern, message });
 
     const REGEXP = {
-        email: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g
+        email: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
+        phone: /^[+]?[\s./0-9()-]{6,20}$/,
+        tel: /^[+]?[\s./0-9()-]{6,20}$/
     }
 
     const ERROR_MESSAGE = {
