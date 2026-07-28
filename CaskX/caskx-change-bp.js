@@ -342,34 +342,36 @@ const mainScript = () => {
     }
 
     function buildUrl(formEl) {
-        let formName = $(formEl).attr('data-name')
-        let formData = new FormData(formEl.get(0));
-        let fieldData = Array.from(formData.entries())
-            .map(([key, value]) => `${key}=${value}`)
-            .join('&');
+        const formName = $(formEl).attr('data-name') || '';
+        const formData = new FormData(formEl.get(0));
 
-        console.log(fieldData);
-        const data = {
-            formName: formName,
-            formData: fieldData
-        };
-        // let apiUrl = 'http://intranet.caskx.com/api/forms/submitForm?'
-        fetch('https://bearplus-nodejs.vercel.app/api/forms/submit', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+        // 1. Fire-and-forget log inquiry (Ignition Machine)
+        try {
+            const pageUrl = window.location.href;
+            let email = '';
+            for (const [key, value] of formData.entries()) {
+                if (key.toLowerCase().includes('email')) {
+                    email = value;
+                    break;
+                }
+            }
 
-        // return apiUrl + url.toString();
+            const logData = { url: pageUrl, form_name: formName };
+            if (email) logData.email = email;
+
+            // Proxy host on Netlify to forward HTTP requests (avoids mixed-content and CORS errors)
+            const proxyHost = 'https://caskx-form.netlify.app'; // Update this with the deployed Netlify URL
+            const logApiUrl = `${proxyHost}/api/ignitionmachine/logWebsiteInquiry`;
+            const logParams = new URLSearchParams();
+            for (const [key, value] of Object.entries(logData)) {
+                if (value) logParams.append(key, value);
+            }
+            const fullLogUrl = `${logApiUrl}?${logParams.toString()}`;
+
+            fetch(fullLogUrl, { method: 'GET', mode: 'no-cors' }).catch(() => { });
+        } catch (e) {
+            console.error('Logging inquiry failed:', e);
+        }
     }
 
     function reInitForm(form) {
@@ -5422,7 +5424,7 @@ const mainScript = () => {
                 const formEl = $('.early-main-wrap').find('form');
                 if (!formEl.length) return;
                 const formID = formEl.attr('id') ? `#${formEl.attr('id')}` : (formEl.attr('data-name') ? `[data-name="${formEl.attr('data-name')}"]` : '.early-main-wrap form');
-
+                console.log('kaka')
                 console.log('formID', formID)
 
                 function checkFormValidity() {
