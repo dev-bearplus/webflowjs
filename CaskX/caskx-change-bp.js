@@ -5542,11 +5542,11 @@ const mainScript = () => {
                     const rules = mapObjectFormToValidate(formTarget, formsObj);
                     const { isValidated, errorObj } = validateForm({ formsObj: formsObj, rules: rules });
                     const submitBtn = $(formID).find('[data-form-btn="submit"], .btn-submit, button[type="submit"], input[type="submit"]');
-                    if (isValidated) {
-                        submitBtn.removeClass('btn-disable');
-                    } else {
-                        submitBtn.addClass('btn-disable');
-                    }
+                    // if (isValidated) {
+                    //     submitBtn.removeClass('btn-disable');
+                    // } else {
+                    //     submitBtn.addClass('btn-disable');
+                    // }
                 }
 
                 formHandlerWithNative(formID, {
@@ -5556,7 +5556,6 @@ const mainScript = () => {
                     }
                 });
 
-                checkFormValidity();
 
                 $(formID).on('input change keyup click', 'input, select, textarea, .input-checkbox-ic-wrap, .radio-input-item', function () {
                     checkFormValidity();
