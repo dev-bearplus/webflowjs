@@ -2,6 +2,86 @@ const mainScript = () => {
   console.log("init bp");
   let lenis = new Lenis();
   gsap.registerPlugin(ScrollTrigger);
+  const viewport = {
+    w: window.innerWidth,
+    h: window.innerHeight
+  };
+
+  class Header {
+    constructor() {
+      this.el = null;
+      this.isOpen = false;
+      this.listDependent = [];
+      this.hideTimeout = null;
+    }
+    init() {
+      this.el = document.querySelector('.header');
+      if (viewport.w <= 991) {
+        this.toggleNav();
+      }
+    }
+    updateOnScroll(inst) {
+      if (!this.el) return;
+      this.toggleHide(inst);
+      this.toggleScroll(inst);
+      this.onHideDependent();
+    }
+    toggleScroll(inst) {
+      if (inst.scroll > $(this.el).height() * 0.5) {
+        $(this.el).addClass("on-scroll");
+      } else {
+        $(this.el).removeClass("on-scroll");
+      }
+    }
+    toggleHide(inst) {
+      if (inst.direction === 1) {
+        if (inst.scroll > $(this.el).height() * 0.5) {
+          $(this.el).addClass('on-hide');
+        }
+      } else {
+        $(this.el).removeClass("on-hide");
+      }
+    }
+    registerDependent(dependentEl) {
+      if ($(dependentEl).length > 0 && !this.listDependent.includes(dependentEl)) {
+        this.listDependent.push(dependentEl);
+        this.onHideDependent();
+      }
+    }
+    unregisterDependent(dependentEl) {
+      const dependentNodes = $(dependentEl).toArray();
+      this.listDependent = this.listDependent.filter((item) => {
+        return !$(item).toArray().some((node) => dependentNodes.includes(node));
+      });
+    }
+    onHideDependent() {
+      if (!this.el) return;
+      let heightHeader = $(this.el).outerHeight();
+      const isVisible = !$(this.el).hasClass('on-hide');
+
+      this.listDependent.forEach((item) => {
+        $(item).css('top', isVisible ? heightHeader + 'px' : '0px');
+      });
+    }
+    toggleNav() {
+      $(this.el).find('.header-menu-btn').on('click', (e) => {
+        e.preventDefault();
+        $(e.currentTarget).closest('.header-menu-btn').toggleClass('active');
+        $(this.el).find('.header-menu').toggleClass('active');
+      });
+      if (viewport.w < 991) {
+        $(this.el).find('.header-menu-item.has-submenu').on('click', function (e) {
+          e.preventDefault();
+          $(this).toggleClass('active');
+          $(this).next('.header-menu-dropdown').slideToggle();
+        });
+      }
+    }
+  }
+
+  const header = new Header();
+  header.init();
+
   if ($(".main").attr("name-space") !== 'login') {
     function raf(time) {
       lenis.raf(time);
@@ -10,17 +90,7 @@ const mainScript = () => {
     requestAnimationFrame(raf);
 
     lenis.on("scroll", function (inst) {
-      if (inst.scroll > $(".header").height() * 0.5) {
-        if (inst.direction >= 1) {
-          $(".header").addClass("on-hide");
-        } else {
-          $(".header").removeClass("on-hide");
-        }
-        $(".header").addClass("on-scroll");
-      } else {
-        $(".header").removeClass("on-scroll");
-        $(".header").removeClass("on-hide");
-      }
+      header.updateOnScroll(inst);
     });
   }
   else {
@@ -69,10 +139,6 @@ const mainScript = () => {
     elArr.forEach((el, idx) => {
       $(el).removeClass('active').eq(index).addClass('active')
     })
-  }
-  const viewport = {
-    w: window.innerWidth,
-    h: window.innerHeight
   }
   const parseRem = (input) => {
     return (input / 10) * parseFloat($("html").css("font-size"));
@@ -652,26 +718,205 @@ const mainScript = () => {
       slide: '.cs-usecase-list-item'
     })
   }
-  SCRIPT.blogDetailScript = () => {
-    $('[btn-type="facebook"]').attr('href', `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`);
-    $('[btn-type="x"]').attr('href', `https://twitter.com/intent/tweet?url=${window.location.href}`);
-    $('[btn-type="linkedin"]').attr('href', `https://www.linkedin.com/shareArticle?mini=true&url=${window.location.href}`);
+  const initBlogTableOfContents = () => {
+    const $table = $('.blog-dt-table');
+    const $mobWrap = $('.blog-dt-table-mob');
+    const $mobList = $('.blog-dt-table-mob .blog-dt-table-list');
+    const $mobTitle = $('.blog-dt-table-title .txt, .blog-dt-table-title [class*="txt"], .blog-dt-table-title div, .blog-dt-table-title');
+    const $headings = $('.tp-egc-richtext h3');
 
+    if (($table.length === 0 && $mobWrap.length === 0) || $headings.length === 0) return;
+
+    if ($mobWrap.length > 0) {
+      header.registerDependent('.blog-dt-table-mob');
+    }
+
+    $table.empty();
+    if ($mobList.length > 0) {
+      $mobList.empty();
+    }
+
+    const headingData = [];
+
+    $headings.each((index, el) => {
+      const $h3 = $(el);
+      if (!$h3.attr('id')) {
+        $h3.attr('id', `heading-toc-${index}`);
+      }
+      const title = $h3.text().trim();
+      const hasNumberPrefix = /^\d+[\.\)]\s*/.test(title);
+      const displayText = hasNumberPrefix ? title : `${index + 1}. ${title}`;
+
+      headingData.push({ el, title, displayText });
+
+      const createItem = () => $(`
+        <div class="blog-dt-table-item" data-index="${index}">
+          <div class="txt-16 txt-med line-lamp-1">${displayText}</div>
+        </div>
+      `);
+
+      if ($table.length > 0) {
+        const $itemDesktop = createItem();
+        $itemDesktop.on('click', function () {
+          scrollToHeading(el);
+        });
+        $table.append($itemDesktop);
+      }
+
+      if ($mobList.length > 0) {
+        const $itemMobile = createItem();
+        $itemMobile.on('click', function () {
+          scrollToHeading(el);
+          $mobList.slideUp();
+          $('.blog-dt-table-mob .blog-dt-table-title-wrap').removeClass('active');
+        });
+        $mobList.append($itemMobile);
+      }
+    });
+
+    const scrollToHeading = (el) => {
+      if (typeof lenis !== 'undefined' && lenis) {
+        lenis.scrollTo(el, { offset: -100 });
+      } else {
+        const targetOffset = $(el).offset().top - 100;
+        $('html, body').animate({ scrollTop: targetOffset }, 500);
+      }
+    };
+
+    $('.blog-dt-table-title-wrap').off('click.mobToc').on('click.mobToc', function () {
+      $(this).toggleClass('active');
+      // $(this).siblings('.blog-dt-table-list').slideToggle();
+    });
+
+    const $desktopItems = $table.find('.blog-dt-table-item');
+    const $mobileItems = $mobList.find('.blog-dt-table-item');
+
+    const updateActiveState = () => {
+      let activeIndex = -1;
+      const threshold = 150;
+
+      $headings.each((index, el) => {
+        const top = el.getBoundingClientRect().top;
+        if (top <= threshold) {
+          activeIndex = index;
+        }
+      });
+
+      if ($(window).scrollTop() + $(window).height() >= $(document).height() - 50) {
+        activeIndex = $headings.length - 1;
+      }
+
+      if (activeIndex < 0 && $headings.length > 0) {
+        activeIndex = 0;
+      }
+
+      $desktopItems.removeClass('active');
+      $mobileItems.removeClass('active');
+
+      if (activeIndex >= 0 && activeIndex < headingData.length) {
+        $desktopItems.eq(activeIndex).addClass('active');
+        $mobileItems.eq(activeIndex).addClass('active');
+
+        const currentHeadingText = headingData[activeIndex].displayText;
+        const $titleTxt = $('.blog-dt-table-title .txt, .blog-dt-table-title [class*="txt"]');
+        if ($titleTxt.length > 0) {
+          $titleTxt.text(currentHeadingText);
+        } else if ($mobTitle.length > 0) {
+          $mobTitle.eq(0).text(currentHeadingText);
+        }
+      }
+    };
+
+    if (typeof lenis !== 'undefined' && lenis) {
+      lenis.on('scroll', updateActiveState);
+    }
+    $(window).on('scroll', updateActiveState);
+
+    updateActiveState();
+  };
+
+  const initSocialShare = () => {
+    const currentUrl = encodeURIComponent(window.location.href);
+
+    const shareUrls = {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${currentUrl}`,
+      x: `https://twitter.com/intent/tweet?url=${currentUrl}`,
+      twitter: `https://twitter.com/intent/tweet?url=${currentUrl}`,
+      linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${currentUrl}`
+    };
+
+    $('.blog-dt-main-side-share-list a[btn-type], [btn-type="facebook"], [btn-type="x"], [btn-type="linkedin"]').each((_, el) => {
+      const $btn = $(el);
+      const type = $btn.attr('btn-type');
+      if (type && shareUrls[type]) {
+        $btn.attr('href', shareUrls[type]);
+        $btn.attr('target', '_blank');
+        $btn.attr('rel', 'noopener noreferrer');
+
+        $btn.off('click.socialShare').on('click.socialShare', function (e) {
+          e.preventDefault();
+          const width = 600;
+          const height = 500;
+          const left = (window.innerWidth - width) / 2;
+          const top = (window.innerHeight - height) / 2;
+          window.open(
+            shareUrls[type],
+            'socialShareWindow',
+            `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`
+          );
+        });
+      }
+    });
+  };
+
+  const handlePageFadeIn = () => {
+    if (viewport.w < 767 || window.innerWidth < 767) return;
+
+    if ($('.blog-dt-hero').length || $('.blog-dt-main').length) {
+      $('.df-init').removeClass('df-init')
+      gsap.from(['.blog-dt-hero', '.blog-dt-main-side-wrap', '.blog-dt-main-content'], {
+        autoAlpha: 0,
+        y: 20,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: 'power2.out',
+        clearProps: 'all'
+      });
+    } else {
+      gsap.from('.main', {
+        autoAlpha: 0,
+        y: 15,
+        duration: 0.6,
+        ease: 'power2.out',
+        clearProps: 'all'
+      });
+    }
+  };
+
+  SCRIPT.blogDetailScript = () => {
+    handlePageFadeIn();
+    initSocialShare();
 
     // check reference
     const ref = document.referrer;
 
-    const btnBack = $('.blog-dt-main-side-btn')
+    const btnBack = $('.blog-dt-main-side-btn');
     if (ref) {
-      btnBack.attr('href', ref)
+      btnBack.attr('href', ref);
     } else {
-      btnBack.attr('href', '/newsroom')
+      btnBack.attr('href', '/newsroom');
     }
-  }
+
+    initBlogTableOfContents();
+  };
+
+  SCRIPT.egcDetailScript = () => {
+    SCRIPT.blogDetailScript();
+  };
 
 
   const pageName = $(".main").attr("name-space");
-  if (pageName) {
+  if (pageName && typeof SCRIPT[`${pageName}Script`] === 'function') {
     SCRIPT[`${pageName}Script`]();
   }
 };
