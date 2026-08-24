@@ -723,7 +723,7 @@ const mainScript = () => {
     const $mobWrap = $('.blog-dt-table-mob');
     const $mobList = $('.blog-dt-table-mob .blog-dt-table-list');
     const $mobTitle = $('.blog-dt-table-title .txt, .blog-dt-table-title [class*="txt"], .blog-dt-table-title div, .blog-dt-table-title');
-    const $headings = $('.tp-egc-richtext h3');
+    const $headings = $('.tp-egc-richtext h2');
 
     if (($table.length === 0 && $mobWrap.length === 0) || $headings.length === 0) return;
 
@@ -739,11 +739,11 @@ const mainScript = () => {
     const headingData = [];
 
     $headings.each((index, el) => {
-      const $h3 = $(el);
-      if (!$h3.attr('id')) {
-        $h3.attr('id', `heading-toc-${index}`);
+      const $h2 = $(el);
+      if (!$h2.attr('id')) {
+        $h2.attr('id', `heading-toc-${index}`);
       }
-      const title = $h3.text().trim();
+      const title = $h2.text().trim();
       const hasNumberPrefix = /^\d+[\.\)]\s*/.test(title);
       const displayText = hasNumberPrefix ? title : `${index + 1}. ${title}`;
 
@@ -894,7 +894,6 @@ const mainScript = () => {
   };
 
   SCRIPT.blogDetailScript = () => {
-    handlePageFadeIn();
     initSocialShare();
 
     // check reference
@@ -911,6 +910,7 @@ const mainScript = () => {
   };
 
   SCRIPT.egcDetailScript = () => {
+    handlePageFadeIn();
     SCRIPT.blogDetailScript();
   };
 
