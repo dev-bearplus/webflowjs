@@ -992,9 +992,9 @@ const mainScript = () => {
         try {
             // Fetch data từ GitHub API
             const data = await Promise.all([
-                fetch("https://cdnwf.bear.plus/Colmeia/files/globe-data-min.json").then(value => value.json()),
-                fetch("https://cdnwf.bear.plus/Colmeia/files/my-flights.json").then(value => value.json()),
-                fetch("https://cdnwf.bear.plus/Colmeia/files/my-airports.json").then(value => value.json())
+                fetch("https://cdnwf-prod.bear.plus/Colmeia/files/globe-data-min.json").then(value => value.json()),
+                fetch("https://cdnwf-prod.bear.plus/Colmeia/files/my-flights.json").then(value => value.json()),
+                fetch("https://cdnwf-prod.bear.plus/Colmeia/files/my-airports.json").then(value => value.json())
             ])
 
             const countries = data[0].features;

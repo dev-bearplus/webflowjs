@@ -431,7 +431,7 @@ const mainScript = () => {
     enviromentMapLoad.encoding = THREE.sRGBEncoding;
 
 
-    let modelUrl = 'https://cdnwf.bear.plus/caskX/img/models/wine_barrel_01_4k.gltf'
+    let modelUrl = 'https://cdnwf-prod.bear.plus/caskX/img/models/wine_barrel_01_4k.gltf'
     let barrelHomeHero = gltfLoader.loadAsync(modelUrl)
     let barrelHomeDiscor = gltfLoader.loadAsync(modelUrl);
     let barrelGlobalNav = gltfLoader.loadAsync(modelUrl);

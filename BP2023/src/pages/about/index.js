@@ -100,7 +100,7 @@ const about = {
 					roughness: .85,
 				})
 
-				let modelUrl = 'https://cdnwf.bear.plus/bp2023/img/home_hero_2023.gltf';
+				let modelUrl = 'https://cdnwf-prod.bear.plus/bp2023/img/home_hero_2023.gltf';
 				let loadModel = gltfLoader.loadAsync(modelUrl);
 
 				loadModel.then((res) => {
@@ -291,14 +291,14 @@ const about = {
 				let canvasData = [
 					{
 						name: 'rocket',
-						url: 'https://cdnwf.bear.plus/bp2023/img/models/rocket.glb',
+						url: 'https://cdnwf-prod.bear.plus/bp2023/img/models/rocket.glb',
 						pos: {x:0,y:-.1,z:0},
 						rot: {x:Math.PI/2,y:Math.PI/6 - Math.PI / 2,z:Math.PI*2.3/5},
 						scale: {x: .85, y: .85, z: .85}
 					},
 					{
 						name: 'hatwand',
-						url: 'https://cdnwf.bear.plus/bp2023/img/models/magic.glb',
+						url: 'https://cdnwf-prod.bear.plus/bp2023/img/models/magic.glb',
 						pos: {x:.4,y:-.35,z:0},
 						rot: {x:0,y:-Math.PI/2,z:0},
 						scale: {x: .8, y: .8, z: .8},
@@ -310,35 +310,35 @@ const about = {
 					},
 					{
 						name: 'arrow',
-						url: 'https://cdnwf.bear.plus/bp2023/img/models/arrow.glb',
+						url: 'https://cdnwf-prod.bear.plus/bp2023/img/models/arrow.glb',
 						pos: {x:.2,y:-.1,z:0},
 						rot: {x:0, y:0, z:0},
 						scale: {x: -.8, y: .8, z: .8},
 					},
 					{
 						name: 'bomb',
-						url: 'https://cdnwf.bear.plus/bp2023/img/models/bomb.glb',
+						url: 'https://cdnwf-prod.bear.plus/bp2023/img/models/bomb.glb',
 						pos: {x:0,y:-.1,z:0},
 						rot: {x:Math.PI/2,y: -Math.PI / 2,z:Math.PI/2},
 						scale: {x: 1, y: 1, z: 1}
 					},
 					{
 						name: 'thumb',
-						url: 'https://cdnwf.bear.plus/bp2023/img/models/thumb.glb',
+						url: 'https://cdnwf-prod.bear.plus/bp2023/img/models/thumb.glb',
 						pos: {x:0,y:-.14,z:0},
 						rot: {x:0, y:-Math.PI/18, z:Math.PI/18},
 						scale: {x: 1, y: 1, z: 1}
 					},
 					{
 						name: 'metalball',
-						url: 'https://cdnwf.bear.plus/bp2023/img/models/bond.glb',
+						url: 'https://cdnwf-prod.bear.plus/bp2023/img/models/bond.glb',
 						pos: {x:0,y:0,z:0},
 						rot: {x:0, y:Math.PI/36 - Math.PI / 2, z:0},
 						scale: {x: 1, y: 1, z: 1}
 					},
 					{
 						name: 'fire',
-						url: 'https://cdnwf.bear.plus/bp2023/img/models/fire.glb',
+						url: 'https://cdnwf-prod.bear.plus/bp2023/img/models/fire.glb',
 						pos: {x:0,y:-.05,z:0},
 						rot: {x:0, y:Math.PI/36, z:0},
 						scale: {x: 1, y: 1, z: 1}
