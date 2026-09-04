@@ -531,7 +531,7 @@ const mainScript = () => {
             const canvas = $('.orb-canvas').get(0);
             const app = new Application(canvas);
             gsap.set('.orb-canvas-wrap', { autoAlpha: 0, duration: 0 })
-            app.load("https://cdnwf.bear.plus/ArmorxAI/armorxAI.splinecode").then(() => {
+            app.load("https://cdnwf-prod.bear.plus/ArmorxAI/armorxAI.splinecode").then(() => {
                 gsap.to('.orb-img', { autoAlpha: 0, duration: .3, ease: 'linear' })
                 gsap.set('.orb-canvas-wrap', { autoAlpha: 1, duration: 0 })
             });
