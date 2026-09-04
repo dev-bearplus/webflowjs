@@ -117,7 +117,7 @@ const mainScript = () => {
 
         // check allow routes for AE
         const allowedRoutesAELive = [];
-        const allowedRoutesAEStagging = ['waitlist'];
+        const allowedRoutesAEStagging = ['waitlist', 'about-us', 'how-it-works', 'boost-with-usd', 'contact-us', 'faqs', 'app-fund-documents'];
         const allowedRoutesAE = isStagging() ? allowedRoutesAEStagging : allowedRoutesAELive;
         const checkAllowedRouteAE = allowedRoutesAE.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
         const isHK = pathname.includes('hk-en') || pathname.includes('hk-zh-hant');
@@ -521,7 +521,12 @@ const mainScript = () => {
         //Update nav
         if ($(window).width() > 991) {
             $('.nav-left-wrap').css('margin-left', `-${marginAuto}px`)
-            $('.nav-right-bg-overflow').css('right', `-${marginAuto}px`)
+            // check nếu là lang lang="ar-AE" thì set left, còn không phải mới set width
+            if ($('html').attr('lang') === 'ar-AE') {
+                $('.nav-right-bg-overflow').css('left', `-${marginAuto}px`)
+            } else {
+                $('.nav-right-bg-overflow').css('right', `-${marginAuto}px`)
+            }
         }
     }
     setNavMargin()
@@ -969,7 +974,11 @@ const mainScript = () => {
     function openNavMenu() {
         const openNavTl = gsap.timeline({
             onStart() {
-                gsap.set('.nav-right-wrap', { xPercent: 100 })
+                if ($('html').attr('lang') === 'ar-AE') {
+                    gsap.set('.nav-right-wrap', { xPercent: -100 })
+                } else {
+                    gsap.set('.nav-right-wrap', { xPercent: 100 })
+                }
                 gsap.set('.nav-link', { xPercent: 40, autoAlpha: 0 })
                 gsap.set('.nav-link-mb-info > *', { x: 60, autoAlpha: 0 })
                 gsap.set('.nav .mod-add .txt-16.nav-info-label, .nav .mod-add .txt-14.nav-info-item-label, .nav .mod-add .txt-14.nav-info-txt, .nav .mod-add .txt-14.nav-info-item-link', { autoAlpha: 0, x: 60 })
@@ -1042,7 +1051,7 @@ const mainScript = () => {
             }
         })
         closeNavTl
-            .to('.nav-right-wrap', { xPercent: 100, ease: Power1.easeInOut, duration: .6 }, '0')
+            .to('.nav-right-wrap', { xPercent: $('html').attr('lang') === 'ar-AE' ? -100 : 100, ease: Power1.easeInOut, duration: .6 }, '0')
     }
     function getMobileOperatingSystem() {
         let userAgent = navigator.userAgent || navigator.vendor || window.opera;
