@@ -903,7 +903,7 @@ const mainScript = () => {
     if (ref) {
       btnBack.attr('href', ref);
     } else {
-      btnBack.attr('href', '/newsroom');
+      // btnBack.attr('href', '/newsroom');
     }
 
     initBlogTableOfContents();
