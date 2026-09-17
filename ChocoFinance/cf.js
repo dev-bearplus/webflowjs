@@ -282,19 +282,21 @@ const mainScript = () => {
     }
     function initChatbox() {
         let lang = $('html').attr('lang');
-        let key;
+        let key = '';
         if (lang == 'en-HK' || lang == 'zh-HK') {
             key = '39299081-8fb6-4a91-9e77-2feea792353b'
         }
-        else {
+        else if (lang == 'en-SG') {
             key = '828c3b01-7155-4ead-9114-3d244832fa64'
         }
-        $('<script/>', {
-            id: 'ze-snippet',
-            src: `https://static.zdassets.com/ekr/snippet.js?key=${key}`,
-            async: true
-        }).appendTo('body');
-        console.log('chatbox initialized');
+        if (key != '') {
+            $('<script/>', {
+                id: 'ze-snippet',
+                src: `https://static.zdassets.com/ekr/snippet.js?key=${key}`,
+                async: true
+            }).appendTo('body');
+            console.log('chatbox initialized');
+        }
     }
     initChatbox();
     function isInViewport(el) {
@@ -2102,7 +2104,6 @@ const mainScript = () => {
         function homeWithDraw() {
             if ($(window).outerWidth() < 479) {
                 $('.sc-home-withdraw-item').on('click', function (e) {
-                    console.log('khanh')
                     let index = $(this).index();
                     if ($(this).hasClass('active')) {
                         $(this).removeClass('active');
