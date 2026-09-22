@@ -3825,7 +3825,7 @@ const mainScript = () => {
                 if (!currentGroups.length) return;
 
                 let activeIdx = 0;
-                let threshold = $(window).height() / 3;
+                let threshold = $(window).height() / 3 - 100;
                 for (let x = 0; x < currentGroups.length; x++) {
                     let el = currentGroups.eq(x).get(0);
                     if (el) {
@@ -3871,10 +3871,11 @@ const mainScript = () => {
                     let targetSelector = isUAE
                         ? `h2.ar-doc-main-item-title[data-title="${target}"]`
                         : `.doc-main-group[data-toc="${target}"]`;
+                    console.log(targetSelector)
                     if ($(targetSelector).length) {
                         isClickScrolling = true;
-                        lenis.scrollTo(targetSelector, { 
-                            offset: -100, 
+                        lenis.scrollTo(targetSelector, {
+                            offset: -100,
                             duration: 1.4,
                             onComplete: () => {
                                 isClickScrolling = false;
