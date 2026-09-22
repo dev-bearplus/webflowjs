@@ -3573,6 +3573,102 @@ const mainScript = () => {
     }
     SCRIPT.documentsNewScript = () => {
         let cateStickyTemplate = $('.term-toc-item-link').eq(1).clone();
+
+        const pathname = window.location.pathname;
+        const isAE = pathname.includes('ae-en') || pathname.includes('ae-ar');
+        const isArabic = $('html').attr('lang') === 'en-AE' || $('html').attr('lang') === 'ar-AE';
+        const isUAE = isAE || isArabic || $('.ar-doc-main-content').length > 0 || $('h2.ar-doc-main-item-title').length > 0;
+        if (isUAE) {
+            fetchUaeDailyNav();
+        }
+
+        async function fetchUaeDailyNav() {
+            const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRiT4zo8_48URTmM1xo3rJ6osRWWoFOU9nCWHbe4f2GWNj1IKsgFMqD3jdOxdJS0XrfhBuzTxYC4gmQ/pub?gid=0&single=true&output=csv';
+            try {
+                const response = await fetch(csvUrl);
+                if (!response.ok) return;
+                const csvText = await response.text();
+                const lines = csvText.trim().split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+                if (lines.length < 2) return;
+
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+                const dateIdx = headers.findIndex(h => h.includes('date'));
+                const aedIdx = headers.findIndex(h => h.includes('aed'));
+                const usdIdx = headers.findIndex(h => h.includes('usd'));
+
+                const latestRow = lines[lines.length - 1].split(',').map(v => v.trim());
+                const dateVal = dateIdx !== -1 ? latestRow[dateIdx] : latestRow[0];
+                const aedVal = aedIdx !== -1 ? latestRow[aedIdx] : latestRow[1];
+                const usdVal = usdIdx !== -1 ? latestRow[usdIdx] : latestRow[2];
+
+                if (usdVal !== undefined) {
+                    const $usd = $('[uae-daily="usd"]');
+                    $usd.text(usdVal).addClass('loaded');
+                    $usd.closest('.load-ske').addClass('loaded');
+                }
+                if (aedVal !== undefined) {
+                    const $aed = $('[uae-daily="aed"]');
+                    $aed.text(aedVal).addClass('loaded');
+                    $aed.closest('.load-ske').addClass('loaded');
+                }
+                if (dateVal !== undefined) {
+                    const formattedDate = formatNavDate(dateVal, isArabic);
+                    const $date = $('[uae-daily="date"]');
+                    $date.text(formattedDate).addClass('loaded');
+                    $date.closest('.load-ske').addClass('loaded');
+                }
+            } catch (error) {
+                console.error('Error fetching UAE daily NAV data:', error);
+            }
+
+            function formatNavDate(dateStr, isArabic) {
+                if (!dateStr) return '';
+                const enMonths = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ];
+                const arMonths = [
+                    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+                    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+                ];
+                const shortMonths = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+
+                let day, monthIdx = -1, year;
+                const parts = dateStr.trim().split(/[\s\-\/]+/);
+                if (parts.length === 3) {
+                    if (isNaN(parts[1])) {
+                        day = parseInt(parts[0], 10);
+                        const mStr = parts[1].toLowerCase().slice(0, 3);
+                        monthIdx = shortMonths.indexOf(mStr);
+                        year = parts[2];
+                    } else if (parts[0].length === 4) {
+                        year = parts[0];
+                        monthIdx = parseInt(parts[1], 10) - 1;
+                        day = parseInt(parts[2], 10);
+                    } else {
+                        day = parseInt(parts[0], 10);
+                        monthIdx = parseInt(parts[1], 10) - 1;
+                        year = parts[2];
+                    }
+                }
+
+                const isArabicLang = $('html').attr('lang') === 'ar-AE';
+                if (monthIdx >= 0 && monthIdx < 12 && day && year) {
+                    const monthName = isArabicLang ? arMonths[monthIdx] : enMonths[monthIdx];
+                    return `${day} ${monthName} ${year}`;
+                }
+
+                const d = new Date(dateStr.replace(/-/g, ' '));
+                if (!isNaN(d.getTime())) {
+                    day = d.getDate();
+                    monthIdx = d.getMonth();
+                    year = d.getFullYear();
+                    const monthName = isArabicLang ? arMonths[monthIdx] : enMonths[monthIdx];
+                    return `${day} ${monthName} ${year}`;
+                }
+                return dateStr;
+            }
+        }
         function getAllDocs() {
             const getApi = [getAllDataByType('fund_document_category_parent'), getAllDataByType('document_category'), getAllDataByType('fund_document')];
             Promise.all(getApi).then(([category_parent, categories, docs]) => {
@@ -3593,7 +3689,8 @@ const mainScript = () => {
         // }
         function updateTocUINew() {
             $('.term-toc-inner').html('');
-            let allCategories = $('.doc-main-content.active .doc-group-title');
+            let allCategories = isUAE ? $('h2.ar-doc-main-item-title') : $('.doc-main-content.active .doc-group-title');
+            console.log(allCategories)
             allCategories.each((index, el) => {
                 let cateName = $(el).text();
                 let cateUID = $(el).attr('data-title');
@@ -3602,9 +3699,18 @@ const mainScript = () => {
                 cateStickyHtml.find('.term-toc-item-number').text(`${index + 1}.`)
                 cateStickyHtml.find('.term-toc-item-txt').text(cateName)
                 cateStickyHtml.attr('data-toc', `${cateUID}`)
+                if (index === 0) {
+                    cateStickyHtml.addClass('active');
+                } else {
+                    cateStickyHtml.removeClass('active');
+                }
                 console.log(cateStickyHtml)
                 $('.term-toc-inner').append(cateStickyHtml)
             })
+            let initialHeadTxt = $('.term-toc-item-link.active .term-toc-item-txt').text() || $('.term-toc-item-link .term-toc-item-txt').eq(0).text();
+            if (initialHeadTxt) {
+                $('.term-toc-head-txt').text(initialHeadTxt);
+            }
         }
         function updateDocUI(categoryParent, allCate, allDoc) {
             let cateItemTemplate = $('.doc-main-item-wrap').eq(0).clone();
@@ -3711,39 +3817,75 @@ const mainScript = () => {
             })
         }
         function docInteractionNew() {
-            let allCateGroups = $('.doc-main-content.active .doc-main-group');
-            $('.term-toc-head-txt').text($('.term-toc-item-link .term-toc-item-txt').eq(0).text())
-            lenis.on('scroll', function (e) {
-                for (let x = 0; x < allCateGroups.length; x++) {
-                    let top = allCateGroups.eq(x).get(0).getBoundingClientRect().top;
-                    if (top > 0 && top < ($(window).height() / 5)) {
-                        $('.term-toc-item-link').eq(x).addClass('active');
-                        $('.term-toc-item-link').not(`:eq(${x})`).removeClass('active');
-                        $('.term-toc-head-txt').text($('.term-toc-item-link.active .term-toc-item-txt').text())
+            let isClickScrolling = false;
+
+            function updateActiveOnScroll() {
+                if (isClickScrolling) return;
+                let currentGroups = isUAE ? $('h2.ar-doc-main-item-title') : $('.doc-main-content.active .doc-group-title');
+                if (!currentGroups.length) return;
+
+                let activeIdx = 0;
+                let threshold = $(window).height() / 3;
+                for (let x = 0; x < currentGroups.length; x++) {
+                    let el = currentGroups.eq(x).get(0);
+                    if (el) {
+                        let top = el.getBoundingClientRect().top;
+                        if (top <= threshold) {
+                            activeIdx = x;
+                        }
                     }
                 }
-            })
-            docTocNavNew();
-        }
-        function docTocNavNew() {
-            if ($(window).width() < 767) {
-                $('.term-toc-head').on('click', function (e) {
-                    e.preventDefault();
-                    if ($(this).hasClass('on-open')) {
-                        $(this).removeClass('on-open');
-                        $('.term-toc-inner').removeClass('on-open')
-                    } else {
-                        $(this).addClass('on-open');
-                        $('.term-toc-inner').addClass('on-open')
-                    }
-                })
+                $('.term-toc-item-link').eq(activeIdx).addClass('active');
+                $('.term-toc-item-link').not(`:eq(${activeIdx})`).removeClass('active');
+                $('.term-toc-head-txt').text($('.term-toc-item-link.active .term-toc-item-txt').text());
             }
-            $('.term-toc-inner').on('click', '.term-toc-item-link', function (e) {
-                e.preventDefault();
-                let target = $(this).attr('data-toc');
-                console.log(`.doc-main-group[data-toc=${target}`)
-                lenis.scrollTo(`.doc-main-group[data-toc=${target}]`, { offset: -100, duration: 1.4 })
-            })
+
+            lenis.on('scroll', updateActiveOnScroll);
+            $(window).on('scroll', updateActiveOnScroll);
+
+            docTocNavNew();
+
+            function docTocNavNew() {
+                if ($(window).width() < 767) {
+                    $('.term-toc-head').on('click', function (e) {
+                        e.preventDefault();
+                        if ($(this).hasClass('on-open')) {
+                            $(this).removeClass('on-open');
+                            $('.term-toc-inner').removeClass('on-open');
+                        } else {
+                            $(this).addClass('on-open');
+                            $('.term-toc-inner').addClass('on-open');
+                        }
+                    });
+                }
+                $('.term-toc-inner').on('click', '.term-toc-item-link', function (e) {
+                    e.preventDefault();
+                    $('.term-toc-head').removeClass('on-open');
+                    $('.term-toc-inner').removeClass('on-open');
+
+                    $('.term-toc-item-link').removeClass('active');
+                    $(this).addClass('active');
+                    $('.term-toc-head-txt').text($(this).find('.term-toc-item-txt').text());
+
+                    let target = $(this).attr('data-toc');
+                    let targetSelector = isUAE
+                        ? `h2.ar-doc-main-item-title[data-title="${target}"]`
+                        : `.doc-main-group[data-toc="${target}"]`;
+                    if ($(targetSelector).length) {
+                        isClickScrolling = true;
+                        lenis.scrollTo(targetSelector, { 
+                            offset: -100, 
+                            duration: 1.4,
+                            onComplete: () => {
+                                isClickScrolling = false;
+                            }
+                        });
+                        setTimeout(() => {
+                            isClickScrolling = false;
+                        }, 1500);
+                    }
+                });
+            }
         }
         // if(!isStagging()){
         //     $('.doc-main-tab-wrap').on('click', '.doc-main-tab', function(e) {
