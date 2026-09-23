@@ -3571,6 +3571,334 @@ const mainScript = () => {
             })
         }
     }
+    SCRIPT.programScript = () => {
+        homeTestiHandleNew();
+        function homeTestiHandleNew() {
+            console.log('init new testi')
+            $('.home-testi-item').each(function (e) {
+                let rate = Number($(this).find('.data-rate').text());
+                let stars = $(this).find('.ic-star');
+                for (let x = 0; x < rate; x++) {
+                    stars.eq(x).addClass('rate-true')
+                }
+            })
+            if ($(window).width() > 991) {
+                $('.home-testi-main').on('mouseenter', function (e) {
+                    if (!isScrolling) {
+                        lenis.stop();
+                    }
+                })
+                $('.home-testi-main').on('mouseleave', function (e) {
+                    if (!isScrolling) {
+                        lenis.start();
+                    }
+                })
+
+                let distanceVal;
+                if ($('.home-testi-col-inner.mod-right').height() >= $('.home-testi-col-inner.mod-left').height()) {
+                    distanceVal = $('.home-testi-col-inner.mod-right').outerHeight() - $('.home-testi-bg-wrap.background').height();
+                } else {
+                    distanceVal = $('.home-testi-col-inner.mod-left').outerHeight() - $('.home-testi-bg-wrap.background').height();
+                }
+
+                const homeTestiTl = new gsap.timeline({
+                    paused: true,
+                });
+                homeTestiTl.to('.home-testi-bar-inner', { scaleX: 1, ease: 'none' })
+                    .fromTo('.home-testi-col-inner.mod-left', { yPercent: 0, ease: 'none' }, { y: -distanceVal, ease: 'none' }, '0')
+                    .fromTo('.home-testi-col-inner.mod-right', { yPercent: 0, ease: 'none' }, { y: distanceVal, ease: 'none' }, '0')
+
+                let currProg = 0;
+                $('.home-testi-main').on('wheel', function (e) {
+                    currProg = currProg + e.originalEvent.deltaY > distanceVal ? distanceVal : currProg + e.originalEvent.deltaY < 0 ? 0 : currProg + e.originalEvent.deltaY;
+                    let prog = currProg / distanceVal > 1 ? 1 : currProg / distanceVal < 0 ? 0 : currProg / distanceVal;
+                    gsap.to(homeTestiTl, { duration: .8 * gsap.utils.clamp(.5, 1, Math.abs(e.originalEvent.deltaY / 110)), progress: prog, ease: Power2.easeOut, overwrite: true });
+                })
+
+                // Extra scub video
+                let homeTestiVid = document.querySelector('.mod-home-testi video')
+                let isPlayed = false;
+                const homeTestiVidTl = new gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '.sc-home-testi-wrap',
+                        start: 'top top+=60%',
+                        end: 'bottom top+=40%',
+                        onEnter() {
+                            if (!isPlayed) {
+                                homeTestiVid.play()
+                                isPlayed = true
+                            }
+                        },
+                    }
+                });
+            } else {
+                const homeTestiSwiperMb = new Swiper('.swiper.home-testi-col-wrapper', {
+                    slidesPerView: "auto",
+                    spaceBetween: 1.6 * unit,
+                    breakpoints: {
+                        767: {
+                            slidesPerView: 2,
+                        }
+                    }
+                })
+
+                let homeTestiVid = document.querySelector('.mod-home-testi video')
+                const homeTestiTl = new gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '.sc-home-testi-wrap',
+                        start: `top top+=25%`,
+                        end: `bottom+=${$('.sc-home-testi').height()} bottom`,
+                        onEnter() {
+                            homeTestiVid.play()
+                        }
+                    }
+                });
+
+                $('.home-testi-col-wrapper .load-ske').removeClass('load-ske')
+            }
+            if ($('.home-card-title').length > 0) {
+                ScrollTrigger.create({
+                    trigger: '.home-card-title',
+                    start: 'center center',
+                    end: 'center center',
+                    once: true,
+                    onEnter: () => {
+                        homeCardHandle()
+                    }
+                })
+            }
+        }
+        function homeGetFaq() {
+            animateFaq();
+            scrollToFaq();
+        }
+
+        function instantWithdrawalHandle() {
+            const btns = $('.prog-instant-cta-btn');
+            const card1 = $('.prog-instant-card.item1');
+            const toggle = $('.prog-work-control-item-toggle input[type="checkbox"]');
+
+            if (btns.length === 0 || card1.length === 0) return;
+
+            // Fix cứng width cho thẻ con ngay từ đầu để tránh text bị rớt dòng khi thêm class .off
+            const card1Width = card1.width();
+            card1.find('.prog-instant-card-head, .prog-instant-card-main').css('width', card1Width + 'px');
+
+            let isOn = true;
+
+            function updateState(newState) {
+                if (isOn === newState) return;
+                isOn = newState;
+
+                if (isOn) {
+                    btns.eq(0).addClass('active');
+                    btns.eq(1).removeClass('active');
+                    toggle.prop('checked', true);
+
+                    card1.removeClass('off');
+                } else {
+                    btns.eq(1).addClass('active');
+                    btns.eq(0).removeClass('active');
+                    toggle.prop('checked', false);
+
+                    card1.addClass('off');
+                }
+            }
+
+            btns.eq(0).on('click', function (e) {
+                e.preventDefault();
+                updateState(true);
+            });
+
+            btns.eq(1).on('click', function (e) {
+                e.preventDefault();
+                updateState(false);
+            });
+
+            toggle.on('change', function (e) {
+                updateState($(this).is(':checked'));
+            });
+        }
+        function advantageProgrammeHandle() {
+            const btns = $('.prog-work-control-input.item-program');
+            if (btns.length === 0) return;
+
+            const checkbox = btns.closest('.prog-work-control-item').find('input[type="checkbox"]');
+            const items = $('.prog-work-percent-item');
+
+            let isOn = true;
+
+            function updateState(newState) {
+                if (isOn === newState) return;
+                isOn = newState;
+                const percentBlock = $('.prog-work-percent');
+
+                if (isOn) {
+                    btns.eq(0).addClass('active');
+                    btns.eq(1).removeClass('active');
+                    checkbox.prop('checked', true);
+
+                    items.eq(0).removeClass('item-notsupport');
+                    items.eq(1).removeClass('item-notsupport');
+                    items.eq(2).addClass('item-notsupport');
+
+                    percentBlock.removeClass('off');
+                } else {
+                    btns.eq(1).addClass('active');
+                    btns.eq(0).removeClass('active');
+                    checkbox.prop('checked', false);
+
+                    items.addClass('item-notsupport');
+
+                    percentBlock.addClass('off');
+                }
+            }
+
+            btns.eq(0).on('click', function () {
+                updateState(true);
+            });
+
+            btns.eq(1).on('click', function () {
+                updateState(false);
+            });
+
+            checkbox.on('change', function () {
+                updateState($(this).is(':checked'));
+            });
+
+            // Set initial state based on active class
+            if (btns.eq(1).hasClass('active')) {
+                isOn = true; // Temporary inverse to force updateState to run
+                updateState(false);
+            } else {
+                isOn = false;
+                updateState(true);
+            }
+        }
+
+        function balanceHandle() {
+            let balanceItem = null;
+            $('.prog-work-control-item').each(function () {
+                if ($(this).find('.prog-work-control-label').text().trim() === 'Your balance') {
+                    balanceItem = $(this);
+                }
+            });
+
+            if (!balanceItem) return;
+
+            const btns = balanceItem.find('.prog-work-control-input');
+            const dropdownTxt = balanceItem.find('.prog-work-control-item-dropdown-txt');
+            const items = $('.prog-work-percent-item');
+
+            if (btns.length === 0) return;
+
+            function updateState(index) {
+                btns.removeClass('active');
+                btns.eq(index).addClass('active');
+                dropdownTxt.text(btns.eq(index).text().trim());
+
+                items.removeClass('item-hide');
+                if (index === 0) { // HK$100k
+                    items.eq(1).addClass('item-hide');
+                    items.eq(2).addClass('item-hide');
+                } else if (index === 1) { // HK$300k
+                    items.eq(2).addClass('item-hide');
+                }
+            }
+
+            btns.on('click', function () {
+                const index = $(this).index();
+                updateState(index);
+            });
+
+            let initIndex = btns.filter('.active').index();
+            if (initIndex < 0) initIndex = 2; // Default
+            updateState(initIndex);
+        }
+
+        function portfolioReturnsHandle() {
+            let portItem = null;
+            $('.prog-work-control-item').each(function () {
+                if ($(this).find('.prog-work-control-label').text().trim() === 'Chocolate portfolio returns') {
+                    portItem = $(this);
+                }
+            });
+
+            if (!portItem) return;
+
+            const btns = portItem.find('.prog-work-control-input');
+            const dropdownTxt = portItem.find('.prog-work-control-item-dropdown-txt');
+            const percentBlock = $('.prog-work-percent');
+            const percentLabel = $('.prog-work-percent-label');
+
+            if (btns.length === 0) return;
+
+            function updateState(index) {
+                btns.removeClass('active');
+                const activeBtn = btns.eq(index);
+                activeBtn.addClass('active');
+
+                const txt = activeBtn.find('.prog-work-control-input-txt').text().trim();
+                dropdownTxt.text(txt);
+                percentLabel.text(txt);
+
+                percentBlock.removeClass('return-small return-mid');
+
+                if (txt === '3.0% p.a.') {
+                    percentBlock.addClass('return-small');
+                    $('.prog-work-percent-item').last().find('.prog-work-percent-item-benefit-inner').text('3.0%')
+                } else if (txt === '3.5% p.a.') {
+                    percentBlock.addClass('return-mid');
+                    $('.prog-work-percent-item').last().find('.prog-work-percent-item-benefit-inner').text('3.5%')
+                }
+                else {
+                    $('.prog-work-percent-item').last().find('.prog-work-percent-item-benefit-inner').text('3.5%')
+                }
+                console.log("txt", txt);
+            }
+
+            btns.on('click', function () {
+                const index = $(this).index();
+                updateState(index);
+            });
+
+            let initIndex = btns.filter('.active').index();
+            if (initIndex < 0) initIndex = 2; // Default to 4.0%
+            updateState(initIndex);
+        }
+
+        function mobileDropdownHandle() {
+            const toggles = $('.prog-work-control-item-toggle').not(':has(input[type="checkbox"])');
+
+            toggles.on('click', function (e) {
+                if ($(window).width() <= 479) {
+                    e.preventDefault();
+                    const wrap = $(this).closest('.prog-work-control-item').find('.prog-work-control-input-wrap');
+                    if (wrap.is(':hidden')) {
+                        wrap.css('display', 'flex').hide().stop().slideDown();
+                        $(this).addClass('active');
+                    } else {
+                        wrap.stop().slideUp();
+                        $(this).removeClass('active');
+                    }
+                }
+            });
+
+            $(window).on('resize', function () {
+                if ($(window).width() > 991) {
+                    $('.prog-work-control-input-wrap').css('display', '');
+                    $('.prog-work-control-item-toggle').removeClass('active');
+                }
+            });
+        }
+
+        homeGetFaq();
+        instantWithdrawalHandle();
+        advantageProgrammeHandle();
+        balanceHandle();
+        portfolioReturnsHandle();
+        mobileDropdownHandle();
+    }
     SCRIPT.documentsNewScript = () => {
         let cateStickyTemplate = $('.term-toc-item-link').eq(1).clone();
 
