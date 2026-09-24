@@ -111,7 +111,7 @@ const mainScript = () => {
         const lastSegment = pathname.split('/').pop();
         // check allow routes for HK
         const allowedRoutesHKLive = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog', '/blogs'];
-        const allowedRoutesHKStagging = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog-new', 'blog', '/blogs'];
+        const allowedRoutesHKStagging = ['programmes', 'privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog-new', 'blog', '/blogs'];
         const allowedRoutesHK = isStagging() ? allowedRoutesHKStagging : allowedRoutesHKLive;
         const checkAllowedRouteHK = allowedRoutesHK.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
 
