@@ -3838,7 +3838,7 @@ const mainScript = () => {
                 const activeBtn = btns.eq(index);
                 activeBtn.addClass('active');
 
-                const txt = activeBtn.find('.prog-work-control-input-txt').text().trim();
+                const txt = activeBtn.attr('data-val').trim();
                 dropdownTxt.text(txt);
                 percentLabel.text(txt);
 
