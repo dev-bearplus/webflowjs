@@ -3777,12 +3777,7 @@ const mainScript = () => {
         }
 
         function balanceHandle() {
-            let balanceItem = null;
-            $('.prog-work-control-item').each(function () {
-                if ($(this).find('.prog-work-control-label').text().trim() === 'Your balance') {
-                    balanceItem = $(this);
-                }
-            });
+            let balanceItem = $('.prog-work-control-item[data-type="balance"]');
 
             if (!balanceItem) return;
 
@@ -3817,12 +3812,7 @@ const mainScript = () => {
         }
 
         function portfolioReturnsHandle() {
-            let portItem = null;
-            $('.prog-work-control-item').each(function () {
-                if ($(this).find('.prog-work-control-label').text().trim() === 'Chocolate portfolio returns') {
-                    portItem = $(this);
-                }
-            });
+            let portItem = $('.prog-work-control-item[data-type="returns"]');
 
             if (!portItem) return;
 
@@ -3839,22 +3829,23 @@ const mainScript = () => {
                 activeBtn.addClass('active');
 
                 const txt = activeBtn.attr('data-val').trim();
+                const type = activeBtn.attr('data-type');
+                console.log('type:', type);
                 dropdownTxt.text(txt);
                 percentLabel.text(txt);
 
                 percentBlock.removeClass('return-small return-mid');
 
-                if (txt === '3.0% p.a.') {
+                if (type === 'small') {
                     percentBlock.addClass('return-small');
                     $('.prog-work-percent-item').last().find('.prog-work-percent-item-benefit-inner').text('3.0%')
-                } else if (txt === '3.5% p.a.') {
+                } else if (type === 'mid') {
                     percentBlock.addClass('return-mid');
                     $('.prog-work-percent-item').last().find('.prog-work-percent-item-benefit-inner').text('3.5%')
                 }
                 else {
                     $('.prog-work-percent-item').last().find('.prog-work-percent-item-benefit-inner').text('3.5%')
                 }
-                console.log("txt", txt);
             }
 
             btns.on('click', function () {
