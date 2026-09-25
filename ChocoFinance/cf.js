@@ -1,4 +1,7 @@
 (async function priorityLanguageCheck() {
+    if (window.location.pathname === '/programmes' && $('html').attr('lang') === 'en-SG') {
+        window.location.href = '/404';
+    }
     let currentLang = document.documentElement.lang || 'en-SG';
     const pathname = window.location.pathname;
     const isHomepage = pathname === '/' || pathname === '' || pathname === '/hk-zh-hant' || pathname === '/hk-en' || pathname === '/hk-zh-hant/' || pathname === '/hk-en/' || pathname === '/ae-en' || pathname === '/ae-ar/';
@@ -3572,6 +3575,7 @@ const mainScript = () => {
         }
     }
     SCRIPT.programScript = () => {
+
         homeTestiHandleNew();
         function homeTestiHandleNew() {
             console.log('init new testi')
@@ -4238,7 +4242,7 @@ const mainScript = () => {
 
     SCRIPT.waitlistScript = () => {
         // check current url is /waitlist và language current is en-SG
-        if (window.location.pathname === '/waitlist' && $('html').attr('lang') === 'en-SG') {
+        if ((window.location.pathname === '/waitlist') && $('html').attr('lang') === 'en-SG') {
             window.location.href = '/404';
         }
         animateFaq();
