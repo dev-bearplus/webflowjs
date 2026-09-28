@@ -207,19 +207,26 @@ const mainScript = () => {
             $headerLangMain.toggleClass('active');
         });
 
+        let animateHeightTimer;
         const animateHeight = (index) => {
             const $targetList = $headerLangContentLists.eq(index);
             const heightCurrent = $headerLangContentInner.height();
             const heightWillChange = $targetList.height();
 
+            clearTimeout(animateHeightTimer);
             $headerLangContentLists.removeClass('active');
 
             if (heightCurrent > heightWillChange) {
                 $targetList.addClass('active');
-                setTimeout(() => $headerLangContentInner.height(heightWillChange), 200);
+                animateHeightTimer = setTimeout(() => {
+                    $headerLangContentInner.height(heightWillChange);
+                }, 200);
             } else {
                 $headerLangContentInner.height(heightWillChange);
-                setTimeout(() => $targetList.addClass('active'), 200);
+                animateHeightTimer = setTimeout(() => {
+                    $headerLangContentLists.removeClass('active');
+                    $targetList.addClass('active');
+                }, 200);
             }
         };
 
@@ -232,7 +239,7 @@ const mainScript = () => {
             animateHeight(index);
         };
         if (viewport.w > 991) {
-            $headerLangNationItems.hover(handleNationItemInteraction);
+            $headerLangNationItems.on('mouseenter', handleNationItemInteraction);
         } else {
             $headerLangNationItems.on('click', function (e) {
                 e.preventDefault();
