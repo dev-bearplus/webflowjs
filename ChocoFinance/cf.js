@@ -3688,6 +3688,9 @@ const mainScript = () => {
             const btns = $('.prog-instant-cta-btn');
             const card1 = $('.prog-instant-card.item1');
             const toggle = $('.prog-work-control-item-toggle input[type="checkbox"]');
+            const $toggleTitle = $('.prog-instant-card-title[data-toggle]');
+            const titleOrigin = $toggleTitle.text();
+
 
             if (btns.length === 0 || card1.length === 0) return;
 
@@ -3705,12 +3708,14 @@ const mainScript = () => {
                     btns.eq(0).addClass('active');
                     btns.eq(1).removeClass('active');
                     toggle.prop('checked', true);
+                    $toggleTitle.text(titleOrigin);
 
                     card1.removeClass('off');
                 } else {
                     btns.eq(1).addClass('active');
                     btns.eq(0).removeClass('active');
                     toggle.prop('checked', false);
+                    $toggleTitle.text($toggleTitle.attr('data-toggle'));
 
                     card1.addClass('off');
                 }
@@ -3736,6 +3741,7 @@ const mainScript = () => {
 
             const checkbox = btns.closest('.prog-work-control-item').find('input[type="checkbox"]');
             const items = $('.prog-work-percent-item');
+            const content = $('.prog-work-content');
 
             let isOn = true;
 
@@ -3754,6 +3760,7 @@ const mainScript = () => {
                     items.eq(2).addClass('item-notsupport');
 
                     percentBlock.removeClass('off');
+                    content.stop(true, true).slideDown();
                 } else {
                     btns.eq(1).addClass('active');
                     btns.eq(0).removeClass('active');
@@ -3762,6 +3769,7 @@ const mainScript = () => {
                     items.addClass('item-notsupport');
 
                     percentBlock.addClass('off');
+                    content.stop(true, true).slideUp();
                 }
             }
 
