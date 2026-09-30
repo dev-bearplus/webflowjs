@@ -3741,7 +3741,7 @@ const mainScript = () => {
 
             const checkbox = btns.closest('.prog-work-control-item').find('input[type="checkbox"]');
             const items = $('.prog-work-percent-item');
-            const content = $('.prog-work-content');
+            // const content = $('.prog-work-content');
             const logoWrap = $('.prog-work-percent-item-logo-wrap');
 
             let isOn = true;
@@ -3762,7 +3762,7 @@ const mainScript = () => {
 
                     percentBlock.removeClass('off');
                     logoWrap.removeClass('off');
-                    content.stop(true, true).slideDown();
+                    // content.stop(true, true).slideDown();
                 } else {
                     btns.eq(1).addClass('active');
                     btns.eq(0).removeClass('active');
@@ -3772,7 +3772,7 @@ const mainScript = () => {
 
                     percentBlock.addClass('off');
                     logoWrap.addClass('off');
-                    content.stop(true, true).slideUp();
+                    // content.stop(true, true).slideUp();
                 }
 
                 $(document).trigger('advantageProgramme:change', [isOn]);
