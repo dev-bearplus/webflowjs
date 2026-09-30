@@ -3742,6 +3742,7 @@ const mainScript = () => {
             const checkbox = btns.closest('.prog-work-control-item').find('input[type="checkbox"]');
             const items = $('.prog-work-percent-item');
             const content = $('.prog-work-content');
+            const logoWrap = $('.prog-work-percent-item-logo-wrap');
 
             let isOn = true;
 
@@ -3760,6 +3761,7 @@ const mainScript = () => {
                     items.eq(2).addClass('item-notsupport');
 
                     percentBlock.removeClass('off');
+                    logoWrap.removeClass('off');
                     content.stop(true, true).slideDown();
                 } else {
                     btns.eq(1).addClass('active');
@@ -3769,8 +3771,11 @@ const mainScript = () => {
                     items.addClass('item-notsupport');
 
                     percentBlock.addClass('off');
+                    logoWrap.addClass('off');
                     content.stop(true, true).slideUp();
                 }
+
+                $(document).trigger('advantageProgramme:change', [isOn]);
             }
 
             btns.eq(0).on('click', function () {
@@ -3836,11 +3841,50 @@ const mainScript = () => {
             if (!portItem) return;
 
             const btns = portItem.find('.prog-work-control-input');
-            const dropdownTxt = portItem.find('.prog-work-control-item-dropdown-txt');
+            const dropdownTxt = portItem.find('.prog-work-control-item-dropdown-txt .percent');
             const percentBlock = $('.prog-work-percent');
-            const percentLabel = $('.prog-work-percent-label');
+            const percentLabel = $('.prog-work-percent-label .percent');
 
-            if (btns.length === 0) return;
+            // Cache origin text for benefit inners
+            $('.prog-work-percent-item .prog-work-percent-item-benefit-inner').each(function () {
+                const $this = $(this);
+                if (!$this.attr('data-origin')) {
+                    $this.attr('data-origin', $this.text().trim());
+                }
+            });
+
+            function updateBenefitText() {
+                const activeBtn = btns.filter('.active');
+                if (activeBtn.length === 0) return;
+
+                let val = (activeBtn.attr('data-val') || '').trim();
+                const txt = val.endsWith('%') ? val : val + '%';
+                const type = activeBtn.attr('data-type');
+                const isAdvantageOn = $('.prog-work-control-input.item-program').length
+                    ? $('.prog-work-control-input.item-program').eq(0).hasClass('active')
+                    : !percentBlock.hasClass('off');
+
+                const $benefitInner = isAdvantageOn ? $('.prog-work-percent-item').last().find('.prog-work-percent-item-benefit-inner') : $('.prog-work-percent-item').find('.prog-work-percent-item-benefit-inner');
+
+                if (isAdvantageOn) {
+                    $('.prog-work-percent-item .prog-work-percent-item-benefit-inner').each(function () {
+                        $(this).text($(this).attr('data-origin'));
+                    });
+                    if (type === 'small') {
+                        $benefitInner.text('3.0%');
+                    } else if (type === 'mid') {
+                        $benefitInner.text('3.5%');
+                    } else {
+                        $benefitInner.text('3.5%');
+                    }
+                } else if (type !== 'big') {
+                    $benefitInner.text(txt);
+                } else {
+                    $benefitInner.each(function () {
+                        $(this).text($(this).attr('data-origin'));
+                    });
+                }
+            }
 
             function updateState(index) {
                 btns.removeClass('active');
@@ -3857,15 +3901,16 @@ const mainScript = () => {
 
                 if (type === 'small') {
                     percentBlock.addClass('return-small');
-                    $('.prog-work-percent-item').last().find('.prog-work-percent-item-benefit-inner').text('3.0%')
                 } else if (type === 'mid') {
                     percentBlock.addClass('return-mid');
-                    $('.prog-work-percent-item').last().find('.prog-work-percent-item-benefit-inner').text('3.5%')
                 }
-                else {
-                    $('.prog-work-percent-item').last().find('.prog-work-percent-item-benefit-inner').text('3.5%')
-                }
+
+                updateBenefitText();
             }
+
+            $(document).on('advantageProgramme:change', function () {
+                updateBenefitText();
+            });
 
             btns.on('click', function () {
                 const index = $(this).index();
