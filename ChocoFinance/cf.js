@@ -113,7 +113,7 @@ const mainScript = () => {
         const pathname = window.location.pathname;
         const lastSegment = pathname.split('/').pop();
         // check allow routes for HK
-        const allowedRoutesHKLive = ['privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog', '/blogs'];
+        const allowedRoutesHKLive = ['programmes', 'privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog', '/blogs'];
         const allowedRoutesHKStagging = ['programmes', 'privacy-policy', 'app-terms-and-conditions', 'app-risk-disclosures', 'app-fund-documents', '/documents', 'faqs', 'about-us', 'waitlist', 'contact-us', 'how-it-works', 'blog-new', 'blog', '/blogs'];
         const allowedRoutesHK = isStagging() ? allowedRoutesHKStagging : allowedRoutesHKLive;
         const checkAllowedRouteHK = allowedRoutesHK.some(route => route.startsWith('/') ? pathname.includes(route) : lastSegment === route);
@@ -1804,17 +1804,8 @@ const mainScript = () => {
                 //     $('.home-secu-img-inner').removeClass('active');
                 // });
             }
-
-            if ($(window).width() < 767) {
-                if ($('.home-secu-main-wrap').length > 0) {
-                    $('.home-secu-main-wrap').addClass('swiper')
-                    $('.home-secu-main').addClass('swiper-wrapper')
-                    $('.home-secu-item').addClass('swiper-slide')
-                    const homeSecuSwiper = new Swiper('.swiper.home-secu-main-wrap', {
-                        slidesPerView: "auto",
-                        spaceBetween: 2.4 * unit,
-                    })
-                }
+            let lang = $('html').attr('lang');
+            if ((lang == 'en-AE' || lang == 'ar-AE') && viewport.w < 992) {
                 if ($('.home-secu-hk-main-wrap').length > 0) {
                     $('.home-secu-hk-main-wrap').addClass('swiper')
                     $('.home-secu-hk-main').addClass('swiper-wrapper')
@@ -1823,6 +1814,28 @@ const mainScript = () => {
                         slidesPerView: "auto",
                         spaceBetween: 2.4 * unit,
                     })
+                }
+            }
+            else {
+                if ($(window).width() < 768) {
+                    if ($('.home-secu-main-wrap').length > 0) {
+                        $('.home-secu-main-wrap').addClass('swiper')
+                        $('.home-secu-main').addClass('swiper-wrapper')
+                        $('.home-secu-item').addClass('swiper-slide')
+                        const homeSecuSwiper = new Swiper('.swiper.home-secu-main-wrap', {
+                            slidesPerView: "auto",
+                            spaceBetween: 2.4 * unit,
+                        })
+                    }
+                    if ($('.home-secu-hk-main-wrap').length > 0) {
+                        $('.home-secu-hk-main-wrap').addClass('swiper')
+                        $('.home-secu-hk-main').addClass('swiper-wrapper')
+                        $('.home-secu-hk-item').addClass('swiper-slide')
+                        const homeSecuSwiper = new Swiper('.swiper.home-secu-hk-main-wrap', {
+                            slidesPerView: "auto",
+                            spaceBetween: 2.4 * unit,
+                        })
+                    }
                 }
             }
 
