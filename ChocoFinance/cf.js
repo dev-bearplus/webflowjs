@@ -2955,8 +2955,8 @@ const mainScript = () => {
                     allTitle.eq(x).attr('id', `toc${index}-${x}`);
                     let tocItem = $('<a></a>').addClass('term-toc-item-link').attr('href', `#toc${index}-${x}`);
                     let tocNumber = $('<div></div>').addClass('txt-14 term-toc-item-number').text(`${x + 1}.`).appendTo(tocItem)
-                    let [head, ...[tail]] = allTitle.eq(x).text().split('. ')
-                    let tocName = $('<div></div>').addClass('txt-14 term-toc-item-txt').text(`${[tail].join('')}`).appendTo(tocItem)
+                    let title = allTitle.eq(x).text().trim().replace(/^\d+\.\s*/, '')
+                    let tocName = $('<div></div>').addClass('txt-14 term-toc-item-txt').text(title).appendTo(tocItem)
                     tocWrap.append(tocItem)
                 }
 
@@ -3103,8 +3103,8 @@ const mainScript = () => {
                     allTitle.eq(x).attr('id', `toc${index}-${x}`);
                     let tocItem = $('<a></a>').addClass('term-toc-item-link').attr('href', `#toc${index}-${x}`);
                     let tocNumber = $('<div></div>').addClass('txt-14 term-toc-item-number').text(`${x + 1}.`).appendTo(tocItem)
-                    let [head, ...[tail]] = allTitle.eq(x).text().split('. ')
-                    let tocName = $('<div></div>').addClass('txt-14 term-toc-item-txt').text(`${[tail].join('')}`).appendTo(tocItem)
+                    let title = allTitle.eq(x).text().trim().replace(/^\d+\.\s*/, '')
+                    let tocName = $('<div></div>').addClass('txt-14 term-toc-item-txt').text(title).appendTo(tocItem)
                     tocWrap.append(tocItem)
                 }
 
