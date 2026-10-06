@@ -4015,6 +4015,10 @@ const mainScript = () => {
                 }
             } catch (error) {
                 console.error('Error fetching UAE daily NAV data:', error);
+            } finally {
+                const $dailyNavFields = $('[uae-daily="usd"], [uae-daily="aed"], [uae-daily="date"]');
+                $dailyNavFields.addClass('loaded');
+                $dailyNavFields.closest('.load-ske').addClass('loaded');
             }
 
             function formatNavDate(dateStr, isArabic) {
