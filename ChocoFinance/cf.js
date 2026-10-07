@@ -659,6 +659,8 @@ const mainScript = () => {
     openFaqItem()
     // Scroll Events
     let header = $('.header');
+    let lastHeaderScroll = lenis.scroll || window.scrollY || 0;
+    const headerDirectionThreshold = 8;
 
     if (localStorage.getItem('preferredLanguage') !== null) {
         localStorage.removeItem('preferredLanguage');
@@ -820,6 +822,8 @@ const mainScript = () => {
     }
 
     lenis.on('scroll', function (inst) {
+        const currentScroll = inst.scroll;
+        const scrollDelta = currentScroll - lastHeaderScroll;
         let threshold = inst.scroll > header.height();
         if ($('.announcement').length) {
             threshold = inst.scroll > header.height() + $('.announcement').height();
@@ -827,16 +831,17 @@ const mainScript = () => {
         if ($('.topbar').length) {
             threshold = inst.scroll > header.height() + $('.topbar').height();
         }
-        console.log(threshold)
         if (threshold) {
             header.addClass('on-scroll');
             $('.home-sticky').addClass('active');
-            if (inst.direction == 1) {
+            if (scrollDelta > headerDirectionThreshold) {
                 // down
-                scrollDown()
-            } else if (inst.direction == -1) {
+                scrollDown();
+                lastHeaderScroll = currentScroll;
+            } else if (scrollDelta < -headerDirectionThreshold) {
                 // up
-                scrollUp()
+                scrollUp();
+                lastHeaderScroll = currentScroll;
             }
             if ($('.dark-header').length) {
                 header.removeClass('dark-mode')
@@ -844,6 +849,7 @@ const mainScript = () => {
         } else {
             header.removeClass('on-scroll on-hide');
             $('.home-sticky').removeClass('active');
+            lastHeaderScroll = currentScroll;
             if ($('.dark-header').length) {
                 header.addClass('dark-mode')
             }
@@ -906,18 +912,6 @@ const mainScript = () => {
         }
     }
     topbar();
-    if (isTouchDevice()) {
-        let lastScrollTop = 0;
-        $(window).on('scroll', function (e) {
-            let st = $(this).scrollTop();
-            if (st > lastScrollTop && st > $('.announcement').height()) {
-                scrollDown()
-            } else {
-                scrollUp();
-            }
-            lastScrollTop = st;
-        })
-    }
     function refreshOnBreakpoint() {
         let initialViewportWidth = window.innerWidth || document.documentElement.clientWidth;
         // portrait mobile viewport initial, any change refresh
