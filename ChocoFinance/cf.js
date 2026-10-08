@@ -11,28 +11,35 @@
     let isAE = pathname.includes('ae-en') || pathname.includes('ae-ar');
     if (isAE) return;
     if (!currentSubdomain && isHomepage) {
-        let suggestedLang = 'en-SG'; // Default location
-        try {
-            const response = await fetch('https://1.1.1.1/cdn-cgi/trace');
-            const data = await response.text();
-            let countryCode = '';
+        const cachedSuggestedLang = sessionStorage.getItem('geoSuggestedLang');
+        if (cachedSuggestedLang) {
+            checkDomain = cachedSuggestedLang;
+        } else {
+            let suggestedLang = 'en-SG'; // Default location
+            try {
+                const response = await fetch('https://1.1.1.1/cdn-cgi/trace');
+                const data = await response.text();
+                let countryCode = '';
 
-            for (const line of data.split('\n')) {
-                if (line.startsWith('loc=')) {
-                    countryCode = line.split('=')[1].trim();
-                    break;
+                for (const line of data.split('\n')) {
+                    if (line.startsWith('loc=')) {
+                        countryCode = line.split('=')[1].trim();
+                        break;
+                    }
                 }
+                if (countryCode === 'HK') {
+                    suggestedLang = 'zh-HK';
+                    // } else if (countryCode === 'AE') {
+                    //     suggestedLang = 'ar-AE';
+                }
+                checkDomain = suggestedLang;
+                sessionStorage.setItem('geoSuggestedLang', suggestedLang);
+            } catch (e) {
+                console.error('Geo detect failed', e);
             }
-            if (countryCode === 'HK') {
-                suggestedLang = 'zh-HK';
-                // } else if (countryCode === 'AE') {
-                //     suggestedLang = 'ar-AE';
-            }
-            checkDomain = suggestedLang;
-        } catch (e) {
-            console.error('Geo detect failed', e);
         }
-        // localStorage.setItem('currentSubdomain', suggestedLang);
+        // Keep the automatic suggestion session-scoped; an explicit language
+        // selection still uses currentSubdomain in localStorage.
     }
 
     const storedSubdomain = localStorage.getItem('currentSubdomain') || checkDomain;
@@ -56,7 +63,9 @@
 
         console.log('targetUrl', targetUrl);
         try {
-            let response = await fetch(targetUrl, { method: 'GET' });
+            // Only verify that the destination exists. A GET would download the
+            // whole page here and then download it again after the redirect.
+            let response = await fetch(targetUrl, { method: 'HEAD' });
             if (response.ok) {
                 window.location.replace(targetUrl);
             } else {
@@ -277,6 +286,35 @@ const mainScript = () => {
 
     const lerp = (a, b, t = 0.08) => {
         return a + (b - a) * t;
+    }
+    function runAnimationInViewport(element, render) {
+        if (!element) return;
+
+        let frameId = null;
+        const loop = () => {
+            render();
+            frameId = requestAnimationFrame(loop);
+        };
+        const start = () => {
+            if (frameId === null) frameId = requestAnimationFrame(loop);
+        };
+        const stop = () => {
+            if (frameId === null) return;
+            cancelAnimationFrame(frameId);
+            frameId = null;
+        };
+
+        if (!('IntersectionObserver' in window)) {
+            start();
+            return;
+        }
+
+        const observer = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting) start();
+            else stop();
+        }, { rootMargin: '100px 0px' });
+
+        observer.observe(element);
     }
     function toTitle(slug) {
         return slug.replace(/-/g, " ").replace(/\b[a-z]/g, function () {
@@ -659,8 +697,26 @@ const mainScript = () => {
     openFaqItem()
     // Scroll Events
     let header = $('.header');
+    const $announcement = $('.announcement');
+    const $topbar = $('.topbar');
+    const $homeSticky = $('.home-sticky');
+    const $articlePage = $('.article-page');
+    const $faqPage = $('.faq-page');
+    const $faqStickWrap = $('.faq-stick-wrap');
+    const $faqHero = $('.sc-faq-hero');
+    const hasDarkHeader = $('.dark-header').length > 0;
+    let headerScrollThreshold = 0;
+    let articleProgressSet = null;
     let lastHeaderScroll = lenis.scroll || window.scrollY || 0;
     const headerDirectionThreshold = 8;
+
+    function updateHeaderScrollThreshold() {
+        headerScrollThreshold = header.height() || 0;
+        if ($announcement.length) headerScrollThreshold += $announcement.height() || 0;
+        if ($topbar.length) headerScrollThreshold = (header.height() || 0) + ($topbar.height() || 0);
+    }
+    updateHeaderScrollThreshold();
+    $(window).on('resize', debounce(updateHeaderScrollThreshold));
 
     if (localStorage.getItem('preferredLanguage') !== null) {
         localStorage.removeItem('preferredLanguage');
@@ -824,16 +880,10 @@ const mainScript = () => {
     lenis.on('scroll', function (inst) {
         const currentScroll = inst.scroll;
         const scrollDelta = currentScroll - lastHeaderScroll;
-        let threshold = inst.scroll > header.height();
-        if ($('.announcement').length) {
-            threshold = inst.scroll > header.height() + $('.announcement').height();
-        }
-        if ($('.topbar').length) {
-            threshold = inst.scroll > header.height() + $('.topbar').height();
-        }
+        const threshold = inst.scroll > headerScrollThreshold;
         if (threshold) {
             header.addClass('on-scroll');
-            $('.home-sticky').addClass('active');
+            $homeSticky.addClass('active');
             if (scrollDelta > headerDirectionThreshold) {
                 // down
                 scrollDown();
@@ -843,29 +893,30 @@ const mainScript = () => {
                 scrollUp();
                 lastHeaderScroll = currentScroll;
             }
-            if ($('.dark-header').length) {
+            if (hasDarkHeader) {
                 header.removeClass('dark-mode')
             }
         } else {
             header.removeClass('on-scroll on-hide');
-            $('.home-sticky').removeClass('active');
+            $homeSticky.removeClass('active');
             lastHeaderScroll = currentScroll;
-            if ($('.dark-header').length) {
+            if (hasDarkHeader) {
                 header.addClass('dark-mode')
             }
         };
 
         // Update blog page
-        if ($('.article-page').length) {
+        if ($articlePage.length) {
             let currentPercent = inst.scroll / inst.limit;
-            blogProgressSetter('.art-progress-inner')(currentPercent);
+            if (!articleProgressSet) articleProgressSet = blogProgressSetter('.art-progress-inner');
+            articleProgressSet(currentPercent);
         }
 
-        if ($('.faq-page').length) {
-            if ($('.faq-stick-wrap').offset().top > $('.sc-faq-hero').height() + 1) {
-                $('.faq-stick-wrap').addClass('on-stick')
+        if ($faqPage.length) {
+            if ($faqStickWrap.offset().top > $faqHero.height() + 1) {
+                $faqStickWrap.addClass('on-stick')
             } else {
-                $('.faq-stick-wrap').removeClass('on-stick')
+                $faqStickWrap.removeClass('on-stick')
             }
         }
     });
@@ -907,7 +958,7 @@ const mainScript = () => {
             $('.topbar .topbar-item .trigger').on('click', function (e) {
                 e.preventDefault();
                 $(this).css('display', 'none');
-                $(this).closest('.topbar-item').find('.topbar-body-inner').slideDown().addClass('active');
+                $(this).closest('.topbar-item').find('.topbar-body-inner').slideDown(slideUpDownTime, updateHeaderScrollThreshold).addClass('active');
             })
         }
     }
@@ -917,7 +968,7 @@ const mainScript = () => {
         // portrait mobile viewport initial, any change refresh
         if (initialViewportWidth < 480) {
             $(window).on('resize', debounce(function () {
-                newViewportWidth = window.innerWidth || document.documentElement.clientWidth;
+                const newViewportWidth = window.innerWidth || document.documentElement.clientWidth;
                 if (newViewportWidth > 479) {
                     location.reload();
                 }
@@ -926,7 +977,7 @@ const mainScript = () => {
         // landscape mobile viewport initial, any change refresh
         else if (initialViewportWidth < 768) {
             $(window).on('resize', debounce(function () {
-                newViewportWidth = window.innerWidth || document.documentElement.clientWidth;
+                const newViewportWidth = window.innerWidth || document.documentElement.clientWidth;
                 if (newViewportWidth > 767) {
                     location.reload();
                 }
@@ -935,7 +986,7 @@ const mainScript = () => {
         // tablet viewport initial, any change refresh
         else if (initialViewportWidth > 767 && initialViewportWidth < 992) {
             $(window).on('resize', debounce(function () {
-                newViewportWidth = window.innerWidth || document.documentElement.clientWidth;
+                const newViewportWidth = window.innerWidth || document.documentElement.clientWidth;
                 if (newViewportWidth < 768 || newViewportWidth > 991) {
                     location.reload();
                 }
@@ -944,7 +995,7 @@ const mainScript = () => {
         // web viewport initial, any change refresh
         else if (initialViewportWidth > 991) {
             $(window).on('resize', debounce(function () {
-                newViewportWidth = window.innerWidth || document.documentElement.clientWidth;
+                const newViewportWidth = window.innerWidth || document.documentElement.clientWidth;
                 if (newViewportWidth < 992) {
                     location.reload();
                 }
@@ -957,12 +1008,15 @@ const mainScript = () => {
     let mousePos = { x: 0, y: 0 };
     let mousePosRaw = { x: 0, y: 0 };
 
-    $(window).on('mousemove', function (e) {
-        mousePosRaw.x = e.clientX;
-        mousePosRaw.y = e.clientY;
-        mousePos.x = (mousePosRaw.x / $(window).width() - 0.5) * 2;
-        mousePos.y = (mousePosRaw.y / $(window).width() - 0.5) * 2;
-    })
+    if (window.innerWidth > 991 && $('.home-hero-img-human, .game-hero-img-human').length) {
+        $(window).on('mousemove', function (e) {
+            mousePosRaw.x = e.clientX;
+            mousePosRaw.y = e.clientY;
+            const viewportWidth = window.innerWidth || 1;
+            mousePos.x = (mousePosRaw.x / viewportWidth - 0.5) * 2;
+            mousePos.y = (mousePosRaw.y / viewportWidth - 0.5) * 2;
+        })
+    }
 
     // Nav
     $('.nav-toggle').on('click', function (e) {
@@ -1127,13 +1181,6 @@ const mainScript = () => {
     }
     handlePopup();
 
-    const xSetter = (el) => {
-        return gsap.quickSetter(el, 'x', `rem`);
-    }
-    const ySetter = (el) => gsap.quickSetter(el, 'y', `rem`)
-
-    const xGetter = (el) => gsap.getProperty(el, 'x')
-    const yGetter = (el) => gsap.getProperty(el, 'y')
     const blogProgressSetter = (el) => gsap.quickSetter(el, 'scaleX', '');
 
     function footerHandle() {
@@ -1633,27 +1680,28 @@ const mainScript = () => {
 
             if ($(window).width() > 991) {
                 homeHeroTl.from('.home-partner-inner', { 'grid-column-gap': '10rem', ease: 'none' }, '0')
-                // Mouse move human parallax
-                function applyHumanParallax() {
-                    let humanX = xGetter('.home-hero-img-human');
-                    let humanY = yGetter('.home-hero-img-human');
-                    let circleX = xGetter('.home-hero-img-c-bg');
-                    let circleY = yGetter('.home-hero-img-c-bg');
-                    let rateX = xGetter('.home-hero-rate-wrap .home-hero-rate');
-                    let rateY = yGetter('.home-hero-rate-wrap .home-hero-rate');
-                    if ($('.home-partner-inner').length) {
-                        xSetter('.home-hero-img-human')(lerp(humanX, -mousePos.x * 1.2));
-                        ySetter('.home-hero-img-human')(lerp(humanY, -mousePos.y));
+                const humanEl = document.querySelector('.home-hero-img-human');
+                const circleEl = document.querySelector('.home-hero-img-c-bg');
+                const rateEl = document.querySelector('.home-hero-rate-wrap .home-hero-rate');
+                const heroEl = document.querySelector('.sc-home-hero') || humanEl;
 
-                        xSetter('.home-hero-img-c-bg')(lerp(circleX, mousePos.x));
-                        ySetter('.home-hero-img-c-bg')(lerp(circleY, mousePos.y * .8));
+                if (humanEl && circleEl && rateEl) {
+                    const setHumanX = gsap.quickSetter(humanEl, 'x', 'rem');
+                    const setHumanY = gsap.quickSetter(humanEl, 'y', 'rem');
+                    const setCircleX = gsap.quickSetter(circleEl, 'x', 'rem');
+                    const setCircleY = gsap.quickSetter(circleEl, 'y', 'rem');
+                    const setRateX = gsap.quickSetter(rateEl, 'x', 'rem');
+                    const setRateY = gsap.quickSetter(rateEl, 'y', 'rem');
 
-                        xSetter('.home-hero-rate-wrap .home-hero-rate')(lerp(rateX, -mousePos.x * 1.6));
-                        ySetter('.home-hero-rate-wrap .home-hero-rate')(lerp(rateY, -mousePos.y * 1.4));
-                        requestAnimationFrame(applyHumanParallax)
-                    }
+                    runAnimationInViewport(heroEl, () => {
+                        setHumanX(lerp(gsap.getProperty(humanEl, 'x'), -mousePos.x * 1.2));
+                        setHumanY(lerp(gsap.getProperty(humanEl, 'y'), -mousePos.y));
+                        setCircleX(lerp(gsap.getProperty(circleEl, 'x'), mousePos.x));
+                        setCircleY(lerp(gsap.getProperty(circleEl, 'y'), mousePos.y * .8));
+                        setRateX(lerp(gsap.getProperty(rateEl, 'x'), -mousePos.x * 1.6));
+                        setRateY(lerp(gsap.getProperty(rateEl, 'y'), -mousePos.y * 1.4));
+                    });
                 }
-                requestAnimationFrame(applyHumanParallax)
             }
         }
         homeHeroHandle();
@@ -1835,24 +1883,30 @@ const mainScript = () => {
 
             if ($(window).width() > 991) {
                 let mousePosHomeSecu = { x: 0, y: 0 };
-                $('.home-secu-main-wrap').on('mousemove', function (e) {
-                    mousePosHomeSecu.x = (((e.clientX - $('.home-secu-main-wrap').get(0).getBoundingClientRect().x) / $('.home-secu-main-wrap').width()) - 0.5) * 2;
-                    mousePosHomeSecu.y = (((e.clientY - $('.home-secu-main-wrap').get(0).getBoundingClientRect().y) / $('.home-secu-main-wrap').height()) - 0.5) * 2;
+                const secuWrap = document.querySelector('.home-secu-main-wrap');
+                const iconsEl = document.querySelector('.home-secu-main-img-wrap');
+                let secuRect;
+
+                $('.home-secu-main-wrap').on('mouseenter', function () {
+                    secuRect = secuWrap.getBoundingClientRect();
+                }).on('mousemove', function (e) {
+                    if (!secuRect) secuRect = secuWrap.getBoundingClientRect();
+                    mousePosHomeSecu.x = ((e.clientX - secuRect.x) / secuRect.width - 0.5) * 2;
+                    mousePosHomeSecu.y = ((e.clientY - secuRect.y) / secuRect.height - 0.5) * 2;
                 })
-                $('.home-secu-main-wrap').on('mouseleave', function (e) {
+                $('.home-secu-main-wrap').on('mouseleave', function () {
                     mousePosHomeSecu = { x: 0, y: 0 }
+                    secuRect = null;
                 })
-                // Mouse move icons parallax
-                function applySecuParallax() {
-                    let iconsX = xGetter('.home-secu-main-img-wrap');
-                    let iconsY = yGetter('.home-secu-main-img-wrap');
-                    if ($('.home-secu-main-img-wrap').length) {
-                        xSetter('.home-secu-main-img-wrap')(lerp(iconsX, -mousePosHomeSecu.x * 4.2));
-                        ySetter('.home-secu-main-img-wrap')(lerp(iconsY, -mousePosHomeSecu.y * 4.2));
-                        requestAnimationFrame(applySecuParallax)
-                    }
+
+                if (secuWrap && iconsEl) {
+                    const setIconsX = gsap.quickSetter(iconsEl, 'x', 'rem');
+                    const setIconsY = gsap.quickSetter(iconsEl, 'y', 'rem');
+                    runAnimationInViewport(secuWrap, () => {
+                        setIconsX(lerp(gsap.getProperty(iconsEl, 'x'), -mousePosHomeSecu.x * 4.2));
+                        setIconsY(lerp(gsap.getProperty(iconsEl, 'y'), -mousePosHomeSecu.y * 4.2));
+                    });
                 }
-                requestAnimationFrame(applySecuParallax)
             }
         };
         homeSecuHover();
@@ -2075,45 +2129,36 @@ const mainScript = () => {
         homeGetFaq();
 
         function homeSocial() {
-            $.fn.hasAttr = function (name) {
-                return this.attr(name) !== undefined;
+            const instaFeed = document.querySelector('.home-insta-feed');
+            if (!instaFeed) return;
+
+            const addLenisPrevention = () => {
+                const popup = document.querySelector(
+                    '.eapps-widget.eapps-instagram-feed-popup-visible .eapps-instagram-feed-popup-inner'
+                );
+                if (!popup) return false;
+                popup.setAttribute('data-lenis-prevent', '');
+                return true;
             };
 
-            let requestId;
-            const loop = (time) => {
-                requestId = undefined;
+            const observerInsta = new IntersectionObserver(([entry]) => {
+                if (!entry.isIntersecting) return;
+                observerInsta.disconnect();
 
-                preventLenis();
-                start();
-                if ($('.eapps-instagram-feed-popup-inner').hasAttr('data-lenis-prevent')) {
-                    stop();
-                }
-            }
-            const start = () => {
-                if (!requestId) {
-                    requestId = window.requestAnimationFrame(loop);
-                }
-            }
-            const stop = () => {
-                if (requestId) {
-                    window.cancelAnimationFrame(requestId);
-                    requestId = undefined;
-                }
-            }
-            const preventLenis = () => {
-                if ($('.eapps-widget.eapps-instagram-feed-popup-visible').length !== 0) {
-                    $('.eapps-instagram-feed-popup-inner').attr('data-lenis-prevent', '');
-                }
-            }
+                if (addLenisPrevention()) return;
 
-            const instaFeed = document.querySelector(".home-insta-feed")
-            const observerInsta = new IntersectionObserver(
-                ([e]) => {
-                    if (e.isIntersecting) {
-                        start();
-                        observerInsta.unobserve(e.target);
-                    }
+                // The third-party widget creates its popup asynchronously. Watch
+                // DOM changes instead of polling the document on every frame.
+                const popupObserver = new MutationObserver(() => {
+                    if (addLenisPrevention()) popupObserver.disconnect();
                 });
+                popupObserver.observe(document.body, {
+                    childList: true,
+                    subtree: true,
+                    attributes: true,
+                    attributeFilter: ['class']
+                });
+            });
 
             observerInsta.observe(instaFeed);
         }
@@ -2206,27 +2251,28 @@ const mainScript = () => {
 
             if ($(window).width() > 991) {
                 // gameHeroTl.from('.game-partner-inner', { 'grid-column-gap': '10rem', ease: 'none' }, '0')
-                // Mouse move human parallax
-                function applyHumanParallax() {
-                    let humanX = xGetter('.game-hero-img-human');
-                    let humanY = yGetter('.game-hero-img-human');
-                    let circleX = xGetter('.game-hero-img-c-bg');
-                    let circleY = yGetter('.game-hero-img-c-bg');
-                    let rateX = xGetter('.game-hero-rate-wrap .game-hero-rate');
-                    let rateY = yGetter('.game-hero-rate-wrap .game-hero-rate');
-                    if ($('.game-hero-img-human').length) {
-                        xSetter('.game-hero-img-human')(lerp(humanX, -mousePos.x * 1.2));
-                        ySetter('.game-hero-img-human')(lerp(humanY, -mousePos.y));
+                const humanEl = document.querySelector('.game-hero-img-human');
+                const circleEl = document.querySelector('.game-hero-img-c-bg');
+                const rateEl = document.querySelector('.game-hero-rate-wrap .game-hero-rate');
+                const heroEl = document.querySelector('.game-hero') || humanEl;
 
-                        xSetter('.game-hero-img-c-bg')(lerp(circleX, mousePos.x));
-                        ySetter('.game-hero-img-c-bg')(lerp(circleY, mousePos.y * .8));
+                if (humanEl && circleEl && rateEl) {
+                    const setHumanX = gsap.quickSetter(humanEl, 'x', 'rem');
+                    const setHumanY = gsap.quickSetter(humanEl, 'y', 'rem');
+                    const setCircleX = gsap.quickSetter(circleEl, 'x', 'rem');
+                    const setCircleY = gsap.quickSetter(circleEl, 'y', 'rem');
+                    const setRateX = gsap.quickSetter(rateEl, 'x', 'rem');
+                    const setRateY = gsap.quickSetter(rateEl, 'y', 'rem');
 
-                        xSetter('.game-hero-rate-wrap .game-hero-rate')(lerp(rateX, -mousePos.x * 1.6));
-                        ySetter('.game-hero-rate-wrap .game-hero-rate')(lerp(rateY, -mousePos.y * 1.4));
-                        requestAnimationFrame(applyHumanParallax)
-                    }
+                    runAnimationInViewport(heroEl, () => {
+                        setHumanX(lerp(gsap.getProperty(humanEl, 'x'), -mousePos.x * 1.2));
+                        setHumanY(lerp(gsap.getProperty(humanEl, 'y'), -mousePos.y));
+                        setCircleX(lerp(gsap.getProperty(circleEl, 'x'), mousePos.x));
+                        setCircleY(lerp(gsap.getProperty(circleEl, 'y'), mousePos.y * .8));
+                        setRateX(lerp(gsap.getProperty(rateEl, 'x'), -mousePos.x * 1.6));
+                        setRateY(lerp(gsap.getProperty(rateEl, 'y'), -mousePos.y * 1.4));
+                    });
                 }
-                requestAnimationFrame(applyHumanParallax)
             }
         }
         gameHeroHandle();
@@ -4212,6 +4258,9 @@ const mainScript = () => {
         }
         function docInteractionNew() {
             let isClickScrolling = false;
+            let activeScrollIndex = -1;
+            const $tocLinks = $('.term-toc-item-link');
+            const $tocHeadText = $('.term-toc-head-txt');
 
             function updateActiveOnScroll() {
                 if (isClickScrolling) return;
@@ -4219,7 +4268,7 @@ const mainScript = () => {
                 if (!currentGroups.length) return;
 
                 let activeIdx = 0;
-                let threshold = $(window).height() / 3 - 100;
+                let threshold = window.innerHeight / 3 - 100;
                 for (let x = 0; x < currentGroups.length; x++) {
                     let el = currentGroups.eq(x).get(0);
                     if (el) {
@@ -4229,13 +4278,13 @@ const mainScript = () => {
                         }
                     }
                 }
-                $('.term-toc-item-link').eq(activeIdx).addClass('active');
-                $('.term-toc-item-link').not(`:eq(${activeIdx})`).removeClass('active');
-                $('.term-toc-head-txt').text($('.term-toc-item-link.active .term-toc-item-txt').text());
+                if (activeIdx === activeScrollIndex) return;
+                activeScrollIndex = activeIdx;
+                $tocLinks.removeClass('active').eq(activeIdx).addClass('active');
+                $tocHeadText.text($tocLinks.eq(activeIdx).find('.term-toc-item-txt').text());
             }
 
             lenis.on('scroll', updateActiveOnScroll);
-            $(window).on('scroll', updateActiveOnScroll);
 
             docTocNavNew();
 
@@ -5214,8 +5263,18 @@ const mainScript = () => {
     const pageName = $('.main').attr('data-barba-namespace');
     if (pageName) {
         detectPage(pageName)
-        SCRIPT[(`${pageName}Script`)]();
+        const pageScript = SCRIPT[`${pageName}Script`];
+        if (typeof pageScript === 'function') pageScript();
     }
 }
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mainScript);
+} else {
+    mainScript();
+}
 
-window.onload = mainScript;
+window.addEventListener('load', () => {
+    if (typeof ScrollTrigger !== 'undefined') {
+        ScrollTrigger.refresh();
+    }
+});
