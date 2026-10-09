@@ -1147,14 +1147,25 @@ const mainScript = () => {
                     e.preventDefault();
                     if ($(this).attr('data-popup') == 'open') {
                         lenis.stop();
-                        $('.popup-wrap').addClass('active')
+                        $('.popup-wrap').addClass('active');
+                        setTimeout(function () {
+                            const $phoneInput = $('#phone-popup, .popup-content-form-inner [data-form="input"]');
+                            if ($phoneInput.length) {
+                                $phoneInput.trigger('focus');
+                            }
+                        }, 100);
                     } else if ($(this).attr('data-popup') == 'close') {
                         lenis.start();
-                        $('.popup-wrap').removeClass('active')
-                        $('.popup-content-form-inner').css('display', 'block')
-                        $('.popup-form-success').css('display', 'none')
-                        $('.popup-wrap').find('[data-form="form"]').trigger('reset')
+                        $('.popup-wrap').removeClass('active');
+                        $('.popup-content-form-inner').css('display', 'block');
+                        $('.popup-form-success').css('display', 'none');
+                        $('.popup-wrap').find('[data-form="form"]').trigger('reset');
                         $('.popup-wrap').find('[data-form="err"]').removeClass('active');
+                        $('.popup-wrap').find('[data-form="form"]').each(function () {
+                            if (typeof validatePhoneForm === 'function') {
+                                validatePhoneForm(this, false);
+                            }
+                        });
                     } else if ($(this).attr('data-popup') == 'to-home') {
                         if (!$('.home-page').length) {
                             let domain = window.location.host;
@@ -1180,6 +1191,15 @@ const mainScript = () => {
         }
     }
     handlePopup();
+
+    $(document).on('click', '[data-popup="open"]', function () {
+        setTimeout(function () {
+            const $phoneInput = $('#phone-popup, .popup-content-form-inner [data-form="input"]');
+            if ($phoneInput.length) {
+                $phoneInput.trigger('focus');
+            }
+        }, 150);
+    });
 
     const blogProgressSetter = (el) => gsap.quickSetter(el, 'scaleX', '');
 
@@ -1388,18 +1408,31 @@ const mainScript = () => {
         // }
     }
     getAllDynamicData('.main')
-    function setupDialCode(data, selectId) {
+    function setupDialCode(data, selectId, showFlags = false) {
         //Get data
         let codes = data;
+
+        function formatCountry(state) {
+            if (!state.id) return state.text;
+
+            const countryCode = $(state.element).attr('data-code');
+            if (!countryCode) return state.text;
+
+            return $(
+                `<span><img src="https://flagcdn.com/60x45/${countryCode.toLowerCase()}.png" class="img-flag" style="margin-right: 8px;" alt="" /> ${state.text}</span>`
+            );
+        }
+
         selectId.forEach((selectItem) => {
             if ($(selectItem).length >= 1) {
                 $(selectItem).html('')
                 codes.forEach((el) => {
-                    let html = `<option value="${el.dial_code}">${el.name} (${el.dial_code})</option>`
+                    let flagAttribute = showFlags ? ` data-code="${el.code}"` : '';
+                    let html = `<option value="${el.dial_code}"${flagAttribute}>${el.name} (${el.dial_code})</option>`
                     $(selectItem).append(html)
                 })
 
-                $(selectItem).select2()
+                $(selectItem).select2(showFlags ? { templateResult: formatCountry } : {})
 
                 $(selectItem).closest('[data-form="form"]').find('.dial-code-wrap').on('click', function (e) {
                     e.preventDefault();
@@ -1407,19 +1440,47 @@ const mainScript = () => {
                 })
                 $(selectItem).on('select2:select', function (e) {
                     let code = $(this).val();
-                    $(selectItem).closest('.dial-code-wrap').find('.phone-region').text(code)
+                    const dialCodeWrap = $(selectItem).closest('.dial-code-wrap');
+                    dialCodeWrap.find('.phone-region').text(code);
+
+                    if (showFlags) {
+                        const countryCode = $(this).find('option:selected').attr('data-code');
+                        if (countryCode) {
+                            dialCodeWrap.find('.img-basic, .selected-flag').first()
+                                .attr('src', `https://flagcdn.com/60x45/${countryCode.toLowerCase()}.png`);
+                        }
+                    }
+
+                    const $parentForm = $(selectItem).closest('[data-form="form"]');
+                    if ($parentForm.length && typeof validatePhoneForm === 'function') {
+                        validatePhoneForm($parentForm, false);
+                    }
                 })
                 $(selectItem).on('select2:opening', function (e) {
                     setTimeout(() => {
                         $('.select2-results__options').attr('data-lenis-prevent', '')
                     }, 300);
                 })
+
+                if (showFlags) {
+                    const aeOption = $(selectItem).find('option[data-code="AE"]');
+                    if (aeOption.length) {
+                        $(selectItem).val(aeOption.val()).trigger('change');
+                        const dialCodeWrap = $(selectItem).closest('.dial-code-wrap');
+                        dialCodeWrap.find('.phone-region').text(aeOption.val());
+                        dialCodeWrap.find('.img-basic, .selected-flag').first()
+                            .attr('src', 'https://flagcdn.com/60x45/ae.png');
+                    }
+                }
             }
 
         })
     }
     if ($('#dialCode').length > 0 || $('#dialPopup').length) {
-        setupDialCode(dialCodes, ['#dialCode', '#dialPopup']);
+        const isAELocale = ['ar-AE', 'en-AE', 'ae-ar', 'ae-en'].includes(document.documentElement.lang) || 
+                           window.location.pathname.includes('/ae-ar/') || 
+                           window.location.pathname.includes('/ae-en/');
+        setupDialCode(dialCodes, ['#dialCode', '#dialPopup'], isAELocale);
     }
     function triggerSubscribeBlueShift(type, formName, value) {
         if (type == 'phone') {
@@ -1497,15 +1558,134 @@ const mainScript = () => {
         })
         // }
     }
+    function validatePhoneForm(form, isBlurOrSubmit) {
+        let $form = $(form);
+        let $input = $form.find('[input-type="phone"], #phone-popup, [data-form="input"]');
+        let $submitBtn = $form.find('[data-form="submit"]');
+        let $err = $form.find('[data-form="err"]');
+
+        if (!$input.length) return true;
+
+        let type = $input.attr('input-type') || 'phone';
+        if (type !== 'phone') return true;
+
+        let dialCode = $form.find('.phone-region, [data-form="dial-input"]').text().trim() || '+971';
+        let rawVal = $input.val() || '';
+        let digitsOnly = rawVal.replace(/\D/g, '');
+        let cleanDigits = digitsOnly.replace(/^0/, ''); // strip leading zero
+
+        let isUAE = dialCode.includes('+971') || dialCode === '971';
+        let isEmpty = (digitsOnly.length === 0);
+        let isValid = false;
+        let isIncomplete = false;
+
+        if (isEmpty) {
+            isValid = false;
+            isIncomplete = false; // State 1: Field empty
+        } else {
+            if (isUAE) {
+                // UAE phone numbers are 9 digits
+                isValid = (cleanDigits.length === 9);
+            } else {
+                // General international numbers (7 to 15 digits)
+                isValid = (digitsOnly.length >= 7 && digitsOnly.length <= 15);
+            }
+            isIncomplete = !isValid; // State 2: Partial/incomplete
+        }
+
+        if (isValid) {
+            // State 3: Complete valid number -> button ENABLED
+            $submitBtn.removeClass('is-disabled').removeAttr('disabled').css({
+                'pointer-events': 'auto',
+                'cursor': 'pointer'
+            });
+            $submitBtn.find('.ic-embed, svg').css('opacity', '1');
+            $err.removeClass('active');
+        } else {
+            // State 1 & 2: Empty or Incomplete -> button DISABLED
+            $submitBtn.addClass('is-disabled').attr('disabled', 'disabled').css({
+                'pointer-events': 'none',
+                'cursor': 'not-allowed'
+            });
+            $submitBtn.find('.ic-embed, svg').css('opacity', '0.45');
+
+            if (isIncomplete && isBlurOrSubmit) {
+                // State 2: Number partial / incomplete + blur/submit -> show inline error
+                $err.addClass('active');
+            } else if (isEmpty && isBlurOrSubmit && $form.data('submitted-empty')) {
+                $err.addClass('active');
+            } else if (!isBlurOrSubmit) {
+                // While user is typing, do not show inline error
+                $err.removeClass('active');
+            }
+        }
+
+        return isValid;
+    }
+
     function formSubscribeTrigger() {
-        //Submit
+        if (!$('#phone-field-dev-note-styles').length) {
+            $('<style id="phone-field-dev-note-styles">' +
+                '.mod-home-sub-submit.is-disabled, a[data-form="submit"].is-disabled {' +
+                    'background-color: #E3DBD8 !important;' +
+                    'pointer-events: none !important;' +
+                    'cursor: not-allowed !important;' +
+                    'opacity: 1 !important;' +
+                '}' +
+                '.mod-home-sub-submit.is-disabled .ic-embed, .mod-home-sub-submit.is-disabled svg, ' +
+                'a[data-form="submit"].is-disabled .ic-embed, a[data-form="submit"].is-disabled svg {' +
+                    'opacity: 0.45 !important;' +
+                '}' +
+                '[data-form="err"], .err-txt {' +
+                    'color: #D92D20 !important;' +
+                    'margin-top: 8px !important;' +
+                '}' +
+                '.dial-code-arrow {' +
+                    'transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;' +
+                    'display: inline-flex !important;' +
+                    'align-items: center !important;' +
+                '}' +
+                '.dial-code-wrap.is-open .dial-code-arrow, .dial-code-arrow.is-open {' +
+                    'transform: rotate(180deg) !important;' +
+                '}' +
+                '.select2-container--open .select2-dropdown {' +
+                    'margin-top: 12px !important;' +
+                '}' +
+            '</style>').appendTo('head');
+        }
+
+        $(document).on('select2:open', function (e) {
+            const $target = $(e.target);
+            const wrap = $target.closest('.dial-code-wrap, .home-sub-dial-code, .phone-input-group, [data-form="form"]');
+            wrap.find('.dial-code-arrow').addClass('is-open');
+            wrap.addClass('is-open');
+        });
+        $(document).on('select2:close', function (e) {
+            const $target = $(e.target);
+            const wrap = $target.closest('.dial-code-wrap, .home-sub-dial-code, .phone-input-group, [data-form="form"]');
+            wrap.find('.dial-code-arrow').removeClass('is-open');
+            wrap.removeClass('is-open');
+        });
+
         let allForm = $('[data-form="form"]');
         allForm.each(function (i, form) {
+            // Initial validation check on load
+            validatePhoneForm(form, false);
+
             $(form).on('submit', function (e) {
                 const valInputCheck = $(this).find('.bp-trap').val();
                 e.preventDefault();
+                $(this).data('submitted-empty', true);
+
+                let isPhoneValid = validatePhoneForm(this, true);
+                let type = $(this).find('[input-type]').attr('input-type');
+
+                if (type === 'phone' && !isPhoneValid) {
+                    $(this).find('[data-form="err"]').addClass('active');
+                    return false;
+                }
+
                 if (valInputCheck == '' || valInputCheck == undefined) {
-                    let type = $(this).find('[input-type]').attr('input-type');
                     let formName = $(this).attr('data-name');
                     let value;
                     if (type == 'phone') {
@@ -1518,29 +1698,30 @@ const mainScript = () => {
                     } else if (type == 'email') {
                         value = $(this).find('[data-form="input"]').val();
                     }
-                    triggerSubscribeBlueShift(type, formName, value)
-                    triggerFormSuccess(type, formName)
+                    triggerSubscribeBlueShift(type, formName, value);
+                    triggerFormSuccess(type, formName);
                     return false;
-                }
-                else {
+                } else {
                     return;
                 }
-
             })
+
             $(form).find('[data-form="submit"]').on('click', function (e) {
                 e.preventDefault();
-                let type = $(form).find('[input-type]').attr('input-type');
-                if ($(form).find('[data-form="input"]').val() != '') {
+                $(form).data('submitted-empty', true);
+                let isPhoneValid = validatePhoneForm(form, true);
+                if (isPhoneValid) {
                     $(form).submit();
                 } else {
                     $(form).find('[data-form="err"]').addClass('active');
-                    //alert(`Please fill in your ${type}`)
                 }
             })
+
             $(form).find('.popup-input, #PhoneNumber-2').on('input', function () {
-                let value = $(this).val().replace(/\s+/g, ''); // Remove existing spaces
-                value = value.match(/.{1,4}/g)?.join(' ') || value; // Add spaces every 4 characters
+                let value = $(this).val().replace(/\s+/g, '');
+                value = value.match(/.{1,4}/g)?.join(' ') || value;
                 $(this).val(value);
+                validatePhoneForm(form, false);
             });
 
             $(form).find('[data-form="input"]').on('focus', (e) => {
@@ -1551,18 +1732,23 @@ const mainScript = () => {
                 }
                 $(form).find('[data-form="err"]').removeClass('active');
             })
+
             $(form).find('[data-form="input"]').on('blur', (e) => {
                 if ($(form).attr('data-name') == 'popup') {
                     $(form).find('.popup-form-input-wrap').removeClass('active');
                 } else {
                     $(form).removeClass('active');
                 }
+                validatePhoneForm(form, true);
             })
+
             $(form).find('[input-type="phone"]').on('input', function (e) {
                 let newValue = this.value.replace(new RegExp(/[^\d-.+ ]/, 'ig'), "");
                 this.value = newValue;
+                validatePhoneForm(form, false);
             })
         })
+
         $('.float-close').on('click', function (e) {
             e.preventDefault();
             $('.float-inner').removeClass('active')
@@ -3267,10 +3453,39 @@ const mainScript = () => {
         termTocNav();
     }
     SCRIPT.faqsScript = () => {
+        groupFaqItemsByCategory();
         updateUICateNew();
         faqInteraction();
         animateFaq();
         $('.faq-main-wrap').attr(schemaFAQParentAttrs);
+
+        function groupFaqItemsByCategory() {
+            const isAELang = ['ar-AE', 'en-AE', 'ae-ar', 'ae-en'].includes(document.documentElement.lang) ||
+                             window.location.pathname.includes('/ae-ar/') ||
+                             window.location.pathname.includes('/ae-en/');
+
+            if (!isAELang && !$('.faq-cate-cms.cms-data').length) return;
+
+            $('.faq-cate-wrap').each(function () {
+                const cateId = $(this).attr('id');
+                if (!cateId) return;
+
+                const $items = $('.faq-cate-cms.cms-data .faq-cate-list-item').filter(function () {
+                    const itemCat = $(this).find('.home-faq-item').attr('data-cateogry') || $(this).find('.home-faq-item').attr('data-category');
+                    return itemCat === cateId;
+                });
+
+                if ($items.length) {
+                    const $listWrap = $('<div role="list" class="faq-cate-list w-dyn-items"></div>');
+                    $listWrap.append($items);
+
+                    let $cateCms = $(this).find('.faq-cate-cms');
+                    if ($cateCms.length) {
+                        $cateCms.empty().append($listWrap);
+                    }
+                }
+            });
+        }
         function updateUICateNew() {
             const stickySearchIcon = $('.faq-cate-inner .faq-stick-srch').eq(0);
             const itemSearch = $('.faq-srch-item').eq(0).clone();
@@ -4372,7 +4587,7 @@ const mainScript = () => {
             if (!state.id) return state.text;
             let countryCode = $(state.element).attr('data-code');
             if (!countryCode) return state.text;
-            let baseUrl = "https://flagcdn.com/20x15";
+            let baseUrl = "https://flagcdn.com/60x45";
             return $(
                 '<span><img src="' + baseUrl + '/' + countryCode.toLowerCase() + '.png" class="img-flag" style="margin-right: 8px;" /> ' + state.text + '</span>'
             );
@@ -4432,7 +4647,7 @@ const mainScript = () => {
                             if (selectedFlag.length === 0) selectedFlag = wrap.find('.selected-flag');
 
                             phoneRegion.text(code);
-                            selectedFlag.attr('src', `https://flagcdn.com/20x15/${countryCode}.png`);
+                            selectedFlag.attr('src', `https://flagcdn.com/60x45/${countryCode}.png`);
                         });
                     }
 
