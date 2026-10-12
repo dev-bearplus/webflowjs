@@ -36,10 +36,10 @@ TEST*.xml
 Thumbs.db
 
 # Graphical assets
-# *.jpeg
-# *.jpg
-# *.png
-# *.svg
+*.jpeg
+*.jpg
+*.png
+*.svg
 
 # Applications
 *.app
@@ -47,18 +47,18 @@ Thumbs.db
 *.war
 
 # Large media files
-# *.mp4
-# *.tiff
-# *.avi
-# *.flv
-# *.mov
-# *.wmv
-# *.webm
+*.mp4
+*.tiff
+*.avi
+*.flv
+*.mov
+*.wmv
+*.webm
 
 # 3d model files
-# *.gltf
-# *.glb
-# *.bin
+*.gltf
+*.glb
+*.bin
 
 #fonts
 # *.otf
