@@ -1477,9 +1477,9 @@ const mainScript = () => {
         })
     }
     if ($('#dialCode').length > 0 || $('#dialPopup').length) {
-        const isAELocale = ['ar-AE', 'en-AE', 'ae-ar', 'ae-en'].includes(document.documentElement.lang) || 
-                           window.location.pathname.includes('/ae-ar/') || 
-                           window.location.pathname.includes('/ae-en/');
+        const isAELocale = ['ar-AE', 'en-AE', 'ae-ar', 'ae-en'].includes(document.documentElement.lang) ||
+            window.location.pathname.includes('/ae-ar/') ||
+            window.location.pathname.includes('/ae-en/');
         setupDialCode(dialCodes, ['#dialCode', '#dialPopup'], isAELocale);
     }
     function triggerSubscribeBlueShift(type, formName, value) {
@@ -1561,7 +1561,10 @@ const mainScript = () => {
     function validatePhoneForm(form, isBlurOrSubmit) {
         let $form = $(form);
         let $input = $form.find('[input-type="phone"], #phone-popup, [data-form="input"]');
-        let $submitBtn = $form.find('[data-form="submit"]');
+        // Only toggle disabled state for .mod-home-sub-submit inside the popup
+        let $submitBtn = $form.closest('.popup-wrap').length
+            ? $form.find('.mod-home-sub-submit')
+            : $();
         let $err = $form.find('[data-form="err"]');
 
         if (!$input.length) return true;
@@ -1624,36 +1627,6 @@ const mainScript = () => {
     }
 
     function formSubscribeTrigger() {
-        if (!$('#phone-field-dev-note-styles').length) {
-            $('<style id="phone-field-dev-note-styles">' +
-                '.mod-home-sub-submit.is-disabled, a[data-form="submit"].is-disabled {' +
-                    'background-color: #E3DBD8 !important;' +
-                    'pointer-events: none !important;' +
-                    'cursor: not-allowed !important;' +
-                    'opacity: 1 !important;' +
-                '}' +
-                '.mod-home-sub-submit.is-disabled .ic-embed, .mod-home-sub-submit.is-disabled svg, ' +
-                'a[data-form="submit"].is-disabled .ic-embed, a[data-form="submit"].is-disabled svg {' +
-                    'opacity: 0.45 !important;' +
-                '}' +
-                '[data-form="err"], .err-txt {' +
-                    'color: #D92D20 !important;' +
-                    'margin-top: 8px !important;' +
-                '}' +
-                '.dial-code-arrow {' +
-                    'transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;' +
-                    'display: inline-flex !important;' +
-                    'align-items: center !important;' +
-                '}' +
-                '.dial-code-wrap.is-open .dial-code-arrow, .dial-code-arrow.is-open {' +
-                    'transform: rotate(180deg) !important;' +
-                '}' +
-                '.select2-container--open .select2-dropdown {' +
-                    'margin-top: 12px !important;' +
-                '}' +
-            '</style>').appendTo('head');
-        }
-
         $(document).on('select2:open', function (e) {
             const $target = $(e.target);
             const wrap = $target.closest('.dial-code-wrap, .home-sub-dial-code, .phone-input-group, [data-form="form"]');
@@ -3461,8 +3434,8 @@ const mainScript = () => {
 
         function groupFaqItemsByCategory() {
             const isAELang = ['ar-AE', 'en-AE', 'ae-ar', 'ae-en'].includes(document.documentElement.lang) ||
-                             window.location.pathname.includes('/ae-ar/') ||
-                             window.location.pathname.includes('/ae-en/');
+                window.location.pathname.includes('/ae-ar/') ||
+                window.location.pathname.includes('/ae-en/');
 
             if (!isAELang && !$('.faq-cate-cms.cms-data').length) return;
 
